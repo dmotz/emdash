@@ -1,21 +1,25 @@
 module Parser exposing (process)
 
-import List exposing (head, map)
+import Bitwise exposing (shiftLeftBy)
+import Char exposing (toCode)
+import List exposing (filter, foldr, head, map, reverse)
 import Maybe exposing (withDefault)
 import Model exposing (Entry)
-import Regex
+import Regex exposing (Regex)
+import String exposing (foldl, lines)
 
 
 process : String -> List Entry
 process raw =
     raw
-        |> String.lines
-        |> List.foldr folder ( [], [] )
+        |> lines
+        |> foldr folder ( [], [] )
         |> Tuple.first
-        |> List.filter predicate
-        |> List.map makeEntry
-        |> List.filter ((/=) Nothing)
-        |> List.map (withDefault <| Entry "" "" "" "")
+        |> filter predicate
+        |> map makeEntry
+        |> filter ((/=) Nothing)
+        |> map (withDefault <| Entry 0 "" "" "" "")
+        |> reverse
 
 
 folder :
@@ -47,7 +51,7 @@ predicate block =
                 not <| String.startsWith "- Your Bookmark" line
 
 
-rx : Regex.Regex
+rx : Regex
 rx =
     "(.+) \\((.+)\\)" |> Regex.fromString |> withDefault Regex.never
 
@@ -66,10 +70,20 @@ makeEntry raw =
             in
             case split of
                 [ title, author ] ->
-                    Just <| Entry text title author meta
+                    Just <| Entry (hash text) text title author meta
 
                 _ ->
                     Nothing
 
         _ ->
             Nothing
+
+
+hash : String -> Int
+hash str =
+    foldl updateHash 5381 str
+
+
+updateHash : Char -> Int -> Int
+updateHash c h =
+    shiftLeftBy 5 h + h + toCode c

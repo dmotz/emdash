@@ -8,12 +8,17 @@ type alias Tag =
 
 
 type alias Id =
+    Int
+
+
+type alias Book =
     String
 
 
 type alias Entry =
-    { text : String
-    , title : String
+    { id : Id
+    , text : String
+    , title : Book
     , author : String
     , meta : String
     }
