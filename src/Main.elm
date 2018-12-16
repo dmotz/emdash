@@ -61,19 +61,42 @@ view : Model -> Html Msg
 view model =
     div [ id "container" ]
         [ div [ id "sidebar" ]
-            [ h1 [] [ model.entries |> List.length |> String.fromInt |> text ]
-            , div []
+            [ div []
                 [ ul [] (List.map renderEntry model.entries)
                 ]
             ]
-        , div [ id "viewer" ] []
+        , div [ id "viewer" ]
+            [ case model.currentEntry of
+                Just entry ->
+                    div []
+                        [ p [] [ text entry.text ]
+                        , div [ id "meta" ]
+                            [ div [ class "title" ] [ text entry.title ]
+                            , div [ class "author" ] [ text entry.author ]
+                            ]
+                        ]
+
+                Nothing ->
+                    h3 [] [ text "Select an entry" ]
+            ]
         ]
+
+
+charLimit =
+    200
 
 
 renderEntry : Entry -> Html Msg
 renderEntry entry =
-    li []
-        [ blockquote [] [ text entry.text ]
-        , div [] [ i [] [ text entry.title ] ]
-        , div [] [ text entry.author ]
+    li [ onClick (ShowEntry entry) ]
+        [ blockquote []
+            [ text
+                (if String.length entry.text > charLimit then
+                    String.slice 0 charLimit entry.text ++ "…"
+
+                 else
+                    entry.text
+                )
+            ]
+        , div [ class "title" ] [ text entry.title ]
         ]
