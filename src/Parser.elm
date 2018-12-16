@@ -56,12 +56,17 @@ rx =
 
 titleAuthorRx : Regex
 titleAuthorRx =
-    "(.+) \\((.+)\\)" |> Regex.fromString |> withDefault Regex.never
+    rx "(.+) \\((.+)\\)"
 
 
 pageRx : Regex
 pageRx =
-    " on page (\\d+)" |> Regex.fromString |> withDefault Regex.never
+    rx " on page (\\d+)"
+
+
+footnoteRx : Regex
+footnoteRx =
+    rx "\\.(\\d+) "
 
 
 makeEntry : List String -> Maybe Entry
@@ -86,7 +91,13 @@ makeEntry raw =
             in
             case split of
                 [ title, author ] ->
-                    Just <| Entry (hex <| text ++ meta) text title author page
+                    Just <|
+                        Entry
+                            (hex <| text ++ meta)
+                            (Regex.replace footnoteRx (\_ -> ".") text)
+                            title
+                            author
+                            page
 
                 _ ->
                     Nothing
