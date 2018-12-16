@@ -35,6 +35,7 @@ init flags =
 
 type Msg
     = OnFetch (Result Http.Error String)
+    | ShowEntry Entry
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -51,6 +52,9 @@ update message model =
 
                 Err _ ->
                     ( model, Cmd.none )
+
+        ShowEntry entry ->
+            ( { model | currentEntry = Just entry }, Cmd.none )
 
 
 view : Model -> Html Msg
