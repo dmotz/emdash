@@ -3,23 +3,22 @@ module Parser exposing (process)
 import Bitwise exposing (shiftLeftBy)
 import Char exposing (toCode)
 import List exposing (filter, foldr, head, map, reverse)
-import Maybe exposing (withDefault)
+import Maybe exposing (andThen, withDefault)
 import Model exposing (Entry)
 import Regex exposing (Regex)
-import String exposing (foldl, lines)
+import String exposing (foldl, lines, toInt)
 
 
 process : String -> List Entry
-process raw =
-    raw
-        |> lines
-        |> foldr folder ( [], [] )
-        |> Tuple.first
-        |> filter predicate
-        |> map makeEntry
-        |> filter ((/=) Nothing)
-        |> map (withDefault <| Entry 0 "" "" "" "")
-        |> reverse
+process =
+    lines
+        >> foldr folder ( [], [] )
+        >> Tuple.first
+        >> filter predicate
+        >> map makeEntry
+        >> filter ((/=) Nothing)
+        >> map (withDefault <| Entry 0 "" "" "" "" Nothing)
+        >> reverse
 
 
 folder :
