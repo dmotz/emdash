@@ -50,9 +50,19 @@ predicate block =
                 not <| String.startsWith "- Your Bookmark" line
 
 
-rx : Regex
+rx : String -> Regex
 rx =
+    Regex.fromString >> withDefault Regex.never
+
+
+titleAuthorRx : Regex
+titleAuthorRx =
     "(.+) \\((.+)\\)" |> Regex.fromString |> withDefault Regex.never
+
+
+pageRx : Regex
+pageRx =
+    " on page (\\d+)" |> Regex.fromString |> withDefault Regex.never
 
 
 makeEntry : List String -> Maybe Entry
@@ -61,15 +71,23 @@ makeEntry raw =
         [ text, meta, titleAuthor ] ->
             let
                 split =
-                    Regex.find rx titleAuthor
+                    Regex.find titleAuthorRx titleAuthor
                         |> map .submatches
                         |> head
                         |> withDefault []
                         |> map (withDefault "")
+
+                page =
+                    Regex.find pageRx meta
+                        |> head
+                        |> Maybe.map .submatches
+                        |> andThen head
+                        |> andThen identity
+                        |> andThen String.toInt
             in
             case split of
                 [ title, author ] ->
-                    Just <| Entry (hash text) text title author meta
+                    Just <| Entry (hash text) text title author meta page
 
                 _ ->
                     Nothing
