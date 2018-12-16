@@ -5,8 +5,10 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
+import List exposing (drop, head, length)
 import Model exposing (Entry, Model, initialModel)
 import Parser
+import Random exposing (generate)
 
 
 main : Program Int Model Msg
@@ -36,6 +38,8 @@ init flags =
 type Msg
     = OnFetch (Result Http.Error String)
     | ShowEntry Entry
+    | ShowRandom
+    | ShowByIndex Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -56,11 +60,23 @@ update message model =
         ShowEntry entry ->
             ( { model | currentEntry = Just entry }, Cmd.none )
 
+        ShowByIndex i ->
+            ( { model | currentEntry = drop i model.entries |> head }, Cmd.none )
+
+        ShowRandom ->
+            ( model
+            , generate
+                ShowByIndex
+              <|
+                Random.int 0 (length model.entries - 1)
+            )
+
 
 view : Model -> Html Msg
 view model =
     div [ id "container" ]
-        [ div [ id "sidebar" ]
+        [ div [ id "controls" ] [ span [ onClick ShowRandom ] [ text "⚂" ] ]
+        , div [ id "sidebar" ]
             [ div []
                 [ ul [] (List.map renderEntry model.entries)
                 ]
