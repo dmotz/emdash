@@ -1,12 +1,11 @@
 module Parser exposing (process)
 
-import Bitwise exposing (shiftLeftBy)
-import Char exposing (toCode)
 import List exposing (filter, foldr, head, map, reverse)
+import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
 import Model exposing (Entry)
 import Regex exposing (Regex)
-import String exposing (foldl, lines, toInt)
+import String exposing (lines, toInt)
 
 
 process : String -> List Entry
@@ -17,7 +16,7 @@ process =
         >> filter predicate
         >> map makeEntry
         >> filter ((/=) Nothing)
-        >> map (withDefault <| Entry 0 "" "" "" Nothing)
+        >> map (withDefault <| Entry "" "" "" "" Nothing)
         >> reverse
 
 
@@ -87,20 +86,10 @@ makeEntry raw =
             in
             case split of
                 [ title, author ] ->
-                    Just <| Entry (hash <| text ++ meta) text title author page
+                    Just <| Entry (hex <| text ++ meta) text title author page
 
                 _ ->
                     Nothing
 
         _ ->
             Nothing
-
-
-hash : String -> Int
-hash str =
-    foldl updateHash 5381 str
-
-
-updateHash : Char -> Int -> Int
-updateHash c h =
-    shiftLeftBy 5 h + h + toCode c

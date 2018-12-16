@@ -8,7 +8,7 @@ type alias Tag =
 
 
 type alias Id =
-    Int
+    String
 
 
 type alias Book =
@@ -26,6 +26,7 @@ type alias Entry =
 
 type alias Model =
     { entries : List Entry
+    , shownEntries : List Entry
     , timeOffset : Int
     , tags : Set Tag
     , hiddenEntries : Set Id
@@ -37,6 +38,7 @@ type alias Model =
 initialModel : Model
 initialModel =
     { entries = []
+    , shownEntries = []
     , timeOffset = 0
     , tags = Set.empty
     , hiddenEntries = Set.empty
