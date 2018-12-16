@@ -21,6 +21,7 @@ type alias Entry =
     , title : Book
     , author : String
     , meta : String
+    , page : Maybe Int
     }
 
 
