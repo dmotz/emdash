@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import List exposing (drop, head, length)
+import List exposing (drop, filter, head, length)
 import Model exposing (Entry, Model, initialModel)
 import Parser
 import Random exposing (generate)
@@ -40,6 +40,7 @@ type Msg
     | ShowEntry Entry
     | ShowRandom
     | ShowByIndex Int
+    | OnFilter String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -71,14 +72,45 @@ update message model =
                 Random.int 0 (length model.entries - 1)
             )
 
+        OnFilter term ->
+            let
+                term2 =
+                    String.trim term
+            in
+            if term2 == "" then
+                ( model, Cmd.none )
+
+            else
+                ( { model
+                    | shownEntries =
+                        filter
+                            (\entry -> String.contains term entry.text)
+                            model.entries
+                  }
+                , Cmd.none
+                )
+
 
 view : Model -> Html Msg
 view model =
     div [ id "container" ]
-        [ div [ id "controls" ] [ span [ onClick ShowRandom ] [ text "⚂" ] ]
+        [ div [ id "controls" ]
+            [ span [ onClick ShowRandom ]
+                [ text "⚂" ]
+            , input
+                [ id "search", placeholder "search", onInput OnFilter ]
+                []
+            ]
         , div [ id "sidebar" ]
             [ div []
-                [ ul [] (List.map renderEntry model.entries)
+                [ ul []
+                    (List.map renderEntry <|
+                        if List.isEmpty model.shownEntries then
+                            model.entries
+
+                        else
+                            model.shownEntries
+                    )
                 ]
             ]
         , div [ id "viewer" ]
