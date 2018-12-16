@@ -95,11 +95,11 @@ view : Model -> Html Msg
 view model =
     div [ id "container" ]
         [ div [ id "controls" ]
-            [ span [ onClick ShowRandom ]
-                [ text "⚂" ]
-            , input
+            [ input
                 [ id "search", placeholder "search", onInput OnFilter ]
                 []
+            , span [ onClick ShowRandom ]
+                [ text "⚂" ]
             ]
         , div [ id "sidebar" ]
             [ div []
