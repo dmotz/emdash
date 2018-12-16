@@ -17,7 +17,7 @@ process =
         >> filter predicate
         >> map makeEntry
         >> filter ((/=) Nothing)
-        >> map (withDefault <| Entry 0 "" "" "" "" Nothing)
+        >> map (withDefault <| Entry 0 "" "" "" Nothing)
         >> reverse
 
 
@@ -87,7 +87,7 @@ makeEntry raw =
             in
             case split of
                 [ title, author ] ->
-                    Just <| Entry (hash text) text title author meta page
+                    Just <| Entry (hash <| text ++ meta) text title author page
 
                 _ ->
                     Nothing
