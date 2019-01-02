@@ -33,6 +33,7 @@ type alias Model =
     , hiddenEntries : Set Id
     , currentEntry : Maybe Entry
     , isLoading : Bool
+    , focusMode : Bool
     }
 
 
@@ -46,4 +47,5 @@ initialModel =
     , hiddenEntries = Set.empty
     , currentEntry = Nothing
     , isLoading = True
+    , focusMode = False
     }
