@@ -86,7 +86,7 @@ update message model =
         OnFilter term ->
             let
                 term2 =
-                    String.trim term
+                    term |> String.trim |> String.toLower
             in
             if term2 == "" then
                 ( model, Cmd.none )
@@ -95,7 +95,11 @@ update message model =
                 ( { model
                     | shownEntries =
                         filter
-                            (\entry -> String.contains term entry.text)
+                            (\entry ->
+                                String.contains
+                                    term2
+                                    (String.toLower entry.text)
+                            )
                             model.entries
                   }
                 , Cmd.none
