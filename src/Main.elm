@@ -43,6 +43,7 @@ type Msg
     | ShowByIndex Int
     | OnFilter String
     | FilterTitle String
+    | SetFocusMode Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -117,6 +118,9 @@ update message model =
                   }
                 , Cmd.none
                 )
+
+        SetFocusMode active ->
+            ( { model | focusMode = active }, Cmd.none )
 
 
 view : Model -> Html Msg
