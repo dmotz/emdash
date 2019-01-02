@@ -27,6 +27,7 @@ type alias Entry =
 type alias Model =
     { entries : List Entry
     , shownEntries : List Entry
+    , titles : List Book
     , timeOffset : Int
     , tags : Set Tag
     , hiddenEntries : Set Id
@@ -39,6 +40,7 @@ initialModel : Model
 initialModel =
     { entries = []
     , shownEntries = []
+    , titles = []
     , timeOffset = 0
     , tags = Set.empty
     , hiddenEntries = Set.empty

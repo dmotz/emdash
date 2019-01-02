@@ -5,10 +5,11 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import List exposing (drop, filter, head, length)
+import List exposing (drop, filter, head, length, map, sort)
 import Model exposing (Entry, Model, initialModel)
 import Parser
 import Random exposing (generate)
+import Set
 
 
 main : Program Int Model Msg
@@ -49,8 +50,18 @@ update message model =
         OnFetch result ->
             case result of
                 Ok text ->
+                    let
+                        entries =
+                            Parser.process text
+                    in
                     ( { model
-                        | entries = Parser.process text
+                        | entries = entries
+                        , titles =
+                            entries
+                                |> map .title
+                                |> Set.fromList
+                                |> Set.toList
+                                |> sort
                       }
                     , Cmd.none
                     )
