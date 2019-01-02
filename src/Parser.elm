@@ -5,7 +5,7 @@ import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
 import Model exposing (Entry)
 import Regex exposing (Regex)
-import String exposing (lines, toInt)
+import String exposing (lines, toInt, trim)
 
 
 process : String -> List Entry
@@ -80,6 +80,7 @@ makeEntry raw =
                         |> head
                         |> withDefault []
                         |> map (withDefault "")
+                        |> map trim
 
                 page =
                     Regex.find pageRx meta
