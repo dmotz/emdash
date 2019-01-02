@@ -31,6 +31,7 @@ type alias Model =
     , timeOffset : Int
     , tags : Set Tag
     , hiddenEntries : Set Id
+    , hiddenBooks : Set Book
     , currentEntry : Maybe Entry
     , isLoading : Bool
     , focusMode : Bool
@@ -45,6 +46,7 @@ initialModel =
     , timeOffset = 0
     , tags = Set.empty
     , hiddenEntries = Set.empty
+    , hiddenBooks = Set.empty
     , currentEntry = Nothing
     , isLoading = True
     , focusMode = False
