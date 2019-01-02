@@ -42,6 +42,7 @@ type Msg
     | ShowRandom
     | ShowByIndex Int
     | OnFilter String
+    | FilterTitle String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -101,6 +102,18 @@ update message model =
                                     (String.toLower entry.text)
                             )
                             model.entries
+                  }
+                , Cmd.none
+                )
+
+        FilterTitle title ->
+            if title == "*" then
+                ( { model | shownEntries = [] }, Cmd.none )
+
+            else
+                ( { model
+                    | shownEntries =
+                        filter (\entry -> entry.title == title) model.entries
                   }
                 , Cmd.none
                 )
