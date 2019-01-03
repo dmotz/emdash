@@ -3,6 +3,7 @@ module View exposing (view)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Html.Keyed as Keyed
 import List exposing (map)
 import Model exposing (Entry, Model)
 import Msg exposing (..)
@@ -51,7 +52,8 @@ view model =
         , main_ []
             [ div [ id "sidebar" ]
                 [ div []
-                    [ ul []
+                    [ Keyed.node "ul"
+                        []
                         (map renderEntry <|
                             if List.isEmpty model.shownEntries then
                                 model.entries
@@ -87,9 +89,10 @@ charLimit =
     200
 
 
-renderEntry : Entry -> Html Msg
+renderEntry : Entry -> ( String, Html Msg )
 renderEntry entry =
-    li [ onClick (ShowEntry entry) ]
+    ( entry.id
+    , li [ onClick (ShowEntry entry) ]
         [ a []
             --[ href <| "/entry/" ++ entry.id ]
             [ blockquote []
@@ -104,3 +107,4 @@ renderEntry entry =
             , div [ class "title" ] [ text entry.title ]
             ]
         ]
+    )
