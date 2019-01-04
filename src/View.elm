@@ -22,7 +22,7 @@ view model =
         ]
         [ div [ id "controls" ]
             [ input
-                [ onInput OnFilter
+                [ onInput FilterBySearch
                 , id "search"
                 , placeholder "search"
                 , autocomplete False
@@ -30,24 +30,66 @@ view model =
                 ]
                 []
             , div [ id "tools" ]
-                [ span [ onClick ShowRandom ]
-                    [ text "⚂" ]
-                , select [ onInput FilterTitle ]
-                    (option
-                        [ value "*" ]
-                        [ text "(all titles)" ]
-                        :: map
-                            (\t -> option [ value t ] [ text t ])
-                            model.titles
-                    )
-                , span [] [ text "×" ]
+                [ div []
+                    [ div [ onClick ShowRandom, class "tool-button" ]
+                        [ text "⚂" ]
+                    , div [ class "tool-button" ]
+                        [ text "❧"
+
+                        -- , input
+                        --    [ type_ "checkbox"
+                        --    , checked model.focusMode
+                        --    , onCheck SetFocusMode
+                        --    ]
+                        --    []
+                        ]
+                    ]
+                , div [ id "title-select" ]
+                    [ span
+                        [ class
+                            ("x"
+                                ++ (if model.titleFilter == Nothing then
+                                        " hidden"
+
+                                    else
+                                        ""
+                                   )
+                            )
+                        , onClick (FilterByTitle "*")
+                        ]
+                        [ text "×" ]
+                    , div []
+                        [ select
+                            [ onInput FilterByTitle
+                            , value
+                                (case model.titleFilter of
+                                    Nothing ->
+                                        "*"
+
+                                    Just title ->
+                                        title
+                                )
+                            ]
+                            (option
+                                [ value "*" ]
+                                [ text "(all titles)" ]
+                                :: map
+                                    (\t -> option [ value t ] [ text t ])
+                                    model.titles
+                            )
+                        , h5 []
+                            [ text
+                                (case model.titleFilter of
+                                    Nothing ->
+                                        "(all titles)"
+
+                                    Just title ->
+                                        title
+                                )
+                            ]
+                        ]
+                    ]
                 ]
-            , input
-                [ type_ "checkbox"
-                , checked model.focusMode
-                , onCheck SetFocusMode
-                ]
-                []
             ]
         , main_ []
             [ div [ id "sidebar" ]
@@ -70,7 +112,7 @@ view model =
                             [ p [] [ text entry.text ]
                             , div [ id "meta" ]
                                 [ div
-                                    [ onClick (FilterTitle entry.title)
+                                    [ onClick (FilterByTitle entry.title)
                                     , class "title"
                                     ]
                                     [ text entry.title ]
