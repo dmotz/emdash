@@ -64,7 +64,12 @@ update message model =
             ( { model | currentEntry = Just entry }, Cmd.none )
 
         ShowByIndex i ->
-            ( { model | currentEntry = drop i model.entries |> head }, Cmd.none )
+            ( { model
+                | currentEntry =
+                    drop i model.entries |> head
+              }
+            , Cmd.none
+            )
 
         ShowRandom ->
             ( model
@@ -98,11 +103,17 @@ update message model =
 
         FilterTitle title ->
             if title == "*" then
-                ( { model | shownEntries = [] }, Cmd.none )
+                ( { model
+                    | shownEntries = []
+                    , titleFilter = Nothing
+                  }
+                , Cmd.none
+                )
 
             else
                 ( { model
-                    | shownEntries =
+                    | titleFilter = Just title
+                    , shownEntries =
                         filter (\entry -> entry.title == title) model.entries
                   }
                 , Cmd.none
