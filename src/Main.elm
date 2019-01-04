@@ -79,21 +79,27 @@ update message model =
                 Random.int 0 (length model.entries - 1)
             )
 
-        OnFilter term ->
+        FilterBySearch rawTerm ->
             let
-                term2 =
-                    term |> String.trim |> String.toLower
+                term =
+                    rawTerm |> String.trim |> String.toLower
             in
-            if term2 == "" then
-                ( model, Cmd.none )
+            if term == "" then
+                ( { model
+                    | shownEntries = []
+                    , searchFilter = Nothing
+                  }
+                , Cmd.none
+                )
 
             else
                 ( { model
-                    | shownEntries =
+                    | searchFilter = Just term
+                    , shownEntries =
                         filter
                             (\entry ->
                                 String.contains
-                                    term2
+                                    term
                                     (String.toLower entry.text)
                             )
                             model.entries
@@ -101,7 +107,7 @@ update message model =
                 , Cmd.none
                 )
 
-        FilterTitle title ->
+        FilterByTitle title ->
             if title == "*" then
                 ( { model
                     | shownEntries = []

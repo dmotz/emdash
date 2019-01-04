@@ -29,6 +29,7 @@ type alias Model =
     , shownEntries : List Entry
     , titles : List Book
     , titleFilter : Maybe Book
+    , searchFilter : Maybe String
     , timeOffset : Int
     , tags : Set Tag
     , hiddenEntries : Set Id
@@ -45,6 +46,7 @@ initialModel =
     , shownEntries = []
     , titles = []
     , titleFilter = Nothing
+    , searchFilter = Nothing
     , timeOffset = 0
     , tags = Set.empty
     , hiddenEntries = Set.empty

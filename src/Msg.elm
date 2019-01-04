@@ -9,6 +9,6 @@ type Msg
     | ShowEntry Entry
     | ShowRandom
     | ShowByIndex Int
-    | OnFilter String
-    | FilterTitle String
+    | FilterBySearch String
+    | FilterByTitle String
     | SetFocusMode Bool
