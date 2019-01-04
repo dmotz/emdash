@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
+import Html.Lazy exposing (lazy)
 import List exposing (map)
 import Model exposing (Entry, Model)
 import Msg exposing (..)
@@ -92,19 +93,13 @@ view model =
                 ]
             ]
         , main_ []
-            [ div [ id "sidebar" ]
-                [ div []
-                    [ Keyed.node "ul"
-                        []
-                        (map renderEntry <|
-                            if List.isEmpty model.shownEntries then
-                                model.entries
+            [ lazy sidebar
+                (if List.isEmpty model.shownEntries then
+                    model.entries
 
-                            else
-                                model.shownEntries
-                        )
-                    ]
-                ]
+                 else
+                    model.shownEntries
+                )
             , div [ id "viewer" ]
                 [ case model.currentEntry of
                     Just entry ->
@@ -123,6 +118,17 @@ view model =
                     Nothing ->
                         h3 [] [ text "Select an entry" ]
                 ]
+            ]
+        ]
+
+
+sidebar : List Entry -> Html Msg
+sidebar entries =
+    div [ id "sidebar" ]
+        [ div []
+            [ Keyed.node "ul"
+                []
+                (map renderEntry entries)
             ]
         ]
 
