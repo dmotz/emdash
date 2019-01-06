@@ -2,6 +2,7 @@ port module Main exposing (main)
 
 import Browser
 import File
+import File.Select as Select
 import List exposing (drop, filter, head, length, map, sort)
 import Model exposing (Model, initialModel)
 import Msg exposing (..)
@@ -58,6 +59,9 @@ update message model =
 
         GotFiles file files ->
             ( model, Task.perform FileLoad (File.toString file) )
+
+        PickFile ->
+            ( model, Select.files [ "text/plain" ] GotFiles )
 
         FileLoad text ->
             let

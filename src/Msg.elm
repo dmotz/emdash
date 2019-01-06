@@ -15,3 +15,4 @@ type Msg
     | DragLeave
     | GotFiles File (List File)
     | FileLoad String
+    | PickFile

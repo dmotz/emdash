@@ -105,6 +105,7 @@ if (MODE === 'development') {
     }
   })
 }
+
 if (MODE === 'production') {
   console.log('Building for Production...')
   module.exports = merge(common, {
