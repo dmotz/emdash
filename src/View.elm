@@ -12,6 +12,10 @@ import Msg exposing (..)
 
 view : Model -> Html Msg
 view model =
+    let
+        noEntries =
+            model.entries == []
+    in
     div
         [ id "container"
         , class <|
@@ -21,7 +25,16 @@ view model =
             else
                 ""
         ]
-        [ div [ id "controls" ]
+        [ div
+            [ id "controls"
+            , class
+                (if noEntries then
+                    "hidden"
+
+                 else
+                    ""
+                )
+            ]
             [ input
                 [ onInput FilterBySearch
                 , id "search"
