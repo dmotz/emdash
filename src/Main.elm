@@ -1,13 +1,14 @@
 port module Main exposing (main)
 
 import Browser
-import Http
+import File
 import List exposing (drop, filter, head, length, map, sort)
 import Model exposing (Model, initialModel)
 import Msg exposing (..)
 import Parser
 import Random exposing (generate)
 import Set
+import Task
 import View exposing (view)
 
 
@@ -18,7 +19,7 @@ main =
         , update = updateWithStorage
         , view =
             \m ->
-                { title = "exegesis"
+                { title = "Hedera"
                 , body = [ view m ]
                 }
         , subscriptions = \_ -> Sub.none
@@ -49,27 +50,36 @@ updateWithStorage msg model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        OnFetch result ->
-            case result of
-                Ok text ->
-                    let
-                        entries =
-                            Parser.process text
-                    in
-                    ( { model
-                        | entries = entries
-                        , titles =
-                            entries
-                                |> map .title
-                                |> Set.fromList
-                                |> Set.toList
-                                |> sort
-                      }
-                    , Cmd.none
-                    )
+        DragEnter ->
+            ( model, Cmd.none )
 
-                Err _ ->
-                    ( model, Cmd.none )
+        DragLeave ->
+            ( model, Cmd.none )
+
+        GotFiles file files ->
+            ( model, Task.perform FileLoad (File.toString file) )
+
+        FileLoad text ->
+            let
+                entries =
+                    Parser.process text
+            in
+            if entries == [] then
+                ( { model | parsingError = True }, Cmd.none )
+
+            else
+                ( { model
+                    | parsingError = False
+                    , entries = entries
+                    , titles =
+                        entries
+                            |> map .title
+                            |> Set.fromList
+                            |> Set.toList
+                            |> sort
+                  }
+                , Cmd.none
+                )
 
         ShowEntry entry ->
             ( { model | currentEntry = Just entry }, Cmd.none )
