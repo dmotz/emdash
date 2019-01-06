@@ -30,6 +30,7 @@ type alias Model =
     , titles : List Book
     , titleFilter : Maybe Book
     , searchFilter : Maybe String
+    , parsingError : Bool
     , timeOffset : Int
     , tags : Set Tag
     , hiddenEntries : Set Id
@@ -47,6 +48,7 @@ initialModel =
     , titles = []
     , titleFilter = Nothing
     , searchFilter = Nothing
+    , parsingError = False
     , timeOffset = 0
     , tags = Set.empty
     , hiddenEntries = Set.empty
