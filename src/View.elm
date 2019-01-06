@@ -36,27 +36,23 @@ view model =
             model.entries == []
     in
     div
-        [ id "container"
-        , class <|
-            if model.focusMode then
-                "focus-mode"
+        ([ id "container"
+         , classList [ ( "focus-mode", model.focusMode ) ]
+         , on "dragenter" (Decode.succeed DragEnter)
+         , on "dragover" (Decode.succeed DragEnter)
+         , on "dragleave" (Decode.succeed DragLeave)
+         , on "drop" dropDecoder
+         ]
+            ++ (if noEntries then
+                    [ onClick PickFile ]
 
-            else
-                ""
-        , on "dragenter" (Decode.succeed DragEnter)
-        , on "dragover" (Decode.succeed DragEnter)
-        , on "dragleave" (Decode.succeed DragLeave)
-        , on "drop" dropDecoder
-        ]
+                else
+                    []
+               )
+        )
         [ div
             [ id "controls"
-            , class
-                (if noEntries then
-                    "hidden"
-
-                 else
-                    ""
-                )
+            , classList [ ( "hidden", noEntries ) ]
             ]
             [ input
                 [ onInput FilterBySearch
@@ -155,14 +151,13 @@ view model =
                         h3 []
                             [ text
                                 (if model.parsingError then
-                                    "Error parsing file"
+                                    "Error parsing file."
+
+                                 else if noEntries then
+                                    "Drag & drop a clippings txt file here (or click to browse)."
 
                                  else
-                                    if noEntries then
-                                        "Drag & drop a clippings txt file here (or click to browse)"
-
-                                    else
-                                        "Select an entry"
+                                    "Select an entry."
                                 )
                             ]
                 ]
