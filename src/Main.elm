@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Http
@@ -11,11 +11,11 @@ import Set
 import View exposing (view)
 
 
-main : Program Int Model Msg
+main : Program (Maybe Model) Model Msg
 main =
     Browser.document
         { init = init
-        , update = update
+        , update = updateWithStorage
         , view =
             \m ->
                 { title = "exegesis"
@@ -25,13 +25,24 @@ main =
         }
 
 
-init : Int -> ( Model, Cmd Msg )
-init flags =
-    ( initialModel
-    , Http.get
-        { url = "/clippings.txt"
-        , expect = Http.expectString OnFetch
-        }
+init : Maybe Model -> ( Model, Cmd Msg )
+init maybeModel =
+    ( Maybe.withDefault initialModel maybeModel
+    , Cmd.none
+    )
+
+
+port setStorage : Model -> Cmd msg
+
+
+updateWithStorage : Msg -> Model -> ( Model, Cmd Msg )
+updateWithStorage msg model =
+    let
+        ( newModel, cmds ) =
+            update msg model
+    in
+    ( newModel
+    , Cmd.batch [ setStorage newModel, cmds ]
     )
 
 
