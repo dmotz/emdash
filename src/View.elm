@@ -1,13 +1,32 @@
 module View exposing (view)
 
+import File
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
 import Html.Lazy exposing (lazy)
+import Json.Decode as Decode
 import List exposing (map)
 import Model exposing (Entry, Model)
 import Msg exposing (..)
+
+
+dropDecoder : Decode.Decoder Msg
+dropDecoder =
+    Decode.at
+        [ "dataTransfer", "files" ]
+        (Decode.oneOrMore GotFiles File.decoder)
+
+
+hijack : msg -> ( msg, Bool )
+hijack msg =
+    ( msg, True )
+
+
+on : String -> Decode.Decoder msg -> Attribute msg
+on event decoder =
+    preventDefaultOn event (Decode.map hijack decoder)
 
 
 view : Model -> Html Msg
@@ -24,6 +43,10 @@ view model =
 
             else
                 ""
+        , on "dragenter" (Decode.succeed DragEnter)
+        , on "dragover" (Decode.succeed DragEnter)
+        , on "dragleave" (Decode.succeed DragLeave)
+        , on "drop" dropDecoder
         ]
         [ div
             [ id "controls"
@@ -129,7 +152,19 @@ view model =
                             ]
 
                     Nothing ->
-                        h3 [] [ text "Select an entry" ]
+                        h3 []
+                            [ text
+                                (if model.parsingError then
+                                    "Error parsing file"
+
+                                 else
+                                    if noEntries then
+                                        "Drag & drop a clippings txt file here (or click to browse)"
+
+                                    else
+                                        "Select an entry"
+                                )
+                            ]
                 ]
             ]
         ]
