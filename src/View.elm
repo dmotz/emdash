@@ -54,44 +54,9 @@ view model =
             [ id "controls"
             , classList [ ( "hidden", noEntries ) ]
             ]
-            [ input
-                [ onInput FilterBySearch
-                , id "search"
-                , placeholder "search"
-                , autocomplete False
-                , spellcheck False
-                ]
-                []
-            , div [ id "tools" ]
-                [ div []
-                    [ div [ onClick ShowRandom, class "tool-button" ]
-                        [ text "⚂" ]
-                    , div [ class "tool-button" ]
-                        [ text "❧"
-
-                        -- , input
-                        --    [ type_ "checkbox"
-                        --    , checked model.focusMode
-                        --    , onCheck SetFocusMode
-                        --    ]
-                        --    []
-                        ]
-                    ]
-                , div [ id "title-select" ]
-                    [ span
-                        [ class
-                            ("x"
-                                ++ (if model.titleFilter == Nothing then
-                                        " hidden"
-
-                                    else
-                                        ""
-                                   )
-                            )
-                        , onClick (FilterByTitle "*")
-                        ]
-                        [ text "×" ]
-                    , div []
+            [ div [ id "tools" ]
+                [ div [ id "title-select" ]
+                    [ div []
                         [ select
                             [ onInput FilterByTitle
                             , value
@@ -121,6 +86,47 @@ view model =
                                 )
                             ]
                         ]
+                    , span
+                        [ classList
+                            [ ( "x", True )
+                            , ( "hidden", model.titleFilter == Nothing )
+                            ]
+                        , onClick (FilterByTitle "*")
+                        ]
+                        [ text "×" ]
+                    ]
+                , div []
+                    [ div [ onClick ShowRandom, class "tool-button" ]
+                        [ text "⚂" ]
+                    , div [ class "tool-button" ]
+                        [ text "❧"
+
+                        -- , input
+                        --    [ type_ "checkbox"
+                        --    , checked model.focusMode
+                        --    , onCheck SetFocusMode
+                        --    ]
+                        --    []
+                        ]
+                    ]
+                , div [ id "search" ]
+                    [ input
+                        [ onInput FilterBySearch
+                        , id "search-input"
+                        , value (Maybe.withDefault "" model.searchFilter)
+                        , placeholder "search"
+                        , autocomplete False
+                        , spellcheck False
+                        ]
+                        []
+                    , span
+                        [ classList
+                            [ ( "x", True )
+                            , ( "hidden", model.searchFilter == Nothing )
+                            ]
+                        , onClick (FilterBySearch "")
+                        ]
+                        [ text "×" ]
                     ]
                 ]
             ]
