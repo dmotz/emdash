@@ -1,10 +1,11 @@
-module Parser exposing (process)
+module Parser exposing (getTitles, process)
 
-import List exposing (filter, foldr, head, map, reverse)
+import List exposing (filter, foldr, head, map, reverse, sort)
 import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Entry)
+import Model exposing (Book, Entry)
 import Regex exposing (Regex)
+import Set
 import String exposing (lines, toInt, trim)
 
 
@@ -105,3 +106,11 @@ makeEntry raw =
 
         _ ->
             Nothing
+
+
+getTitles : List Entry -> List Book
+getTitles =
+    map .title
+        >> Set.fromList
+        >> Set.toList
+        >> sort

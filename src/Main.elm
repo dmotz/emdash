@@ -3,12 +3,11 @@ port module Main exposing (main)
 import Browser
 import File
 import File.Select as Select
-import List exposing (drop, filter, head, length, map, sort)
-import Model exposing (Model, initialModel)
+import List exposing (drop, filter, head, length, map)
+import Model exposing (Model, StoredModel, initialModel, initialStoredModel)
 import Msg exposing (..)
 import Parser
 import Random exposing (generate)
-import Set
 import Task
 import View exposing (view)
 
@@ -75,12 +74,7 @@ update message model =
                 ( { model
                     | parsingError = False
                     , entries = entries
-                    , titles =
-                        entries
-                            |> map .title
-                            |> Set.fromList
-                            |> Set.toList
-                            |> sort
+                    , titles = Parser.getTitles entries
                   }
                 , Cmd.none
                 )
