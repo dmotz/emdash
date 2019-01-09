@@ -37,7 +37,10 @@ view model =
     in
     div
         ([ id "container"
-         , classList [ ( "focus-mode", model.focusMode ) ]
+         , classList
+            [ ( "focus-mode", model.focusMode )
+            , ( "drag-on", model.isDragging )
+            ]
          , on "dragenter" (Decode.succeed DragEnter)
          , on "dragover" (Decode.succeed DragEnter)
          , on "dragleave" (Decode.succeed DragLeave)

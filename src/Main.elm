@@ -65,13 +65,15 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         DragEnter ->
-            ( model, Cmd.none )
+            ( { model | isDragging = True }, Cmd.none )
 
         DragLeave ->
-            ( model, Cmd.none )
+            ( { model | isDragging = False }, Cmd.none )
 
-        GotFiles file files ->
-            ( model, Task.perform FileLoad (File.toString file) )
+        GotFiles file _ ->
+            ( { model | isDragging = False }
+            , Task.perform FileLoad (File.toString file)
+            )
 
         PickFile ->
             ( model, Select.files [ "text/plain" ] GotFiles )

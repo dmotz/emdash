@@ -31,6 +31,7 @@ type alias Model =
     , titleFilter : Maybe Book
     , searchFilter : Maybe String
     , parsingError : Bool
+    , isDragging : Bool
     , timeOffset : Int
     , tags : Set Tag
     , hiddenEntries : Set Id
