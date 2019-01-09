@@ -1,0 +1,223 @@
+$font: 'Libre Baskerville', serif
+$black: #000
+$white: #fff
+$gray: #aaa
+$lightGray: #eee
+$highlight: #ffff00
+
+*
+  box-sizing: border-box
+  margin: 0
+  padding: 0
+
+
+::selection
+  background: $highlight
+  color: $black
+  text-shadow: none
+
+
+::-webkit-scrollbar
+  width: 5px
+  background-color: rgba(0, 0, 0, 0)
+
+
+::-webkit-scrollbar-thumb
+  background-color: $lightGray
+
+
+body
+  background-color: $white
+  font-family: $font
+  font-size: 14px
+  display: flex
+
+
+a
+  text-decoration: none
+  color: $black
+
+
+.hidden
+  visibility: hidden
+
+
+#container
+  padding: 50px
+  width: 100vw
+  height: 100vh
+  overflow: hidden
+  display: flex
+  flex-direction: column
+
+  &.drag-on
+    opacity: 0.5
+
+
+main
+  display: flex
+  overflow: hidden
+  flex: 1
+  border: 1px solid $lightGray
+
+
+.focus-mode #sidebar
+  opacity: 0
+
+
+#sidebar
+  height: 100%
+  overflow: auto
+  border-right: 1px solid $lightGray
+  flex: 3
+  transition: opacity 0.2s ease-out
+
+  &:hover
+    opacity: 1
+
+
+#viewer
+  flex: 7
+  display: flex
+  align-items: center
+  justify-content: center
+  line-height: 1.8
+  overflow: auto
+  font-size: 18px
+
+  > div
+    max-height: 100%
+    padding: 5vw
+
+
+ul, li
+  list-style: none
+
+
+li
+  border-bottom: 1px solid $lightGray
+  padding: 40px 20px
+  cursor: pointer
+  line-height: 1.5
+
+
+blockquote
+  word-break: break-word
+
+.title
+  font-style: italic
+  margin-top: 20px
+  cursor: pointer
+
+  &:hover
+    color: $black
+
+
+#meta
+  margin-top: 100px
+  color: #ccc
+
+
+.focus-mode #controls
+  opacity: 0
+
+
+#controls
+  font-size: 26px
+  display: flex
+  margin-bottom: 20px
+  transition: opacity 0.2s ease-out
+
+  &:hover
+    opacity: 1
+
+
+#tools
+  flex: 7
+  display: flex
+  align-items: center
+  user-select: none
+  justify-content: space-between
+
+  > div
+    display: flex
+    flex: 3.5
+
+  input[type='checkbox']
+    transform: translateY(-25%)
+
+
+.tool-button
+  cursor: pointer
+  margin-right: 20px
+
+  &:hover
+    opacity: 0.5
+
+
+#search
+  position: relative
+
+  .x
+    position: absolute
+    right: 7px
+    top: -2px
+
+
+#search-input
+  border: 1px solid $lightGray
+  font-family: $font
+  padding: 4px 20px
+  flex: 3
+  outline: none
+  font-size: 14px
+
+  &:focus
+    border-color: $gray
+
+
+  &::placeholder
+    font-style: italic
+
+
+select
+  opacity: 0
+  position: absolute
+  width: 100%
+  cursor: pointer
+
+
+#title-select
+  display: flex
+  align-items: center
+  overflow: hidden
+  position: relative
+  flex: 3 !important
+
+  select
+    height: 40px
+
+
+  > div
+    position: relative
+    max-width: 250px
+    overflow: hidden
+    transform: translateY(2px)
+    cursor: pointer
+    margin-right: 6px
+
+  h5
+    font-style: italic
+    font-size: 16px
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
+    border-bottom: 2px dotted $lightGray
+    margin-left: 10px
+    padding-right: 2px
+
+  .x
+    transform: translateY(2px)
+
+.x
+  cursor: pointer

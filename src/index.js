@@ -1,4 +1,4 @@
-require('./styles.scss')
+require('./styles.sass')
 const {Elm} = require('./Main')
 const lsNs = 'ls'
 const state = window.localStorage.getItem(lsNs)

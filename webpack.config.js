@@ -28,7 +28,7 @@ const common = {
   ],
   resolve: {
     modules: [path.join(__dirname, 'src'), 'node_modules'],
-    extensions: ['.js', '.elm', '.scss', '.png']
+    extensions: ['.js', '.elm', '.sass', '.png']
   },
   module: {
     rules: [
@@ -40,7 +40,7 @@ const common = {
         }
       },
       {
-        test: /\.scss$/,
+        test: /\.sass$/,
         exclude: [/elm-stuff/, /node_modules/],
         loaders: ['style-loader', 'css-loader?url=false', 'sass-loader']
       },
@@ -144,7 +144,7 @@ if (MODE === 'production') {
           loaders: [MiniCssExtractPlugin.loader, 'css-loader?url=false']
         },
         {
-          test: /\.scss$/,
+          test: /\.sass$/,
           exclude: [/elm-stuff/, /node_modules/],
           loaders: [
             MiniCssExtractPlugin.loader,
