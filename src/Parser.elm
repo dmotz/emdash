@@ -1,12 +1,12 @@
 module Parser exposing (getTitles, process)
 
-import List exposing (filter, foldr, head, map, reverse, sort)
+import List exposing (filter, foldr, head, map, reverse, sortWith)
 import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
 import Model exposing (Book, Entry)
 import Regex exposing (Regex)
 import Set
-import String exposing (lines, toInt, trim)
+import String exposing (lines, toInt, toLower, trim)
 
 
 process : String -> List Entry
@@ -113,4 +113,19 @@ getTitles =
     map .title
         >> Set.fromList
         >> Set.toList
-        >> sort
+        >> sortWith titleSorter
+
+
+titleSorter : String -> String -> Order
+titleSorter a b =
+    compare (normalizeTitle a) (normalizeTitle b)
+
+
+titlePrefixRx : Regex
+titlePrefixRx =
+    rx "^(the )"
+
+
+normalizeTitle : String -> String
+normalizeTitle =
+    toLower >> Regex.replace titlePrefixRx (always "")
