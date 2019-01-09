@@ -98,16 +98,8 @@ view model =
                 , div []
                     [ div [ onClick ShowRandom, class "tool-button" ]
                         [ text "⚂" ]
-                    , div [ class "tool-button" ]
-                        [ text "❧"
-
-                        -- , input
-                        --    [ type_ "checkbox"
-                        --    , checked model.focusMode
-                        --    , onCheck SetFocusMode
-                        --    ]
-                        --    []
-                        ]
+                    , div [ onClick ToggleFocusMode, class "tool-button" ]
+                        [ text "❧" ]
                     ]
                 , div [ id "search" ]
                     [ input
@@ -201,7 +193,7 @@ renderEntry entry =
                         entry.text
                     )
                 ]
-            , div [ class "title" ] [ text entry.title ]
+            , Html.cite [ class "title" ] [ text entry.title ]
             ]
         ]
     )

@@ -144,5 +144,5 @@ update message model =
                 , Cmd.none
                 )
 
-        SetFocusMode active ->
-            ( { model | focusMode = active }, Cmd.none )
+        ToggleFocusMode ->
+            ( { model | focusMode = not model.focusMode }, Cmd.none )
