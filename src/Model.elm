@@ -56,6 +56,7 @@ initialModel =
     , titleFilter = Nothing
     , searchFilter = Nothing
     , parsingError = False
+    , isDragging = False
     , timeOffset = 0
     , tags = Set.empty
     , hiddenEntries = Set.empty
