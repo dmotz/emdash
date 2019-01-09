@@ -1,0 +1,12 @@
+*.log
+npm-debug.log*
+node_modules
+.npm
+yarn.lock
+.node_repl_history
+elm-stuff/
+repl-temp-*
+.DS_Store
+dist
+package-lock.json
+clippings.txt
