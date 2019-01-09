@@ -1,4 +1,4 @@
-module Model exposing (Entry, Model, initialModel)
+module Model exposing (Book, Entry, Model, StoredModel, initialModel, initialStoredModel)
 
 import Set exposing (..)
 
@@ -41,6 +41,12 @@ type alias Model =
     }
 
 
+type alias StoredModel =
+    { entries : List Entry
+    , currentEntry : Maybe Entry
+    }
+
+
 initialModel : Model
 initialModel =
     { entries = []
@@ -56,4 +62,11 @@ initialModel =
     , currentEntry = Nothing
     , isLoading = True
     , focusMode = False
+    }
+
+
+initialStoredModel : StoredModel
+initialStoredModel =
+    { entries = []
+    , currentEntry = Nothing
     }

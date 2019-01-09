@@ -10,7 +10,7 @@ type Msg
     | ShowByIndex Int
     | FilterBySearch String
     | FilterByTitle String
-    | SetFocusMode Bool
+    | ToggleFocusMode
     | DragEnter
     | DragLeave
     | GotFiles File (List File)

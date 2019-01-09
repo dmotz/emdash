@@ -12,28 +12,36 @@ import Task
 import View exposing (view)
 
 
-main : Program (Maybe Model) Model Msg
+main : Program (Maybe StoredModel) Model Msg
 main =
     Browser.document
         { init = init
         , update = updateWithStorage
         , view =
             \m ->
-                { title = "Hedera"
+                { title = "Marginalia"
                 , body = [ view m ]
                 }
         , subscriptions = \_ -> Sub.none
         }
 
 
-init : Maybe Model -> ( Model, Cmd Msg )
+init : Maybe StoredModel -> ( Model, Cmd Msg )
 init maybeModel =
-    ( Maybe.withDefault initialModel maybeModel
+    let
+        restored =
+            Maybe.withDefault initialStoredModel maybeModel
+    in
+    ( { initialModel
+        | entries = restored.entries
+        , currentEntry = restored.currentEntry
+        , titles = Parser.getTitles restored.entries
+      }
     , Cmd.none
     )
 
 
-port setStorage : Model -> Cmd msg
+port setStorage : StoredModel -> Cmd msg
 
 
 updateWithStorage : Msg -> Model -> ( Model, Cmd Msg )
@@ -43,7 +51,13 @@ updateWithStorage msg model =
             update msg model
     in
     ( newModel
-    , Cmd.batch [ setStorage newModel, cmds ]
+    , Cmd.batch
+        [ setStorage
+            { entries = newModel.entries
+            , currentEntry = newModel.currentEntry
+            }
+        , cmds
+        ]
     )
 
 
