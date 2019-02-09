@@ -1,18 +1,16 @@
 {
+  "name": "marginalia",
   "author": {
     "name": "Dan Motzenbecker",
     "email": "dan@oxism.com",
     "url": "http://oxism.com"
   },
-  "name": "marginalia",
   "version": "0.0.0",
   "description": "E-book highlights organizer",
   "main": "index.js",
   "scripts": {
-    "start": "npm run dev",
-    "dev": "webpack-dev-server --hot --colors --port 3000",
-    "build": "webpack",
-    "prod": "webpack -p"
+    "start": "webpack-dev-server --hot --colors --port 3000",
+    "build": "webpack -p"
   },
   "license": "GPL-3.0",
   "private": true,
