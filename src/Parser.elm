@@ -96,7 +96,7 @@ makeEntry raw =
                     Just <|
                         Entry
                             (hex <| text ++ meta)
-                            (Regex.replace footnoteRx (\_ -> ".") text)
+                            (Regex.replace footnoteRx (always ".") text)
                             title
                             author
                             page

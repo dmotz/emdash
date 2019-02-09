@@ -7,7 +7,7 @@ import Html.Events exposing (..)
 import Html.Keyed as Keyed
 import Html.Lazy exposing (lazy)
 import Json.Decode as Decode
-import List exposing (map)
+import List exposing (length, map, take)
 import Model exposing (Entry, Model)
 import Msg exposing (..)
 
@@ -177,20 +177,24 @@ sidebar entries =
         ]
 
 
-charLimit =
-    200
+wordLimit : Int
+wordLimit =
+    30
 
 
 renderEntry : Entry -> ( String, Html Msg )
 renderEntry entry =
+    let
+        words =
+            String.words entry.text
+    in
     ( entry.id
     , li [ onClick (ShowEntry entry) ]
         [ a []
-            --[ href <| "/entry/" ++ entry.id ]
             [ blockquote []
                 [ text
-                    (if String.length entry.text > charLimit then
-                        String.slice 0 charLimit entry.text ++ "…"
+                    (if length words > wordLimit then
+                        String.join " " (take wordLimit words) ++ "…"
 
                      else
                         entry.text
