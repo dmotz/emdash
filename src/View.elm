@@ -34,6 +34,9 @@ view model =
     let
         noEntries =
             model.entries == []
+
+        noTitleFilter =
+            model.titleFilter == Nothing
     in
     div
         ([ id "container"
@@ -78,7 +81,7 @@ view model =
                                     (\t -> option [ value t ] [ text t ])
                                     model.titles
                             )
-                        , h5 []
+                        , h5 [ classList [ ( "no-filter", noTitleFilter ) ] ]
                             [ text
                                 (case model.titleFilter of
                                     Nothing ->
@@ -92,7 +95,7 @@ view model =
                     , span
                         [ classList
                             [ ( "x", True )
-                            , ( "hidden", model.titleFilter == Nothing )
+                            , ( "hidden", noTitleFilter )
                             ]
                         , onClick (FilterByTitle "*")
                         ]
