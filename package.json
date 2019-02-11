@@ -6,7 +6,7 @@
     "url": "http://oxism.com"
   },
   "version": "0.0.0",
-  "description": "E-book highlights organizer",
+  "description": "Book excerpt organizer",
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --hot --colors --port 3000",
