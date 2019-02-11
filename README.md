@@ -4,11 +4,11 @@
 
 ```sh
 $ npm install
-$ npm run dev
+$ npm start
 ```
 
 ### Prod
 
 ```sh
-$ npm run prod
+$ npm run build
 ```
