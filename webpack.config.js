@@ -43,30 +43,6 @@ const common = {
         test: /\.sass$/,
         exclude: [/elm-stuff/, /node_modules/],
         loaders: ['style-loader', 'css-loader?url=false', 'sass-loader']
-      },
-      {
-        test: /\.css$/,
-        exclude: [/elm-stuff/, /node_modules/],
-        loaders: ['style-loader', 'css-loader?url=false']
-      },
-      {
-        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        exclude: [/elm-stuff/, /node_modules/],
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          mimetype: 'application/font-woff'
-        }
-      },
-      {
-        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        exclude: [/elm-stuff/, /node_modules/],
-        loader: 'file-loader'
-      },
-      {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        exclude: [/elm-stuff/, /node_modules/],
-        loader: 'file-loader'
       }
     ]
   }
