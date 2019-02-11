@@ -1,8 +1,10 @@
 port module Main exposing (main)
 
 import Browser
+import Browser.Events exposing (onKeyDown)
 import File
 import File.Select as Select
+import Json.Decode as Decode
 import List exposing (drop, filter, head, length, map)
 import Model exposing (Model, StoredModel, initialModel, initialStoredModel)
 import Msg exposing (..)
@@ -22,7 +24,11 @@ main =
                 { title = "Marginalia"
                 , body = [ view m ]
                 }
-        , subscriptions = \_ -> Sub.none
+        , subscriptions =
+            \_ ->
+                Decode.field "key" Decode.string
+                    |> Decode.map KeyDown
+                    |> onKeyDown
         }
 
 
@@ -162,3 +168,6 @@ update message model =
 
         ToggleFocusMode ->
             ( { model | focusMode = not model.focusMode }, Cmd.none )
+
+        KeyDown key ->
+            ( model, Cmd.none )
