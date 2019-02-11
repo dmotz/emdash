@@ -16,3 +16,4 @@ type Msg
     | GotFiles File (List File)
     | FileLoad String
     | PickFile
+    | KeyDown String
