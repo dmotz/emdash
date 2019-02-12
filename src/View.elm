@@ -5,11 +5,14 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy)
+import Html.Lazy exposing (lazy2)
+import Html.Parser
+import Html.Parser.Util
 import Json.Decode as Decode
 import List exposing (length, map, take)
 import Model exposing (Entry, Model)
 import Msg exposing (..)
+import Regex
 
 
 dropDecoder : Decode.Decoder Msg
@@ -129,13 +132,14 @@ view model =
                 ]
             ]
         , main_ []
-            [ lazy sidebar
+            [ lazy2 sidebar
                 (if List.isEmpty model.shownEntries then
                     model.entries
 
                  else
                     model.shownEntries
                 )
+                model.searchFilter
             , div [ id "viewer" ]
                 [ case model.currentEntry of
                     Just entry ->
@@ -169,13 +173,13 @@ view model =
         ]
 
 
-sidebar : List Entry -> Html Msg
-sidebar entries =
+sidebar : List Entry -> Maybe String -> Html Msg
+sidebar entries query =
     div [ id "sidebar" ]
         [ div []
             [ Keyed.node "ul"
                 []
-                (map renderEntry entries)
+                (map (renderEntry query) entries)
             ]
         ]
 
@@ -185,24 +189,50 @@ wordLimit =
     30
 
 
-renderEntry : Entry -> ( String, Html Msg )
-renderEntry entry =
+addHighlighting : String -> String -> List (Html msg)
+addHighlighting str query =
+    let
+        rx =
+            Regex.fromStringWith
+                { caseInsensitive = True, multiline = False }
+                query
+                |> Maybe.withDefault Regex.never
+
+        addTag m =
+            "<span class=\"highlight\">" ++ .match m ++ "</span>"
+    in
+    case Html.Parser.run <| Regex.replace rx addTag str of
+        Ok parsedNodes ->
+            Html.Parser.Util.toVirtualDom parsedNodes
+
+        _ ->
+            [ text str ]
+
+
+renderEntry : Maybe String -> Entry -> ( String, Html Msg )
+renderEntry query entry =
     let
         words =
             String.words entry.text
+
+        excerpt =
+            if length words > wordLimit then
+                String.join " " (take wordLimit words) ++ "…"
+
+            else
+                entry.text
     in
     ( entry.id
     , li [ onClick (ShowEntry entry) ]
         [ a []
             [ blockquote []
-                [ text
-                    (if length words > wordLimit then
-                        String.join " " (take wordLimit words) ++ "…"
+                (case query of
+                    Nothing ->
+                        [ text excerpt ]
 
-                     else
-                        entry.text
-                    )
-                ]
+                    Just q ->
+                        addHighlighting excerpt q
+                )
             , Html.cite [ class "title" ] [ text entry.title ]
             ]
         ]
