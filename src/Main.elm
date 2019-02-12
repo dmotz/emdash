@@ -170,4 +170,9 @@ update message model =
             ( { model | focusMode = not model.focusMode }, Cmd.none )
 
         KeyDown key ->
-            ( model, Cmd.none )
+            case key of
+                "r" ->
+                    update ShowRandom model
+
+                _ ->
+                    ( model, Cmd.none )
