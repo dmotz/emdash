@@ -123,9 +123,9 @@ update message model =
         FilterBySearch rawTerm ->
             let
                 term =
-                    rawTerm |> String.trim |> String.toLower
+                    String.toLower rawTerm
             in
-            if term == "" then
+            if String.trim term == "" then
                 ( { model
                     | shownEntries = []
                     , searchFilter = Nothing
@@ -169,7 +169,6 @@ update message model =
                 , Cmd.none
                 )
 
-        -- FilterByAuthor name ->
         ToggleFocusMode ->
             ( { model | focusMode = not model.focusMode }, Cmd.none )
 
