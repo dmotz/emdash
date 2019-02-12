@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Browser
+import Browser exposing (document)
 import Browser.Events exposing (onKeyDown)
 import File
 import File.Select as Select
@@ -16,7 +16,7 @@ import View exposing (view)
 
 main : Program (Maybe StoredModel) Model Msg
 main =
-    Browser.document
+    document
         { init = init
         , update = updateWithStorage
         , view =
@@ -148,6 +148,9 @@ update message model =
                 , Cmd.none
                 )
 
+        SetInputFocus bool ->
+            ( { model | inputFocused = bool }, Cmd.none )
+
         FilterByTitle title ->
             if title == "*" then
                 ( { model
@@ -166,13 +169,18 @@ update message model =
                 , Cmd.none
                 )
 
+        -- FilterByAuthor name ->
         ToggleFocusMode ->
             ( { model | focusMode = not model.focusMode }, Cmd.none )
 
         KeyDown key ->
-            case key of
-                "r" ->
-                    update ShowRandom model
+            if model.inputFocused then
+                ( model, Cmd.none )
 
-                _ ->
-                    ( model, Cmd.none )
+            else
+                case key of
+                    "r" ->
+                        update ShowRandom model
+
+                    _ ->
+                        ( model, Cmd.none )

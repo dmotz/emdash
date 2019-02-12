@@ -113,6 +113,8 @@ view model =
                 , div [ id "search" ]
                     [ input
                         [ onInput FilterBySearch
+                        , onFocus (SetInputFocus True)
+                        , onBlur (SetInputFocus False)
                         , id "search-input"
                         , value (Maybe.withDefault "" model.searchFilter)
                         , placeholder "search"

@@ -17,3 +17,4 @@ type Msg
     | FileLoad String
     | PickFile
     | KeyDown String
+    | SetInputFocus Bool
