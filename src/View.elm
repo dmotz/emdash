@@ -158,7 +158,7 @@ view model =
                             ]
 
                     Nothing ->
-                        h3 []
+                        h3 [ class "intro" ]
                             [ text
                                 (if model.parsingError then
                                     "Error parsing file."
