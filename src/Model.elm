@@ -39,6 +39,7 @@ type alias Model =
     , currentEntry : Maybe Entry
     , isLoading : Bool
     , focusMode : Bool
+    , inputFocused : Bool
     }
 
 
@@ -64,6 +65,7 @@ initialModel =
     , currentEntry = Nothing
     , isLoading = True
     , focusMode = False
+    , inputFocused = False
     }
 
 
