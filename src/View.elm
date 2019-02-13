@@ -115,15 +115,19 @@ view model =
                 ]
             ]
         , main_ []
-            [ lazy3 sidebar
-                (if List.isEmpty model.shownEntries then
-                    model.entries
+            [ if noEntries then
+                text ""
 
-                 else
-                    model.shownEntries
-                )
-                model.searchFilter
-                noTitleFilter
+              else
+                lazy3 sidebar
+                    (if List.isEmpty model.shownEntries then
+                        model.entries
+
+                     else
+                        model.shownEntries
+                    )
+                    model.searchFilter
+                    noTitleFilter
             , lazy3 viewer model.currentEntry model.parsingError noEntries
             ]
         ]
