@@ -124,35 +124,40 @@ view model =
                 )
                 model.searchFilter
                 noTitleFilter
-            , div [ id "viewer" ]
-                [ case model.currentEntry of
-                    Just entry ->
-                        div []
-                            [ p [] [ text entry.text ]
-                            , div [ id "meta" ]
-                                [ div
-                                    [ onClick (FilterByTitle entry.title)
-                                    , class "title"
-                                    ]
-                                    [ text entry.title ]
-                                , div [ class "author" ] [ text entry.author ]
-                                ]
-                            ]
-
-                    Nothing ->
-                        h3 [ class "intro" ]
-                            [ text <|
-                                if model.parsingError then
-                                    "Error parsing file."
-
-                                else if noEntries then
-                                    "Drag & drop a clippings txt file here (or click to browse)."
-
-                                else
-                                    "Select an entry."
-                            ]
-                ]
+            , lazy3 viewer model.currentEntry model.parsingError noEntries
             ]
+        ]
+
+
+viewer : Maybe Entry -> Bool -> Bool -> Html Msg
+viewer mEntry parsingError noEntries =
+    div [ id "viewer" ]
+        [ case mEntry of
+            Just entry ->
+                div []
+                    [ p [] [ text entry.text ]
+                    , div [ id "meta" ]
+                        [ div
+                            [ onClick (FilterByTitle entry.title)
+                            , class "title"
+                            ]
+                            [ text entry.title ]
+                        , div [ class "author" ] [ text entry.author ]
+                        ]
+                    ]
+
+            Nothing ->
+                h3 [ class "intro" ]
+                    [ text <|
+                        if parsingError then
+                            "Error parsing file."
+
+                        else if noEntries then
+                            "Drag & drop a clippings txt file here (or click to browse)."
+
+                        else
+                            "Select an entry."
+                    ]
         ]
 
 
