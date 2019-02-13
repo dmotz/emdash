@@ -162,7 +162,7 @@ sidebar entries query showTitles =
         [ div []
             [ Keyed.node "ul"
                 []
-                (map (renderEntry query showTitles) entries)
+                (map (listEntry query showTitles) entries)
             ]
         ]
 
@@ -192,8 +192,8 @@ addHighlighting str query =
             [ text str ]
 
 
-renderEntry : Maybe String -> Bool -> Entry -> ( String, Html Msg )
-renderEntry query showTitles entry =
+listEntry : Maybe String -> Bool -> Entry -> ( String, Html Msg )
+listEntry query showTitles entry =
     let
         words =
             String.words entry.text
