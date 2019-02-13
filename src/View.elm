@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy2)
+import Html.Lazy exposing (lazy3)
 import Html.Parser
 import Html.Parser.Util
 import Json.Decode as Decode
@@ -134,7 +134,7 @@ view model =
                 ]
             ]
         , main_ []
-            [ lazy2 sidebar
+            [ lazy3 sidebar
                 (if List.isEmpty model.shownEntries then
                     model.entries
 
@@ -142,6 +142,7 @@ view model =
                     model.shownEntries
                 )
                 model.searchFilter
+                noTitleFilter
             , div [ id "viewer" ]
                 [ case model.currentEntry of
                     Just entry ->
@@ -159,29 +160,28 @@ view model =
 
                     Nothing ->
                         h3 [ class "intro" ]
-                            [ text
-                                (if model.parsingError then
+                            [ text <|
+                                if model.parsingError then
                                     "Error parsing file."
 
-                                 else if noEntries then
+                                else if noEntries then
                                     "Drag & drop a clippings txt file here (or click to browse)."
 
-                                 else
+                                else
                                     "Select an entry."
-                                )
                             ]
                 ]
             ]
         ]
 
 
-sidebar : List Entry -> Maybe String -> Html Msg
-sidebar entries query =
+sidebar : List Entry -> Maybe String -> Bool -> Html Msg
+sidebar entries query showTitles =
     div [ id "sidebar" ]
         [ div []
             [ Keyed.node "ul"
                 []
-                (map (renderEntry query) entries)
+                (map (renderEntry query showTitles) entries)
             ]
         ]
 
@@ -211,8 +211,8 @@ addHighlighting str query =
             [ text str ]
 
 
-renderEntry : Maybe String -> Entry -> ( String, Html Msg )
-renderEntry query entry =
+renderEntry : Maybe String -> Bool -> Entry -> ( String, Html Msg )
+renderEntry query showTitles entry =
     let
         words =
             String.words entry.text
@@ -227,7 +227,7 @@ renderEntry query entry =
     ( entry.id
     , li [ onClick (ShowEntry entry) ]
         [ a []
-            [ blockquote []
+            ([ blockquote []
                 (case query of
                     Nothing ->
                         [ text excerpt ]
@@ -235,7 +235,13 @@ renderEntry query entry =
                     Just q ->
                         addHighlighting excerpt q
                 )
-            , Html.cite [ class "title" ] [ text entry.title ]
-            ]
+             ]
+                ++ (if showTitles then
+                        [ Html.cite [ class "title" ] [ text entry.title ] ]
+
+                    else
+                        []
+                   )
+            )
         ]
     )
