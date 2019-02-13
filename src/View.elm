@@ -15,23 +15,6 @@ import Msg exposing (..)
 import Regex
 
 
-dropDecoder : Decode.Decoder Msg
-dropDecoder =
-    Decode.at
-        [ "dataTransfer", "files" ]
-        (Decode.oneOrMore GotFiles File.decoder)
-
-
-hijack : msg -> ( msg, Bool )
-hijack msg =
-    ( msg, True )
-
-
-on : String -> Decode.Decoder msg -> Attribute msg
-on event decoder =
-    preventDefaultOn event (Decode.map hijack decoder)
-
-
 view : Model -> Html Msg
 view model =
     let
@@ -68,14 +51,13 @@ view model =
                     [ div []
                         [ select
                             [ onInput FilterByTitle
-                            , value
-                                (case model.titleFilter of
+                            , value <|
+                                case model.titleFilter of
                                     Nothing ->
                                         "*"
 
                                     Just title ->
                                         title
-                                )
                             ]
                             (option
                                 [ value "*" ]
@@ -85,14 +67,13 @@ view model =
                                     model.titles
                             )
                         , h5 [ classList [ ( "no-filter", noTitleFilter ) ] ]
-                            [ text
-                                (case model.titleFilter of
+                            [ text <|
+                                case model.titleFilter of
                                     Nothing ->
                                         "(all titles)"
 
                                     Just title ->
                                         title
-                                )
                             ]
                         ]
                     , span
@@ -245,3 +226,20 @@ renderEntry query showTitles entry =
             )
         ]
     )
+
+
+dropDecoder : Decode.Decoder Msg
+dropDecoder =
+    Decode.at
+        [ "dataTransfer", "files" ]
+        (Decode.oneOrMore GotFiles File.decoder)
+
+
+hijack : msg -> ( msg, Bool )
+hijack msg =
+    ( msg, True )
+
+
+on : String -> Decode.Decoder msg -> Attribute msg
+on event decoder =
+    preventDefaultOn event (Decode.map hijack decoder)
