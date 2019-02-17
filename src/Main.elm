@@ -5,11 +5,12 @@ import Browser.Events exposing (onKeyDown)
 import File
 import File.Select as Select
 import Json.Decode as Decode
-import List exposing (drop, filter, head, length, map)
+import List exposing (drop, filter, head, isEmpty, length, map)
 import Model exposing (Model, StoredModel, initialModel, initialStoredModel)
 import Msg exposing (..)
 import Parser
 import Random exposing (generate)
+import Set exposing (insert)
 import Task
 import View exposing (view)
 
@@ -61,6 +62,7 @@ updateWithStorage msg model =
         [ setStorage
             { entries = newModel.entries
             , currentEntry = newModel.currentEntry
+            , hiddenEntries = Set.toList newModel.hiddenEntries
             }
         , cmds
         ]
@@ -171,6 +173,14 @@ update message model =
 
         ToggleFocusMode ->
             ( { model | focusMode = not model.focusMode }, Cmd.none )
+
+        HideEntry entry ->
+            ( { model
+                | hiddenEntries = insert entry.id model.hiddenEntries
+                , entries = filter ((/=) entry) model.entries
+              }
+            , Cmd.none
+            )
 
         KeyDown key ->
             if model.inputFocused then
