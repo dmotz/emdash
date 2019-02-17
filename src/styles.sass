@@ -101,9 +101,24 @@ ul, li
 
 li
   border-bottom: 1px solid $lightGray
-  padding: 40px 20px
   cursor: pointer
   line-height: 1.5
+  overflow: hidden
+  position: relative
+
+  a
+    display: block
+    padding: 4rem 2rem
+
+.active-entry
+  position: absolute
+  width: 4rem
+  height: 2rem
+  background-color: $black
+  transform: rotate(-45deg)
+  transform-origin: 50% 50%
+  left: -2rem
+  top: -1rem
 
 
 .highlight
