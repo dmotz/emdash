@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy3)
+import Html.Lazy exposing (lazy3, lazy4)
 import Html.Parser
 import Html.Parser.Util
 import Json.Decode as Decode
@@ -119,7 +119,7 @@ view model =
                 text ""
 
               else
-                lazy3 sidebar
+                lazy4 sidebar
                     (if List.isEmpty model.shownEntries then
                         model.entries
 
@@ -128,6 +128,7 @@ view model =
                     )
                     model.searchFilter
                     noTitleFilter
+                    model.currentEntry
             , lazy3 viewer model.currentEntry model.parsingError noEntries
             ]
         ]
@@ -165,13 +166,13 @@ viewer mEntry parsingError noEntries =
         ]
 
 
-sidebar : List Entry -> Maybe String -> Bool -> Html Msg
-sidebar entries query showTitles =
+sidebar : List Entry -> Maybe String -> Bool -> Maybe Entry -> Html Msg
+sidebar entries query showTitles currentEntry =
     div [ id "sidebar" ]
         [ div []
             [ Keyed.node "ul"
                 []
-                (map (listEntry query showTitles) entries)
+                (map (listEntry query showTitles currentEntry) entries)
             ]
         ]
 
@@ -201,8 +202,8 @@ addHighlighting str query =
             [ text str ]
 
 
-listEntry : Maybe String -> Bool -> Entry -> ( String, Html Msg )
-listEntry query showTitles entry =
+listEntry : Maybe String -> Bool -> Maybe Entry -> Entry -> ( String, Html Msg )
+listEntry query showTitles currentEntry entry =
     let
         words =
             String.words entry.text
@@ -216,8 +217,19 @@ listEntry query showTitles entry =
     in
     ( entry.id
     , li [ onClick (ShowEntry entry) ]
-        [ a []
-            ([ blockquote []
+        [ case currentEntry of
+            Just e ->
+                if e == entry then
+                    div [ class "active-entry" ] []
+
+                else
+                    text ""
+
+            _ ->
+                text ""
+        , a []
+            ([ blockquote
+                []
                 (case query of
                     Nothing ->
                         [ text excerpt ]
