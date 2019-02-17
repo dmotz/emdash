@@ -148,6 +148,11 @@ viewer mEntry parsingError noEntries =
                             ]
                             [ text entry.title ]
                         , div [ class "author" ] [ text entry.author ]
+                        , div [ class "actions" ]
+                            [ div
+                                [ class "trash", onClick <| HideEntry entry ]
+                                [ text "delete entry" ]
+                            ]
                         ]
                     ]
 
@@ -158,7 +163,7 @@ viewer mEntry parsingError noEntries =
                             "Error parsing file."
 
                         else if noEntries then
-                            "Drag & drop a clippings txt file here (or click to browse)."
+                            "Drag & drop a clippings text file here. Or, click to browse."
 
                         else
                             "Select an entry."
