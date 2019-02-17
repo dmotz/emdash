@@ -18,3 +18,4 @@ type Msg
     | PickFile
     | KeyDown String
     | SetInputFocus Bool
+    | HideEntry Entry
