@@ -13,6 +13,7 @@ import Random exposing (generate)
 import Set exposing (insert)
 import String exposing (toLower, trim)
 import Task
+import Utils exposing (insertOnce)
 import View exposing (view)
 
 
@@ -182,13 +183,13 @@ update message model =
                             toLower tag
 
                         newTags =
-                            Set.toList <| insert tagN (Set.fromList entry.tags)
+                            insertOnce entry.tags tagN
 
                         newEntry =
                             { entry | tags = newTags }
                     in
                     ( { model
-                        | tags = Set.toList <| insert tagN (Set.fromList model.tags)
+                        | tags = insertOnce model.tags tagN
                         , entries =
                             map
                                 (\ent ->
