@@ -24,3 +24,4 @@ type Msg
     | HideEntry Entry
     | UpdatePendingTag Tag
     | AddTag Tag
+    | RemoveTag Tag

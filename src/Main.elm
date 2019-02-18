@@ -271,11 +271,8 @@ update message model =
                 case model.currentEntry of
                     Just entry ->
                         let
-                            newTags =
-                                insertOnce entry.tags tagN
-
                             newEntry =
-                                { entry | tags = newTags }
+                                { entry | tags = insertOnce entry.tags tagN }
                         in
                         ( { model
                             | tags = insertOnce model.tags tagN
@@ -294,6 +291,33 @@ update message model =
 
                     _ ->
                         noOp
+
+        RemoveTag tag ->
+            case model.currentEntry of
+                Just entry ->
+                    let
+                        newEntry =
+                            { entry | tags = removeItem entry.tags tag }
+
+                        newEntries =
+                            updateItem model.entries entry newEntry
+                    in
+                    ( { model
+                        | entries = newEntries
+                        , tags = Parser.getTags newEntries
+                        , currentEntry = Just newEntry
+                        , shownEntries =
+                            Maybe.map
+                                (\entries ->
+                                    updateItem entries entry newEntry
+                                )
+                                model.shownEntries
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    noOp
 
         ToggleFocusMode ->
             ( { model | focusMode = not model.focusMode }, Cmd.none )
