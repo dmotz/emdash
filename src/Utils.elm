@@ -1,12 +1,31 @@
-module Utils exposing (getIndex, getNextIndex, getPrevIndex, insertOnce)
+module Utils exposing
+    ( getIndex
+    , getNextIndex
+    , getPrevIndex
+    , insertOnce
+    , updateItem
+    )
 
-import List exposing (length)
+import List exposing (length, map)
 import Set
 
 
 insertOnce : List comparable -> comparable -> List comparable
 insertOnce list x =
     Set.toList <| Set.insert x (Set.fromList list)
+
+
+updateItem : List a -> a -> a -> List a
+updateItem list old new =
+    map
+        (\x ->
+            if x == old then
+                new
+
+            else
+                x
+        )
+        list
 
 
 getIndex : List a -> a -> Int
