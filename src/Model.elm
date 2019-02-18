@@ -35,7 +35,7 @@ type alias Entry =
 
 type alias Model =
     { entries : List Entry
-    , shownEntries : List Entry
+    , shownEntries : Maybe (List Entry)
     , titles : List Book
     , titleFilter : Maybe Book
     , searchFilter : Maybe String
@@ -57,7 +57,7 @@ type alias Model =
 initialModel : Model
 initialModel =
     { entries = []
-    , shownEntries = []
+    , shownEntries = Nothing
     , titles = []
     , titleFilter = Nothing
     , searchFilter = Nothing

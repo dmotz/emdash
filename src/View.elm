@@ -120,11 +120,12 @@ view model =
 
               else
                 lazy4 sidebar
-                    (if List.isEmpty model.shownEntries then
-                        model.entries
+                    (case model.shownEntries of
+                        Just entries ->
+                            entries
 
-                     else
-                        model.shownEntries
+                        _ ->
+                            model.entries
                     )
                     model.searchFilter
                     noTitleFilter

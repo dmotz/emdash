@@ -156,7 +156,7 @@ update message model =
             in
             if trim term == "" then
                 ( { model
-                    | shownEntries = []
+                    | shownEntries = Nothing
                     , searchFilter = Nothing
                   }
                 , Cmd.none
@@ -166,11 +166,12 @@ update message model =
                 ( { model
                     | searchFilter = Just term
                     , shownEntries =
-                        filter
-                            (\entry ->
-                                String.contains term (toLower entry.text)
-                            )
-                            model.entries
+                        Just <|
+                            filter
+                                (\entry ->
+                                    String.contains term (toLower entry.text)
+                                )
+                                model.entries
                   }
                 , Cmd.none
                 )
@@ -181,7 +182,7 @@ update message model =
         FilterByTitle title ->
             if title == "*" then
                 ( { model
-                    | shownEntries = []
+                    | shownEntries = Nothing
                     , titleFilter = Nothing
                   }
                 , Cmd.none
@@ -191,7 +192,10 @@ update message model =
                 ( { model
                     | titleFilter = Just title
                     , shownEntries =
-                        filter (\entry -> entry.title == title) model.entries
+                        Just <|
+                            filter
+                                (\entry -> entry.title == title)
+                                model.entries
                   }
                 , Cmd.none
                 )
