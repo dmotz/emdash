@@ -165,7 +165,11 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                     []
                                     (map
                                         (\tag ->
-                                            li [ class "tag" ] [ text tag ]
+                                            li
+                                                [ class "tag"
+                                                , onClick <| FilterByTag tag
+                                                ]
+                                                [ text tag ]
                                         )
                                         entry.tags
                                     )
@@ -204,8 +208,10 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                     ]
                                 ]
                             , div
-                                [ class "button", onClick <| HideEntry entry ]
-                                [ text "remove entry" ]
+                                [ class "hide-button"
+                                , onClick <| HideEntry entry
+                                ]
+                                [ text "×" ]
                             ]
                         ]
                     ]
