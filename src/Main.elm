@@ -225,6 +225,7 @@ update message model =
                                 )
                                 model.entries
                         , currentEntry = Just newEntry
+                        , pendingTag = Nothing
                       }
                     , Cmd.none
                     )
