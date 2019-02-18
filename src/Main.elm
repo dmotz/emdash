@@ -5,7 +5,7 @@ import Browser.Events exposing (onKeyDown)
 import File
 import File.Select as Select
 import Json.Decode as Decode
-import List exposing (drop, filter, head, isEmpty, length, map)
+import List exposing (drop, filter, head, isEmpty, length, map, member)
 import Maybe exposing (withDefault)
 import Model exposing (Model, StoredModel, initialModel, initialStoredModel)
 import Msg exposing (..)
@@ -20,6 +20,7 @@ import Utils
         , getNextIndex
         , getPrevIndex
         , insertOnce
+        , removeItem
         , updateItem
         )
 import View exposing (view)
@@ -53,6 +54,7 @@ init maybeModel =
         | entries = restored.entries
         , currentEntry = restored.currentEntry
         , titles = Parser.getTitles restored.entries
+        , tags = Parser.getTags restored.entries
       }
     , Cmd.none
     )
