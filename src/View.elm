@@ -5,11 +5,11 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy3, lazy4)
+import Html.Lazy exposing (lazy3, lazy4, lazy5)
 import Html.Parser
 import Html.Parser.Util
 import Json.Decode as Decode
-import List exposing (length, map, take)
+import List exposing (filter, length, map, member, take)
 import Model exposing (Entry, Model, Tag)
 import Msg exposing (..)
 import Regex
@@ -129,15 +129,25 @@ view model =
                     model.searchFilter
                     noTitleFilter
                     model.currentEntry
-            , lazy4 viewer model.currentEntry model.parsingError noEntries model.pendingTag
+            , lazy5
+                viewer
+                model.currentEntry
+                model.parsingError
+                noEntries
+                model.tags
+                model.pendingTag
             ]
         ]
 
 
-viewer : Maybe Entry -> Bool -> Bool -> Maybe Tag -> Html Msg
-viewer mEntry parsingError noEntries pendingTag =
+viewer : Maybe Entry -> Bool -> Bool -> List Tag -> Maybe Tag -> Html Msg
+viewer mEntry parsingError noEntries tags pendingTag =
     div [ id "viewer" ]
-        [ case mEntry of
+        [ let
+            pendTag =
+                Maybe.withDefault "" pendingTag
+          in
+          case mEntry of
             Just entry ->
                 div []
                     [ p [] [ text entry.text ]
@@ -149,22 +159,52 @@ viewer mEntry parsingError noEntries pendingTag =
                             [ text entry.title ]
                         , div [ class "author" ] [ text entry.author ]
                         , div [ class "actions" ]
-                            [ div
-                                [ class "trash", onClick <| HideEntry entry ]
-                                [ text "delete entry" ]
-                            , div [ class "tags" ]
-                                [ input
-                                    [ onInput UpdatePendingTag
-                                    , onFocus (SetInputFocus True)
-                                    , onBlur (SetInputFocus False)
-                                    , value <| Maybe.withDefault "" pendingTag
-                                    , placeholder "add tag"
-                                    , autocomplete False
-                                    , spellcheck False
-                                    ]
+                            [ div [ class "tags" ]
+                                [ ul
                                     []
-                                , ul [] (map (\tag -> li [] [ text tag ]) entry.tags)
+                                    (map
+                                        (\tag ->
+                                            li [ class "tag" ] [ text tag ]
+                                        )
+                                        entry.tags
+                                    )
+                                , div [ class "tag-input" ]
+                                    [ input
+                                        [ onInput UpdatePendingTag
+                                        , onFocus (SetInputFocus True)
+                                        , onBlur (SetInputFocus False)
+                                        , value pendTag
+                                        , placeholder "add tag"
+                                        , autocomplete False
+                                        , spellcheck False
+                                        ]
+                                        []
+                                    , ul
+                                        [ class "tag-list" ]
+                                        (map
+                                            (\tag ->
+                                                li
+                                                    [ onClick (AddTag tag) ]
+                                                    [ text tag ]
+                                            )
+                                            (filter
+                                                (\tag ->
+                                                    member tag entry.tags
+                                                        |> not
+                                                        |> (&&)
+                                                            (String.contains
+                                                                pendTag
+                                                                tag
+                                                            )
+                                                )
+                                                tags
+                                            )
+                                        )
+                                    ]
                                 ]
+                            , div
+                                [ class "button", onClick <| HideEntry entry ]
+                                [ text "remove entry" ]
                             ]
                         ]
                     ]
@@ -176,7 +216,8 @@ viewer mEntry parsingError noEntries pendingTag =
                             "Error parsing file."
 
                         else if noEntries then
-                            "Drag & drop a clippings text file here. Or, click to browse."
+                            "Drag & drop a clippings text file here. "
+                                ++ "Or, click to browse."
 
                         else
                             "Select an entry."
