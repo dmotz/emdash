@@ -200,38 +200,43 @@ update message model =
             ( { model | pendingTag = Just text }, Cmd.none )
 
         AddTag tag ->
-            case model.currentEntry of
-                Just entry ->
-                    let
-                        tagN =
-                            toLower tag
+            let
+                tagN =
+                    tag |> trim |> toLower
+            in
+            if tagN == "" then
+                ( { model | pendingTag = Nothing }, Cmd.none )
 
-                        newTags =
-                            insertOnce entry.tags tagN
+            else
+                case model.currentEntry of
+                    Just entry ->
+                        let
+                            newTags =
+                                insertOnce entry.tags tagN
 
-                        newEntry =
-                            { entry | tags = newTags }
-                    in
-                    ( { model
-                        | tags = insertOnce model.tags tagN
-                        , entries =
-                            map
-                                (\ent ->
-                                    if ent == entry then
-                                        newEntry
+                            newEntry =
+                                { entry | tags = newTags }
+                        in
+                        ( { model
+                            | tags = insertOnce model.tags tagN
+                            , entries =
+                                map
+                                    (\ent ->
+                                        if ent == entry then
+                                            newEntry
 
-                                    else
-                                        ent
-                                )
-                                model.entries
-                        , currentEntry = Just newEntry
-                        , pendingTag = Nothing
-                      }
-                    , Cmd.none
-                    )
+                                        else
+                                            ent
+                                    )
+                                    model.entries
+                            , currentEntry = Just newEntry
+                            , pendingTag = Nothing
+                          }
+                        , Cmd.none
+                        )
 
-                _ ->
-                    noOp
+                    _ ->
+                        noOp
 
         ToggleFocusMode ->
             ( { model | focusMode = not model.focusMode }, Cmd.none )
