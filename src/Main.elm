@@ -247,6 +247,15 @@ update message model =
                 , Cmd.none
                 )
 
+        FilterByTag tag ->
+            ( { model
+                | shownEntries =
+                    Just <|
+                        filter (\ent -> member tag ent.tags) model.entries
+              }
+            , Cmd.none
+            )
+
         UpdatePendingTag text ->
             ( { model | pendingTag = Just text }, Cmd.none )
 

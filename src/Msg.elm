@@ -12,6 +12,7 @@ type Msg
     | ShowPrev
     | FilterBySearch String
     | FilterByTitle String
+    | FilterByTag Tag
     | ToggleFocusMode
     | DragEnter
     | DragLeave
