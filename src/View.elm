@@ -81,7 +81,7 @@ view model =
                             [ ( "x", True )
                             , ( "hidden", noTitleFilter )
                             ]
-                        , onClick (FilterByTitle "*")
+                        , onClick <| FilterByTitle "*"
                         ]
                         [ text "×" ]
                     ]
@@ -108,7 +108,7 @@ view model =
                             [ ( "x", True )
                             , ( "hidden", model.searchFilter == Nothing )
                             ]
-                        , onClick (FilterBySearch "")
+                        , onClick <| FilterBySearch ""
                         ]
                         [ text "×" ]
                     ]
@@ -154,7 +154,7 @@ viewer mEntry parsingError noEntries tags pendingTag =
                     [ p [] [ text entry.text ]
                     , div [ id "meta" ]
                         [ div
-                            [ onClick (FilterByTitle entry.title)
+                            [ onClick <| FilterByTitle entry.title
                             , class "title"
                             ]
                             [ text entry.title ]
@@ -172,18 +172,27 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                     (map
                                         (\tag ->
                                             li
-                                                [ class "tag"
-                                                , onClick <| FilterByTag tag
+                                                [ class "tag" ]
+                                                [ span
+                                                    [ onClick <|
+                                                        FilterByTag tag
+                                                    , class "tag-title"
+                                                    ]
+                                                    [ text tag ]
+                                                , span
+                                                    [ onClick <| RemoveTag tag
+                                                    , class "tag-remove"
+                                                    ]
+                                                    [ span [] [ text "×" ] ]
                                                 ]
-                                                [ text tag ]
                                         )
                                         entry.tags
                                     )
                                 , div [ class "tag-input" ]
                                     [ input
                                         [ onInput UpdatePendingTag
-                                        , onFocus (SetInputFocus True)
-                                        , onBlur (SetInputFocus False)
+                                        , onFocus <| SetInputFocus True
+                                        , onBlur <| SetInputFocus False
                                         , value pendTag
                                         , placeholder "add tag"
                                         , autocomplete False
@@ -195,7 +204,7 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                         (map
                                             (\tag ->
                                                 li
-                                                    [ onClick (AddTag tag) ]
+                                                    [ onClick <| AddTag tag ]
                                                     [ text tag ]
                                             )
                                             (filter
@@ -241,11 +250,13 @@ viewer mEntry parsingError noEntries tags pendingTag =
 sidebar : List Entry -> Maybe String -> Bool -> Maybe Entry -> Html Msg
 sidebar entries query showTitles currentEntry =
     div [ id "sidebar" ]
-        [ div []
-            [ Keyed.node "ul"
+        [ if length entries == 0 then
+            div [ class "no-results" ] [ text "no results" ]
+
+          else
+            Keyed.node "ul"
                 []
                 (map (listEntry query showTitles currentEntry) entries)
-            ]
         ]
 
 
@@ -288,7 +299,7 @@ listEntry query showTitles currentEntry entry =
                 entry.text
     in
     ( entry.id
-    , li [ onClick (ShowEntry entry) ]
+    , li [ onClick <| ShowEntry entry ]
         [ case currentEntry of
             Just ent ->
                 if ent == entry then
