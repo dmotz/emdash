@@ -1,9 +1,9 @@
-module Parser exposing (getTitles, process)
+module Parser exposing (getTags, getTitles, process)
 
-import List exposing (filter, foldr, head, map, reverse, sortWith)
+import List exposing (concat, filter, foldr, head, map, reverse, sortWith)
 import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Book, Entry)
+import Model exposing (Book, Entry, Tag)
 import Regex exposing (Regex)
 import Set
 import String exposing (lines, toInt, toLower, trim)
@@ -130,3 +130,11 @@ titlePrefixRx =
 normalizeTitle : String -> String
 normalizeTitle =
     toLower >> Regex.replace titlePrefixRx (always "")
+
+
+getTags : List Entry -> List Tag
+getTags =
+    map .tags
+        >> concat
+        >> Set.fromList
+        >> Set.toList
