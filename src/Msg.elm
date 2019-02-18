@@ -8,6 +8,8 @@ type Msg
     = ShowEntry Entry
     | ShowRandom
     | ShowByIndex Int
+    | ShowNext
+    | ShowPrev
     | FilterBySearch String
     | FilterByTitle String
     | ToggleFocusMode

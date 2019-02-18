@@ -1,4 +1,4 @@
-module Utils exposing (getNextIndex, getPrevIndex, insertOnce)
+module Utils exposing (getIndex, getNextIndex, getPrevIndex, insertOnce)
 
 import List exposing (length)
 import Set

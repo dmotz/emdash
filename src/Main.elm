@@ -13,7 +13,7 @@ import Random exposing (generate)
 import Set exposing (insert)
 import String exposing (toLower, trim)
 import Task
-import Utils exposing (getNextIndex, getPrevIndex, insertOnce)
+import Utils exposing (getIndex, getNextIndex, getPrevIndex, insertOnce)
 import View exposing (view)
 
 
@@ -120,6 +120,26 @@ update message model =
               }
             , Cmd.none
             )
+
+        ShowNext ->
+            case model.currentEntry of
+                Just entry ->
+                    update
+                        (ShowByIndex <| getNextIndex model.entries entry)
+                        model
+
+                _ ->
+                    noOp
+
+        ShowPrev ->
+            case model.currentEntry of
+                Just entry ->
+                    update
+                        (ShowByIndex <| getPrevIndex model.entries entry)
+                        model
+
+                _ ->
+                    noOp
 
         ShowRandom ->
             ( model
@@ -243,20 +263,10 @@ update message model =
                         update ShowRandom model
 
                     "ArrowRight" ->
-                        case model.currentEntry of
-                            Just entry ->
-                                update (ShowByIndex <| getNextIndex model.entries entry) model
-
-                            _ ->
-                                noOp
+                        update ShowNext model
 
                     "ArrowLeft" ->
-                        case model.currentEntry of
-                            Just entry ->
-                                update (ShowByIndex <| getPrevIndex model.entries entry) model
-
-                            _ ->
-                                noOp
+                        update ShowPrev model
 
                     _ ->
                         noOp
