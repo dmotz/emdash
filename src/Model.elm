@@ -1,4 +1,12 @@
-module Model exposing (Book, Entry, Model, StoredModel, initialModel, initialStoredModel)
+module Model exposing
+    ( Book
+    , Entry
+    , Model
+    , StoredModel
+    , Tag
+    , initialModel
+    , initialStoredModel
+    )
 
 import Set exposing (..)
 
@@ -21,6 +29,7 @@ type alias Entry =
     , title : Book
     , author : String
     , page : Maybe Int
+    , tags : List Tag
     }
 
 
@@ -33,19 +42,15 @@ type alias Model =
     , parsingError : Bool
     , isDragging : Bool
     , timeOffset : Int
-    , tags : Set Tag
+    , tags : List Tag
     , hiddenEntries : Set Id
     , hiddenBooks : Set Book
     , currentEntry : Maybe Entry
+    , pendingTag : Maybe Tag
     , isLoading : Bool
     , focusMode : Bool
     , inputFocused : Bool
-    }
-
-
-type alias StoredModel =
-    { entries : List Entry
-    , currentEntry : Maybe Entry
+    , currentIndex : Int
     }
 
 
@@ -59,13 +64,23 @@ initialModel =
     , parsingError = False
     , isDragging = False
     , timeOffset = 0
-    , tags = Set.empty
+    , tags = []
     , hiddenEntries = Set.empty
     , hiddenBooks = Set.empty
     , currentEntry = Nothing
+    , pendingTag = Nothing
     , isLoading = True
     , focusMode = False
     , inputFocused = False
+    , currentIndex = 0
+    }
+
+
+type alias StoredModel =
+    { entries : List Entry
+    , currentEntry : Maybe Entry
+    , hiddenEntries : List Id
+    , tags : List Tag
     }
 
 
@@ -73,4 +88,6 @@ initialStoredModel : StoredModel
 initialStoredModel =
     { entries = []
     , currentEntry = Nothing
+    , hiddenEntries = []
+    , tags = []
     }

@@ -10,7 +10,7 @@ import Html.Parser
 import Html.Parser.Util
 import Json.Decode as Decode
 import List exposing (length, map, take)
-import Model exposing (Entry, Model)
+import Model exposing (Entry, Model, Tag)
 import Msg exposing (..)
 import Regex
 
@@ -94,10 +94,10 @@ view model =
                 , div [ id "search" ]
                     [ input
                         [ onInput FilterBySearch
-                        , onFocus (SetInputFocus True)
-                        , onBlur (SetInputFocus False)
+                        , onFocus <| SetInputFocus True
+                        , onBlur <| SetInputFocus False
                         , id "search-input"
-                        , value (Maybe.withDefault "" model.searchFilter)
+                        , value <| Maybe.withDefault "" model.searchFilter
                         , placeholder "search"
                         , autocomplete False
                         , spellcheck False
@@ -129,13 +129,13 @@ view model =
                     model.searchFilter
                     noTitleFilter
                     model.currentEntry
-            , lazy3 viewer model.currentEntry model.parsingError noEntries
+            , lazy4 viewer model.currentEntry model.parsingError noEntries model.pendingTag
             ]
         ]
 
 
-viewer : Maybe Entry -> Bool -> Bool -> Html Msg
-viewer mEntry parsingError noEntries =
+viewer : Maybe Entry -> Bool -> Bool -> Maybe Tag -> Html Msg
+viewer mEntry parsingError noEntries pendingTag =
     div [ id "viewer" ]
         [ case mEntry of
             Just entry ->
@@ -152,6 +152,19 @@ viewer mEntry parsingError noEntries =
                             [ div
                                 [ class "trash", onClick <| HideEntry entry ]
                                 [ text "delete entry" ]
+                            , div [ class "tags" ]
+                                [ input
+                                    [ onInput UpdatePendingTag
+                                    , onFocus (SetInputFocus True)
+                                    , onBlur (SetInputFocus False)
+                                    , value <| Maybe.withDefault "" pendingTag
+                                    , placeholder "add tag"
+                                    , autocomplete False
+                                    , spellcheck False
+                                    ]
+                                    []
+                                , ul [] (map (\tag -> li [] [ text tag ]) entry.tags)
+                                ]
                             ]
                         ]
                     ]
@@ -223,8 +236,8 @@ listEntry query showTitles currentEntry entry =
     ( entry.id
     , li [ onClick (ShowEntry entry) ]
         [ case currentEntry of
-            Just e ->
-                if e == entry then
+            Just ent ->
+                if ent == entry then
                     div [ class "active-entry" ] []
 
                 else

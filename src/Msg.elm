@@ -1,7 +1,7 @@
 module Msg exposing (Msg(..))
 
 import File exposing (File)
-import Model exposing (Entry)
+import Model exposing (Entry, Tag)
 
 
 type Msg
@@ -19,3 +19,5 @@ type Msg
     | KeyDown String
     | SetInputFocus Bool
     | HideEntry Entry
+    | UpdatePendingTag Tag
+    | AddTag Tag

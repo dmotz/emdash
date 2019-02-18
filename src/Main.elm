@@ -11,6 +11,7 @@ import Msg exposing (..)
 import Parser
 import Random exposing (generate)
 import Set exposing (insert)
+import String exposing (toLower, trim)
 import Task
 import View exposing (view)
 
@@ -63,6 +64,7 @@ updateWithStorage msg model =
             { entries = newModel.entries
             , currentEntry = newModel.currentEntry
             , hiddenEntries = Set.toList newModel.hiddenEntries
+            , tags = newModel.tags
             }
         , cmds
         ]
@@ -125,9 +127,9 @@ update message model =
         FilterBySearch rawTerm ->
             let
                 term =
-                    String.toLower rawTerm
+                    toLower rawTerm
             in
-            if String.trim term == "" then
+            if trim term == "" then
                 ( { model
                     | shownEntries = []
                     , searchFilter = Nothing
@@ -141,9 +143,7 @@ update message model =
                     , shownEntries =
                         filter
                             (\entry ->
-                                String.contains
-                                    term
-                                    (String.toLower entry.text)
+                                String.contains term (toLower entry.text)
                             )
                             model.entries
                   }
@@ -151,7 +151,7 @@ update message model =
                 )
 
         SetInputFocus bool ->
-            ( { model | inputFocused = bool }, Cmd.none )
+            ( { model | inputFocused = bool, pendingTag = Nothing }, Cmd.none )
 
         FilterByTitle title ->
             if title == "*" then
@@ -170,6 +170,42 @@ update message model =
                   }
                 , Cmd.none
                 )
+
+        UpdatePendingTag text ->
+            ( { model | pendingTag = Just text }, Cmd.none )
+
+        AddTag tag ->
+            case model.currentEntry of
+                Just entry ->
+                    let
+                        tagN =
+                            toLower tag
+
+                        newTags =
+                            Set.toList <| insert tagN (Set.fromList entry.tags)
+
+                        newEntry =
+                            { entry | tags = newTags }
+                    in
+                    ( { model
+                        | tags = Set.toList <| insert tagN (Set.fromList model.tags)
+                        , entries =
+                            map
+                                (\ent ->
+                                    if ent == entry then
+                                        newEntry
+
+                                    else
+                                        ent
+                                )
+                                model.entries
+                        , currentEntry = Just newEntry
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
 
         ToggleFocusMode ->
             ( { model | focusMode = not model.focusMode }, Cmd.none )
