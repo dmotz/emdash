@@ -221,7 +221,17 @@ update message model =
 
         KeyDown key ->
             if model.inputFocused then
-                ( model, Cmd.none )
+                case key of
+                    "Enter" ->
+                        case model.pendingTag of
+                            Just tag ->
+                                update (AddTag tag) model
+
+                            _ ->
+                                ( model, Cmd.none )
+
+                    _ ->
+                        ( model, Cmd.none )
 
             else
                 case key of
