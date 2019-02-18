@@ -6,6 +6,7 @@ import File
 import File.Select as Select
 import Json.Decode as Decode
 import List exposing (drop, filter, head, isEmpty, length, map)
+import Maybe exposing (withDefault)
 import Model exposing (Model, StoredModel, initialModel, initialStoredModel)
 import Msg exposing (..)
 import Parser
@@ -13,7 +14,14 @@ import Random exposing (generate)
 import Set exposing (insert)
 import String exposing (toLower, trim)
 import Task
-import Utils exposing (getIndex, getNextIndex, getPrevIndex, insertOnce)
+import Utils
+    exposing
+        ( getIndex
+        , getNextIndex
+        , getPrevIndex
+        , insertOnce
+        , updateItem
+        )
 import View exposing (view)
 
 
@@ -39,7 +47,7 @@ init : Maybe StoredModel -> ( Model, Cmd Msg )
 init maybeModel =
     let
         restored =
-            Maybe.withDefault initialStoredModel maybeModel
+            withDefault initialStoredModel maybeModel
     in
     ( { initialModel
         | entries = restored.entries
@@ -116,7 +124,8 @@ update message model =
         ShowByIndex i ->
             ( { model
                 | currentEntry =
-                    drop i model.entries |> head
+                    drop i (withDefault model.entries model.shownEntries)
+                        |> head
               }
             , Cmd.none
             )
@@ -125,7 +134,11 @@ update message model =
             case model.currentEntry of
                 Just entry ->
                     update
-                        (ShowByIndex <| getNextIndex model.entries entry)
+                        (ShowByIndex <|
+                            getNextIndex
+                                (withDefault model.entries model.shownEntries)
+                                entry
+                        )
                         model
 
                 _ ->
@@ -135,7 +148,11 @@ update message model =
             case model.currentEntry of
                 Just entry ->
                     update
-                        (ShowByIndex <| getPrevIndex model.entries entry)
+                        (ShowByIndex <|
+                            getPrevIndex
+                                (withDefault model.entries model.shownEntries)
+                                entry
+                        )
                         model
 
                 _ ->
@@ -146,7 +163,9 @@ update message model =
             , generate
                 ShowByIndex
               <|
-                Random.int 0 (length model.entries - 1)
+                Random.int
+                    0
+                    (length (withDefault model.entries model.shownEntries) - 1)
             )
 
         FilterBySearch rawTerm ->
@@ -223,16 +242,13 @@ update message model =
                         in
                         ( { model
                             | tags = insertOnce model.tags tagN
-                            , entries =
-                                map
-                                    (\ent ->
-                                        if ent == entry then
-                                            newEntry
-
-                                        else
-                                            ent
+                            , entries = updateItem model.entries entry newEntry
+                            , shownEntries =
+                                Maybe.map
+                                    (\entries ->
+                                        updateItem entries entry newEntry
                                     )
-                                    model.entries
+                                    model.shownEntries
                             , currentEntry = Just newEntry
                             , pendingTag = Nothing
                           }
