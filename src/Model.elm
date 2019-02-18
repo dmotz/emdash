@@ -49,7 +49,6 @@ type alias Model =
     , pendingTag : Maybe Tag
     , focusMode : Bool
     , inputFocused : Bool
-    , currentIndex : Int
     }
 
 
@@ -70,7 +69,6 @@ initialModel =
     , pendingTag = Nothing
     , focusMode = False
     , inputFocused = False
-    , currentIndex = 0
     }
 
 
