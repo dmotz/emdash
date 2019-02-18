@@ -74,6 +74,10 @@ updateWithStorage msg model =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
+    let
+        noOp =
+            ( model, Cmd.none )
+    in
     case message of
         DragEnter ->
             ( { model | isDragging = True }, Cmd.none )
@@ -206,7 +210,7 @@ update message model =
                     )
 
                 _ ->
-                    ( model, Cmd.none )
+                    noOp
 
         ToggleFocusMode ->
             ( { model | focusMode = not model.focusMode }, Cmd.none )
@@ -228,10 +232,10 @@ update message model =
                                 update (AddTag tag) model
 
                             _ ->
-                                ( model, Cmd.none )
+                                noOp
 
                     _ ->
-                        ( model, Cmd.none )
+                        noOp
 
             else
                 case key of
@@ -244,7 +248,7 @@ update message model =
                                 update (ShowByIndex <| getNextIndex model.entries entry) model
 
                             _ ->
-                                ( model, Cmd.none )
+                                noOp
 
                     "ArrowLeft" ->
                         case model.currentEntry of
@@ -252,7 +256,7 @@ update message model =
                                 update (ShowByIndex <| getPrevIndex model.entries entry) model
 
                             _ ->
-                                ( model, Cmd.none )
+                                noOp
 
                     _ ->
-                        ( model, Cmd.none )
+                        noOp
