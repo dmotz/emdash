@@ -159,6 +159,12 @@ viewer mEntry parsingError noEntries tags pendingTag =
                             ]
                             [ text entry.title ]
                         , div [ class "author" ] [ text entry.author ]
+                        , case entry.page of
+                            Just n ->
+                                div [] [ text <| "p. " ++ String.fromInt n ]
+
+                            _ ->
+                                text ""
                         , div [ class "actions" ]
                             [ div [ class "tags" ]
                                 [ ul
