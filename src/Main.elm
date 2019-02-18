@@ -159,14 +159,40 @@ update message model =
                     noOp
 
         ShowRandom ->
-            ( model
-            , generate
-                ShowByIndex
-              <|
-                Random.int
-                    0
-                    (length (withDefault model.entries model.shownEntries) - 1)
-            )
+            let
+                list =
+                    withDefault model.entries model.shownEntries
+
+                len =
+                    length list
+            in
+            case len of
+                0 ->
+                    noOp
+
+                1 ->
+                    noOp
+
+                2 ->
+                    update ShowNext model
+
+                _ ->
+                    ( model
+                    , generate
+                        (\n ->
+                            case model.currentEntry of
+                                Just entry ->
+                                    if n == getIndex list entry then
+                                        ShowRandom
+
+                                    else
+                                        ShowByIndex n
+
+                                _ ->
+                                    ShowByIndex n
+                        )
+                        (Random.int 0 (len - 1))
+                    )
 
         FilterBySearch rawTerm ->
             let
@@ -263,15 +289,18 @@ update message model =
 
         HideEntry entry ->
             let
-                idx =
-                    getIndex model.entries entry
+                list =
+                    withDefault model.entries model.shownEntries
 
-                entries =
-                    filter ((/=) entry) model.entries
+                idx =
+                    getIndex list entry
+
+                fn =
+                    filter ((/=) entry)
             in
             update
                 (ShowByIndex <|
-                    if idx == length entries then
+                    if idx == length list - 1 then
                         idx - 1
 
                     else
@@ -279,7 +308,8 @@ update message model =
                 )
                 { model
                     | hiddenEntries = insert entry.id model.hiddenEntries
-                    , entries = entries
+                    , entries = fn model.entries
+                    , shownEntries = Maybe.map fn model.shownEntries
                 }
 
         KeyDown key ->
