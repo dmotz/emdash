@@ -236,12 +236,25 @@ update message model =
             ( { model | focusMode = not model.focusMode }, Cmd.none )
 
         HideEntry entry ->
-            ( { model
-                | hiddenEntries = insert entry.id model.hiddenEntries
-                , entries = filter ((/=) entry) model.entries
-              }
-            , Cmd.none
-            )
+            let
+                idx =
+                    getIndex model.entries entry
+
+                entries =
+                    filter ((/=) entry) model.entries
+            in
+            update
+                (ShowByIndex <|
+                    if idx == length entries then
+                        idx - 1
+
+                    else
+                        idx
+                )
+                { model
+                    | hiddenEntries = insert entry.id model.hiddenEntries
+                    , entries = entries
+                }
 
         KeyDown key ->
             if model.inputFocused then
