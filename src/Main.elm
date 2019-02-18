@@ -13,7 +13,7 @@ import Random exposing (generate)
 import Set exposing (insert)
 import String exposing (toLower, trim)
 import Task
-import Utils exposing (insertOnce)
+import Utils exposing (getNextIndex, getPrevIndex, insertOnce)
 import View exposing (view)
 
 
@@ -227,6 +227,22 @@ update message model =
                 case key of
                     "r" ->
                         update ShowRandom model
+
+                    "ArrowRight" ->
+                        case model.currentEntry of
+                            Just entry ->
+                                update (ShowByIndex <| getNextIndex model.entries entry) model
+
+                            _ ->
+                                ( model, Cmd.none )
+
+                    "ArrowLeft" ->
+                        case model.currentEntry of
+                            Just entry ->
+                                update (ShowByIndex <| getPrevIndex model.entries entry) model
+
+                            _ ->
+                                ( model, Cmd.none )
 
                     _ ->
                         ( model, Cmd.none )
