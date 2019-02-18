@@ -47,7 +47,6 @@ type alias Model =
     , hiddenBooks : Set Book
     , currentEntry : Maybe Entry
     , pendingTag : Maybe Tag
-    , isLoading : Bool
     , focusMode : Bool
     , inputFocused : Bool
     , currentIndex : Int
@@ -69,7 +68,6 @@ initialModel =
     , hiddenBooks = Set.empty
     , currentEntry = Nothing
     , pendingTag = Nothing
-    , isLoading = True
     , focusMode = False
     , inputFocused = False
     , currentIndex = 0
