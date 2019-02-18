@@ -363,14 +363,17 @@ update message model =
 
             else
                 case key of
-                    "r" ->
-                        update ShowRandom model
-
                     "ArrowRight" ->
                         update ShowNext model
 
                     "ArrowLeft" ->
                         update ShowPrev model
+
+                    "r" ->
+                        update ShowRandom model
+
+                    "f" ->
+                        update ToggleFocusMode model
 
                     _ ->
                         noOp
