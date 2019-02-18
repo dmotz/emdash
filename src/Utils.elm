@@ -3,6 +3,7 @@ module Utils exposing
     , getNextIndex
     , getPrevIndex
     , insertOnce
+    , removeItem
     , updateItem
     )
 
@@ -13,6 +14,11 @@ import Set
 insertOnce : List comparable -> comparable -> List comparable
 insertOnce list x =
     Set.toList <| Set.insert x (Set.fromList list)
+
+
+removeItem : List comparable -> comparable -> List comparable
+removeItem list x =
+    Set.toList <| Set.remove x (Set.fromList list)
 
 
 updateItem : List a -> a -> a -> List a
