@@ -41,10 +41,8 @@ type alias Model =
     , searchFilter : Maybe String
     , parsingError : Bool
     , isDragging : Bool
-    , timeOffset : Int
     , tags : List Tag
     , hiddenEntries : Set Id
-    , hiddenBooks : Set Book
     , currentEntry : Maybe Entry
     , pendingTag : Maybe Tag
     , focusMode : Bool
@@ -61,10 +59,8 @@ initialModel =
     , searchFilter = Nothing
     , parsingError = False
     , isDragging = False
-    , timeOffset = 0
     , tags = []
     , hiddenEntries = Set.empty
-    , hiddenBooks = Set.empty
     , currentEntry = Nothing
     , pendingTag = Nothing
     , focusMode = False
