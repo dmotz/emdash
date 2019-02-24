@@ -3,12 +3,18 @@ module Utils exposing
     , getNextIndex
     , getPrevIndex
     , insertOnce
+    , queryCharMin
     , removeItem
     , updateItem
     )
 
 import List exposing (length, map)
 import Set
+
+
+queryCharMin : Int
+queryCharMin =
+    4
 
 
 insertOnce : List comparable -> comparable -> List comparable

@@ -20,6 +20,7 @@ import Utils
         , getNextIndex
         , getPrevIndex
         , insertOnce
+        , queryCharMin
         , removeItem
         , updateItem
         )
@@ -208,6 +209,9 @@ update message model =
                   }
                 , Cmd.none
                 )
+
+            else if String.length rawTerm < queryCharMin then
+                ( { model | searchFilter = Just term }, Cmd.none )
 
             else
                 ( { model
