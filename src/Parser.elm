@@ -7,6 +7,7 @@ import Model exposing (Book, Entry, Tag)
 import Regex exposing (Regex)
 import Set
 import String exposing (lines, toInt, toLower, trim)
+import Utils exposing (rx)
 
 
 process : String -> List Entry
@@ -48,11 +49,6 @@ predicate block =
 
             Just line ->
                 not <| String.startsWith "- Your Bookmark" line
-
-
-rx : String -> Regex
-rx =
-    Regex.fromString >> withDefault Regex.never
 
 
 titleAuthorRx : Regex

@@ -5,16 +5,23 @@ module Utils exposing
     , insertOnce
     , queryCharMin
     , removeItem
+    , rx
     , updateItem
     )
 
 import List exposing (length, map)
+import Regex exposing (Regex)
 import Set
 
 
 queryCharMin : Int
 queryCharMin =
     4
+
+
+rx : String -> Regex
+rx =
+    Regex.fromString >> Maybe.withDefault Regex.never
 
 
 insertOnce : List comparable -> comparable -> List comparable
