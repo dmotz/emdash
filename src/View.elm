@@ -339,7 +339,11 @@ listEntry query showTitles currentEntry entry =
                         [ text excerpt ]
 
                     Just q ->
-                        addHighlighting excerpt q
+                        if String.length q < queryCharMin then
+                            [ text excerpt ]
+
+                        else
+                            addHighlighting excerpt q
                 )
              ]
                 ++ (if showTitles then
