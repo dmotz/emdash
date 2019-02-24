@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy3, lazy4, lazy5)
+import Html.Lazy exposing (lazy4, lazy5)
 import Html.Parser
 import Html.Parser.Util
 import Json.Decode as Decode
@@ -13,6 +13,7 @@ import List exposing (filter, length, map, member, take)
 import Model exposing (Entry, Model, Tag)
 import Msg exposing (..)
 import Regex
+import Utils exposing (formatNumber, queryCharMin)
 
 
 view : Model -> Html Msg
@@ -23,6 +24,15 @@ view model =
 
         noTitleFilter =
             model.titleFilter == Nothing
+
+        entryCount =
+            length <|
+                case model.shownEntries of
+                    Just entries ->
+                        entries
+
+                    _ ->
+                        model.entries
     in
     div
         ([ id "container"
@@ -47,7 +57,18 @@ view model =
             , classList [ ( "hidden", noEntries ) ]
             ]
             [ div [ id "tools" ]
-                [ div [ id "title-select" ]
+                [ div [ id "entry-count" ]
+                    [ text <|
+                        formatNumber entryCount
+                            ++ " excerpt"
+                            ++ (if entryCount == 1 then
+                                    ""
+
+                                else
+                                    "s"
+                               )
+                    ]
+                , div [ id "title-select" ]
                     [ div []
                         [ select
                             [ onInput FilterByTitle
