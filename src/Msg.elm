@@ -1,5 +1,6 @@
 module Msg exposing (Msg(..))
 
+import Browser.Dom exposing (Error)
 import File exposing (File)
 import Model exposing (Entry, Tag)
 
@@ -25,3 +26,5 @@ type Msg
     | UpdatePendingTag Tag
     | AddTag Tag
     | RemoveTag Tag
+    | GotDomEl (Result Error (List Float))
+    | DidScroll (Result Error ())
