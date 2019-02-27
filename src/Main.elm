@@ -1,6 +1,7 @@
 port module Main exposing (main)
 
 import Browser exposing (document)
+import Browser.Dom exposing (getElement, getViewportOf, setViewportOf)
 import Browser.Events exposing (onKeyDown)
 import File
 import File.Select as Select
@@ -13,7 +14,7 @@ import Parser
 import Random exposing (generate)
 import Set exposing (insert)
 import String exposing (toLower, trim)
-import Task
+import Task exposing (andThen, attempt, sequence, succeed)
 import Utils
     exposing
         ( getIndex
@@ -125,13 +126,25 @@ update message model =
             ( { model | currentEntry = Just entry }, Cmd.none )
 
         ShowByIndex i ->
-            ( { model
-                | currentEntry =
-                    drop i (withDefault model.entries model.shownEntries)
-                        |> head
-              }
-            , Cmd.none
-            )
+            case
+                drop i (withDefault model.entries model.shownEntries)
+                    |> head
+            of
+                Just entry ->
+                    ( { model | currentEntry = Just entry }
+                    , attempt GotDomEl
+                        (sequence
+                            [ Task.map
+                                (.viewport >> .y)
+                                (getViewportOf "sidebar")
+                            , Task.map (.element >> .y) (getElement "sidebar")
+                            , Task.map (.element >> .y) (getElement entry.id)
+                            ]
+                        )
+                    )
+
+                _ ->
+                    noOp
 
         ShowNext ->
             case model.currentEntry of
@@ -350,6 +363,28 @@ update message model =
                     , entries = fn model.entries
                     , shownEntries = Maybe.map fn model.shownEntries
                 }
+
+        GotDomEl result ->
+            case result of
+                Ok [ offset, parentY, childY ] ->
+                    ( model
+                    , Task.attempt
+                        DidScroll
+                        (setViewportOf
+                            "sidebar"
+                            0
+                            (offset + (childY - parentY))
+                        )
+                    )
+
+                Ok _ ->
+                    noOp
+
+                Err _ ->
+                    noOp
+
+        DidScroll _ ->
+            noOp
 
         KeyDown key ->
             if model.inputFocused then
