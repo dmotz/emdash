@@ -320,7 +320,7 @@ listEntry query showTitles currentEntry entry =
                 entry.text
     in
     ( entry.id
-    , li [ onClick <| ShowEntry entry ]
+    , li [ id entry.id, onClick <| ShowEntry entry ]
         [ case currentEntry of
             Just ent ->
                 if ent == entry then
