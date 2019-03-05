@@ -11,6 +11,7 @@ import Maybe exposing (withDefault)
 import Model exposing (Model, StoredModel, initialModel, initialStoredModel)
 import Msg exposing (..)
 import Parser
+import Platform.Cmd exposing (none)
 import Random exposing (generate)
 import Set exposing (insert)
 import String exposing (toLower, trim)
@@ -58,7 +59,7 @@ init maybeModel =
         , titles = Parser.getTitles restored.entries
         , tags = Parser.getTags restored.entries
       }
-    , Cmd.none
+    , none
     )
 
 
@@ -88,14 +89,14 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     let
         noOp =
-            ( model, Cmd.none )
+            ( model, none )
     in
     case message of
         DragEnter ->
-            ( { model | isDragging = True }, Cmd.none )
+            ( { model | isDragging = True }, none )
 
         DragLeave ->
-            ( { model | isDragging = False }, Cmd.none )
+            ( { model | isDragging = False }, none )
 
         GotFiles file _ ->
             ( { model | isDragging = False }
@@ -111,7 +112,7 @@ update message model =
                     Parser.process text
             in
             if entries == [] then
-                ( { model | parsingError = True }, Cmd.none )
+                ( { model | parsingError = True }, none )
 
             else
                 ( { model
@@ -119,11 +120,11 @@ update message model =
                     , entries = entries
                     , titles = Parser.getTitles entries
                   }
-                , Cmd.none
+                , none
                 )
 
         ShowEntry entry ->
-            ( { model | currentEntry = Just entry }, Cmd.none )
+            ( { model | currentEntry = Just entry }, none )
 
         ShowByIndex i ->
             case
@@ -220,11 +221,11 @@ update message model =
                     | shownEntries = Nothing
                     , searchFilter = Nothing
                   }
-                , Cmd.none
+                , none
                 )
 
             else if String.length rawTerm < queryCharMin then
-                ( { model | searchFilter = Just term }, Cmd.none )
+                ( { model | searchFilter = Just term }, none )
 
             else
                 ( { model
@@ -237,11 +238,11 @@ update message model =
                                 )
                                 model.entries
                   }
-                , Cmd.none
+                , none
                 )
 
         SetInputFocus bool ->
-            ( { model | inputFocused = bool, pendingTag = Nothing }, Cmd.none )
+            ( { model | inputFocused = bool, pendingTag = Nothing }, none )
 
         FilterByTitle title ->
             if title == "*" then
@@ -249,7 +250,7 @@ update message model =
                     | shownEntries = Nothing
                     , titleFilter = Nothing
                   }
-                , Cmd.none
+                , none
                 )
 
             else
@@ -261,7 +262,7 @@ update message model =
                                 (\entry -> entry.title == title)
                                 model.entries
                   }
-                , Cmd.none
+                , none
                 )
 
         FilterByTag tag ->
@@ -270,11 +271,11 @@ update message model =
                     Just <|
                         filter (\ent -> member tag ent.tags) model.entries
               }
-            , Cmd.none
+            , none
             )
 
         UpdatePendingTag text ->
-            ( { model | pendingTag = Just text }, Cmd.none )
+            ( { model | pendingTag = Just text }, none )
 
         AddTag tag ->
             let
@@ -282,7 +283,7 @@ update message model =
                     tag |> trim |> toLower
             in
             if tagN == "" then
-                ( { model | pendingTag = Nothing }, Cmd.none )
+                ( { model | pendingTag = Nothing }, none )
 
             else
                 case model.currentEntry of
@@ -303,7 +304,7 @@ update message model =
                             , currentEntry = Just newEntry
                             , pendingTag = Nothing
                           }
-                        , Cmd.none
+                        , none
                         )
 
                     _ ->
@@ -330,14 +331,14 @@ update message model =
                                 )
                                 model.shownEntries
                       }
-                    , Cmd.none
+                    , none
                     )
 
                 _ ->
                     noOp
 
         ToggleFocusMode ->
-            ( { model | focusMode = not model.focusMode }, Cmd.none )
+            ( { model | focusMode = not model.focusMode }, none )
 
         HideEntry entry ->
             let
