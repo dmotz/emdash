@@ -172,20 +172,24 @@ viewer mEntry parsingError noEntries tags pendingTag =
           case mEntry of
             Just entry ->
                 div []
-                    [ p [] [ text entry.text ]
+                    [ blockquote [] [ text entry.text ]
                     , div [ id "meta" ]
-                        [ div
-                            [ onClick <| FilterByTitle entry.title
-                            , class "title"
-                            ]
-                            [ text entry.title ]
-                        , div [ class "author" ] [ text entry.author ]
-                        , case entry.page of
-                            Just n ->
-                                div [] [ text <| "p. " ++ String.fromInt n ]
+                        [ Html.cite []
+                            [ div
+                                [ onClick <| FilterByTitle entry.title
+                                , class "title"
+                                ]
+                                [ text entry.title ]
+                            , div [ class "author" ] [ text entry.author ]
+                            , case entry.page of
+                                Just n ->
+                                    div
+                                        [ class "page" ]
+                                        [ text <| "p. " ++ String.fromInt n ]
 
-                            _ ->
-                                text ""
+                                _ ->
+                                    text ""
+                            ]
                         , div [ class "actions" ]
                             [ div [ class "tags" ]
                                 [ ul
@@ -209,6 +213,7 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                         )
                                         entry.tags
                                     )
+                                , span [ class "add-tag" ] [ text "add tag" ]
                                 , div [ class "tag-input" ]
                                     [ input
                                         [ onInput UpdatePendingTag
