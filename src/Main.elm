@@ -26,7 +26,7 @@ import Utils
         , removeItem
         , updateItem
         )
-import View exposing (view)
+import View exposing (sidebarId, view)
 
 
 main : Program (Maybe StoredModel) Model Msg
@@ -137,8 +137,8 @@ update message model =
                         (sequence
                             [ Task.map
                                 (.viewport >> .y)
-                                (getViewportOf "sidebar")
-                            , Task.map (.element >> .y) (getElement "sidebar")
+                                (getViewportOf sidebarId)
+                            , Task.map (.element >> .y) (getElement sidebarId)
                             , Task.map (.element >> .y) (getElement entry.id)
                             ]
                         )
@@ -372,7 +372,7 @@ update message model =
                     , Task.attempt
                         DidScroll
                         (setViewportOf
-                            "sidebar"
+                            sidebarId
                             0
                             (offset + (childY - parentY))
                         )

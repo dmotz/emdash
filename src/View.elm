@@ -1,4 +1,4 @@
-module View exposing (view)
+module View exposing (sidebarId, view)
 
 import File
 import Html exposing (..)
@@ -268,9 +268,13 @@ viewer mEntry parsingError noEntries tags pendingTag =
         ]
 
 
+sidebarId =
+    "sidebar"
+
+
 sidebar : List Entry -> Maybe String -> Bool -> Maybe Entry -> Html Msg
 sidebar entries query showTitles currentEntry =
-    div [ id "sidebar" ]
+    div [ id sidebarId ]
         [ if length entries == 0 then
             div [ class "no-results" ] [ text "no results" ]
 
