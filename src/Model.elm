@@ -47,6 +47,7 @@ type alias Model =
     , pendingTag : Maybe Tag
     , focusMode : Bool
     , inputFocused : Bool
+    , metaKeyCount : Int
     }
 
 
@@ -65,6 +66,7 @@ initialModel =
     , pendingTag = Nothing
     , focusMode = False
     , inputFocused = False
+    , metaKeyCount = 0
     }
 
 

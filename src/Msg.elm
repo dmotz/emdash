@@ -21,6 +21,7 @@ type Msg
     | FileLoad String
     | PickFile
     | KeyDown String
+    | KeyUp String
     | SetInputFocus Bool
     | HideEntry Entry
     | UpdatePendingTag Tag

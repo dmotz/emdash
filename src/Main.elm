@@ -2,7 +2,7 @@ port module Main exposing (main)
 
 import Browser exposing (document)
 import Browser.Dom exposing (getElement, getViewportOf, setViewportOf)
-import Browser.Events exposing (onKeyDown)
+import Browser.Events exposing (onKeyDown, onKeyUp)
 import File
 import File.Select as Select
 import Json.Decode as Decode
@@ -40,10 +40,19 @@ main =
                 , body = [ view m ]
                 }
         , subscriptions =
+            let
+                decoder =
+                    Decode.field "key" Decode.string
+            in
             \_ ->
-                Decode.field "key" Decode.string
-                    |> Decode.map KeyDown
-                    |> onKeyDown
+                Sub.batch
+                    [ decoder
+                        |> Decode.map KeyDown
+                        |> onKeyDown
+                    , decoder
+                        |> Decode.map KeyUp
+                        |> onKeyUp
+                    ]
         }
 
 
@@ -381,7 +390,7 @@ update message model =
                     in
                     if targetY + elHeight > height || targetY < 0 then
                         ( model
-                        , Task.attempt
+                        , attempt
                             DidScroll
                             (setViewportOf
                                 sidebarId
@@ -403,32 +412,64 @@ update message model =
             noOp
 
         KeyDown key ->
-            if model.inputFocused then
-                case key of
-                    "Enter" ->
-                        case model.pendingTag of
-                            Just tag ->
-                                update (AddTag tag) model
+            let
+                f =
+                    \m ->
+                        ( { m | metaKeyCount = m.metaKeyCount + 1 }, none )
+            in
+            case key of
+                "Meta" ->
+                    f model
+
+                "Control" ->
+                    f model
+
+                _ ->
+                    if model.metaKeyCount > 0 then
+                        noOp
+
+                    else if model.inputFocused then
+                        case key of
+                            "Enter" ->
+                                case model.pendingTag of
+                                    Just tag ->
+                                        update (AddTag tag) model
+
+                                    _ ->
+                                        noOp
 
                             _ ->
                                 noOp
 
-                    _ ->
-                        noOp
+                    else
+                        case key of
+                            "ArrowRight" ->
+                                update ShowNext model
 
-            else
-                case key of
-                    "ArrowRight" ->
-                        update ShowNext model
+                            "ArrowLeft" ->
+                                update ShowPrev model
 
-                    "ArrowLeft" ->
-                        update ShowPrev model
+                            "r" ->
+                                update ShowRandom model
 
-                    "r" ->
-                        update ShowRandom model
+                            "f" ->
+                                update ToggleFocusMode model
 
-                    "f" ->
-                        update ToggleFocusMode model
+                            _ ->
+                                Debug.log key noOp
 
-                    _ ->
-                        noOp
+        KeyUp key ->
+            let
+                f =
+                    \m ->
+                        ( { m | metaKeyCount = m.metaKeyCount - 1 }, none )
+            in
+            case key of
+                "Meta" ->
+                    f model
+
+                "Control" ->
+                    f model
+
+                _ ->
+                    noOp
