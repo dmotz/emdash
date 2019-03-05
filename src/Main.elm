@@ -132,14 +132,21 @@ update message model =
                     |> head
             of
                 Just entry ->
+                    let
+                        sidebarView =
+                            getViewportOf sidebarId
+
+                        entryElement =
+                            getElement entry.id
+                    in
                     ( { model | currentEntry = Just entry }
                     , attempt GotDomEl
                         (sequence
-                            [ Task.map
-                                (.viewport >> .y)
-                                (getViewportOf sidebarId)
+                            [ Task.map (.viewport >> .y) sidebarView
+                            , Task.map (.viewport >> .height) sidebarView
                             , Task.map (.element >> .y) (getElement sidebarId)
-                            , Task.map (.element >> .y) (getElement entry.id)
+                            , Task.map (.element >> .y) entryElement
+                            , Task.map (.element >> .height) entryElement
                             ]
                         )
                     )
@@ -367,16 +374,24 @@ update message model =
 
         GotDomEl result ->
             case result of
-                Ok [ offset, parentY, childY ] ->
-                    ( model
-                    , Task.attempt
-                        DidScroll
-                        (setViewportOf
-                            sidebarId
-                            0
-                            (offset + (childY - parentY))
+                Ok [ offset, height, parentY, childY, elHeight ] ->
+                    let
+                        targetY =
+                            childY - parentY
+                    in
+                    if targetY + elHeight > height || targetY < 0 then
+                        ( model
+                        , Task.attempt
+                            DidScroll
+                            (setViewportOf
+                                sidebarId
+                                0
+                                (offset + targetY)
+                            )
                         )
-                    )
+
+                    else
+                        noOp
 
                 Ok _ ->
                     noOp
