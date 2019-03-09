@@ -49,19 +49,19 @@ type alias Entry =
 type alias Model =
     { entries : List Entry
     , shownEntries : Maybe (List Entry)
-    , titles : List Title
-    , authors : List Author
-    , filterType : Filter
-    , filterValue : Maybe String
-    , parsingError : Bool
-    , isDragging : Bool
-    , tags : List Tag
     , hiddenEntries : Set Id
     , currentEntry : Maybe Entry
+    , titles : List Title
+    , authors : List Author
+    , tags : List Tag
+    , filterType : Filter
+    , filterValue : Maybe String
     , pendingTag : Maybe Tag
     , focusMode : Bool
+    , isDragging : Bool
     , inputFocused : Bool
     , metaKeyCount : Int
+    , parsingError : Bool
     }
 
 
@@ -69,19 +69,19 @@ initialModel : Model
 initialModel =
     { entries = []
     , shownEntries = Nothing
-    , titles = []
-    , authors = []
-    , filterType = AuthorFilter
-    , filterValue = Nothing
-    , parsingError = False
-    , isDragging = False
-    , tags = []
     , hiddenEntries = Set.empty
     , currentEntry = Nothing
+    , titles = []
+    , authors = []
+    , tags = []
+    , filterType = AuthorFilter
+    , filterValue = Nothing
     , pendingTag = Nothing
     , focusMode = False
+    , isDragging = False
     , inputFocused = False
     , metaKeyCount = 0
+    , parsingError = False
     }
 
 
