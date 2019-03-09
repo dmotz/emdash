@@ -114,7 +114,15 @@ view model =
 
                             TextFilter ->
                                 div [ id "search" ]
-                                    [ input
+                                    [ span
+                                        [ classList
+                                            [ ( "x", True )
+                                            , ( "hidden", model.filterValue == Nothing )
+                                            ]
+                                        , onClick <| FilterBy TextFilter ""
+                                        ]
+                                        [ text "×" ]
+                                    , input
                                         [ onInput <| FilterBy TextFilter
                                         , onFocus <| SetInputFocus True
                                         , onBlur <| SetInputFocus False
@@ -125,14 +133,6 @@ view model =
                                         , spellcheck False
                                         ]
                                         []
-                                    , span
-                                        [ classList
-                                            [ ( "x", True )
-                                            , ( "hidden", model.filterValue == Nothing )
-                                            ]
-                                        , onClick <| FilterBy TextFilter ""
-                                        ]
-                                        [ text "×" ]
                                     ]
                         ]
                     ]
