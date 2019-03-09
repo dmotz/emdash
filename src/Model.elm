@@ -1,11 +1,11 @@
 module Model exposing
     ( Author
-    , Book
     , Entry
     , Filter(..)
     , Model
     , StoredModel
     , Tag
+    , Title
     , initialModel
     , initialStoredModel
     )
@@ -20,15 +20,11 @@ type Filter
     | TagFilter
 
 
-type alias Tag =
-    String
-
-
 type alias Id =
     String
 
 
-type alias Book =
+type alias Title =
     String
 
 
@@ -36,10 +32,14 @@ type alias Author =
     String
 
 
+type alias Tag =
+    String
+
+
 type alias Entry =
     { id : Id
     , text : String
-    , title : Book
+    , title : Title
     , author : String
     , page : Maybe Int
     , tags : List Tag
@@ -49,16 +49,15 @@ type alias Entry =
 type alias Model =
     { entries : List Entry
     , shownEntries : Maybe (List Entry)
-    , titles : List Book
+    , titles : List Title
     , authors : List Author
-    , titleFilter : Maybe Book
-    , searchFilter : Maybe String
+    , filterType : Filter
+    , filterValue : Maybe String
     , parsingError : Bool
     , isDragging : Bool
     , tags : List Tag
     , hiddenEntries : Set Id
     , currentEntry : Maybe Entry
-    , filterMode : Filter
     , pendingTag : Maybe Tag
     , focusMode : Bool
     , inputFocused : Bool
@@ -72,14 +71,13 @@ initialModel =
     , shownEntries = Nothing
     , titles = []
     , authors = []
-    , titleFilter = Nothing
-    , searchFilter = Nothing
+    , filterType = AuthorFilter
+    , filterValue = Nothing
     , parsingError = False
     , isDragging = False
     , tags = []
     , hiddenEntries = Set.empty
     , currentEntry = Nothing
-    , filterMode = TitleFilter
     , pendingTag = Nothing
     , focusMode = False
     , inputFocused = False
