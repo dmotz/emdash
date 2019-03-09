@@ -1,9 +1,9 @@
-module Parser exposing (getTags, getTitles, process)
+module Parser exposing (getAuthors, getTags, getTitles, process)
 
-import List exposing (concat, filter, foldr, head, map, reverse, sortWith)
+import List exposing (concat, filter, foldr, head, map, reverse, sort, sortWith)
 import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Book, Entry, Tag)
+import Model exposing (Author, Book, Entry, Tag)
 import Regex exposing (Regex)
 import Set
 import String exposing (lines, toInt, toLower, trim)
@@ -111,6 +111,14 @@ getTitles =
         >> Set.fromList
         >> Set.toList
         >> sortWith titleSorter
+
+
+getAuthors : List Entry -> List Author
+getAuthors =
+    map .author
+        >> Set.fromList
+        >> Set.toList
+        >> sort
 
 
 titleSorter : String -> String -> Order

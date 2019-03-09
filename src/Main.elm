@@ -67,6 +67,7 @@ init maybeModel =
                 | entries = restored.entries
                 , currentEntry = restored.currentEntry
                 , titles = Parser.getTitles restored.entries
+                , authors = Parser.getAuthors restored.entries
                 , tags = Parser.getTags restored.entries
             }
     in
@@ -127,6 +128,7 @@ update message model =
                             | parsingError = False
                             , entries = entries
                             , titles = Parser.getTitles entries
+                            , authors = Parser.getAuthors entries
                         }
                 in
                 ( newModel, store newModel )
