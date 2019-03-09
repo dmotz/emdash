@@ -11,10 +11,7 @@ type Msg
     | ShowByIndex Int
     | ShowNext
     | ShowPrev
-    | SetFilterMode Filter
-    | FilterBySearch String
-    | FilterByTitle String
-    | FilterByTag Tag
+    | FilterBy Filter String
     | ToggleFocusMode
     | DragEnter
     | DragLeave
