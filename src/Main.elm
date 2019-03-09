@@ -11,11 +11,11 @@ import Maybe exposing (withDefault)
 import Model exposing (Model, StoredModel, initialModel, initialStoredModel)
 import Msg exposing (..)
 import Parser
-import Platform.Cmd exposing (none)
+import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Set exposing (insert)
 import String exposing (toLower, trim)
-import Task exposing (andThen, attempt, sequence, succeed)
+import Task exposing (attempt, sequence)
 import Utils
     exposing
         ( getIndex
@@ -33,7 +33,7 @@ main : Program (Maybe StoredModel) Model Msg
 main =
     document
         { init = init
-        , update = updateWithStorage
+        , update = update
         , view =
             \m ->
                 { title = "Marginalia"
@@ -75,23 +75,14 @@ init maybeModel =
 port setStorage : StoredModel -> Cmd msg
 
 
-updateWithStorage : Msg -> Model -> ( Model, Cmd Msg )
-updateWithStorage msg model =
-    let
-        ( newModel, cmds ) =
-            update msg model
-    in
-    ( newModel
-    , Cmd.batch
-        [ setStorage
-            { entries = newModel.entries
-            , currentEntry = newModel.currentEntry
-            , hiddenEntries = Set.toList newModel.hiddenEntries
-            , tags = newModel.tags
-            }
-        , cmds
-        ]
-    )
+store : Model -> Cmd Msg
+store model =
+    setStorage
+        { entries = model.entries
+        , currentEntry = model.currentEntry
+        , hiddenEntries = Set.toList model.hiddenEntries
+        , tags = model.tags
+        }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -124,16 +115,42 @@ update message model =
                 ( { model | parsingError = True }, none )
 
             else
-                ( { model
-                    | parsingError = False
-                    , entries = entries
-                    , titles = Parser.getTitles entries
-                  }
-                , none
-                )
+                let
+                    newModel =
+                        { model
+                            | parsingError = False
+                            , entries = entries
+                            , titles = Parser.getTitles entries
+                        }
+                in
+                ( newModel, store newModel )
 
         ShowEntry entry ->
-            ( { model | currentEntry = Just entry }, none )
+            let
+                newModel =
+                    { model | currentEntry = Just entry }
+
+                sidebarView =
+                    getViewportOf sidebarId
+
+                entryElement =
+                    getElement entry.id
+            in
+            ( newModel
+            , batch
+                [ attempt
+                    GotDomEl
+                    (sequence
+                        [ Task.map (.viewport >> .y) sidebarView
+                        , Task.map (.viewport >> .height) sidebarView
+                        , Task.map (.element >> .y) (getElement sidebarId)
+                        , Task.map (.element >> .y) entryElement
+                        , Task.map (.element >> .height) entryElement
+                        ]
+                    )
+                , store newModel
+                ]
+            )
 
         ShowByIndex i ->
             case
@@ -141,24 +158,7 @@ update message model =
                     |> head
             of
                 Just entry ->
-                    let
-                        sidebarView =
-                            getViewportOf sidebarId
-
-                        entryElement =
-                            getElement entry.id
-                    in
-                    ( { model | currentEntry = Just entry }
-                    , attempt GotDomEl
-                        (sequence
-                            [ Task.map (.viewport >> .y) sidebarView
-                            , Task.map (.viewport >> .height) sidebarView
-                            , Task.map (.element >> .y) (getElement sidebarId)
-                            , Task.map (.element >> .y) entryElement
-                            , Task.map (.element >> .height) entryElement
-                            ]
-                        )
-                    )
+                    update (ShowEntry entry) model
 
                 _ ->
                     noOp
@@ -307,21 +307,29 @@ update message model =
                         let
                             newEntry =
                                 { entry | tags = insertOnce entry.tags tagN }
+
+                            newModel =
+                                { model
+                                    | tags = insertOnce model.tags tagN
+                                    , entries =
+                                        updateItem
+                                            model.entries
+                                            entry
+                                            newEntry
+                                    , shownEntries =
+                                        Maybe.map
+                                            (\entries ->
+                                                updateItem
+                                                    entries
+                                                    entry
+                                                    newEntry
+                                            )
+                                            model.shownEntries
+                                    , currentEntry = Just newEntry
+                                    , pendingTag = Nothing
+                                }
                         in
-                        ( { model
-                            | tags = insertOnce model.tags tagN
-                            , entries = updateItem model.entries entry newEntry
-                            , shownEntries =
-                                Maybe.map
-                                    (\entries ->
-                                        updateItem entries entry newEntry
-                                    )
-                                    model.shownEntries
-                            , currentEntry = Just newEntry
-                            , pendingTag = Nothing
-                          }
-                        , none
-                        )
+                        ( newModel, store newModel )
 
                     _ ->
                         noOp
@@ -335,20 +343,21 @@ update message model =
 
                         newEntries =
                             updateItem model.entries entry newEntry
+
+                        newModel =
+                            { model
+                                | entries = newEntries
+                                , tags = Parser.getTags newEntries
+                                , currentEntry = Just newEntry
+                                , shownEntries =
+                                    Maybe.map
+                                        (\entries ->
+                                            updateItem entries entry newEntry
+                                        )
+                                        model.shownEntries
+                            }
                     in
-                    ( { model
-                        | entries = newEntries
-                        , tags = Parser.getTags newEntries
-                        , currentEntry = Just newEntry
-                        , shownEntries =
-                            Maybe.map
-                                (\entries ->
-                                    updateItem entries entry newEntry
-                                )
-                                model.shownEntries
-                      }
-                    , none
-                    )
+                    ( newModel, store newModel )
 
                 _ ->
                     noOp
@@ -456,7 +465,7 @@ update message model =
                                 update ToggleFocusMode model
 
                             _ ->
-                                Debug.log key noOp
+                                noOp
 
         KeyUp key ->
             let
