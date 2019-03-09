@@ -366,6 +366,55 @@ listEntry query showTitles currentEntry entry =
     )
 
 
+selectMenu :
+    List String
+    -> Maybe String
+    -> (String -> Msg)
+    -> String
+    -> Html Msg
+selectMenu values mState inputFn default =
+    let
+        defaultLabel =
+            "(all " ++ default ++ ")"
+    in
+    div [ class "select" ]
+        [ span
+            [ classList
+                [ ( "x", True )
+                , ( "hidden", mState == Nothing )
+                ]
+            , onClick <| inputFn ""
+            ]
+            [ text "×" ]
+        , div [ class <| "select-" ++ default ]
+            [ select
+                [ onInput inputFn
+                , value <|
+                    case mState of
+                        Just state ->
+                            state
+
+                        _ ->
+                            ""
+                ]
+                (option
+                    [ value "" ]
+                    [ text defaultLabel ]
+                    :: map (\t -> option [ value t ] [ text t ]) values
+                )
+            , h5 [ classList [ ( "no-filter", mState == Nothing ) ] ]
+                [ text <|
+                    case mState of
+                        Just state ->
+                            state
+
+                        _ ->
+                            defaultLabel
+                ]
+            ]
+        ]
+
+
 dropDecoder : Decode.Decoder Msg
 dropDecoder =
     Decode.at
