@@ -124,14 +124,22 @@ update message model =
 
         FileLoad text ->
             let
+                ids =
+                    Set.fromList <| map .id model.entries
+
+                new =
+                    Parser.process text
+
                 entries =
                     filter
                         (\entry ->
-                            not <| Set.member entry.id model.hiddenEntries
+                            (not <| Set.member entry.id model.hiddenEntries)
+                                && (not <| Set.member entry.id ids)
                         )
-                        (Parser.process text)
+                        new
+                        ++ model.entries
             in
-            if entries == [] then
+            if new == [] then
                 ( { model | parsingError = True }, none )
 
             else
