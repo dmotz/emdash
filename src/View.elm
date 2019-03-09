@@ -8,11 +8,13 @@ import Html.Keyed as Keyed
 import Html.Lazy exposing (lazy4, lazy5)
 import Html.Parser
 import Html.Parser.Util
-import Json.Decode as Decode
-import List exposing (filter, length, map, member, take)
+import Json.Decode as Decode exposing (Decoder)
+import List exposing (filter, head, length, map, member, take)
+import Maybe exposing (withDefault)
 import Model exposing (Entry, Filter(..), Model, Tag)
 import Msg exposing (..)
 import Regex
+import String exposing (fromChar, slice, toList)
 import Utils exposing (formatNumber, queryCharMin)
 
 
@@ -307,19 +309,19 @@ charLimit =
 takeExcerpt : String -> String
 takeExcerpt text =
     let
-        f output chars n =
+        f acc chars n =
             case chars of
                 x :: xs ->
                     if n < charLimit || n >= charLimit && x /= ' ' then
-                        f (output ++ String.fromChar x) xs (n + 1)
+                        f (acc ++ fromChar x) xs (n + 1)
 
                     else
-                        output
+                        acc
 
                 [] ->
-                    output
+                    acc
     in
-    f "" (String.toList text) 0 ++ " …"
+    f "" (toList text) 0 ++ " …"
 
 
 addHighlighting : String -> String -> List (Html msg)
@@ -328,13 +330,31 @@ addHighlighting str query =
         rx =
             Regex.fromStringWith
                 { caseInsensitive = True, multiline = False }
-                query
+                ("\\b" ++ query)
                 |> Maybe.withDefault Regex.never
+
+        index =
+            Regex.find rx str |> map .index |> head |> withDefault 0
 
         addTag m =
             "<span class=\"highlight\">" ++ .match m ++ "</span>"
+
+        excerpt =
+            let
+                trunc =
+                    if (index + String.length query) > charLimit then
+                        "… " ++ slice index (String.length str) str
+
+                    else
+                        str
+            in
+            if String.length trunc > charLimit then
+                takeExcerpt trunc
+
+            else
+                trunc
     in
-    case Html.Parser.run <| Regex.replace rx addTag str of
+    case Html.Parser.run <| Regex.replace rx addTag excerpt of
         Ok parsedNodes ->
             Html.Parser.Util.toVirtualDom parsedNodes
 
@@ -376,7 +396,7 @@ listEntry query showTitles currentEntry entry =
                             [ text excerpt ]
 
                         else
-                            addHighlighting excerpt q
+                            addHighlighting entry.text q
                 )
              ]
                 ++ (if showTitles then
@@ -439,7 +459,7 @@ selectMenu values mState inputFn default =
         ]
 
 
-dropDecoder : Decode.Decoder Msg
+dropDecoder : Decoder Msg
 dropDecoder =
     Decode.at
         [ "dataTransfer", "files" ]
@@ -451,6 +471,6 @@ hijack msg =
     ( msg, True )
 
 
-on : String -> Decode.Decoder msg -> Attribute msg
+on : String -> Decoder msg -> Attribute msg
 on event decoder =
     preventDefaultOn event (Decode.map hijack decoder)

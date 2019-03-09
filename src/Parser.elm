@@ -4,7 +4,7 @@ import List exposing (concat, filter, foldr, head, map, reverse, sortWith)
 import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Entry, Tag, Title)
-import Regex exposing (Regex)
+import Regex exposing (Regex, replace)
 import Set
 import String exposing (lines, toInt, toLower, trim)
 import Utils exposing (rx)
@@ -115,17 +115,9 @@ makeEntry raw =
                     Just <|
                         Entry
                             (hex <| text ++ meta)
-                            (Regex.replace footnoteRx (always ".") text)
-                            (Regex.replace
-                                apostropheRx
-                                apostropheReplacer
-                                title
-                            )
-                            (Regex.replace
-                                apostropheRx
-                                apostropheReplacer
-                                author
-                            )
+                            (replace footnoteRx (always ".") text)
+                            (replace apostropheRx apostropheReplacer title)
+                            (replace apostropheRx apostropheReplacer author)
                             page
                             []
 
@@ -170,7 +162,7 @@ titlePrefixRx =
 
 normalizeTitle : String -> String
 normalizeTitle =
-    toLower >> Regex.replace titlePrefixRx (always "")
+    toLower >> replace titlePrefixRx (always "")
 
 
 getTags : List Entry -> List Tag

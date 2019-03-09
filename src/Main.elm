@@ -20,6 +20,7 @@ import Msg exposing (..)
 import Parser
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
+import Regex
 import Set exposing (insert)
 import String exposing (toLower, trim)
 import Task exposing (attempt, sequence)
@@ -31,6 +32,7 @@ import Utils
         , insertOnce
         , queryCharMin
         , removeItem
+        , rx
         , updateItem
         )
 import View exposing (sidebarId, view)
@@ -294,7 +296,11 @@ update message model =
                         ( { model | filterValue = Just val, filterType = filterType }, none )
 
                     else
-                        applyFilter <| \entry -> String.contains term (toLower entry.text)
+                        applyFilter <|
+                            \entry ->
+                                Regex.contains
+                                    (rx <| "\\b" ++ term)
+                                    (toLower entry.text)
 
         UpdatePendingTag text ->
             ( { model | pendingTag = Just text }, none )
