@@ -1,6 +1,6 @@
 module Parser exposing (getAuthors, getTags, getTitles, process)
 
-import List exposing (concat, filter, foldr, head, map, reverse, sort, sortWith)
+import List exposing (concat, filter, foldr, head, map, reverse, sortWith)
 import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Book, Entry, Tag)
@@ -105,20 +105,26 @@ makeEntry raw =
             Nothing
 
 
+getUniques :
+    (Entry -> String)
+    -> (String -> String -> Order)
+    -> List Entry
+    -> List String
+getUniques key sorter entries =
+    map key entries
+        |> Set.fromList
+        |> Set.toList
+        |> sortWith sorter
+
+
 getTitles : List Entry -> List Book
 getTitles =
-    map .title
-        >> Set.fromList
-        >> Set.toList
-        >> sortWith titleSorter
+    getUniques .title titleSorter
 
 
 getAuthors : List Entry -> List Author
 getAuthors =
-    map .author
-        >> Set.fromList
-        >> Set.toList
-        >> sort
+    getUniques .author compare
 
 
 titleSorter : String -> String -> Order
