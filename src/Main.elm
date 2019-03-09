@@ -8,7 +8,14 @@ import File.Select as Select
 import Json.Decode as Decode
 import List exposing (drop, filter, head, isEmpty, length, map, member)
 import Maybe exposing (withDefault)
-import Model exposing (Model, StoredModel, initialModel, initialStoredModel)
+import Model
+    exposing
+        ( Filter(..)
+        , Model
+        , StoredModel
+        , initialModel
+        , initialStoredModel
+        )
 import Msg exposing (..)
 import Parser
 import Platform.Cmd exposing (batch, none)
@@ -235,71 +242,59 @@ update message model =
                         (Random.int 0 (len - 1))
                     )
 
-        SetFilterMode mode ->
-            ( { model | filterMode = mode }, none )
-
-        FilterBySearch rawTerm ->
-            let
-                term =
-                    toLower rawTerm
-            in
-            if trim term == "" then
-                ( { model
-                    | shownEntries = Nothing
-                    , searchFilter = Nothing
-                  }
-                , none
-                )
-
-            else if String.length rawTerm < queryCharMin then
-                ( { model | searchFilter = Just term }, none )
-
-            else
-                ( { model
-                    | searchFilter = Just term
-                    , shownEntries =
-                        Just <|
-                            filter
-                                (\entry ->
-                                    String.contains term (toLower entry.text)
-                                )
-                                model.entries
-                  }
-                , none
-                )
-
         SetInputFocus bool ->
             ( { model | inputFocused = bool, pendingTag = Nothing }, none )
 
-        FilterByTitle title ->
-            if title == "*" then
-                ( { model
-                    | shownEntries = Nothing
-                    , titleFilter = Nothing
-                  }
-                , none
-                )
+        FilterBy filterType val ->
+            let
+                applyFilter fn =
+                    if val == "" then
+                        ( { model
+                            | shownEntries = Nothing
+                            , filterValue = Nothing
+                            , filterType = filterType
+                          }
+                        , none
+                        )
 
-            else
-                ( { model
-                    | titleFilter = Just title
-                    , shownEntries =
-                        Just <|
-                            filter
-                                (\entry -> entry.title == title)
-                                model.entries
-                  }
-                , none
-                )
+                    else
+                        ( { model
+                            | filterValue = Just val
+                            , shownEntries = Just <| filter fn model.entries
+                            , filterType = filterType
+                          }
+                        , none
+                        )
+            in
+            case filterType of
+                TitleFilter ->
+                    applyFilter <| \entry -> entry.title == val
 
-        FilterByTag tag ->
-            ( { model
-                | shownEntries =
-                    Just <|
-                        filter (\ent -> member tag ent.tags) model.entries
-              }
-            , none
-            )
+                AuthorFilter ->
+                    applyFilter <| \entry -> entry.author == val
+
+                TagFilter ->
+                    applyFilter <| \entry -> member val entry.tags
+
+                TextFilter ->
+                    let
+                        term =
+                            toLower val
+                    in
+                    if trim term == "" then
+                        ( { model
+                            | filterValue = Nothing
+                            , shownEntries = Nothing
+                            , filterType = filterType
+                          }
+                        , none
+                        )
+
+                    else if String.length term < queryCharMin then
+                        ( { model | filterValue = Just val, filterType = filterType }, none )
+
+                    else
+                        applyFilter <| \entry -> String.contains term (toLower entry.text)
 
         UpdatePendingTag text ->
             ( { model | pendingTag = Just text }, none )
