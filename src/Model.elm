@@ -1,5 +1,6 @@
 module Model exposing
-    ( Book
+    ( Author
+    , Book
     , Entry
     , Model
     , StoredModel
@@ -23,6 +24,10 @@ type alias Book =
     String
 
 
+type alias Author =
+    String
+
+
 type alias Entry =
     { id : Id
     , text : String
@@ -37,6 +42,7 @@ type alias Model =
     { entries : List Entry
     , shownEntries : Maybe (List Entry)
     , titles : List Book
+    , authors : List Author
     , titleFilter : Maybe Book
     , searchFilter : Maybe String
     , parsingError : Bool
@@ -56,6 +62,7 @@ initialModel =
     { entries = []
     , shownEntries = Nothing
     , titles = []
+    , authors = []
     , titleFilter = Nothing
     , searchFilter = Nothing
     , parsingError = False
