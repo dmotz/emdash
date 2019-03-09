@@ -185,7 +185,11 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                 , class "title"
                                 ]
                                 [ text entry.title ]
-                            , div [ class "author" ] [ text entry.author ]
+                            , div
+                                [ onClick <| FilterBy AuthorFilter entry.author
+                                , class "author"
+                                ]
+                                [ text entry.author ]
                             , case entry.page of
                                 Just n ->
                                     div
