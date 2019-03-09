@@ -66,6 +66,29 @@ footnoteRx =
     rx "\\.(\\d+) "
 
 
+apostropheRx : Regex
+apostropheRx =
+    rx "(\\w)(')(\\w)"
+
+
+apostropheReplacer : Regex.Match -> String
+apostropheReplacer match =
+    String.concat <|
+        map
+            (\sub ->
+                let
+                    s =
+                        withDefault "" sub
+                in
+                if s == "'" then
+                    "’"
+
+                else
+                    s
+            )
+            match.submatches
+
+
 makeEntry : List String -> Maybe Entry
 makeEntry raw =
     case raw of
@@ -93,8 +116,16 @@ makeEntry raw =
                         Entry
                             (hex <| text ++ meta)
                             (Regex.replace footnoteRx (always ".") text)
-                            title
-                            author
+                            (Regex.replace
+                                apostropheRx
+                                apostropheReplacer
+                                title
+                            )
+                            (Regex.replace
+                                apostropheRx
+                                apostropheReplacer
+                                author
+                            )
                             page
                             []
 
