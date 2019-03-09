@@ -16,8 +16,8 @@ import Set exposing (Set)
 type Filter
     = TitleFilter
     | AuthorFilter
-    | TextFilter
     | TagFilter
+    | TextFilter
 
 
 type alias Id =
@@ -74,7 +74,7 @@ initialModel =
     , titles = []
     , authors = []
     , tags = []
-    , filterType = AuthorFilter
+    , filterType = TitleFilter
     , filterValue = Nothing
     , pendingTag = Nothing
     , focusMode = False
