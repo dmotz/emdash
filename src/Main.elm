@@ -61,15 +61,21 @@ init maybeModel =
     let
         restored =
             withDefault initialStoredModel maybeModel
+
+        model =
+            { initialModel
+                | entries = restored.entries
+                , currentEntry = restored.currentEntry
+                , titles = Parser.getTitles restored.entries
+                , tags = Parser.getTags restored.entries
+            }
     in
-    ( { initialModel
-        | entries = restored.entries
-        , currentEntry = restored.currentEntry
-        , titles = Parser.getTitles restored.entries
-        , tags = Parser.getTags restored.entries
-      }
-    , none
-    )
+    case restored.currentEntry of
+        Just entry ->
+            update (ShowEntry entry) model
+
+        _ ->
+            ( model, none )
 
 
 port setStorage : StoredModel -> Cmd msg
