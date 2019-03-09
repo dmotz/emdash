@@ -125,7 +125,11 @@ update message model =
         FileLoad text ->
             let
                 entries =
-                    Parser.process text
+                    filter
+                        (\entry ->
+                            not <| Set.member entry.id model.hiddenEntries
+                        )
+                        (Parser.process text)
             in
             if entries == [] then
                 ( { model | parsingError = True }, none )
