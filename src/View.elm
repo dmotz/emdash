@@ -10,7 +10,7 @@ import Html.Parser
 import Html.Parser.Util
 import Json.Decode as Decode
 import List exposing (filter, length, map, member, take)
-import Model exposing (Entry, Model, Tag)
+import Model exposing (Entry, Filter(..), Model, Tag)
 import Msg exposing (..)
 import Regex
 import Utils exposing (formatNumber, queryCharMin)
@@ -21,9 +21,6 @@ view model =
     let
         noEntries =
             model.entries == []
-
-        noTitleFilter =
-            model.titleFilter == Nothing
 
         entryCount =
             length <|
@@ -52,12 +49,12 @@ view model =
                     []
                )
         )
-        [ div
-            [ id "controls"
-            , classList [ ( "hidden", noEntries ) ]
+        [ header
+            [ classList [ ( "hidden", noEntries ) ]
             ]
-            [ div [ id "tools" ]
-                [ div [ id "entry-count" ]
+            [ div []
+                [ h1 [] [ span [] [ text "❧" ], text "M" ]
+                , div [ id "entry-count" ]
                     [ text <|
                         formatNumber entryCount
                             ++ " excerpt"
@@ -68,70 +65,74 @@ view model =
                                     "s"
                                )
                     ]
-                , div [ id "title-select" ]
-                    [ div []
-                        [ select
-                            [ onInput FilterByTitle
-                            , value <|
-                                case model.titleFilter of
-                                    Nothing ->
-                                        "*"
-
-                                    Just title ->
-                                        title
-                            ]
-                            (option
-                                [ value "*" ]
-                                [ text "(all titles)" ]
-                                :: map
-                                    (\t -> option [ value t ] [ text t ])
-                                    model.titles
+                ]
+            , div [ id "tools" ]
+                [ div [ id "filters" ]
+                    [ div [ id "filter-links" ]
+                        (map
+                            (\( mode, label ) ->
+                                span
+                                    [ onClick <| FilterBy mode ""
+                                    , classList
+                                        [ ( "active"
+                                          , model.filterType == mode
+                                          )
+                                        ]
+                                    ]
+                                    [ text label ]
                             )
-                        , h5 [ classList [ ( "no-filter", noTitleFilter ) ] ]
-                            [ text <|
-                                case model.titleFilter of
-                                    Nothing ->
-                                        "(all titles)"
+                            [ ( TitleFilter, "title" )
+                            , ( AuthorFilter, "author" )
+                            , ( TagFilter, "tag" )
+                            , ( TextFilter, "text" )
+                            ]
+                        )
+                    , div [ id "filter-controls" ]
+                        [ case model.filterType of
+                            TitleFilter ->
+                                selectMenu
+                                    model.titles
+                                    model.filterValue
+                                    (FilterBy TitleFilter)
+                                    "titles"
 
-                                    Just title ->
-                                        title
-                            ]
+                            AuthorFilter ->
+                                selectMenu
+                                    model.authors
+                                    model.filterValue
+                                    (FilterBy AuthorFilter)
+                                    "authors"
+
+                            TagFilter ->
+                                selectMenu
+                                    model.tags
+                                    model.filterValue
+                                    (FilterBy TagFilter)
+                                    "tags"
+
+                            TextFilter ->
+                                div [ id "search" ]
+                                    [ input
+                                        [ onInput <| FilterBy TextFilter
+                                        , onFocus <| SetInputFocus True
+                                        , onBlur <| SetInputFocus False
+                                        , id "search-input"
+                                        , value <| Maybe.withDefault "" model.filterValue
+                                        , placeholder "search"
+                                        , autocomplete False
+                                        , spellcheck False
+                                        ]
+                                        []
+                                    , span
+                                        [ classList
+                                            [ ( "x", True )
+                                            , ( "hidden", model.filterValue == Nothing )
+                                            ]
+                                        , onClick <| FilterBy TextFilter ""
+                                        ]
+                                        [ text "×" ]
+                                    ]
                         ]
-                    , span
-                        [ classList
-                            [ ( "x", True )
-                            , ( "hidden", noTitleFilter )
-                            ]
-                        , onClick <| FilterByTitle "*"
-                        ]
-                        [ text "×" ]
-                    ]
-                , div []
-                    [ div [ onClick ShowRandom, class "tool-button" ]
-                        [ text "⚂" ]
-                    , div [ onClick ToggleFocusMode, class "tool-button" ]
-                        [ text "❧" ]
-                    ]
-                , div [ id "search" ]
-                    [ input
-                        [ onInput FilterBySearch
-                        , onFocus <| SetInputFocus True
-                        , onBlur <| SetInputFocus False
-                        , id "search-input"
-                        , value <| Maybe.withDefault "" model.searchFilter
-                        , placeholder "search"
-                        , autocomplete False
-                        , spellcheck False
-                        ]
-                        []
-                    , span
-                        [ classList
-                            [ ( "x", True )
-                            , ( "hidden", model.searchFilter == Nothing )
-                            ]
-                        , onClick <| FilterBySearch ""
-                        ]
-                        [ text "×" ]
                     ]
                 ]
             ]
@@ -148,8 +149,12 @@ view model =
                         _ ->
                             model.entries
                     )
-                    model.searchFilter
-                    noTitleFilter
+                    model.filterValue
+                    (model.filterType
+                        /= TitleFilter
+                        || model.filterValue
+                        == Nothing
+                    )
                     model.currentEntry
             , lazy5
                 viewer
@@ -176,7 +181,7 @@ viewer mEntry parsingError noEntries tags pendingTag =
                     , div [ id "meta" ]
                         [ Html.cite []
                             [ div
-                                [ onClick <| FilterByTitle entry.title
+                                [ onClick <| FilterBy TitleFilter entry.title
                                 , class "title"
                                 ]
                                 [ text entry.title ]
@@ -200,7 +205,7 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                                 [ class "tag" ]
                                                 [ span
                                                     [ onClick <|
-                                                        FilterByTag tag
+                                                        FilterBy TagFilter tag
                                                     , class "tag-title"
                                                     ]
                                                     [ text tag ]
