@@ -235,6 +235,9 @@ update message model =
                         (Random.int 0 (len - 1))
                     )
 
+        SetFilterMode mode ->
+            ( { model | filterMode = mode }, none )
+
         FilterBySearch rawTerm ->
             let
                 term =

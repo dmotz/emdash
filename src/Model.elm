@@ -2,6 +2,7 @@ module Model exposing
     ( Author
     , Book
     , Entry
+    , Filter(..)
     , Model
     , StoredModel
     , Tag
@@ -9,7 +10,14 @@ module Model exposing
     , initialStoredModel
     )
 
-import Set exposing (..)
+import Set exposing (Set)
+
+
+type Filter
+    = TitleFilter
+    | AuthorFilter
+    | TextFilter
+    | TagFilter
 
 
 type alias Tag =
@@ -50,6 +58,7 @@ type alias Model =
     , tags : List Tag
     , hiddenEntries : Set Id
     , currentEntry : Maybe Entry
+    , filterMode : Filter
     , pendingTag : Maybe Tag
     , focusMode : Bool
     , inputFocused : Bool
@@ -70,6 +79,7 @@ initialModel =
     , tags = []
     , hiddenEntries = Set.empty
     , currentEntry = Nothing
+    , filterMode = TitleFilter
     , pendingTag = Nothing
     , focusMode = False
     , inputFocused = False
