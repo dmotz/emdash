@@ -3,7 +3,7 @@ module Parser exposing (getAuthors, getTags, getTitles, process)
 import List exposing (concat, filter, foldr, head, map, reverse, sortWith)
 import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Author, Book, Entry, Tag)
+import Model exposing (Author, Entry, Tag, Title)
 import Regex exposing (Regex)
 import Set
 import String exposing (lines, toInt, toLower, trim)
@@ -117,7 +117,7 @@ getUniques key sorter entries =
         |> sortWith sorter
 
 
-getTitles : List Entry -> List Book
+getTitles : List Entry -> List Title
 getTitles =
     getUniques .title titleSorter
 
