@@ -299,9 +299,27 @@ sidebar entries query showTitles currentEntry =
         ]
 
 
-wordLimit : Int
-wordLimit =
-    30
+charLimit : Int
+charLimit =
+    240
+
+
+takeExcerpt : String -> String
+takeExcerpt text =
+    let
+        f output chars n =
+            case chars of
+                x :: xs ->
+                    if n < charLimit || n >= charLimit && x /= ' ' then
+                        f (output ++ String.fromChar x) xs (n + 1)
+
+                    else
+                        output
+
+                [] ->
+                    output
+    in
+    f "" (String.toList text) 0 ++ " …"
 
 
 addHighlighting : String -> String -> List (Html msg)
@@ -327,12 +345,9 @@ addHighlighting str query =
 listEntry : Maybe String -> Bool -> Maybe Entry -> Entry -> ( String, Html Msg )
 listEntry query showTitles currentEntry entry =
     let
-        words =
-            String.words entry.text
-
         excerpt =
-            if length words > wordLimit then
-                String.join " " (take wordLimit words) ++ "…"
+            if String.length entry.text > charLimit then
+                takeExcerpt entry.text
 
             else
                 entry.text
