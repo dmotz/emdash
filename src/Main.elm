@@ -222,6 +222,9 @@ update message model =
 
                 len =
                     length list
+
+                currentIndex =
+                    Maybe.map (getIndex list) model.currentEntry
             in
             case len of
                 0 ->
@@ -237,9 +240,9 @@ update message model =
                     ( model
                     , generate
                         (\n ->
-                            case model.currentEntry of
-                                Just entry ->
-                                    if n == getIndex list entry then
+                            case currentIndex of
+                                Just index ->
+                                    if n == index then
                                         ShowRandom
 
                                     else
