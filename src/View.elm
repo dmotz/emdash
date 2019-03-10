@@ -151,7 +151,12 @@ view model =
                         _ ->
                             model.entries
                     )
-                    model.filterValue
+                    (if model.filterType == TextFilter then
+                        model.filterValue
+
+                     else
+                        Nothing
+                    )
                     (model.filterType
                         /= TitleFilter
                         || model.filterValue
