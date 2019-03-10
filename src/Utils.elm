@@ -1,5 +1,6 @@
 module Utils exposing
-    ( formatNumber
+    ( KeyEvent
+    , formatNumber
     , getIndex
     , getNextIndex
     , getPrevIndex
@@ -13,6 +14,10 @@ module Utils exposing
 import List exposing (length, map)
 import Regex exposing (Regex)
 import Set
+
+
+type alias KeyEvent =
+    { key : String, control : Bool, meta : Bool }
 
 
 queryCharMin : Int

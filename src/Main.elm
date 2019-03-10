@@ -2,7 +2,7 @@ port module Main exposing (main)
 
 import Browser exposing (document)
 import Browser.Dom exposing (getElement, getViewportOf, setViewportOf)
-import Browser.Events exposing (onKeyDown, onKeyUp)
+import Browser.Events exposing (onKeyDown)
 import File
 import File.Select as Select
 import Json.Decode as Decode
@@ -26,7 +26,8 @@ import String exposing (toLower, trim)
 import Task exposing (attempt, sequence)
 import Utils
     exposing
-        ( getIndex
+        ( KeyEvent
+        , getIndex
         , getNextIndex
         , getPrevIndex
         , insertOnce
@@ -49,19 +50,13 @@ main =
                 , body = [ view m ]
                 }
         , subscriptions =
-            let
-                decoder =
-                    Decode.field "key" Decode.string
-            in
             \_ ->
-                Sub.batch
-                    [ decoder
-                        |> Decode.map KeyDown
-                        |> onKeyDown
-                    , decoder
-                        |> Decode.map KeyUp
-                        |> onKeyUp
-                    ]
+                Decode.map3 KeyEvent
+                    (Decode.field "key" Decode.string)
+                    (Decode.field "ctrlKey" Decode.bool)
+                    (Decode.field "metaKey" Decode.bool)
+                    |> Decode.map KeyDown
+                    |> onKeyDown
         }
 
 
@@ -444,65 +439,38 @@ update message model =
         DidScroll _ ->
             noOp
 
-        KeyDown key ->
-            let
-                f =
-                    \m ->
-                        ( { m | metaKeyCount = m.metaKeyCount + 1 }, none )
-            in
-            case key of
-                "Meta" ->
-                    f model
+        KeyDown { key, control, meta } ->
+            if control || meta then
+                noOp
 
-                "Control" ->
-                    f model
+            else if model.inputFocused then
+                if key == "Enter" then
+                    case model.pendingTag of
+                        Just tag ->
+                            update (AddTag tag) model
 
-                _ ->
-                    if model.metaKeyCount > 0 then
-                        noOp
+                        _ ->
+                            noOp
 
-                    else if model.inputFocused then
-                        case key of
-                            "Enter" ->
-                                case model.pendingTag of
-                                    Just tag ->
-                                        update (AddTag tag) model
-
-                                    _ ->
-                                        noOp
-
-                            _ ->
-                                noOp
-
-                    else
-                        case key of
-                            "ArrowRight" ->
-                                update ShowNext model
-
-                            "ArrowLeft" ->
-                                update ShowPrev model
-
-                            "r" ->
-                                update ShowRandom model
-
-                            "f" ->
-                                update ToggleFocusMode model
-
-                            _ ->
-                                noOp
-
-        KeyUp key ->
-            let
-                f =
-                    \m ->
-                        ( { m | metaKeyCount = m.metaKeyCount - 1 }, none )
-            in
-            case key of
-                "Meta" ->
-                    f model
-
-                "Control" ->
-                    f model
-
-                _ ->
+                else
                     noOp
+
+            else
+                case key of
+                    "ArrowRight" ->
+                        update ShowNext model
+
+                    "ArrowLeft" ->
+                        update ShowPrev model
+
+                    "r" ->
+                        update ShowRandom model
+
+                    "f" ->
+                        update ToggleFocusMode model
+
+                    "Escape" ->
+                        update (FilterBy model.filterType "") model
+
+                    _ ->
+                        Debug.log key noOp

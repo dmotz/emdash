@@ -3,6 +3,7 @@ module Msg exposing (Msg(..))
 import Browser.Dom exposing (Error)
 import File exposing (File)
 import Model exposing (Entry, Filter, Tag)
+import Utils exposing (KeyEvent)
 
 
 type Msg
@@ -18,8 +19,7 @@ type Msg
     | GotFiles File (List File)
     | FileLoad String
     | PickFile
-    | KeyDown String
-    | KeyUp String
+    | KeyDown KeyEvent
     | SetInputFocus Bool
     | HideEntry Entry
     | UpdatePendingTag Tag

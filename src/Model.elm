@@ -60,7 +60,6 @@ type alias Model =
     , focusMode : Bool
     , isDragging : Bool
     , inputFocused : Bool
-    , metaKeyCount : Int
     , parsingError : Bool
     }
 
@@ -80,7 +79,6 @@ initialModel =
     , focusMode = False
     , isDragging = False
     , inputFocused = False
-    , metaKeyCount = 0
     , parsingError = False
     }
 
