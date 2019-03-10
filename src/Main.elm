@@ -403,10 +403,19 @@ update message model =
 
                 fn =
                     filter ((/=) entry)
+
+                len =
+                    length list
+
+                soleEntry =
+                    len == 1
             in
             update
                 (ShowByIndex <|
-                    if idx == length list - 1 then
+                    if soleEntry then
+                        0
+
+                    else if idx == len - 1 then
                         idx - 1
 
                     else
@@ -415,7 +424,18 @@ update message model =
                 { model
                     | hiddenEntries = insert entry.id model.hiddenEntries
                     , entries = fn model.entries
-                    , shownEntries = Maybe.map fn model.shownEntries
+                    , shownEntries =
+                        if soleEntry then
+                            Nothing
+
+                        else
+                            Maybe.map fn model.shownEntries
+                    , filterValue =
+                        if soleEntry then
+                            Nothing
+
+                        else
+                            model.filterValue
                 }
 
         GotDomEl result ->
