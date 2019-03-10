@@ -55,7 +55,7 @@ view model =
             [ classList [ ( "hidden", noEntries ) ]
             ]
             [ div []
-                [ h1 [] [ span [] [ text "❧" ], text "M" ]
+                [ img [ src "/m.svg" ] []
                 , div [ id "entry-count" ]
                     [ text <|
                         formatNumber entryCount
@@ -117,7 +117,9 @@ view model =
                                     [ span
                                         [ classList
                                             [ ( "x", True )
-                                            , ( "hidden", model.filterValue == Nothing )
+                                            , ( "hidden"
+                                              , model.filterValue == Nothing
+                                              )
                                             ]
                                         , onClick <| FilterBy TextFilter ""
                                         ]
@@ -127,7 +129,10 @@ view model =
                                         , onFocus <| SetInputFocus True
                                         , onBlur <| SetInputFocus False
                                         , id "search-input"
-                                        , value <| Maybe.withDefault "" model.filterValue
+                                        , value <|
+                                            Maybe.withDefault
+                                                ""
+                                                model.filterValue
                                         , placeholder "search"
                                         , autocomplete False
                                         , spellcheck False
@@ -136,6 +141,19 @@ view model =
                                     ]
                         ]
                     ]
+                , div [ id "actions" ]
+                    (map
+                        (\( s, action ) ->
+                            div [ onClick action ]
+                                [ img [ src <| "/" ++ s ++ ".svg" ] []
+                                , label [] [ text s ]
+                                ]
+                        )
+                        [ ( "focus", ToggleFocusMode )
+                        , ( "random", ShowRandom )
+                        , ( "about", ShowRandom )
+                        ]
+                    )
                 ]
             ]
         , main_ []
