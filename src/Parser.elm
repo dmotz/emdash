@@ -1,6 +1,7 @@
 module Parser exposing (getAuthors, getTags, getTitles, process)
 
-import List exposing (concat, filter, foldr, head, map, reverse, sortWith)
+import Char exposing (isDigit)
+import List exposing (all, concat, filter, foldr, head, map, reverse, sortWith)
 import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Entry, Tag, Title)
@@ -63,7 +64,25 @@ pageRx =
 
 footnoteRx : Regex
 footnoteRx =
-    rx "\\.(\\d+) "
+    rx "([A-Za-z\\)][A-Za-z\\.,])(\\d+)"
+
+
+footnoteReplacer : Regex.Match -> String
+footnoteReplacer match =
+    String.concat <|
+        map
+            (\sub ->
+                let
+                    s =
+                        withDefault "" sub
+                in
+                if all isDigit (String.toList s) then
+                    ""
+
+                else
+                    s
+            )
+            match.submatches
 
 
 apostropheRx : Regex
@@ -115,7 +134,7 @@ makeEntry raw =
                     Just <|
                         Entry
                             (hex <| text ++ meta)
-                            (replace footnoteRx (always ".") text)
+                            (replace footnoteRx footnoteReplacer text)
                             (replace apostropheRx apostropheReplacer title)
                             (replace apostropheRx apostropheReplacer author)
                             page
