@@ -9,6 +9,7 @@ $highlight: #ffff00
   box-sizing: border-box
   margin: 0
   padding: 0
+  user-select: none
 
 
 ::selection
@@ -30,6 +31,7 @@ html
 
 body
   background-color: $white
+  color: $black
   font-family: $font
   font-size: 1.4rem
   display: flex
@@ -40,12 +42,17 @@ a
   color: $black
 
 
+ul, li
+  list-style: none
+
+
 .hidden
   visibility: hidden
 
 
 #container
-  padding: 50px
+  padding: 5rem
+  padding-top: 3rem
   width: 100vw
   height: 100vh
   overflow: hidden
@@ -63,8 +70,15 @@ main
   border: 1px solid $lightGray
 
 
-.focus-mode #sidebar
-  opacity: 0
+.focus-mode
+  #sidebar
+    display: none
+
+  .editing
+    opacity: 0
+
+    &:hover
+      opacity: 1
 
 
 #sidebar
@@ -72,7 +86,6 @@ main
   overflow: auto
   border-right: 1px solid $lightGray
   flex: 3
-  transition: opacity 0.2s ease-out
 
   &:hover
     opacity: 1
@@ -80,35 +93,46 @@ main
 
 .intro
   font-weight: normal
+  align-self: center
+
 
 #viewer
   flex: 7
   display: flex
-  align-items: center
   justify-content: center
   line-height: 1.8
   overflow: auto
-  font-size: 18px
+  font-size: 1.8rem
+  position: relative
 
   > div
     max-height: 100%
+    width: 100%
+    max-width: 100rem
     padding: 5vw
 
+  blockquote
+    user-select: text
 
-ul, li
-  list-style: none
+  .title, .author, .page
+    user-select: text
+
+  cite
+    font-style: normal
 
 
-li
-  border-bottom: 1px solid $lightGray
-  cursor: pointer
-  line-height: 1.5
-  overflow: hidden
-  position: relative
+#sidebar
+  li
+    border-bottom: 1px solid $lightGray
+    cursor: pointer
+    line-height: 1.5
+    overflow: hidden
+    position: relative
 
-  a
-    display: block
-    padding: 4rem 2rem
+    a
+      display: block
+      padding: 4rem 2rem
+
 
 .active-entry
   position: absolute
@@ -124,17 +148,23 @@ li
 .highlight
   background-color: $highlight
 
+
 blockquote
   word-break: break-word
 
-.title
-  font-style: italic
-  margin-top: 2rem
+
+.title, .author
   cursor: pointer
   display: block
 
   &:hover
     color: $black
+
+
+.title
+  margin-top: 2rem
+  font-style: italic
+
 
 .no-results
   height: 100%
@@ -143,71 +173,118 @@ blockquote
   justify-content: center
   font-style: italic
 
+
 #meta
-  margin-top: 100px
-  color: #ccc
+  color: $gray
+  position: absolute
+  padding: 10rem 0
+  font-size: 1.4rem
 
 
-.focus-mode #controls
+.focus-mode header
   opacity: 0
 
 
-#controls
-  font-size: 26px
+header
   display: flex
-  margin-bottom: 20px
+  margin-bottom: 2rem
   transition: opacity 0.2s ease-out
 
   &:hover
     opacity: 1
+
+  h1
+    font-weight: bold
+    font-size: 2.2rem
+    margin-bottom: 0.6rem
+
+    span
+      font-style: normal
+      margin-right: 0.6rem
+
+
+  > div:first-child
+    flex: 3
+
+
+#entry-count
+  font-size: 1.4rem
 
 
 #tools
   flex: 7
   display: flex
   align-items: center
-  user-select: none
   justify-content: space-between
 
   > div
     display: flex
-    flex: 3.5
-
-  input[type='checkbox']
-    transform: translateY(-25%)
+    height: 100%
 
 
 .tool-button
   cursor: pointer
-  margin-right: 20px
+  margin-right: 2rem
 
   &:hover
     opacity: 0.5
 
 
+#filters
+  flex-direction: column
+
+
+#filter-links
+  white-space: nowrap
+  margin-bottom: 1rem
+
+  span
+    color: $gray
+    cursor: pointer
+
+    &.active
+      color: $black
+
+    &::after
+      display: inline-block
+      content: '•'
+      margin: 0 1rem
+      color: $gray
+      cursor: default
+
+    &:last-child::after
+      content: ''
+
+
 #search
-  position: relative
-
-  .x
-    position: absolute
-    right: 7px
-    top: -2px
+  display: flex
 
 
-#search-input
-  border: 1px solid $lightGray
+#actions
+  span
+    font-size: 2.4rem
+    margin-right: .5rem
+    transform: translateY(0.2rem)
+    display: inline-block
+
+
+input
+  border: none
+  border-bottom: 1px solid $gray
   font-family: $font
-  padding: 4px 20px
-  flex: 3
+  padding: 0
+  padding-top: 0.2rem
+  padding-bottom: 0.4rem
   outline: none
-  font-size: 14px
+  font-size: 1.6rem
+  width: 100%
 
   &:focus
     border-color: $gray
 
-
   &::placeholder
     font-style: italic
+    color: $gray
 
 
 select
@@ -217,41 +294,173 @@ select
   cursor: pointer
 
 
-#title-select
+.select
   display: flex
   align-items: center
-  overflow: hidden
   position: relative
-  flex: 3 !important
 
   select
-    height: 40px
+    height: 4rem
 
 
   > div
     position: relative
-    max-width: 250px
+    max-width: 40rem
     overflow: hidden
-    transform: translateY(2px)
+    transform: translateY(0.2rem)
     cursor: pointer
-    margin-right: 6px
+    margin-right: 0.6rem
 
   h5
-    font-style: italic
-    font-size: 16px
+    font-size: 1.6rem
+    font-weight: normal
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
     border-bottom: 2px dotted $lightGray
-    margin-left: 10px
-    padding-right: 2px
+    padding-right: 0.2rem
+    padding-bottom: 0.3rem
+    margin-bottom: 0.2rem
 
     &.no-filter
       font-style: normal
       font-weight: normal
+      color: $gray
 
-  .x
-    transform: translateY(2px)
+
+.select-titles h5
+  font-style: italic
+
 
 .x
+  color: $black
   cursor: pointer
+  font-size: 2.4rem
+  position: absolute
+  transform: translateX(-150%) translateY(-5%)
+
+  &:hover
+    color: $gray
+
+
+.editing
+  margin-top: 2rem
+  transition: opacity 0.2s ease-out
+
+.hide-button
+  width: 2.6rem
+  height: 2.6rem
+  display: flex
+  align-items: center
+  justify-content: center
+  font-size: 2.6rem
+  line-height: 0
+  cursor: pointer
+  border: 1px solid $black
+  color: $black
+  position: relative
+  margin-top: 2rem
+
+  &:hover
+    background-color: $black
+    border-color: $black
+    color: $white
+
+    &::after
+      display: block
+
+  &::after
+    display: none
+    content: 'Delete this entry'
+    color: $black
+    line-height: 1
+    font-size: 1.4rem
+    position: absolute
+    left: 150%
+    width: 30rem
+
+.tags
+  margin-top: 5rem
+  margin-bottom: 3rem
+
+.tag
+  display: inline-block
+  margin-right: 4rem
+  margin-right: 1rem
+  font-size: 1.4rem
+  position: relative
+
+  .x
+    transform: translateX(-135%) translateY(-20%)
+    display: none
+
+
+.tag-title
+  border-bottom: 2px dotted $gray
+  margin-right: 1.2rem
+
+  &:hover
+    color: $black
+    cursor: pointer
+
+
+.tag-remove
+  cursor: pointer
+  font-size: 2.2rem
+  color: $black
+  display: none
+
+
+.edit-mode
+  .tag
+    margin-right: 3rem
+
+  .tag-title
+    border: none
+    pointer-events: none
+
+  .x
+    display: inline-block
+
+
+.tag-input
+  position: relative
+  margin-top: 2rem
+
+  input
+    width: 20rem
+
+    &:focus + .tag-list
+      display: block
+
+
+.tag-list
+  display: none
+  position: absolute
+  width: 20rem
+  max-height: 14rem
+  overflow: auto
+  background-color: $lightGray
+  color: $black
+  font-size: 1.4rem
+  z-index: 99
+
+  &:active
+    display: block
+
+  li
+    display: block
+    cursor: pointer
+    padding: 0.5rem 1rem
+
+    &:hover
+      background-color: $black
+      color: $white
+
+
+.edit-button
+  display: inline-block
+  cursor: pointer
+  border: 1px solid $gray
+  padding: 1rem 2rem
+  margin-top: 2rem
