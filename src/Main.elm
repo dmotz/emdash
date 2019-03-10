@@ -160,7 +160,7 @@ update message model =
                 entryElement =
                     getElement entry.id
             in
-            ( newModel
+            ( { newModel | editMode = False }
             , batch
                 [ attempt
                     GotDomEl
@@ -387,6 +387,12 @@ update message model =
         ToggleFocusMode ->
             ( { model | focusMode = not model.focusMode }, none )
 
+        EnterEditMode ->
+            ( { model | editMode = True }, none )
+
+        ExitEditMode ->
+            ( { model | editMode = False }, none )
+
         HideEntry entry ->
             let
                 list =
@@ -476,4 +482,4 @@ update message model =
                         update (FilterBy model.filterType "") model
 
                     _ ->
-                        Debug.log key noOp
+                        noOp
