@@ -384,28 +384,24 @@ listEntry query showTitles currentEntry entry =
 
             _ ->
                 text ""
-        , a []
-            ([ blockquote
-                []
-                (case query of
-                    Nothing ->
+        , blockquote
+            []
+            (case query of
+                Nothing ->
+                    [ text excerpt ]
+
+                Just q ->
+                    if String.length q < queryCharMin then
                         [ text excerpt ]
 
-                    Just q ->
-                        if String.length q < queryCharMin then
-                            [ text excerpt ]
-
-                        else
-                            addHighlighting entry.text q
-                )
-             ]
-                ++ (if showTitles then
-                        [ Html.cite [ class "title" ] [ text entry.title ] ]
-
                     else
-                        []
-                   )
+                        addHighlighting entry.text q
             )
+        , if showTitles then
+            Html.cite [ class "title" ] [ text entry.title ]
+
+          else
+            text ""
         ]
     )
 
