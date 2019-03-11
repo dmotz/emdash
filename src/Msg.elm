@@ -14,6 +14,7 @@ type Msg
     | ShowPrev
     | FilterBy Filter String
     | ToggleFocusMode
+    | ToggleAboutMode
     | EnterEditMode
     | ExitEditMode
     | DragEnter

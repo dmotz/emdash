@@ -387,6 +387,9 @@ update message model =
         ToggleFocusMode ->
             ( { model | focusMode = not model.focusMode }, none )
 
+        ToggleAboutMode ->
+            ( { model | aboutMode = not model.aboutMode }, none )
+
         EnterEditMode ->
             ( { model | editMode = True }, none )
 

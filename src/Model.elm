@@ -59,6 +59,7 @@ type alias Model =
     , pendingTag : Maybe Tag
     , focusMode : Bool
     , editMode : Bool
+    , aboutMode : Bool
     , isDragging : Bool
     , inputFocused : Bool
     , parsingError : Bool
@@ -79,6 +80,7 @@ initialModel =
     , pendingTag = Nothing
     , focusMode = False
     , editMode = False
+    , aboutMode = True
     , isDragging = False
     , inputFocused = False
     , parsingError = False
