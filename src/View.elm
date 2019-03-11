@@ -188,6 +188,27 @@ view model =
                 noEntries
                 model.tags
                 model.pendingTag
+                model.editMode
+            , if model.aboutMode then
+                div [ id "about" ]
+                    [ div [ onClick ToggleAboutMode, class "x" ] [ text "×" ]
+                    , h1 [] [ text "About Marginalia" ]
+                    , p []
+                        [ text "Marginalia is an open source tool created by "
+                        , a [ href "https://oxism.com" ]
+                            [ text "Dan Motzenbecker" ]
+                        , text "."
+                        ]
+                    , p []
+                        [ a
+                            [ href "https://github.com/dmotz/marginalia" ]
+                            [ text "View source" ]
+                        , text "."
+                        ]
+                    ]
+
+              else
+                text ""
             ]
         ]
 

@@ -4,6 +4,7 @@ $white: #fff
 $gray: #aaa
 $lightGray: #eee
 $highlight: #ffff00
+$actionUnderline: 2px dotted $gray
 
 *
   box-sizing: border-box
@@ -40,6 +41,10 @@ body
 a
   text-decoration: none
   color: $black
+  border-bottom: $actionUnderline
+
+  &:hover
+    color: $gray
 
 
 ul, li
@@ -63,7 +68,35 @@ ul, li
     opacity: 0.5
 
 
+#about
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  background-color: $white
+  padding: 8rem
+  padding-top: 5rem
+  font-size: 1.8rem
+  line-height: 1.8
+
+  .x
+    transform: none
+    position: absolute
+    line-height: 1
+    left: 2.5rem
+    font-size: 5rem
+
+  h1
+    font-size: 3rem
+
+  h1, p, a
+    margin-bottom: 2rem
+    user-select: text
+
+
 main
+  position: relative
   display: flex
   overflow: hidden
   flex: 1
