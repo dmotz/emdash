@@ -280,13 +280,13 @@ update message model =
             in
             case filterType of
                 TitleFilter ->
-                    applyFilter <| \entry -> entry.title == val
+                    applyFilter <| .title >> (==) val
 
                 AuthorFilter ->
-                    applyFilter <| \entry -> entry.author == val
+                    applyFilter <| .author >> (==) val
 
                 TagFilter ->
-                    applyFilter <| \entry -> member val entry.tags
+                    applyFilter <| .tags >> member val
 
                 TextFilter ->
                     let
