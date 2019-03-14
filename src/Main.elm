@@ -31,12 +31,19 @@ import Utils
         , getNextIndex
         , getPrevIndex
         , insertOnce
+        , modelToStoredModel
         , queryCharMin
         , removeItem
         , rx
         , updateItem
         )
 import View exposing (sidebarId, view)
+
+
+port setStorage : StoredModel -> Cmd msg
+
+
+port exportJson : StoredModel -> Cmd msg
 
 
 main : Program (Maybe StoredModel) Model Msg
@@ -83,17 +90,9 @@ init maybeModel =
             ( model, none )
 
 
-port setStorage : StoredModel -> Cmd msg
-
-
 store : Model -> Cmd Msg
-store model =
-    setStorage
-        { entries = model.entries
-        , currentEntry = model.currentEntry
-        , hiddenEntries = Set.toList model.hiddenEntries
-        , tags = model.tags
-        }
+store =
+    modelToStoredModel >> setStorage
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -470,6 +469,9 @@ update message model =
 
         DidScroll _ ->
             noOp
+
+        ExportJson ->
+            ( model, model |> modelToStoredModel |> exportJson )
 
         KeyDown { key, control, meta } ->
             if control || meta then

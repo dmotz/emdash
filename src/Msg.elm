@@ -30,3 +30,4 @@ type Msg
     | RemoveTag Tag
     | GotDomEl (Result Error (List Float))
     | DidScroll (Result Error ())
+    | ExportJson

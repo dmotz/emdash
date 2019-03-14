@@ -5,6 +5,7 @@ module Utils exposing
     , getNextIndex
     , getPrevIndex
     , insertOnce
+    , modelToStoredModel
     , queryCharMin
     , removeItem
     , rx
@@ -12,6 +13,7 @@ module Utils exposing
     )
 
 import List exposing (length, map)
+import Model exposing (Model, StoredModel)
 import Regex exposing (Regex)
 import Set
 
@@ -100,3 +102,12 @@ getPrevIndex list item =
 
     else
         idx - 1
+
+
+modelToStoredModel : Model -> StoredModel
+modelToStoredModel model =
+    { entries = model.entries
+    , currentEntry = model.currentEntry
+    , hiddenEntries = Set.toList model.hiddenEntries
+    , tags = model.tags
+    }
