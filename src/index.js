@@ -1,5 +1,6 @@
 require('./styles.sass')
 const {Elm} = require('./Main')
+const {document, localStorage, URL} = window
 const lsNs = 'ls'
 const state = window.localStorage.getItem(lsNs)
 let app
@@ -12,5 +13,14 @@ try {
 }
 
 app.ports.setStorage.subscribe(state =>
-  window.localStorage.setItem(lsNs, JSON.stringify(state))
+  localStorage.setItem(lsNs, JSON.stringify(state))
 )
+
+app.ports.exportJson.subscribe(state => {
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(
+    new Blob([JSON.stringify(state)], {type: 'text/plain'})
+  )
+  a.download = `marginalia_backup_${new Date().toLocaleDateString()}.json`
+  a.click()
+})
