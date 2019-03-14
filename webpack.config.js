@@ -8,7 +8,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const MODE =
-  process.env.npm_lifecycle_event === 'prod' ? 'production' : 'development'
+  process.env.npm_lifecycle_event === 'build' ? 'production' : 'development'
 
 const filename = MODE === 'production' ? '[name]-[hash].js' : 'index.js'
 
