@@ -105,7 +105,7 @@ if (MODE === 'production') {
   module.exports = merge(common, {
     plugins: [
       new elmMinify.WebpackPlugin(),
-      new CleanWebpackPlugin(['dist'], {
+      new CleanWebpackPlugin({
         root: __dirname,
         exclude: [],
         verbose: true,
