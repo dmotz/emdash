@@ -6,6 +6,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const WorkboxPlugin = require('workbox-webpack-plugin')
 
 const MODE =
   process.env.npm_lifecycle_event === 'build' ? 'production' : 'development'
@@ -24,6 +25,23 @@ const common = {
     new HTMLWebpackPlugin({
       template: 'src/index.html',
       inject: 'body'
+    }),
+    new WorkboxPlugin.GenerateSW({
+      swDest: 'sw.js',
+      clientsClaim: true,
+      skipWaiting: true,
+      globDirectory: 'src/assets',
+      globPatterns: ['**/*.{js,css,html,svg,png}'],
+      runtimeCaching: [
+        {
+          urlPattern: /^https:\/\/fonts\.googleapis\.com/,
+          handler: 'StaleWhileRevalidate'
+        },
+        {
+          urlPattern: /^https:\/\/fonts\.gstatic\.com/,
+          handler: 'CacheFirst'
+        }
+      ]
     })
   ],
   resolve: {
