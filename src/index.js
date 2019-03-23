@@ -24,3 +24,9 @@ app.ports.exportJson.subscribe(state => {
   a.download = `marginalia_backup_${new Date().toLocaleDateString()}.json`
   a.click()
 })
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () =>
+    navigator.serviceWorker.register('/sw.js')
+  )
+}
