@@ -504,7 +504,14 @@ update message model =
                         update ToggleFocusMode model
 
                     "Escape" ->
-                        update (FilterBy model.filterType "") model
+                        update
+                            (if model.aboutMode then
+                                ToggleAboutMode
+
+                             else
+                                FilterBy model.filterType ""
+                            )
+                            model
 
                     _ ->
                         noOp
