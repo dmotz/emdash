@@ -343,9 +343,11 @@ viewer mEntry parsingError noEntries tags pendingTag editMode =
                             [ textarea
                                 [ placeholder "notes"
                                 , onFocus <| SetInputFocus True
-                                , onBlur <| SetInputFocus False
+                                , onBlurVal UpdateNotes
+                                , value entry.notes
                                 ]
-                                []
+                                [ text entry.notes
+                                ]
                             ]
                         , section []
                             [ div
@@ -561,3 +563,8 @@ hijack msg =
 on : String -> Decoder msg -> Attribute msg
 on event decoder =
     preventDefaultOn event (Decode.map hijack decoder)
+
+
+onBlurVal : (String -> msg) -> Attribute msg
+onBlurVal ev =
+    Html.Events.on "blur" (Decode.map ev targetValue)

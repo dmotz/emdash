@@ -311,6 +311,37 @@ update message model =
                                     (rx <| "\\b" ++ term)
                                     (toLower entry.text)
 
+        UpdateNotes text ->
+            case model.currentEntry of
+                Just entry ->
+                    let
+                        newEntry =
+                            { entry | notes = text }
+
+                        newModel =
+                            { model
+                                | entries =
+                                    updateItem
+                                        model.entries
+                                        entry
+                                        newEntry
+                                , shownEntries =
+                                    Maybe.map
+                                        (\entries ->
+                                            updateItem
+                                                entries
+                                                entry
+                                                newEntry
+                                        )
+                                        model.shownEntries
+                                , currentEntry = Just newEntry
+                            }
+                    in
+                    ( newModel, store newModel )
+
+                _ ->
+                    noOp
+
         UpdatePendingTag text ->
             ( { model | pendingTag = Just text }, none )
 
