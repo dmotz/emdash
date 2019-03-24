@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy4, lazy5)
+import Html.Lazy exposing (lazy4, lazy6)
 import Html.Parser
 import Html.Parser.Util
 import Json.Decode as Decode exposing (Decoder)
@@ -55,7 +55,7 @@ view model =
             [ classList [ ( "hidden", noEntries ) ]
             ]
             [ div []
-                [ img [ src "/m.svg" ] []
+                [ img [ src "/logo.svg" ] []
                 , div [ id "entry-count" ]
                     [ text <|
                         formatNumber entryCount
@@ -146,12 +146,19 @@ view model =
                         (\( s, action ) ->
                             div [ onClick action ]
                                 [ img [ src <| "/" ++ s ++ ".svg" ] []
-                                , label [] [ text s ]
+                                , label []
+                                    [ text <|
+                                        if s == "about" then
+                                            "&c."
+
+                                        else
+                                            s
+                                    ]
                                 ]
                         )
                         [ ( "focus", ToggleFocusMode )
                         , ( "random", ShowRandom )
-                        , ( "about", ShowRandom )
+                        , ( "about", ToggleAboutMode )
                         ]
                     )
                 ]
@@ -181,7 +188,7 @@ view model =
                         == Nothing
                     )
                     model.currentEntry
-            , lazy5
+            , lazy6
                 viewer
                 model.currentEntry
                 model.parsingError
@@ -213,8 +220,15 @@ view model =
         ]
 
 
-viewer : Maybe Entry -> Bool -> Bool -> List Tag -> Maybe Tag -> Html Msg
-viewer mEntry parsingError noEntries tags pendingTag =
+viewer :
+    Maybe Entry
+    -> Bool
+    -> Bool
+    -> List Tag
+    -> Maybe Tag
+    -> Bool
+    -> Html Msg
+viewer mEntry parsingError noEntries tags pendingTag editMode =
     div [ id "viewer" ]
         [ let
             pendTag =
@@ -224,90 +238,114 @@ viewer mEntry parsingError noEntries tags pendingTag =
             Just entry ->
                 div []
                     [ blockquote [] [ text entry.text ]
-                    , div [ id "meta" ]
-                        [ Html.cite []
-                            [ div
-                                [ onClick <| FilterBy TitleFilter entry.title
-                                , class "title"
-                                ]
-                                [ text entry.title ]
-                            , div
-                                [ onClick <| FilterBy AuthorFilter entry.author
-                                , class "author"
-                                ]
-                                [ text entry.author ]
-                            , case entry.page of
-                                Just n ->
-                                    div
-                                        [ class "page" ]
-                                        [ text <| "p. " ++ String.fromInt n ]
-
-                                _ ->
-                                    text ""
+                    , Html.cite [ id "meta" ]
+                        [ div
+                            [ onClick <| FilterBy TitleFilter entry.title
+                            , class "title"
                             ]
-                        , div [ class "actions" ]
-                            [ div [ class "tags" ]
-                                [ ul
-                                    []
-                                    (map
-                                        (\tag ->
-                                            li
-                                                [ class "tag" ]
-                                                [ span
-                                                    [ onClick <|
-                                                        FilterBy TagFilter tag
-                                                    , class "tag-title"
-                                                    ]
-                                                    [ text tag ]
-                                                , span
-                                                    [ onClick <| RemoveTag tag
-                                                    , class "tag-remove"
-                                                    ]
-                                                    [ span [] [ text "×" ] ]
-                                                ]
-                                        )
-                                        entry.tags
-                                    )
-                                , span [ class "add-tag" ] [ text "add tag" ]
-                                , div [ class "tag-input" ]
-                                    [ input
-                                        [ onInput UpdatePendingTag
-                                        , onFocus <| SetInputFocus True
-                                        , onBlur <| SetInputFocus False
-                                        , value pendTag
-                                        , placeholder "add tag"
-                                        , autocomplete False
-                                        , spellcheck False
-                                        ]
+                            [ text entry.title ]
+                        , div
+                            [ onClick <| FilterBy AuthorFilter entry.author
+                            , class "author"
+                            ]
+                            [ text entry.author ]
+                        , case entry.page of
+                            Just n ->
+                                div
+                                    [ class "page" ]
+                                    [ text <| "p. " ++ String.fromInt n ]
+
+                            _ ->
+                                text ""
+                        ]
+                    , div
+                        [ id "entry-tools" ]
+                        [ section []
+                            [ if length entry.tags > 0 then
+                                div
+                                    [ id "tags"
+                                    , classList [ ( "edit-mode", editMode ) ]
+                                    ]
+                                    [ ul
                                         []
-                                    , ul
-                                        [ class "tag-list" ]
                                         (map
                                             (\tag ->
                                                 li
-                                                    [ onClick <| AddTag tag ]
-                                                    [ text tag ]
-                                            )
-                                            (filter
-                                                (\tag ->
-                                                    member tag entry.tags
-                                                        |> not
-                                                        |> (&&)
-                                                            (String.contains
-                                                                pendTag
+                                                    [ class "tag" ]
+                                                    [ span
+                                                        [ onClick <|
+                                                            RemoveTag tag
+                                                        , class "x"
+                                                        ]
+                                                        [ text "×" ]
+                                                    , span
+                                                        [ onClick <|
+                                                            FilterBy
+                                                                TagFilter
                                                                 tag
-                                                            )
-                                                )
-                                                tags
+                                                        , class "tag-title"
+                                                        ]
+                                                        [ text tag ]
+                                                    ]
                                             )
+                                            entry.tags
                                         )
                                     ]
+
+                              else
+                                text ""
+                            , div [ class "tag-input" ]
+                                [ input
+                                    [ onInput UpdatePendingTag
+                                    , onFocus <| SetInputFocus True
+                                    , onBlur <| SetInputFocus False
+                                    , value pendTag
+                                    , placeholder "add tag"
+                                    , autocomplete False
+                                    , spellcheck False
+                                    ]
+                                    []
+                                , ul
+                                    [ class "tag-list" ]
+                                    (map
+                                        (\tag ->
+                                            li
+                                                [ onClick <|
+                                                    AddTag tag
+                                                ]
+                                                [ text tag ]
+                                        )
+                                        (filter
+                                            (\tag ->
+                                                member tag entry.tags
+                                                    |> not
+                                                    |> (&&)
+                                                        (String.contains
+                                                            pendTag
+                                                            tag
+                                                        )
+                                            )
+                                            tags
+                                        )
+                                    )
                                 ]
-                            , div
+                            ]
+                        , section []
+                            [ textarea
+                                [ placeholder "notes"
+                                , onFocus <| SetInputFocus True
+                                , onBlur <| SetInputFocus False
+                                ]
+                                []
+                            ]
+                        , section []
+                            [ div
                                 [ class "hide-button"
                                 , onClick <| HideEntry entry
                                 ]
-                                [ text "×" ]
+                                [ div [] [ text "×" ]
+                                , span [] [ text "delete entry" ]
+                                ]
                             ]
                         ]
                     ]
