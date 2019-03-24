@@ -202,16 +202,18 @@ view model =
                     , h1 [] [ text "About Marginalia" ]
                     , p []
                         [ text "Marginalia is an open source tool created by "
-                        , a [ href "https://oxism.com" ]
+                        , a [ href "https://oxism.com", target "_blank" ]
                             [ text "Dan Motzenbecker" ]
                         , text "."
                         ]
                     , p []
                         [ a
-                            [ href "https://github.com/dmotz/marginalia" ]
+                            [ href "https://github.com/dmotz/marginalia"
+                            , target "_blank"
+                            ]
                             [ text "View source" ]
-                        , text "."
                         ]
+                    , p [] [ a [ onClick ExportJson ] [ text "Export JSON" ] ]
                     ]
 
               else
