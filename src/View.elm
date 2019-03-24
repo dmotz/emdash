@@ -307,17 +307,9 @@ viewer mEntry parsingError noEntries tags pendingTag editMode =
                                     , spellcheck False
                                     ]
                                     []
-                                , ul
-                                    [ class "tag-list" ]
-                                    (map
-                                        (\tag ->
-                                            li
-                                                [ onClick <|
-                                                    AddTag tag
-                                                ]
-                                                [ text tag ]
-                                        )
-                                        (filter
+                                , let
+                                    tagList =
+                                        filter
                                             (\tag ->
                                                 member tag entry.tags
                                                     |> not
@@ -328,8 +320,23 @@ viewer mEntry parsingError noEntries tags pendingTag editMode =
                                                         )
                                             )
                                             tags
+                                  in
+                                  if length tagList > 0 then
+                                    ul
+                                        [ class "tag-list" ]
+                                        (map
+                                            (\tag ->
+                                                li
+                                                    [ onClick <|
+                                                        AddTag tag
+                                                    ]
+                                                    [ text tag ]
+                                            )
+                                            tagList
                                         )
-                                    )
+
+                                  else
+                                    text ""
                                 ]
                             ]
                         , section []
