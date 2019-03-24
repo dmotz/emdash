@@ -55,7 +55,7 @@ view model =
             [ classList [ ( "hidden", noEntries ) ]
             ]
             [ div []
-                [ img [ src "/logo.svg" ] []
+                [ img [ src "/logo.svg", draggable "false" ] []
                 , div [ id "entry-count" ]
                     [ text <|
                         formatNumber entryCount
@@ -145,7 +145,11 @@ view model =
                     (map
                         (\( s, action ) ->
                             div [ onClick action ]
-                                [ img [ src <| "/" ++ s ++ ".svg" ] []
+                                [ img
+                                    [ src <| "/" ++ s ++ ".svg"
+                                    , draggable "false"
+                                    ]
+                                    []
                                 , label []
                                     [ text <|
                                         if s == "about" then
