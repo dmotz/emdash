@@ -19,7 +19,7 @@ process =
         >> filter predicate
         >> map makeEntry
         >> filter ((/=) Nothing)
-        >> map (withDefault <| Entry "" "" "" "" Nothing [])
+        >> map (withDefault <| Entry "" "" "" "" Nothing [] "")
         >> reverse
 
 
@@ -139,6 +139,7 @@ makeEntry raw =
                             (replace apostropheRx apostropheReplacer author)
                             page
                             []
+                            ""
 
                 _ ->
                     Nothing

@@ -43,6 +43,7 @@ type alias Entry =
     , author : String
     , page : Maybe Int
     , tags : List Tag
+    , notes : String
     }
 
 
