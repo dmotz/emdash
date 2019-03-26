@@ -8,10 +8,12 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const WorkboxPlugin = require('workbox-webpack-plugin')
 
-const MODE =
-  process.env.npm_lifecycle_event === 'build' ? 'production' : 'development'
+const dev = 'development'
+const prod = 'production'
 
-const filename = MODE === 'production' ? '[name]-[hash].js' : 'index.js'
+const MODE = process.env.npm_lifecycle_event === 'build' ? prod : dev
+
+const filename = MODE === prod ? '[name]-[hash].js' : 'index.js'
 
 const common = {
   mode: MODE,
@@ -49,7 +51,7 @@ const common = {
   }
 }
 
-if (MODE === 'development') {
+if (MODE === dev) {
   console.log('Building for dev...')
   module.exports = merge(common, {
     plugins: [
@@ -83,8 +85,8 @@ if (MODE === 'development') {
   })
 }
 
-if (MODE === 'production') {
-  console.log('Building for Production...')
+if (MODE === prod) {
+  console.log('Building for production...')
   module.exports = merge(common, {
     plugins: [
       new elmMinify.WebpackPlugin(),
