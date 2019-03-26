@@ -375,8 +375,8 @@ viewer mEntry parsingError noEntries tags pendingTag editMode =
                             "Drag & drop a clippings text file here. "
                                 ++ "Or, click to browse."
 
-                        else
-                            "Select an entry."
+                      else
+                        text ""
                     ]
         ]
 

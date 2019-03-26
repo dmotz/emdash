@@ -142,6 +142,7 @@ update message model =
                         { model
                             | parsingError = False
                             , entries = entries
+                            , currentEntry = head entries
                             , titles = Parser.getTitles entries
                             , authors = Parser.getAuthors entries
                         }
