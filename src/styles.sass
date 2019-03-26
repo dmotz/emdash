@@ -97,6 +97,9 @@ ul, li
     margin-bottom: 2rem
     user-select: text
 
+  p:first-of-type
+    margin-bottom: 10rem
+
 
 main
   position: relative
@@ -109,6 +112,10 @@ main
 
 #container.focus-mode
   padding-bottom: 0
+
+
+#container.focus-mode.empty
+  padding-bottom: 5rem
 
 
 .focus-mode
@@ -146,9 +153,28 @@ main
       margin-top: 2rem
 
 
-.intro
+#intro
   font-weight: normal
   align-self: center
+  padding: 4rem
+  max-width: 75rem !important
+
+  p, li, a
+    user-select: text
+
+  p
+    hyphens: auto
+
+  p:first-child
+    margin-bottom: 4rem
+
+  ol
+    font-size: 1.4rem
+    margin-top: 6rem
+
+  li
+    list-style: lower-roman
+    margin-bottom: 2rem
 
 
 #viewer
@@ -169,6 +195,7 @@ main
 
   blockquote
     user-select: text
+    hyphens: auto
 
   .title, .author, .page
     user-select: text
@@ -219,7 +246,6 @@ blockquote
 #meta
   color: $gray
   padding-top: 10rem
-  padding-bottom: 2rem
   font-size: 1.4rem
 
 
@@ -440,12 +466,16 @@ select
 
 
 #entry-tools
-  margin-top: 5rem
+  margin-top: 2rem
+  width: 70%
   transition: opacity 0.2s ease-out
 
   section
     border-top: 1px solid $lightGray
     padding: 3rem 0
+
+    &:first-child
+      border: none
 
 
 .hide-button
@@ -462,8 +492,8 @@ select
     justify-content: center
     font-size: 2.6rem
     line-height: 0
-    border: 1px solid $gray
-    color: $gray
+    border: 1px solid $lightGray
+    color: $lightGray
     margin-right: 1rem
 
   &:hover
@@ -499,13 +529,15 @@ select
     position: relative
     left: -0.2rem
     top: 0.4rem
-    visibility: hidden
+    opacity: 0
+    transition: opacity .2s ease-out
     line-height: 0
 
   &:hover
     cursor: pointer
     .x
-      visibility: visible
+      opacity: 1
+
       &:hover + .tag-title
         color: $black
 
@@ -543,9 +575,13 @@ select
   input
     width: 12rem
     font-size: 1.4rem
+    border-bottom-color: $lightGray
 
-    &:focus + .tag-list
-      display: block
+    &:focus
+      border-bottom-color: $gray
+
+      + .tag-list
+        display: block
 
 
 .tag-list
