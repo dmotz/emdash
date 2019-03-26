@@ -163,7 +163,7 @@ update message model =
                 entryElement =
                     getElement entry.id
             in
-            ( { newModel | editMode = False }
+            ( newModel
             , batch
                 [ attempt
                     GotDomEl
@@ -423,12 +423,6 @@ update message model =
 
         ToggleAboutMode ->
             ( { model | aboutMode = not model.aboutMode }, none )
-
-        EnterEditMode ->
-            ( { model | editMode = True }, none )
-
-        ExitEditMode ->
-            ( { model | editMode = False }, none )
 
         HideEntry entry ->
             let

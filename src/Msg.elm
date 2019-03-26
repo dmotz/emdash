@@ -15,8 +15,6 @@ type Msg
     | FilterBy Filter String
     | ToggleFocusMode
     | ToggleAboutMode
-    | EnterEditMode
-    | ExitEditMode
     | DragEnter
     | DragLeave
     | GotFiles File (List File)

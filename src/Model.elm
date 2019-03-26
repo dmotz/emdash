@@ -59,7 +59,6 @@ type alias Model =
     , filterValue : Maybe String
     , pendingTag : Maybe Tag
     , focusMode : Bool
-    , editMode : Bool
     , aboutMode : Bool
     , isDragging : Bool
     , inputFocused : Bool
@@ -80,7 +79,6 @@ initialModel =
     , filterValue = Nothing
     , pendingTag = Nothing
     , focusMode = False
-    , editMode = False
     , aboutMode = False
     , isDragging = False
     , inputFocused = False
