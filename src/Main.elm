@@ -149,6 +149,9 @@ update message model =
                 in
                 ( newModel, store newModel )
 
+        ResetError ->
+            ( { model | parsingError = False }, none )
+
         ShowEntry entry ->
             let
                 newModel =

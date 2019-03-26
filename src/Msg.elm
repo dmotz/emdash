@@ -32,3 +32,4 @@ type Msg
     | GotDomEl (Result Error (List Float))
     | DidScroll (Result Error ())
     | ExportJson
+    | ResetError
