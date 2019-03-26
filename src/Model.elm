@@ -90,7 +90,6 @@ type alias StoredModel =
     { entries : List Entry
     , currentEntry : Maybe Entry
     , hiddenEntries : List Id
-    , tags : List Tag
     }
 
 
@@ -99,5 +98,4 @@ initialStoredModel =
     { entries = []
     , currentEntry = Nothing
     , hiddenEntries = []
-    , tags = []
     }
