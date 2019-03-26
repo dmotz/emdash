@@ -172,14 +172,9 @@ view model =
                 text ""
 
               else
-                lazy4 sidebar
-                    (case model.shownEntries of
-                        Just entries ->
-                            entries
-
-                        _ ->
-                            model.entries
-                    )
+                lazy4
+                    sidebar
+                    (withDefault model.entries model.shownEntries)
                     (if model.filterType == TextFilter then
                         model.filterValue
 
