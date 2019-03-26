@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy4, lazy6)
+import Html.Lazy exposing (lazy4, lazy5)
 import Html.Parser
 import Html.Parser.Util
 import Json.Decode as Decode exposing (Decoder)
@@ -34,26 +34,19 @@ view model =
                         model.entries
     in
     div
-        ([ id "container"
-         , classList
+        [ id "container"
+        , classList
             [ ( "focus-mode", model.focusMode )
             , ( "drag-on", model.isDragging )
+            , ( "empty", noEntries )
             ]
-         , on "dragenter" (Decode.succeed DragEnter)
-         , on "dragover" (Decode.succeed DragEnter)
-         , on "dragleave" (Decode.succeed DragLeave)
-         , on "drop" dropDecoder
-         ]
-            ++ (if noEntries then
-                    [ onClick PickFile ]
-
-                else
-                    []
-               )
-        )
+        , on "dragenter" (Decode.succeed DragEnter)
+        , on "dragover" (Decode.succeed DragEnter)
+        , on "dragleave" (Decode.succeed DragLeave)
+        , on "drop" dropDecoder
+        ]
         [ header
-            [ classList [ ( "hidden", noEntries ) ]
-            ]
+            []
             [ div []
                 [ img [ src "logo.svg", draggable "false" ] []
                 , div [ id "entry-count" ]
@@ -69,7 +62,7 @@ view model =
                     ]
                 ]
             , div [ id "tools" ]
-                [ div [ id "filters" ]
+                [ div [ id "filters", classList [ ( "hidden", noEntries ) ] ]
                     [ div [ id "filter-links" ]
                         (map
                             (\( mode, label ) ->
@@ -187,18 +180,17 @@ view model =
                         == Nothing
                     )
                     model.currentEntry
-            , lazy6
+            , lazy5
                 viewer
                 model.currentEntry
                 model.parsingError
                 noEntries
                 model.tags
                 model.pendingTag
-                model.editMode
             , if model.aboutMode then
                 div [ id "about" ]
                     [ div [ onClick ToggleAboutMode, class "x" ] [ text "×" ]
-                    , h1 [] [ text "About Marginalia" ]
+                    , h1 [] [ text "Marginalia" ]
                     , p []
                         [ text "Marginalia is an open source tool created by "
                         , a [ href "https://oxism.com", target "_blank" ]
@@ -227,10 +219,17 @@ viewer :
     -> Bool
     -> List Tag
     -> Maybe Tag
-    -> Bool
     -> Html Msg
-viewer mEntry parsingError noEntries tags pendingTag editMode =
-    div [ id "viewer" ]
+viewer mEntry parsingError noEntries tags pendingTag =
+    div
+        ([ id "viewer" ]
+            ++ (if parsingError then
+                    [ onClick ResetError ]
+
+                else
+                    []
+               )
+        )
         [ let
             pendTag =
                 Maybe.withDefault "" pendingTag
@@ -264,9 +263,7 @@ viewer mEntry parsingError noEntries tags pendingTag editMode =
                         [ section []
                             [ if length entry.tags > 0 then
                                 div
-                                    [ id "tags"
-                                    , classList [ ( "edit-mode", editMode ) ]
-                                    ]
+                                    [ id "tags" ]
                                     [ ul
                                         []
                                         (map
@@ -361,14 +358,46 @@ viewer mEntry parsingError noEntries tags pendingTag editMode =
                     ]
 
             Nothing ->
-                h3 [ class "intro" ]
-                    [ text <|
-                        if parsingError then
-                            "Error parsing file."
+                div [ id "intro" ]
+                    [ if parsingError then
+                        p [] [ text "Error parsing file." ]
 
-                        else if noEntries then
-                            "Drag & drop a clippings text file here. "
-                                ++ "Or, click to browse."
+                      else if noEntries then
+                        div []
+                            [ p []
+                                [ text <|
+                                    "This is Marginalia, a tool to "
+                                        ++ "organize excerpts from e-readers."
+                                ]
+                            , p []
+                                [ text <|
+                                    "Drop a clippings text file here "
+                                        ++ "to import it."
+                                ]
+                            , p []
+                                [ text "Or, click "
+                                , a [ onClick PickFile ] [ text "here" ]
+                                , text " to browse the filesystem."
+                                ]
+                            , p [] [ text "❦" ]
+                            , ol []
+                                [ li []
+                                    [ text <|
+                                        "Marginalia works entirely on your "
+                                            ++ "device and stores all your data there."
+                                    ]
+                                , li []
+                                    [ text <|
+                                        "It even works with no "
+                                            ++ "network connection."
+                                    ]
+                                , li []
+                                    [ text <|
+                                        "You can easily export your data "
+                                            ++ "(tags, notes, etc.) as JSON."
+                                    ]
+                                ]
+                            ]
 
                       else
                         text ""
