@@ -27,6 +27,6 @@ app.ports.exportJson.subscribe(state => {
 
 if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () =>
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('sw.js')
   )
 }
