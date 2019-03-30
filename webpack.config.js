@@ -20,7 +20,7 @@ const common = {
   entry: './src/index.js',
   output: {
     path: path.join(__dirname, 'dist'),
-    publicPath: './',
+    publicPath: '/',
     filename
   },
   plugins: [
@@ -88,6 +88,10 @@ if (MODE === dev) {
 if (MODE === prod) {
   console.log('Building for production...')
   module.exports = merge(common, {
+    output: {
+      ...common.output,
+      publicPath: './'
+    },
     plugins: [
       new elmMinify.WebpackPlugin(),
       new CleanWebpackPlugin({
