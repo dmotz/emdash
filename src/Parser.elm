@@ -64,7 +64,7 @@ pageRx =
 
 footnoteRx : Regex
 footnoteRx =
-    rx "([A-Za-z\\.,\\)’”\"'][A-Za-z\\.,\\)’”\"'])(\\d+)"
+    rx "([^\\s\\d]{2,})(\\d+)"
 
 
 footnoteReplacer : Regex.Match -> String
