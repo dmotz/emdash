@@ -1,4 +1,4 @@
-module View exposing (sidebarId, view)
+module View exposing (sidebarId, view, viewerId)
 
 import File
 import Html exposing (..)
@@ -405,6 +405,12 @@ viewer mEntry parsingError noEntries tags pendingTag =
         ]
 
 
+viewerId : String
+viewerId =
+    "viewer"
+
+
+sidebarId : String
 sidebarId =
     "sidebar"
 

@@ -37,7 +37,7 @@ import Utils
         , rx
         , updateItem
         )
-import View exposing (sidebarId, view)
+import View exposing (sidebarId, view, viewerId)
 
 
 port setStorage : StoredModel -> Cmd msg
@@ -478,13 +478,12 @@ update message model =
                     in
                     if targetY + elHeight > height || targetY < 0 then
                         ( model
-                        , attempt
-                            DidScroll
-                            (setViewportOf
-                                sidebarId
-                                0
-                                (offset + targetY)
-                            )
+                        , batch
+                            [ attempt
+                                DidScroll
+                                (setViewportOf sidebarId 0 (offset + targetY))
+                            , attempt DidScroll (setViewportOf viewerId 0 0)
+                            ]
                         )
 
                     else
