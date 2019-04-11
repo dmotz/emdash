@@ -3,7 +3,7 @@
   "author": {
     "name": "Dan Motzenbecker",
     "email": "dan@oxism.com",
-    "url": "http://oxism.com"
+    "url": "https://oxism.com"
   },
   "version": "0.1.0",
   "description": "Book excerpt organizer",
@@ -35,5 +35,12 @@
     "webpack-dev-server": "^3.2.1",
     "webpack-merge": "^4.2.1",
     "workbox-webpack-plugin": "^4.1.1"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env"
+      ]
+    ]
   }
 }
