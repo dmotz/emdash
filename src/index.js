@@ -1,7 +1,7 @@
 require('./styles.sass')
 const {Elm} = require('./Main')
 const {document, localStorage, URL} = window
-const lsNs = 'ls'
+const lsNs = 'marginalia'
 const state = window.localStorage.getItem(lsNs)
 let app
 
