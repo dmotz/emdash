@@ -18,7 +18,18 @@ by [Dan Motzenbecker](https://oxism.com)
 
 - private (your data never leaves your computer)
 - works offline (PWA)
+- JSON-exportable data
 - open source
+
+## Keyboard shortcuts
+
+|      key       | action                      |
+| :------------: | --------------------------- |
+|  <kbd>→</kbd>  | show next entry in list     |
+|  <kbd>←</kbd>  | show previous entry in list |
+|  <kbd>r</kbd>  | show random entry from list |
+|  <kbd>f</kbd>  | toggle focus mode           |
+| <kbd>esc</kbd> | clear current filter        |
 
 ## Current limitations
 
@@ -38,5 +49,7 @@ $ npm start
 ```sh
 $ npm run build
 ```
+
+---
 
 _Habent sua fata libelli_
