@@ -199,7 +199,7 @@ view model =
                         ]
                     , p []
                         [ a
-                            [ href "https://github.com/dmotz/marginalia"
+                            [ href repoUrl
                             , target "_blank"
                             ]
                             [ text "View source" ]
@@ -367,42 +367,53 @@ viewer mEntry parsingError noEntries tags pendingTag =
                             [ p []
                                 [ text <|
                                     "This is Marginalia, a tool to "
-                                        ++ "organize excerpts from e-readers."
+                                        ++ "organize excerpts from e-books "
+                                        ++ "with tags, notes, and filtering."
                                 ]
                             , p []
                                 [ text <|
-                                    "Drop a clippings text file here "
+                                    "Drop a clippings text file onto the page "
                                         ++ "to import it."
                                 ]
                             , p []
-                                [ text "Or, click "
-                                , a [ onClick PickFile ] [ text "here" ]
-                                , text " to browse the filesystem."
+                                [ text "Or, "
+                                , a [ onClick PickFile ] [ text "click here" ]
+                                , text " to browse for the file."
                                 ]
                             , p [] [ text "❦" ]
                             , ol []
                                 [ li []
                                     [ text <|
                                         "Marginalia works entirely on your "
-                                            ++ "device and stores all your data there."
-                                    ]
-                                , li []
-                                    [ text <|
-                                        "It even works with no "
-                                            ++ "network connection."
+                                            ++ "device and stores all your "
+                                            ++ "data there."
                                     ]
                                 , li []
                                     [ text <|
                                         "You can easily export your data "
                                             ++ "(tags, notes, etc.) as JSON."
                                     ]
+                                , li []
+                                    [ text "It works offline." ]
+                                , li []
+                                    [ text "It’s "
+                                    , a [ href repoUrl, target "_blank" ]
+                                        [ text "open source" ]
+                                    , text "."
+                                    ]
                                 ]
+                            , footer [] [ text "Habent sua fata libelli" ]
                             ]
 
                       else
                         text ""
                     ]
         ]
+
+
+repoUrl : String
+repoUrl =
+    "https://github.com/dmotz/marginalia"
 
 
 viewerId : String
