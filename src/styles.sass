@@ -157,13 +157,16 @@ main
   font-weight: normal
   align-self: center
   padding: 4rem
-  max-width: 75rem !important
+  max-width: 70rem !important
 
   p, li, a
     user-select: text
 
   p
     hyphens: auto
+
+    &:first-child
+      font-size: 2.4rem
 
   p:first-child
     margin-bottom: 4rem
@@ -175,6 +178,11 @@ main
   li
     list-style: lower-roman
     margin-bottom: 2rem
+
+  footer
+    font-size: 1.2rem
+    font-style: italic
+    margin-top: 6rem
 
 
 #viewer
