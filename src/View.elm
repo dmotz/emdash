@@ -48,7 +48,12 @@ view model =
         [ header
             []
             [ div []
-                [ img [ src "logo.svg", draggable "false" ] []
+                [ img
+                    [ src "logo.svg"
+                    , draggable "false"
+                    , onClick ToggleAboutMode
+                    ]
+                    []
                 , div [ id "entry-count" ]
                     [ text <|
                         formatNumber entryCount
