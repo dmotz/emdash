@@ -108,6 +108,11 @@ apostropheReplacer match =
             match.submatches
 
 
+replaceApostrophes : String -> String
+replaceApostrophes =
+    replace apostropheRx apostropheReplacer
+
+
 makeEntry : List String -> Maybe Entry
 makeEntry raw =
     case raw of
@@ -135,8 +140,8 @@ makeEntry raw =
                         Entry
                             (hex <| text ++ meta)
                             (replace footnoteRx footnoteReplacer text)
-                            (replace apostropheRx apostropheReplacer title)
-                            (replace apostropheRx apostropheReplacer author)
+                            (replaceApostrophes title)
+                            (replaceApostrophes author)
                             page
                             []
                             ""
