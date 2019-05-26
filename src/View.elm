@@ -5,9 +5,10 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy4, lazy5)
+import Html.Lazy exposing (lazy5, lazy6)
 import Html.Parser
 import Html.Parser.Util
+import InfiniteList as IL
 import Json.Decode as Decode exposing (Decoder)
 import List exposing (filter, head, length, map, member, take)
 import Maybe exposing (withDefault)
@@ -170,8 +171,10 @@ view model =
                 text ""
 
               else
-                lazy4
+                lazy6
                     sidebar
+                    model.infiniteList
+                    model.uiSize
                     (withDefault model.entries model.shownEntries)
                     (if model.filterType == TextFilter then
                         model.filterValue
@@ -431,17 +434,47 @@ sidebarId =
     "sidebar"
 
 
-sidebar : List Entry -> Maybe String -> Bool -> Maybe Entry -> Html Msg
-sidebar entries query showTitles currentEntry =
-    div [ id sidebarId ]
+sidebar :
+    IL.Model
+    -> ( Int, Int )
+    -> List Entry
+    -> Maybe String
+    -> Bool
+    -> Maybe Entry
+    -> Html Msg
+sidebar infiniteList ( w, h ) entries query showTitles currentEntry =
+    div
+        [ id sidebarId
+        , classList [ ( "no-titles", not showTitles ) ]
+        , IL.onScroll InfList
+        ]
         [ if length entries == 0 then
             div [ class "no-results" ] [ text "no results" ]
 
           else
-            Keyed.node "ul"
-                []
-                (map (listEntry query showTitles currentEntry) entries)
+            IL.view
+                (IL.config
+                    { itemView = listEntry query showTitles currentEntry
+                    , itemHeight =
+                        IL.withConstantHeight
+                            (if showTitles then
+                                90
+
+                             else
+                                60
+                            )
+                    , containerHeight = h
+                    }
+                    |> IL.withCustomContainer entriesContainer
+                )
+                infiniteList
+                entries
         ]
+
+
+entriesContainer : List ( String, String ) -> List (Html msg) -> Html msg
+entriesContainer styles children =
+    ul (map (\( k, v ) -> style k v) styles) children
 
 
 charLimit : Int
@@ -505,8 +538,15 @@ addHighlighting str query =
             [ text str ]
 
 
-listEntry : Maybe String -> Bool -> Maybe Entry -> Entry -> ( String, Html Msg )
-listEntry query showTitles currentEntry entry =
+listEntry :
+    Maybe String
+    -> Bool
+    -> Maybe Entry
+    -> Int
+    -> Int
+    -> Entry
+    -> Html Msg
+listEntry query showTitles currentEntry idx listIdx entry =
     let
         excerpt =
             if String.length entry.text > charLimit then
@@ -515,8 +555,7 @@ listEntry query showTitles currentEntry entry =
             else
                 entry.text
     in
-    ( entry.id
-    , li [ id entry.id, onClick <| ShowEntry entry ]
+    li [ id entry.id, onClick <| ShowEntry entry ]
         [ case currentEntry of
             Just ent ->
                 if ent == entry then
@@ -546,7 +585,6 @@ listEntry query showTitles currentEntry entry =
           else
             text ""
         ]
-    )
 
 
 selectMenu :
