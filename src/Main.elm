@@ -1,8 +1,14 @@
 port module Main exposing (main)
 
 import Browser exposing (document)
-import Browser.Dom exposing (getElement, getViewportOf, setViewportOf)
-import Browser.Events exposing (onKeyDown)
+import Browser.Dom
+    exposing
+        ( getElement
+        , getViewport
+        , getViewportOf
+        , setViewportOf
+        )
+import Browser.Events exposing (onKeyDown, onResize)
 import File
 import File.Select as Select
 import Json.Decode as Decode
@@ -23,7 +29,7 @@ import Random exposing (generate)
 import Regex
 import Set exposing (insert)
 import String exposing (toLower, trim)
-import Task exposing (attempt, sequence)
+import Task exposing (attempt, perform, sequence)
 import Utils
     exposing
         ( KeyEvent
@@ -58,12 +64,15 @@ main =
                 }
         , subscriptions =
             \_ ->
-                Decode.map3 KeyEvent
-                    (Decode.field "key" Decode.string)
-                    (Decode.field "ctrlKey" Decode.bool)
-                    (Decode.field "metaKey" Decode.bool)
-                    |> Decode.map KeyDown
-                    |> onKeyDown
+                Sub.batch
+                    [ onResize (\w h -> Resize ( w, h ))
+                    , Decode.map3 KeyEvent
+                        (Decode.field "key" Decode.string)
+                        (Decode.field "ctrlKey" Decode.bool)
+                        (Decode.field "metaKey" Decode.bool)
+                        |> Decode.map KeyDown
+                        |> onKeyDown
+                    ]
         }
 
 
@@ -81,13 +90,30 @@ init maybeModel =
                 , authors = Parser.getAuthors restored.entries
                 , tags = Parser.getTags restored.entries
             }
+
+        getSize =
+            perform Resize
+                (Task.map
+                    (.viewport
+                        >> (\v ->
+                                ( v |> .width |> floor
+                                , v |> .height |> floor
+                                )
+                           )
+                    )
+                    getViewport
+                )
     in
     case restored.currentEntry of
         Just entry ->
-            update (ShowEntry entry) model
+            let
+                ( m, cmd ) =
+                    update (ShowEntry entry) model
+            in
+            ( m, batch [ getSize, cmd ] )
 
         _ ->
-            ( model, none )
+            ( model, getSize )
 
 
 store : Model -> Cmd Msg
@@ -110,7 +136,7 @@ update message model =
 
         GotFiles file _ ->
             ( { model | isDragging = False }
-            , Task.perform FileLoad (File.toString file)
+            , perform FileLoad (File.toString file)
             )
 
         PickFile ->
@@ -306,7 +332,12 @@ update message model =
                         )
 
                     else if String.length term < queryCharMin then
-                        ( { model | filterValue = Just val, filterType = filterType }, none )
+                        ( { model
+                            | filterValue = Just val
+                            , filterType = filterType
+                          }
+                        , none
+                        )
 
                     else
                         applyFilter <|
@@ -546,3 +577,6 @@ update message model =
 
                     _ ->
                         noOp
+
+        Resize size ->
+            ( { model | uiSize = size }, none )

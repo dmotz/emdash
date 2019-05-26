@@ -32,4 +32,5 @@ type Msg
     | DidScroll (Result Error ())
     | ExportJson
     | ResetError
+    | Resize ( Int, Int )
     | InfList IL.Model

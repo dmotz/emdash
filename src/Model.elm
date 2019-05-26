@@ -64,6 +64,7 @@ type alias Model =
     , isDragging : Bool
     , inputFocused : Bool
     , parsingError : Bool
+    , uiSize : ( Int, Int )
     , infiniteList : InfiniteList.Model
     }
 
@@ -85,6 +86,7 @@ initialModel =
     , isDragging = False
     , inputFocused = False
     , parsingError = False
+    , uiSize = ( 1, 1 )
     , infiniteList = InfiniteList.init
     }
 
