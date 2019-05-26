@@ -1,11 +1,13 @@
 module Utils exposing
     ( KeyEvent
     , formatNumber
+    , getEntryHeight
     , getIndex
     , getNextIndex
     , getPrevIndex
     , insertOnce
     , modelToStoredModel
+    , needsTitles
     , queryCharMin
     , removeItem
     , rx
@@ -13,7 +15,7 @@ module Utils exposing
     )
 
 import List exposing (length, map)
-import Model exposing (Model, StoredModel)
+import Model exposing (Filter(..), Model, StoredModel)
 import Regex exposing (Regex)
 import Set
 
@@ -110,3 +112,20 @@ modelToStoredModel model =
     , currentEntry = model.currentEntry
     , hiddenEntries = Set.toList model.hiddenEntries
     }
+
+
+needsTitles : Model -> Bool
+needsTitles model =
+    model.filterType
+        /= TitleFilter
+        || model.filterValue
+        == Nothing
+
+
+getEntryHeight : Bool -> Int
+getEntryHeight hasTitle =
+    if hasTitle then
+        90
+
+    else
+        60

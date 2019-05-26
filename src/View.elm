@@ -16,7 +16,7 @@ import Model exposing (Entry, Filter(..), Model, Tag)
 import Msg exposing (..)
 import Regex
 import String exposing (fromChar, slice, toList)
-import Utils exposing (formatNumber, queryCharMin)
+import Utils exposing (formatNumber, getEntryHeight, needsTitles, queryCharMin)
 
 
 view : Model -> Html Msg
@@ -182,11 +182,7 @@ view model =
                      else
                         Nothing
                     )
-                    (model.filterType
-                        /= TitleFilter
-                        || model.filterValue
-                        == Nothing
-                    )
+                    (needsTitles model)
                     model.currentEntry
             , lazy5
                 viewer
@@ -455,13 +451,7 @@ sidebar infiniteList ( _, h ) entries query showTitles currentEntry =
                 (IL.config
                     { itemView = listEntry query showTitles currentEntry
                     , itemHeight =
-                        IL.withConstantHeight
-                            (if showTitles then
-                                90
-
-                             else
-                                60
-                            )
+                        IL.withConstantHeight <| getEntryHeight showTitles
                     , containerHeight = h
                     }
                     |> IL.withCustomContainer entriesContainer
