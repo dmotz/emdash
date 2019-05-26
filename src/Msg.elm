@@ -2,6 +2,7 @@ module Msg exposing (Msg(..))
 
 import Browser.Dom exposing (Error)
 import File exposing (File)
+import InfiniteList as IL
 import Model exposing (Entry, Filter, Tag)
 import Utils exposing (KeyEvent)
 
@@ -31,3 +32,4 @@ type Msg
     | DidScroll (Result Error ())
     | ExportJson
     | ResetError
+    | InfList IL.Model

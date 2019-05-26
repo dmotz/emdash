@@ -10,6 +10,7 @@ module Model exposing
     , initialStoredModel
     )
 
+import InfiniteList
 import Set exposing (Set)
 
 
@@ -63,6 +64,7 @@ type alias Model =
     , isDragging : Bool
     , inputFocused : Bool
     , parsingError : Bool
+    , infiniteList : InfiniteList.Model
     }
 
 
@@ -83,6 +85,7 @@ initialModel =
     , isDragging = False
     , inputFocused = False
     , parsingError = False
+    , infiniteList = InfiniteList.init
     }
 
 

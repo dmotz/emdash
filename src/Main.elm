@@ -498,6 +498,9 @@ update message model =
         DidScroll _ ->
             noOp
 
+        InfList infiniteList ->
+            ( { model | infiniteList = infiniteList }, none )
+
         ExportJson ->
             ( model, model |> modelToStoredModel |> exportJson )
 
