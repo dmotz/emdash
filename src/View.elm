@@ -196,10 +196,9 @@ view model =
                 model.tags
                 model.pendingTag
             , if model.aboutMode then
-                div [ id "about" ]
+                div [ id "about", class "info-page" ]
                     [ div [ onClick ToggleAboutMode, class "x" ] [ text "×" ]
-                    , h1 [] [ text "Marginalia" ]
-                    , p []
+                    , p [ class "big" ]
                         [ text "Marginalia is an open source tool created by "
                         , a [ href "https://oxism.com", target "_blank" ]
                             [ text "Dan Motzenbecker" ]
@@ -366,13 +365,13 @@ viewer mEntry parsingError noEntries tags pendingTag =
                     ]
 
             Nothing ->
-                div [ id "intro" ]
+                div [ id "intro", class "info-page" ]
                     [ if parsingError then
-                        p [] [ text "Error parsing file." ]
+                        p [ class "error" ] [ text "Error parsing file." ]
 
                       else if noEntries then
                         div []
-                            [ p []
+                            [ p [ class "big" ]
                                 [ text <|
                                     "This is Marginalia, a tool to "
                                         ++ "organize excerpts from e-books "
@@ -442,7 +441,7 @@ sidebar :
     -> Bool
     -> Maybe Entry
     -> Html Msg
-sidebar infiniteList ( w, h ) entries query showTitles currentEntry =
+sidebar infiniteList ( _, h ) entries query showTitles currentEntry =
     div
         [ id sidebarId
         , classList [ ( "no-titles", not showTitles ) ]
