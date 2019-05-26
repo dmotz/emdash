@@ -136,8 +136,7 @@ main
 
 
 #sidebar
-  height: 100%
-  overflow: auto
+  overflow-y: scroll
   border-right: 1px solid $lightGray
   flex: 3
 
@@ -148,15 +147,33 @@ main
     overflow: hidden
     position: relative
     padding: 4rem 2rem
+    height: 240px
+    padding: 2rem
+    height: 9rem
+
+    blockquote
+      white-space: nowrap
+      text-overflow: ellipsis
+      width: 100%
+      overflow: hidden
 
     .title
-      margin-top: 2rem
+      color: $gray
+      margin-top: 1rem
+      white-space: nowrap
+      text-overflow: ellipsis
+      width: 100%
+      overflow: hidden
+
+
+  &.no-titles
+    li
+      height: 6rem
 
 
 #intro
   font-weight: normal
-  align-self: center
-  padding: 4rem
+  padding: 4rem !important
   max-width: 70rem !important
 
   p, li, a
@@ -165,11 +182,13 @@ main
   p
     hyphens: auto
 
-    &:first-child
+    &.big
       font-size: 2.4rem
+      margin-bottom: 4rem
 
-  p:first-child
-    margin-bottom: 4rem
+    &.error
+      text-align: center
+      cursor: pointer
 
   ol
     font-size: 1.4rem
@@ -190,7 +209,7 @@ main
   display: flex
   justify-content: center
   line-height: 1.8
-  overflow: auto
+  overflow-y: scroll
   font-size: 1.8rem
   position: relative
 
