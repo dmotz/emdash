@@ -18,7 +18,7 @@ type Msg
     | ToggleAboutMode
     | DragEnter
     | DragLeave
-    | GotFiles File (List File)
+    | GotFiles (String -> Msg) File (List File)
     | FileLoad String
     | PickFile
     | KeyDown KeyEvent
@@ -32,6 +32,8 @@ type Msg
     | GotDomEl (Result Error (List Float))
     | DidScroll (Result Error ())
     | ExportJson
+    | ImportJson
+    | JsonFileLoad String
     | ResetError
     | Resize ( Int, Int )
     | InfList IL.Model

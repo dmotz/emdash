@@ -54,6 +54,9 @@ port setStorage : StoredModel -> Cmd msg
 port exportJson : StoredModel -> Cmd msg
 
 
+port importJson : String -> Cmd msg
+
+
 main : Program (Maybe StoredModel) Model Msg
 main =
     document
@@ -136,13 +139,13 @@ update message model =
         DragLeave ->
             ( { model | isDragging = False }, none )
 
-        GotFiles file _ ->
+        GotFiles msg file _ ->
             ( { model | isDragging = False }
-            , perform FileLoad (File.toString file)
+            , perform msg (File.toString file)
             )
 
         PickFile ->
-            ( model, Select.files [ "text/plain" ] GotFiles )
+            ( model, Select.files [ "text/plain" ] (GotFiles FileLoad) )
 
         FileLoad text ->
             let
@@ -566,6 +569,14 @@ update message model =
 
         ExportJson ->
             ( model, model |> modelToStoredModel |> exportJson )
+
+        ImportJson ->
+            ( model
+            , Select.files [ "application/json" ] (GotFiles JsonFileLoad)
+            )
+
+        JsonFileLoad jsonText ->
+            ( model, importJson jsonText )
 
         KeyDown { key, control, meta } ->
             if control || meta then

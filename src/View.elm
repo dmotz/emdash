@@ -613,7 +613,7 @@ dropDecoder : Decoder Msg
 dropDecoder =
     Decode.at
         [ "dataTransfer", "files" ]
-        (Decode.oneOrMore GotFiles File.decoder)
+        (Decode.oneOrMore (GotFiles FileLoad) File.decoder)
 
 
 hijack : msg -> ( msg, Bool )

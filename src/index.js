@@ -25,6 +25,14 @@ app.ports.exportJson.subscribe(state => {
   a.click()
 })
 
+app.ports.importJson.subscribe(text => {
+  try {
+    app = Elm.Main.init({flags: JSON.parse(text)})
+  } catch (e) {
+    console.warn('Failed to parse restored JSON:', e)
+  }
+})
+
 if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () =>
     navigator.serviceWorker.register('sw.js')
