@@ -58,6 +58,10 @@ ul, li
   visibility: hidden
 
 
+.small-caps
+  font-variant: small-caps
+
+
 #container
   padding: 5rem
   padding-top: 3rem
@@ -80,13 +84,25 @@ ul, li
   padding-top: 5rem
   font-size: 1.8rem
   line-height: 1.8
+  display: flex
+  justify-content: center
 
-  .x
-    transform: none
+  .hide-button
     position: absolute
-    line-height: 1
-    left: 2.5rem
-    font-size: 5rem
+    right: 2rem
+    top: 2rem
+
+    div
+      background-color: $black
+      border-color: $black
+      color: $white
+      margin: 0
+
+    &:hover
+      div
+        background-color: $white
+        border-color: $gray
+        color: $gray
 
   h1
     font-size: 3rem
@@ -169,7 +185,7 @@ main
       height: 6rem
 
 
-#intro
+.info-page
   font-weight: normal
   padding: 4rem !important
   max-width: 70rem !important

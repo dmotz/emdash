@@ -207,22 +207,40 @@ view model =
                 model.tags
                 model.pendingTag
             , if model.aboutMode then
-                div [ id "about", class "info-page" ]
-                    [ div [ onClick ToggleAboutMode, class "x" ] [ text "×" ]
-                    , p [ class "big" ]
-                        [ text "Marginalia is an open source tool created by "
-                        , a [ href "https://oxism.com", target "_blank" ]
-                            [ text "Dan Motzenbecker" ]
-                        , text "."
-                        ]
-                    , p []
-                        [ a
-                            [ href repoUrl
-                            , target "_blank"
+                div [ id "about" ]
+                    [ div [ class "info-page" ]
+                        [ div
+                            [ class "hide-button", onClick ToggleAboutMode ]
+                            [ div [] [ text "×" ] ]
+                        , p [ class "big" ]
+                            [ text
+                                "Marginalia is an open source tool created by "
+                            , a [ href "https://oxism.com", target "_blank" ]
+                                [ text "Dan Motzenbecker" ]
+                            , text "."
                             ]
-                            [ text "View source" ]
+                        , p []
+                            [ a
+                                [ href repoUrl
+                                , target "_blank"
+                                ]
+                                [ text "View source" ]
+                            ]
+                        , p []
+                            [ a [ onClick ExportJson ]
+                                [ text "Export "
+                                , span [ class "small-caps" ] [ text "json" ]
+                                ]
+                            ]
+                        , p []
+                            [ a [ onClick ImportJson ]
+                                [ text "Import "
+                                , span [ class "small-caps" ] [ text "json" ]
+                                ]
+                            ]
+                        , p [] [ text "❦" ]
+                        , footer [] [ text "Habent sua fata libelli" ]
                         ]
-                    , p [] [ a [ onClick ExportJson ] [ text "Export JSON" ] ]
                     ]
 
               else
@@ -409,7 +427,11 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                 , li []
                                     [ text <|
                                         "You can easily export your data "
-                                            ++ "(tags, notes, etc.) as JSON."
+                                            ++ "(tags, notes, etc.) as "
+                                    , span
+                                        [ class "small-caps" ]
+                                        [ text "json" ]
+                                    , text "."
                                     ]
                                 , li []
                                     [ text "It works offline." ]
