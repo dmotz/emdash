@@ -38,7 +38,6 @@ view model =
         [ id "container"
         , classList
             [ ( "focus-mode", model.focusMode )
-            , ( "drag-on", model.isDragging )
             , ( "empty", noEntries )
             ]
         , on "dragenter" (Decode.succeed DragEnter)
