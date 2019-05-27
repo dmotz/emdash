@@ -31,6 +31,10 @@ by [Dan Motzenbecker](https://oxism.com)
 |  <kbd>s</kbd>  | toggle list sort order      |
 |  <kbd>f</kbd>  | toggle focus mode           |
 | <kbd>esc</kbd> | clear current filter        |
+|  <kbd>1</kbd>  | set title filter mode       |
+|  <kbd>2</kbd>  | set author filter mode      |
+|  <kbd>3</kbd>  | set tag filter mode         |
+|  <kbd>4</kbd>  | set text filter mode        |
 
 ## Current limitations
 
