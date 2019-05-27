@@ -33,11 +33,13 @@ import Task exposing (attempt, perform, sequence)
 import Utils
     exposing
         ( KeyEvent
+        , getEntryHeight
         , getIndex
         , getNextIndex
         , getPrevIndex
         , insertOnce
         , modelToStoredModel
+        , needsTitles
         , queryCharMin
         , removeItem
         , rx
@@ -185,9 +187,6 @@ update message model =
 
                 sidebarView =
                     getViewportOf sidebarId
-
-                entryElement =
-                    getElement entry.id
             in
             ( newModel
             , batch
@@ -196,9 +195,6 @@ update message model =
                     (sequence
                         [ Task.map (.viewport >> .y) sidebarView
                         , Task.map (.viewport >> .height) sidebarView
-                        , Task.map (.element >> .y) (getElement sidebarId)
-                        , Task.map (.element >> .y) entryElement
-                        , Task.map (.element >> .height) entryElement
                         ]
                     )
                 , store newModel
@@ -502,23 +498,50 @@ update message model =
 
         GotDomEl result ->
             case result of
-                Ok [ offset, height, parentY, childY, elHeight ] ->
-                    let
-                        targetY =
-                            childY - parentY
-                    in
-                    if targetY + elHeight > height || targetY < 0 then
-                        ( model
-                        , batch
-                            [ attempt
-                                DidScroll
-                                (setViewportOf sidebarId 0 (offset + targetY))
-                            , attempt DidScroll (setViewportOf viewerId 0 0)
-                            ]
-                        )
+                Ok [ offset, height ] ->
+                    case
+                        model.currentEntry
+                    of
+                        Just entry ->
+                            let
+                                elHeight =
+                                    needsTitles model
+                                        |> getEntryHeight
+                                        |> toFloat
 
-                    else
-                        noOp
+                                targetY =
+                                    getIndex
+                                        (withDefault
+                                            model.entries
+                                            model.shownEntries
+                                        )
+                                        entry
+                                        |> toFloat
+                                        |> (*) elHeight
+                            in
+                            if
+                                targetY
+                                    + elHeight
+                                    > (offset + height)
+                                    || targetY
+                                    < offset
+                            then
+                                ( model
+                                , batch
+                                    [ attempt
+                                        DidScroll
+                                        (setViewportOf sidebarId 0 targetY)
+                                    , attempt
+                                        DidScroll
+                                        (setViewportOf viewerId 0 0)
+                                    ]
+                                )
+
+                            else
+                                noOp
+
+                        _ ->
+                            noOp
 
                 Ok _ ->
                     noOp
