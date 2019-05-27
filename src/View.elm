@@ -54,23 +54,27 @@ view model =
                     , onClick ToggleAboutMode
                     ]
                     []
-                , div [ id "entry-count", onClick Sort ]
-                    [ text <|
-                        formatNumber entryCount
-                            ++ " excerpt"
-                            ++ (if entryCount == 1 then
-                                    " "
+                , if noEntries then
+                    text ""
 
-                                else
-                                    "s "
-                               )
-                            ++ (if model.reverseList then
-                                    "▲"
+                  else
+                    div [ id "entry-count", onClick Sort ]
+                        [ text <|
+                            formatNumber entryCount
+                                ++ " excerpt"
+                                ++ (if entryCount == 1 then
+                                        " "
 
-                                else
-                                    "▼"
-                               )
-                    ]
+                                    else
+                                        "s "
+                                   )
+                                ++ (if model.reverseList then
+                                        "▲"
+
+                                    else
+                                        "▼"
+                                   )
+                        ]
                 ]
             , div [ id "tools" ]
                 [ div [ id "filters", classList [ ( "hidden", noEntries ) ] ]
