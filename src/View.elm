@@ -355,9 +355,9 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                 ]
                             ]
                         , section []
-                            [ textarea
-                                [ placeholder "notes"
-                                , onFocus <| SetInputFocus True
+                            [ div [] [ text "notes:" ]
+                            , textarea
+                                [ onFocus <| SetInputFocus True
                                 , onBlurVal UpdateNotes
                                 , value entry.notes
                                 ]
