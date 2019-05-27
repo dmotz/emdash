@@ -468,7 +468,7 @@ entriesContainer styles children =
 
 charLimit : Int
 charLimit =
-    240
+    42
 
 
 takeExcerpt : String -> String
@@ -508,16 +508,12 @@ addHighlighting str query =
             let
                 trunc =
                     if (index + String.length query) > charLimit then
-                        "… " ++ slice index (String.length str) str
+                        "…" ++ slice index (String.length str) str
 
                     else
                         str
             in
-            if String.length trunc > charLimit then
-                takeExcerpt trunc
-
-            else
-                trunc
+            trunc
     in
     case Html.Parser.run <| Regex.replace rx addTag excerpt of
         Ok parsedNodes ->
@@ -536,14 +532,6 @@ listEntry :
     -> Entry
     -> Html Msg
 listEntry query showTitles currentEntry idx listIdx entry =
-    let
-        excerpt =
-            if String.length entry.text > charLimit then
-                takeExcerpt entry.text
-
-            else
-                entry.text
-    in
     li [ id entry.id, onClick <| ShowEntry entry ]
         [ case currentEntry of
             Just ent ->
@@ -559,11 +547,11 @@ listEntry query showTitles currentEntry idx listIdx entry =
             []
             (case query of
                 Nothing ->
-                    [ text excerpt ]
+                    [ text entry.text ]
 
                 Just q ->
                     if String.length q < queryCharMin then
-                        [ text excerpt ]
+                        [ text entry.text ]
 
                     else
                         addHighlighting entry.text q
