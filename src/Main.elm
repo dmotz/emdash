@@ -197,6 +197,9 @@ update message model =
                         , Task.map (.viewport >> .height) sidebarView
                         ]
                     )
+                , attempt
+                    DidScroll
+                    (setViewportOf viewerId 0 0)
                 , store newModel
                 ]
             )
@@ -527,14 +530,9 @@ update message model =
                                     < offset
                             then
                                 ( model
-                                , batch
-                                    [ attempt
-                                        DidScroll
-                                        (setViewportOf sidebarId 0 targetY)
-                                    , attempt
-                                        DidScroll
-                                        (setViewportOf viewerId 0 0)
-                                    ]
+                                , attempt
+                                    DidScroll
+                                    (setViewportOf sidebarId 0 targetY)
                                 )
 
                             else
