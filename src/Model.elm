@@ -10,7 +10,7 @@ module Model exposing
     , initialStoredModel
     )
 
-import InfiniteList
+import InfiniteList as IL
 import Set exposing (Set)
 
 
@@ -65,7 +65,7 @@ type alias Model =
     , inputFocused : Bool
     , parsingError : Bool
     , uiSize : ( Int, Int )
-    , infiniteList : InfiniteList.Model
+    , infiniteList : IL.Model
     }
 
 
@@ -87,7 +87,7 @@ initialModel =
     , inputFocused = False
     , parsingError = False
     , uiSize = ( 1, 1 )
-    , infiniteList = InfiniteList.init
+    , infiniteList = IL.init
     }
 
 
