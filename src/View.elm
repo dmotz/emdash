@@ -414,21 +414,6 @@ viewer mEntry parsingError noEntries tags pendingTag =
         ]
 
 
-repoUrl : String
-repoUrl =
-    "https://github.com/dmotz/marginalia"
-
-
-viewerId : String
-viewerId =
-    "viewer"
-
-
-sidebarId : String
-sidebarId =
-    "sidebar"
-
-
 sidebar :
     IL.Model
     -> ( Int, Int )
@@ -464,11 +449,6 @@ sidebar infiniteList ( _, h ) entries query showTitles currentEntry =
 entriesContainer : List ( String, String ) -> List (Html msg) -> Html msg
 entriesContainer styles children =
     ul (map (\( k, v ) -> style k v) styles) children
-
-
-charLimit : Int
-charLimit =
-    42
 
 
 takeExcerpt : String -> String
@@ -633,3 +613,23 @@ on event decoder =
 onBlurVal : (String -> msg) -> Attribute msg
 onBlurVal ev =
     Html.Events.on "blur" (Decode.map ev targetValue)
+
+
+charLimit : Int
+charLimit =
+    42
+
+
+repoUrl : String
+repoUrl =
+    "https://github.com/dmotz/marginalia"
+
+
+viewerId : String
+viewerId =
+    "viewer"
+
+
+sidebarId : String
+sidebarId =
+    "sidebar"
