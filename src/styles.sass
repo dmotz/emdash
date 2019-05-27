@@ -66,6 +66,8 @@ ul, li
   overflow: hidden
   display: flex
   flex-direction: column
+  min-width: 557px
+
 
   &.drag-on
     opacity: 0.5
@@ -637,3 +639,7 @@ select
 
     &:hover
       background-color: $lightGray
+
+@media (max-width: 700px)
+  #entry-count
+    visibility: hidden
