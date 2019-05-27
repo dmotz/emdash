@@ -369,12 +369,13 @@ update message model =
                                         )
                                         model.shownEntries
                                 , currentEntry = Just newEntry
+                                , inputFocused = False
                             }
                     in
                     ( newModel, store newModel )
 
                 _ ->
-                    noOp
+                    ( { model | inputFocused = False }, none )
 
         UpdatePendingTag text ->
             ( { model | pendingTag = Just text }, none )
