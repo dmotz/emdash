@@ -625,6 +625,18 @@ update message model =
                     "s" ->
                         update Sort model
 
+                    "1" ->
+                        update (FilterBy TitleFilter "") model
+
+                    "2" ->
+                        update (FilterBy AuthorFilter "") model
+
+                    "3" ->
+                        update (FilterBy TagFilter "") model
+
+                    "4" ->
+                        update (FilterBy TextFilter "") model
+
                     "Escape" ->
                         update
                             (if model.aboutMode then
