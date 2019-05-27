@@ -12,7 +12,7 @@ import Browser.Events exposing (onKeyDown, onResize)
 import File
 import File.Select as Select
 import Json.Decode as Decode
-import List exposing (drop, filter, head, isEmpty, length, map, member)
+import List exposing (drop, filter, head, isEmpty, length, map, member, reverse)
 import Maybe exposing (withDefault)
 import Model
     exposing
@@ -499,6 +499,9 @@ update message model =
                             model.filterValue
                 }
 
+        Sort ->
+            ( { model | reverseList = not model.reverseList }, none )
+
         GotDomEl result ->
             case result of
                 Ok [ offset, height ] ->
@@ -514,9 +517,16 @@ update message model =
 
                                 targetY =
                                     getIndex
-                                        (withDefault
-                                            model.entries
-                                            model.shownEntries
+                                        ((if model.reverseList then
+                                            reverse
+
+                                          else
+                                            identity
+                                         )
+                                            (withDefault
+                                                model.entries
+                                                model.shownEntries
+                                            )
                                         )
                                         entry
                                         |> toFloat
@@ -575,10 +585,24 @@ update message model =
             else
                 case key of
                     "ArrowRight" ->
-                        update ShowNext model
+                        update
+                            (if model.reverseList then
+                                ShowPrev
+
+                             else
+                                ShowNext
+                            )
+                            model
 
                     "ArrowLeft" ->
-                        update ShowPrev model
+                        update
+                            (if model.reverseList then
+                                ShowNext
+
+                             else
+                                ShowPrev
+                            )
+                            model
 
                     "r" ->
                         update ShowRandom model

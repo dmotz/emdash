@@ -10,7 +10,7 @@ import Html.Parser
 import Html.Parser.Util
 import InfiniteList as IL
 import Json.Decode as Decode exposing (Decoder)
-import List exposing (filter, head, length, map, member, take)
+import List exposing (filter, head, length, map, member, reverse, take)
 import Maybe exposing (withDefault)
 import Model exposing (Entry, Filter(..), Model, Tag)
 import Msg exposing (..)
@@ -55,21 +55,27 @@ view model =
                     , onClick ToggleAboutMode
                     ]
                     []
-                , div [ id "entry-count" ]
+                , div [ id "entry-count", onClick Sort ]
                     [ text <|
                         formatNumber entryCount
                             ++ " excerpt"
                             ++ (if entryCount == 1 then
-                                    ""
+                                    " "
 
                                 else
-                                    "s"
+                                    "s "
+                               )
+                            ++ (if model.reverseList then
+                                    "▲"
+
+                                else
+                                    "▼"
                                )
                     ]
                 ]
             , div [ id "tools" ]
                 [ div [ id "filters", classList [ ( "hidden", noEntries ) ] ]
-                    [ div [ id "filter-links" ]
+                    [ nav [ id "filter-links" ]
                         (map
                             (\( mode, label ) ->
                                 span
@@ -175,7 +181,14 @@ view model =
                     sidebar
                     model.infiniteList
                     model.uiSize
-                    (withDefault model.entries model.shownEntries)
+                    ((if model.reverseList then
+                        reverse
+
+                      else
+                        identity
+                     )
+                        (withDefault model.entries model.shownEntries)
+                    )
                     (if model.filterType == TextFilter then
                         model.filterValue
 

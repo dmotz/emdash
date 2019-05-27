@@ -28,6 +28,7 @@ type Msg
     | UpdatePendingTag Tag
     | AddTag Tag
     | RemoveTag Tag
+    | Sort
     | GotDomEl (Result Error (List Float))
     | DidScroll (Result Error ())
     | ExportJson

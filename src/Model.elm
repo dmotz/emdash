@@ -62,6 +62,7 @@ type alias Model =
     , focusMode : Bool
     , aboutMode : Bool
     , isDragging : Bool
+    , reverseList : Bool
     , inputFocused : Bool
     , parsingError : Bool
     , uiSize : ( Int, Int )
@@ -84,6 +85,7 @@ initialModel =
     , focusMode = False
     , aboutMode = False
     , isDragging = False
+    , reverseList = False
     , inputFocused = False
     , parsingError = False
     , uiSize = ( 1, 1 )
