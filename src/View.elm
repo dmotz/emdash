@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy5, lazy6)
+import Html.Lazy exposing (lazy4, lazy5, lazy6)
 import Html.Parser
 import Html.Parser.Util
 import InfiniteList as IL
@@ -97,21 +97,24 @@ view model =
                     , div [ id "filter-controls" ]
                         [ case model.filterType of
                             TitleFilter ->
-                                selectMenu
+                                lazy4
+                                    selectMenu
                                     model.titles
                                     model.filterValue
                                     (FilterBy TitleFilter)
                                     "titles"
 
                             AuthorFilter ->
-                                selectMenu
+                                lazy4
+                                    selectMenu
                                     model.authors
                                     model.filterValue
                                     (FilterBy AuthorFilter)
                                     "authors"
 
                             TagFilter ->
-                                selectMenu
+                                lazy4
+                                    selectMenu
                                     model.tags
                                     model.filterValue
                                     (FilterBy TagFilter)
