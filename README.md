@@ -28,6 +28,7 @@ by [Dan Motzenbecker](https://oxism.com)
 |  <kbd>→</kbd>  | show next entry in list     |
 |  <kbd>←</kbd>  | show previous entry in list |
 |  <kbd>r</kbd>  | show random entry from list |
+|  <kbd>s</kbd>  | toggle list sort order      |
 |  <kbd>f</kbd>  | toggle focus mode           |
 | <kbd>esc</kbd> | clear current filter        |
 
