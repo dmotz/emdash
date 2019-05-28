@@ -23,6 +23,11 @@ process =
         >> reverse
 
 
+separator : String
+separator =
+    repeat 10 "="
+
+
 folder :
     String
     -> ( List (List String), List String )
@@ -61,11 +66,6 @@ findNotes block acc =
 
         _ ->
             acc
-
-
-separator : String
-separator =
-    repeat 10 "="
 
 
 titleAuthorRx : Regex
@@ -148,7 +148,7 @@ makeEntry ( raw, notes ) =
                         |> Maybe.map .submatches
                         |> andThen head
                         |> andThen identity
-                        |> andThen String.toInt
+                        |> andThen toInt
             in
             case split of
                 [ title, author ] ->
