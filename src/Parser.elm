@@ -15,7 +15,7 @@ process : String -> List Entry
 process =
     lines
         >> foldr folder ( [], [] )
-        >> Tuple.first
+        >> (\( xs, x ) -> x :: xs)
         >> filter predicate
         >> map makeEntry
         >> filter ((/=) Nothing)
