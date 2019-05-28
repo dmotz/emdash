@@ -16,7 +16,7 @@ process =
     lines
         >> foldr folder ( [], [] )
         >> (\( xs, x ) -> x :: xs)
-        >> filter predicate
+        >> foldr findNotes []
         >> map makeEntry
         >> filter ((/=) Nothing)
         >> map (withDefault <| Entry "" "" "" "" Nothing [] "")
@@ -38,18 +38,29 @@ folder line ( blocks, currentBlock ) =
         ( blocks, currentBlock ++ [ line ] )
 
 
-predicate : List String -> Bool
-predicate block =
-    if block == [] then
-        False
+findNotes :
+    List String
+    -> List ( List String, String )
+    -> List ( List String, String )
+findNotes block acc =
+    case block of
+        [ text, meta, _ ] ->
+            if String.startsWith "- Your Note on Page " meta then
+                case acc of
+                    [ ( x, _ ) ] ->
+                        [ ( x, text ) ]
 
-    else
-        case head block of
-            Nothing ->
-                False
+                    ( x, _ ) :: xs ->
+                        ( x, text ) :: xs
 
-            Just line ->
-                not <| String.startsWith "- Your Bookmark" line
+                    _ ->
+                        acc
+
+            else
+                ( block, "" ) :: acc
+
+        _ ->
+            acc
 
 
 titleAuthorRx : Regex
@@ -113,8 +124,8 @@ replaceApostrophes =
     replace apostropheRx apostropheReplacer
 
 
-makeEntry : List String -> Maybe Entry
-makeEntry raw =
+makeEntry : ( List String, String ) -> Maybe Entry
+makeEntry ( raw, notes ) =
     case raw of
         [ text, meta, titleAuthor ] ->
             let
@@ -144,7 +155,7 @@ makeEntry raw =
                             (replaceApostrophes author)
                             page
                             []
-                            ""
+                            notes
 
                 _ ->
                     Nothing
