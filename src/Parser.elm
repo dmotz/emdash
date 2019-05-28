@@ -7,7 +7,7 @@ import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Entry, Tag, Title)
 import Regex exposing (Regex, replace)
 import Set
-import String exposing (lines, toInt, toLower, trim)
+import String exposing (lines, repeat, toInt, toLower, trim)
 import Utils exposing (rx)
 
 
@@ -31,7 +31,7 @@ folder line ( blocks, currentBlock ) =
     if line == "" then
         ( blocks, currentBlock )
 
-    else if line == "==========" then
+    else if line == separator then
         ( currentBlock :: blocks, [] )
 
     else
@@ -61,6 +61,11 @@ findNotes block acc =
 
         _ ->
             acc
+
+
+separator : String
+separator =
+    repeat 10 "="
 
 
 titleAuthorRx : Regex
