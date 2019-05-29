@@ -1,4 +1,4 @@
-# ❧ Marginalia
+# ❧ [Marginalia](https://oxism.com/marginalia)
 
 ### A book excerpt organizer
 
@@ -16,7 +16,7 @@ by [Dan Motzenbecker](https://oxism.com)
 
 ## Nice things
 
-- private (your data never leaves your computer)
+- private (keeps data on your device)
 - works offline (PWA)
 - JSON-exportable data
 - open source
@@ -38,7 +38,7 @@ by [Dan Motzenbecker](https://oxism.com)
 
 ## Current limitations
 
-- only recognizes Kindle clippings `txt` files
+- only recognizes Kindle clippings `txt` files (_help wanted on more formats_)
 
 ## DIY
 
