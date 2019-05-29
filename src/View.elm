@@ -4,7 +4,6 @@ import File
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Html.Keyed as Keyed
 import Html.Lazy exposing (lazy4, lazy5, lazy6)
 import Html.Parser
 import Html.Parser.Util
