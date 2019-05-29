@@ -211,58 +211,7 @@ view model =
                 model.tags
                 model.pendingTag
             , if model.aboutMode then
-                div [ id "about" ]
-                    [ div [ class "info-page" ]
-                        [ div
-                            [ class "hide-button", onClick ToggleAboutMode ]
-                            [ div [] [ text "×" ] ]
-                        , p [ class "big" ]
-                            [ text
-                                "Marginalia is an open source tool created by "
-                            , a [ href "https://oxism.com", target "_blank" ]
-                                [ text "Dan Motzenbecker" ]
-                            , text "."
-                            ]
-                        , h4 [] [ text "Actions" ]
-                        , p []
-                            [ a
-                                [ href repoUrl
-                                , target "_blank"
-                                ]
-                                [ text "Read the source" ]
-                            ]
-                        , p []
-                            [ a [ onClick ExportJson ]
-                                [ text "Export "
-                                , span [ class "small-caps" ] [ text "json" ]
-                                ]
-                            ]
-                        , p []
-                            [ a [ onClick ImportJson ]
-                                [ text "Import "
-                                , span [ class "small-caps" ] [ text "json" ]
-                                ]
-                            ]
-                        , h4 [] [ text "Colophon" ]
-                        , p []
-                            [ text "Marginalia is written in "
-                            , a
-                                [ href "https://elm-lang.org/"
-                                , target "_blank"
-                                ]
-                                [ text "Elm" ]
-                            , text " and typeset in "
-                            , a
-                                [ href "https://github.com/impallari/Libre-Baskerville"
-                                , target "_blank"
-                                ]
-                                [ text "Libre Baskerville" ]
-                            , text "."
-                            ]
-                        , p [] [ text "❦" ]
-                        , footer [] [ text "Habent sua fata libelli" ]
-                        ]
-                    ]
+                aboutView
 
               else
                 text ""
@@ -653,6 +602,60 @@ selectMenu values mState inputFn default =
                         _ ->
                             defaultLabel
                 ]
+            ]
+        ]
+
+
+aboutView : Html Msg
+aboutView =
+    div [ id "about" ]
+        [ div [ class "info-page" ]
+            [ div
+                [ class "hide-button", onClick ToggleAboutMode ]
+                [ div [] [ text "×" ] ]
+            , p [ class "big" ]
+                [ text
+                    "Marginalia is an open source tool created by "
+                , a [ href "https://oxism.com", target "_blank" ]
+                    [ text "Dan Motzenbecker" ]
+                , text "."
+                ]
+            , h4 [] [ text "Actions" ]
+            , p []
+                [ a
+                    [ href repoUrl
+                    , target "_blank"
+                    ]
+                    [ text "Read the source" ]
+                ]
+            , p []
+                [ a [ onClick ExportJson ]
+                    [ text "Export "
+                    , span [ class "small-caps" ] [ text "json" ]
+                    ]
+                ]
+            , p []
+                [ a [ onClick ImportJson ]
+                    [ text "Import "
+                    , span [ class "small-caps" ] [ text "json" ]
+                    ]
+                ]
+            , h4 [] [ text "Colophon" ]
+            , p []
+                [ text "Marginalia is written in "
+                , a
+                    [ href "https://elm-lang.org/", target "_blank" ]
+                    [ text "Elm" ]
+                , text " and typeset in "
+                , a
+                    [ href "https://github.com/impallari/Libre-Baskerville"
+                    , target "_blank"
+                    ]
+                    [ text "Libre Baskerville" ]
+                , text "."
+                ]
+            , p [] [ text "❦" ]
+            , footer [] [ text "Habent sua fata libelli" ]
             ]
         ]
 
