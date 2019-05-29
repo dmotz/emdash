@@ -425,19 +425,23 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                 [ text <|
                                     "This is Marginalia, a tool to "
                                         ++ "organize excerpts from ebooks "
-                                        ++ "with tags, notes, and filtering."
+                                        ++ "with tags, notes, and search."
                                 ]
-                            , p []
-                                [ text <|
-                                    "Drop a clippings text file onto the page "
-                                        ++ "to import it."
+                            , h4 [] [ text "To begin:" ]
+                            , div [ id "instructions" ]
+                                [ p []
+                                    [ text <|
+                                        "Drop a clippings text file onto this "
+                                            ++ "page to import its excerpts."
+                                    ]
+                                , p []
+                                    [ text "Or, "
+                                    , a [ onClick PickFile ]
+                                        [ text "click here" ]
+                                    , text " to browse for the file."
+                                    ]
                                 ]
-                            , p []
-                                [ text "Or, "
-                                , a [ onClick PickFile ] [ text "click here" ]
-                                , text " to browse for the file."
-                                ]
-                            , p [] [ text "❦" ]
+                            , h4 [] [ em [] [ text "Nota bene:" ] ]
                             , ol []
                                 [ li []
                                     [ text <|
@@ -447,8 +451,8 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                     ]
                                 , li []
                                     [ text <|
-                                        "You can easily export your data "
-                                            ++ "(tags, notes, &c.) as "
+                                        "You can easily export/import your "
+                                            ++ "data (tags, notes, &c.) as "
                                     , span
                                         [ class "small-caps" ]
                                         [ text "json" ]
@@ -462,7 +466,9 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                         [ text "open source" ]
                                     , text "."
                                     ]
+                                , li [] [ text "You might like it." ]
                                 ]
+                            , p [] [ text "❦" ]
                             , footer [] [ text "Habent sua fata libelli" ]
                             ]
 

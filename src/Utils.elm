@@ -117,10 +117,7 @@ modelToStoredModel model =
 
 needsTitles : Model -> Bool
 needsTitles model =
-    model.filterType
-        /= TitleFilter
-        || model.filterValue
-        == Nothing
+    model.filterType /= TitleFilter || model.filterValue == Nothing
 
 
 getEntryHeight : Bool -> Int
