@@ -111,6 +111,7 @@ modelToStoredModel model =
     { entries = model.entries
     , currentEntry = model.currentEntry
     , hiddenEntries = Set.toList model.hiddenEntries
+    , schemaVersion = model.schemaVersion
     }
 
 

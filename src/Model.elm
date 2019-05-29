@@ -67,6 +67,7 @@ type alias Model =
     , parsingError : Bool
     , uiSize : ( Int, Int )
     , infiniteList : IL.Model
+    , schemaVersion : Int
     }
 
 
@@ -90,6 +91,7 @@ initialModel =
     , parsingError = False
     , uiSize = ( 1, 1 )
     , infiniteList = IL.init
+    , schemaVersion = 0
     }
 
 
@@ -97,6 +99,7 @@ type alias StoredModel =
     { entries : List Entry
     , currentEntry : Maybe Entry
     , hiddenEntries : List Id
+    , schemaVersion : Int
     }
 
 
@@ -105,4 +108,5 @@ initialStoredModel =
     { entries = []
     , currentEntry = Nothing
     , hiddenEntries = []
+    , schemaVersion = initialModel.schemaVersion
     }
