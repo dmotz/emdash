@@ -68,12 +68,14 @@ view model =
                                     else
                                         "s "
                                    )
-                                ++ (if model.reverseList then
-                                        "▲"
+                        , span []
+                            [ text <|
+                                if model.reverseList then
+                                    "▲"
 
-                                    else
-                                        "▼"
-                                   )
+                                else
+                                    "▼"
+                            ]
                         ]
                 ]
             , div [ id "tools" ]
