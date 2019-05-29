@@ -7,7 +7,7 @@ import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Entry, Tag, Title)
 import Regex exposing (Regex, replace)
 import Set
-import String exposing (lines, repeat, toInt, toLower, trim)
+import String exposing (lines, repeat, startsWith, toInt, toLower, trim)
 import Utils exposing (rx)
 
 
@@ -50,7 +50,7 @@ findNotes :
 findNotes block acc =
     case block of
         [ text, meta, _ ] ->
-            if String.startsWith "- Your Note on Page " meta then
+            if startsWith "- Your Note on Page " meta then
                 case acc of
                     [ ( x, _ ) ] ->
                         [ ( x, text ) ]

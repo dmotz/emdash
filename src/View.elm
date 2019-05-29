@@ -223,12 +223,13 @@ view model =
                                 [ text "Dan Motzenbecker" ]
                             , text "."
                             ]
+                        , h4 [] [ text "Actions" ]
                         , p []
                             [ a
                                 [ href repoUrl
                                 , target "_blank"
                                 ]
-                                [ text "View source" ]
+                                [ text "Read the source" ]
                             ]
                         , p []
                             [ a [ onClick ExportJson ]
@@ -241,6 +242,22 @@ view model =
                                 [ text "Import "
                                 , span [ class "small-caps" ] [ text "json" ]
                                 ]
+                            ]
+                        , h4 [] [ text "Colophon" ]
+                        , p []
+                            [ text "Marginalia is written in "
+                            , a
+                                [ href "https://elm-lang.org/"
+                                , target "_blank"
+                                ]
+                                [ text "Elm" ]
+                            , text " and typeset in "
+                            , a
+                                [ href "https://github.com/impallari/Libre-Baskerville"
+                                , target "_blank"
+                                ]
+                                [ text "Libre Baskerville" ]
+                            , text "."
                             ]
                         , p [] [ text "❦" ]
                         , footer [] [ text "Habent sua fata libelli" ]
@@ -407,7 +424,7 @@ viewer mEntry parsingError noEntries tags pendingTag =
                             [ p [ class "big" ]
                                 [ text <|
                                     "This is Marginalia, a tool to "
-                                        ++ "organize excerpts from e-books "
+                                        ++ "organize excerpts from ebooks "
                                         ++ "with tags, notes, and filtering."
                                 ]
                             , p []
@@ -431,7 +448,7 @@ viewer mEntry parsingError noEntries tags pendingTag =
                                 , li []
                                     [ text <|
                                         "You can easily export your data "
-                                            ++ "(tags, notes, etc.) as "
+                                            ++ "(tags, notes, &c.) as "
                                     , span
                                         [ class "small-caps" ]
                                         [ text "json" ]
