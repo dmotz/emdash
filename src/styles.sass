@@ -73,6 +73,14 @@ ul, li
   min-width: 557px
 
 
+#intro
+  justify-content: center
+
+
+#instructions
+  margin-bottom: 3rem
+
+
 #about
   position: absolute
   top: 0
@@ -115,15 +123,8 @@ ul, li
     margin-bottom: 2rem
     user-select: text
 
-  h4
-    margin-bottom: 1rem
-    margin-top: 5rem
-
   p:first-of-type
     margin-bottom: 10rem
-
-  footer
-    margin-bottom: 4rem
 
 
 main
@@ -201,11 +202,12 @@ main
   padding: 4rem !important
   max-width: 70rem !important
 
-  p, li, a
+  *
     user-select: text
 
   p
     hyphens: auto
+    margin-bottom: 1.2rem
 
     &.big
       font-size: 2.4rem
@@ -217,7 +219,6 @@ main
 
   ol
     font-size: 1.4rem
-    margin-top: 6rem
 
   li
     list-style: lower-roman
@@ -227,6 +228,11 @@ main
     font-size: 1.2rem
     font-style: italic
     margin-top: 6rem
+    margin-bottom: 4rem
+
+  h4
+    margin-bottom: 1rem
+    margin-top: 5rem
 
 
 #viewer
@@ -666,6 +672,13 @@ select
     &:hover
       background-color: $lightGray
 
+
 @media (max-width: 720px)
   #entry-count
     visibility: hidden
+
+
+@media (max-height: 1000px)
+  #intro
+    justify-content: flex-start
+    padding-top: 6rem !important
