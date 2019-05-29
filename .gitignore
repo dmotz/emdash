@@ -10,3 +10,4 @@ repl-temp-*
 dist
 package-lock.json
 clippings.txt
+art
