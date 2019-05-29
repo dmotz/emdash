@@ -4,6 +4,8 @@
 
 by [Dan Motzenbecker](https://oxism.com)
 
+![Marginalia](https://user-images.githubusercontent.com/302080/58527465-c1f01d00-81a0-11e9-9001-d3442d20c27d.png)
+
 ---
 
 ## Features
