@@ -4,7 +4,7 @@
 
 by [Dan Motzenbecker](https://oxism.com)
 
-![Marginalia](https://user-images.githubusercontent.com/302080/58527465-c1f01d00-81a0-11e9-9001-d3442d20c27d.png)
+![Marginalia](https://user-images.githubusercontent.com/302080/58527660-8e61c280-81a1-11e9-9251-3100ca954db6.png)
 
 ---
 
