@@ -136,9 +136,9 @@ init maybeModel =
             ( model, getSize )
 
 
-store : Model -> Cmd Msg
-store =
-    modelToStoredModel >> setStorage
+store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+store ( model, cmd ) =
+    ( model, batch [ cmd, model |> modelToStoredModel |> setStorage ] )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -183,17 +183,16 @@ update message model =
                 ( { model | parsingError = True }, none )
 
             else
-                let
-                    newModel =
-                        { model
-                            | parsingError = False
-                            , entries = entries
-                            , currentEntry = head entries
-                            , titles = Parser.getTitles entries
-                            , authors = Parser.getAuthors entries
-                        }
-                in
-                ( newModel, store newModel )
+                store
+                    ( { model
+                        | parsingError = False
+                        , entries = entries
+                        , currentEntry = head entries
+                        , titles = Parser.getTitles entries
+                        , authors = Parser.getAuthors entries
+                      }
+                    , none
+                    )
 
         ResetError ->
             ( { model | parsingError = False }, none )
@@ -206,21 +205,21 @@ update message model =
                 sidebarView =
                     getViewportOf sidebarId
             in
-            ( newModel
-            , batch
-                [ attempt
-                    GotDomEl
-                    (sequence
-                        [ Task.map (.viewport >> .y) sidebarView
-                        , Task.map (.viewport >> .height) sidebarView
-                        ]
-                    )
-                , attempt
-                    DidScroll
-                    (setViewportOf viewerId 0 0)
-                , store newModel
-                ]
-            )
+            store
+                ( { model | currentEntry = Just entry }
+                , batch
+                    [ attempt
+                        GotDomEl
+                        (sequence
+                            [ Task.map (.viewport >> .y) sidebarView
+                            , Task.map (.viewport >> .height) sidebarView
+                            ]
+                        )
+                    , attempt
+                        DidScroll
+                        (setViewportOf viewerId 0 0)
+                    ]
+                )
 
         ShowByIndex i ->
             case
@@ -369,28 +368,28 @@ update message model =
                     let
                         newEntry =
                             { entry | notes = text }
-
-                        newModel =
-                            { model
-                                | entries =
-                                    updateItem
-                                        model.entries
-                                        entry
-                                        newEntry
-                                , shownEntries =
-                                    Maybe.map
-                                        (\entries ->
-                                            updateItem
-                                                entries
-                                                entry
-                                                newEntry
-                                        )
-                                        model.shownEntries
-                                , currentEntry = Just newEntry
-                                , inputFocused = False
-                            }
                     in
-                    ( newModel, store newModel )
+                    store
+                        ( { model
+                            | entries =
+                                updateItem
+                                    model.entries
+                                    entry
+                                    newEntry
+                            , shownEntries =
+                                Maybe.map
+                                    (\entries ->
+                                        updateItem
+                                            entries
+                                            entry
+                                            newEntry
+                                    )
+                                    model.shownEntries
+                            , currentEntry = Just newEntry
+                            , inputFocused = False
+                          }
+                        , none
+                        )
 
                 _ ->
                     ( { model | inputFocused = False }, none )
@@ -412,29 +411,29 @@ update message model =
                         let
                             newEntry =
                                 { entry | tags = insertOnce entry.tags tagN }
-
-                            newModel =
-                                { model
-                                    | tags = insertOnce model.tags tagN
-                                    , entries =
-                                        updateItem
-                                            model.entries
-                                            entry
-                                            newEntry
-                                    , shownEntries =
-                                        Maybe.map
-                                            (\entries ->
-                                                updateItem
-                                                    entries
-                                                    entry
-                                                    newEntry
-                                            )
-                                            model.shownEntries
-                                    , currentEntry = Just newEntry
-                                    , pendingTag = Nothing
-                                }
                         in
-                        ( newModel, store newModel )
+                        store
+                            ( { model
+                                | tags = insertOnce model.tags tagN
+                                , entries =
+                                    updateItem
+                                        model.entries
+                                        entry
+                                        newEntry
+                                , shownEntries =
+                                    Maybe.map
+                                        (\entries ->
+                                            updateItem
+                                                entries
+                                                entry
+                                                newEntry
+                                        )
+                                        model.shownEntries
+                                , currentEntry = Just newEntry
+                                , pendingTag = Nothing
+                              }
+                            , none
+                            )
 
                     _ ->
                         noOp
@@ -448,21 +447,21 @@ update message model =
 
                         newEntries =
                             updateItem model.entries entry newEntry
-
-                        newModel =
-                            { model
-                                | entries = newEntries
-                                , tags = Parser.getTags newEntries
-                                , currentEntry = Just newEntry
-                                , shownEntries =
-                                    Maybe.map
-                                        (\entries ->
-                                            updateItem entries entry newEntry
-                                        )
-                                        model.shownEntries
-                            }
                     in
-                    ( newModel, store newModel )
+                    store
+                        ( { model
+                            | entries = newEntries
+                            , tags = Parser.getTags newEntries
+                            , currentEntry = Just newEntry
+                            , shownEntries =
+                                Maybe.map
+                                    (\entries ->
+                                        updateItem entries entry newEntry
+                                    )
+                                    model.shownEntries
+                          }
+                        , none
+                        )
 
                 _ ->
                     noOp
