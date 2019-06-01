@@ -21,6 +21,7 @@ import Model
         , StoredModel
         , initialModel
         , initialStoredModel
+        , stringToFilter
         )
 import Msg exposing (..)
 import Parser
@@ -30,6 +31,7 @@ import Regex
 import Set exposing (insert)
 import String exposing (toLower, trim)
 import Task exposing (attempt, perform, sequence)
+import Tuple exposing (first)
 import Utils
     exposing
         ( KeyEvent
@@ -87,14 +89,27 @@ init maybeModel =
         restored =
             withDefault initialStoredModel maybeModel
 
-        model =
+        filterType =
+            stringToFilter restored.filterType
+
+        model_ =
             { initialModel
                 | entries = restored.entries
                 , currentEntry = restored.currentEntry
                 , titles = Parser.getTitles restored.entries
                 , authors = Parser.getAuthors restored.entries
                 , tags = Parser.getTags restored.entries
+                , filterType = filterType
+                , reverseList = restored.reverseList
             }
+
+        model =
+            case restored.filterValue of
+                Just val ->
+                    first <| update (FilterBy filterType val) model_
+
+                _ ->
+                    model_
 
         getSize =
             perform Resize
