@@ -99,6 +99,9 @@ type alias StoredModel =
     { entries : List Entry
     , currentEntry : Maybe Entry
     , hiddenEntries : List Id
+    , filterType : String
+    , filterValue : Maybe String
+    , reverseList : Bool
     , schemaVersion : Int
     }
 
@@ -108,5 +111,8 @@ initialStoredModel =
     { entries = []
     , currentEntry = Nothing
     , hiddenEntries = []
+    , filterType = filterToString initialModel.filterType
+    , filterValue = initialModel.filterValue
+    , reverseList = initialModel.reverseList
     , schemaVersion = initialModel.schemaVersion
     }
