@@ -6,8 +6,10 @@ module Model exposing
     , StoredModel
     , Tag
     , Title
+    , filterToString
     , initialModel
     , initialStoredModel
+    , stringToFilter
     )
 
 import InfiniteList as IL
@@ -116,3 +118,35 @@ initialStoredModel =
     , reverseList = initialModel.reverseList
     , schemaVersion = initialModel.schemaVersion
     }
+
+
+stringToFilter : String -> Filter
+stringToFilter s =
+    case s of
+        "title" ->
+            TitleFilter
+
+        "author" ->
+            AuthorFilter
+
+        "tag" ->
+            TagFilter
+
+        _ ->
+            TextFilter
+
+
+filterToString : Filter -> String
+filterToString f =
+    case f of
+        TitleFilter ->
+            "title"
+
+        AuthorFilter ->
+            "author"
+
+        TagFilter ->
+            "tag"
+
+        _ ->
+            "text"
