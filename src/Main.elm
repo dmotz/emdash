@@ -519,7 +519,7 @@ update message model =
                 }
 
         Sort ->
-            ( { model | reverseList = not model.reverseList }, none )
+            store ( { model | reverseList = not model.reverseList }, none )
 
         GotDomEl result ->
             case result of
