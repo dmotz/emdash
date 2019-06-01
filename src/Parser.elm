@@ -50,7 +50,10 @@ findNotes :
 findNotes block acc =
     case block of
         [ text, meta, _ ] ->
-            if startsWith "- Your Note on Page " meta then
+            if text == limitNotice then
+                acc
+
+            else if startsWith "- Your Note on Page " meta then
                 case acc of
                     [ ( x, _ ) ] ->
                         [ ( x, text ) ]
@@ -66,6 +69,11 @@ findNotes block acc =
 
         _ ->
             acc
+
+
+limitNotice : String
+limitNotice =
+    " <You have reached the clipping limit for this item>"
 
 
 titleAuthorRx : Regex
