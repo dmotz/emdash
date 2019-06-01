@@ -100,6 +100,7 @@ init maybeModel =
                 , authors = Parser.getAuthors restored.entries
                 , tags = Parser.getTags restored.entries
                 , filterType = filterType
+                , focusMode = restored.focusMode
                 , reverseList = restored.reverseList
             }
 
@@ -468,7 +469,7 @@ update message model =
                     noOp
 
         ToggleFocusMode ->
-            ( { model | focusMode = not model.focusMode }, none )
+            store ( { model | focusMode = not model.focusMode }, none )
 
         ToggleAboutMode ->
             ( { model | aboutMode = not model.aboutMode }, none )
