@@ -15,7 +15,7 @@ module Utils exposing
     )
 
 import List exposing (length, map)
-import Model exposing (Filter(..), Model, StoredModel)
+import Model exposing (Filter(..), Model, StoredModel, filterToString)
 import Regex exposing (Regex)
 import Set
 
@@ -111,6 +111,9 @@ modelToStoredModel model =
     { entries = model.entries
     , currentEntry = model.currentEntry
     , hiddenEntries = Set.toList model.hiddenEntries
+    , filterType = filterToString model.filterType
+    , filterValue = model.filterValue
+    , reverseList = model.reverseList
     , schemaVersion = model.schemaVersion
     }
 
