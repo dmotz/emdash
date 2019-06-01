@@ -3,7 +3,9 @@ const {Elm} = require('./Main')
 const {document, localStorage, URL} = window
 const lsNs = 'marginalia'
 const state = window.localStorage.getItem(lsNs)
+const debounceTime = 1000
 let app
+let lsTimer
 
 try {
   app = Elm.Main.init({flags: state ? JSON.parse(state) : null})
@@ -12,9 +14,13 @@ try {
   app = Elm.Main.init({flags: null})
 }
 
-app.ports.setStorage.subscribe(state =>
-  localStorage.setItem(lsNs, JSON.stringify(state))
-)
+app.ports.setStorage.subscribe(state => {
+  clearTimeout(lsTimer)
+  lsTimer = setTimeout(
+    () => localStorage.setItem(lsNs, JSON.stringify(state)),
+    debounceTime
+  )
+})
 
 app.ports.exportJson.subscribe(state => {
   const a = document.createElement('a')
