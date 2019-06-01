@@ -323,44 +323,45 @@ update message model =
                         , none
                         )
             in
-            case filterType of
-                TitleFilter ->
-                    applyFilter <| .title >> (==) val
+            store <|
+                case filterType of
+                    TitleFilter ->
+                        applyFilter <| .title >> (==) val
 
-                AuthorFilter ->
-                    applyFilter <| .author >> (==) val
+                    AuthorFilter ->
+                        applyFilter <| .author >> (==) val
 
-                TagFilter ->
-                    applyFilter <| .tags >> member val
+                    TagFilter ->
+                        applyFilter <| .tags >> member val
 
-                TextFilter ->
-                    let
-                        term =
-                            toLower val
-                    in
-                    if trim term == "" then
-                        ( { model
-                            | filterValue = Nothing
-                            , shownEntries = Nothing
-                            , filterType = filterType
-                          }
-                        , none
-                        )
+                    TextFilter ->
+                        let
+                            term =
+                                toLower val
+                        in
+                        if trim term == "" then
+                            ( { model
+                                | filterValue = Nothing
+                                , shownEntries = Nothing
+                                , filterType = filterType
+                              }
+                            , none
+                            )
 
-                    else if String.length term < queryCharMin then
-                        ( { model
-                            | filterValue = Just val
-                            , filterType = filterType
-                          }
-                        , none
-                        )
+                        else if String.length term < queryCharMin then
+                            ( { model
+                                | filterValue = Just val
+                                , filterType = filterType
+                              }
+                            , none
+                            )
 
-                    else
-                        applyFilter <|
-                            \entry ->
-                                Regex.contains
-                                    (rx <| "\\b" ++ term)
-                                    (toLower entry.text)
+                        else
+                            applyFilter <|
+                                \entry ->
+                                    Regex.contains
+                                        (rx <| "\\b" ++ term)
+                                        (toLower entry.text)
 
         UpdateNotes text ->
             case model.currentEntry of
