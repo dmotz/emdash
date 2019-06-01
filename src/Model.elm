@@ -103,6 +103,7 @@ type alias StoredModel =
     , hiddenEntries : List Id
     , filterType : String
     , filterValue : Maybe String
+    , focusMode : Bool
     , reverseList : Bool
     , schemaVersion : Int
     }
@@ -115,6 +116,7 @@ initialStoredModel =
     , hiddenEntries = []
     , filterType = filterToString initialModel.filterType
     , filterValue = initialModel.filterValue
+    , focusMode = initialModel.focusMode
     , reverseList = initialModel.reverseList
     , schemaVersion = initialModel.schemaVersion
     }

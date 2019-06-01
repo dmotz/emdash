@@ -113,6 +113,7 @@ modelToStoredModel model =
     , hiddenEntries = Set.toList model.hiddenEntries
     , filterType = filterToString model.filterType
     , filterValue = model.filterValue
+    , focusMode = model.focusMode
     , reverseList = model.reverseList
     , schemaVersion = model.schemaVersion
     }
