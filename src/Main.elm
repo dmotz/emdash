@@ -12,7 +12,7 @@ import Browser.Events exposing (onKeyDown, onResize)
 import File
 import File.Select as Select
 import Json.Decode as Decode
-import List exposing (drop, filter, head, length, map, member, reverse)
+import List exposing (drop, filter, head, isEmpty, length, map, member, reverse)
 import Maybe exposing (withDefault)
 import Model
     exposing
@@ -180,7 +180,7 @@ update message model =
                         new
                         ++ model.entries
             in
-            if new == [] then
+            if isEmpty new then
                 ( { model | parsingError = True }, none )
 
             else
