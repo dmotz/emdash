@@ -24,11 +24,13 @@ app.ports.setStorage.subscribe(state => {
 
 app.ports.exportJson.subscribe(state => {
   const a = document.createElement('a')
-  a.href = URL.createObjectURL(
+  const url = URL.createObjectURL(
     new Blob([JSON.stringify(state)], {type: 'text/plain'})
   )
+  a.href = url
   a.download = `marginalia_backup_${new Date().toLocaleDateString()}.json`
   a.click()
+  URL.revokeObjectURL(url)
 })
 
 app.ports.importJson.subscribe(text => {
