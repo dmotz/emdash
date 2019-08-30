@@ -199,9 +199,6 @@ update message model =
 
         ShowEntry entry ->
             let
-                newModel =
-                    { model | currentEntry = Just entry }
-
                 sidebarView =
                     getViewportOf sidebarId
             in
