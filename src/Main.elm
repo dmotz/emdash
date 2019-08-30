@@ -3,8 +3,7 @@ port module Main exposing (main)
 import Browser exposing (document)
 import Browser.Dom
     exposing
-        ( getElement
-        , getViewport
+        ( getViewport
         , getViewportOf
         , setViewportOf
         )
