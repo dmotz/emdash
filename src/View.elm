@@ -229,8 +229,8 @@ viewer :
     -> Html Msg
 viewer mEntry parsingError noEntries tags pendingTag =
     div
-        ([ id "viewer" ]
-            ++ (if parsingError then
+        (id "viewer"
+            :: (if parsingError then
                     [ onClick ResetError ]
 
                 else
