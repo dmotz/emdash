@@ -21,7 +21,10 @@ import Set
 
 
 type alias KeyEvent =
-    { key : String, control : Bool, meta : Bool }
+    { key : String
+    , control : Bool
+    , meta : Bool
+    }
 
 
 queryCharMin : Int
