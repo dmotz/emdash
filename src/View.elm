@@ -9,7 +9,7 @@ import Html.Parser
 import Html.Parser.Util
 import InfiniteList as IL
 import Json.Decode as Decode exposing (Decoder)
-import List exposing (filter, head, isEmpty, length, map, member, reverse)
+import List exposing (filter, head, isEmpty, length, member, reverse)
 import Maybe exposing (withDefault)
 import Model exposing (Entry, Filter(..), Model, Tag)
 import Msg exposing (..)
@@ -699,3 +699,8 @@ viewerId =
 sidebarId : String
 sidebarId =
     "sidebar"
+
+
+map : (a -> b) -> List a -> List b
+map =
+    List.map
