@@ -99,6 +99,9 @@ ul, li
   .info-page
     max-width: 64rem !important
 
+  .big
+    margin-bottom: 10rem
+
   .hide-button
     position: absolute
     right: 2rem
@@ -123,9 +126,13 @@ ul, li
     margin-bottom: 2rem
     user-select: text
 
-  p:first-of-type
-    margin-bottom: 10rem
+.col-2
+  > div
+    display: inline-block
+    vertical-align: top
 
+    &:first-child
+      margin-right: 10rem
 
 main
   position: relative
