@@ -11,7 +11,7 @@ import InfiniteList as IL
 import Json.Decode as Decode exposing (Decoder)
 import List exposing (filter, head, isEmpty, length, member, reverse)
 import Maybe exposing (withDefault)
-import Model exposing (Entry, Filter(..), Model, Tag)
+import Model exposing (Author, Entry, Filter(..), Model, Tag, Title)
 import Msg exposing (..)
 import Regex
 import String exposing (fromChar, slice, toList)
@@ -212,7 +212,12 @@ view model =
                 model.tags
                 model.pendingTag
             , if model.aboutMode then
-                aboutView
+                lazy4
+                    aboutView
+                    model.entries
+                    model.titles
+                    model.authors
+                    model.tags
 
               else
                 text ""
@@ -605,8 +610,8 @@ introView =
         ]
 
 
-aboutView : Html Msg
-aboutView =
+aboutView : List Entry -> List Title -> List Author -> List Tag -> Html Msg
+aboutView entries titles authors tags =
     div [ id "about" ]
         [ div [ class "info-page" ]
             [ div
@@ -619,24 +624,54 @@ aboutView =
                     [ text "Dan Motzenbecker" ]
                 , text "."
                 ]
-            , h4 [] [ text "Actions" ]
-            , p []
-                [ a
-                    [ href repoUrl
-                    , target "_blank"
+            , div
+                [ class "col-2" ]
+                [ div []
+                    [ h4 [] [ text "Actions" ]
+                    , p []
+                        [ a
+                            [ href repoUrl
+                            , target "_blank"
+                            ]
+                            [ text "Read the source" ]
+                        ]
+                    , p []
+                        [ a [ onClick ExportJson ]
+                            [ text "Export "
+                            , span [ class "small-caps" ] [ text "json" ]
+                            ]
+                        ]
+                    , p []
+                        [ a [ onClick ImportJson ]
+                            [ text "Import "
+                            , span [ class "small-caps" ] [ text "json" ]
+                            ]
+                        ]
                     ]
-                    [ text "Read the source" ]
-                ]
-            , p []
-                [ a [ onClick ExportJson ]
-                    [ text "Export "
-                    , span [ class "small-caps" ] [ text "json" ]
-                    ]
-                ]
-            , p []
-                [ a [ onClick ImportJson ]
-                    [ text "Import "
-                    , span [ class "small-caps" ] [ text "json" ]
+                , div []
+                    [ h4 [] [ text "Statistics" ]
+                    , ol []
+                        (map
+                            (\( name, n ) ->
+                                li []
+                                    [ text <|
+                                        formatNumber n
+                                            ++ " "
+                                            ++ name
+                                            ++ (if n /= 1 then
+                                                    "s"
+
+                                                else
+                                                    ""
+                                               )
+                                    ]
+                            )
+                            [ ( "excerpt", length entries )
+                            , ( "title", length titles )
+                            , ( "author", length authors )
+                            , ( "tag", length tags )
+                            ]
+                        )
                     ]
                 ]
             , h4 [] [ text "Colophon" ]
