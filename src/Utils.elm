@@ -112,7 +112,7 @@ getPrevIndex list item =
 modelToStoredModel : Model -> StoredModel
 modelToStoredModel model =
     { entries = model.entries
-    , currentEntry = model.currentEntry
+    , selectedEntries = map .id model.selectedEntries
     , hiddenEntries = Set.toList model.hiddenEntries
     , filterType = filterToString model.filterType
     , filterValue = model.filterValue
