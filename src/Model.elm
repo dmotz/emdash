@@ -99,7 +99,7 @@ initialModel =
 
 type alias StoredModel =
     { entries : List Entry
-    , currentEntry : Maybe Entry
+    , selectedEntries : List Id
     , hiddenEntries : List Id
     , filterType : String
     , filterValue : Maybe String
@@ -112,7 +112,7 @@ type alias StoredModel =
 initialStoredModel : StoredModel
 initialStoredModel =
     { entries = []
-    , currentEntry = Nothing
+    , selectedEntries = []
     , hiddenEntries = []
     , filterType = filterToString initialModel.filterType
     , filterValue = initialModel.filterValue
