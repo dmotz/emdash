@@ -54,7 +54,7 @@ type alias Model =
     { entries : List Entry
     , shownEntries : Maybe (List Entry)
     , hiddenEntries : Set Id
-    , currentEntry : Maybe Entry
+    , selectedEntries : List Entry
     , titles : List Title
     , authors : List Author
     , tags : List Tag
@@ -78,7 +78,7 @@ initialModel =
     { entries = []
     , shownEntries = Nothing
     , hiddenEntries = Set.empty
-    , currentEntry = Nothing
+    , selectedEntries = []
     , titles = []
     , authors = []
     , tags = []
