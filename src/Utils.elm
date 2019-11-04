@@ -12,9 +12,12 @@ module Utils exposing
     , removeItem
     , rx
     , updateItem
+    , updateItems
     )
 
+import Dict exposing (Dict)
 import List exposing (length, map)
+import Maybe exposing (withDefault)
 import Model exposing (Filter(..), Model, StoredModel, filterToString)
 import Regex exposing (Regex)
 import Set
@@ -61,6 +64,18 @@ updateItem list old new =
 
             else
                 x
+        )
+        list
+
+
+updateItems :
+    List { a | id : comparable }
+    -> Dict comparable { a | id : comparable }
+    -> List { a | id : comparable }
+updateItems list mapping =
+    map
+        (\x ->
+            withDefault x (Dict.get x.id mapping)
         )
         list
 
