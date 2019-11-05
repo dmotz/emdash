@@ -713,7 +713,7 @@ on event decoder =
 
 onBlurVal : (String -> msg) -> Attribute msg
 onBlurVal ev =
-    Html.Events.on "blur" (Decode.map ev targetValue)
+    on "blur" (Decode.map ev targetValue)
 
 
 charLimit : Int
