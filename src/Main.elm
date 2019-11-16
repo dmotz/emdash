@@ -105,7 +105,7 @@ init maybeModel =
             stringToFilter restored.filterType
 
         selectedIds =
-            restored.entries |> map .id |> Set.fromList
+            Set.fromList restored.selectedEntries
 
         model_ =
             { initialModel
