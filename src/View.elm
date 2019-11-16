@@ -426,9 +426,9 @@ sidebar :
     -> List Entry
     -> Maybe String
     -> Bool
-    -> Maybe Entry
+    -> List Entry
     -> Html Msg
-sidebar infiniteList ( _, h ) entries query showTitles currentEntry =
+sidebar infiniteList ( _, h ) entries query showTitles selectedEntries =
     div
         [ id sidebarId
         , classList [ ( "no-titles", not showTitles ) ]
@@ -440,7 +440,7 @@ sidebar infiniteList ( _, h ) entries query showTitles currentEntry =
           else
             IL.view
                 (IL.config
-                    { itemView = listEntry query showTitles currentEntry
+                    { itemView = listEntry query showTitles selectedEntries
                     , itemHeight =
                         IL.withConstantHeight <| getEntryHeight showTitles
                     , containerHeight = h
@@ -512,23 +512,30 @@ addHighlighting str query =
 listEntry :
     Maybe String
     -> Bool
-    -> Maybe Entry
+    -> List Entry
     -> Int
     -> Int
     -> Entry
     -> Html Msg
-listEntry query showTitles currentEntry idx listIdx entry =
-    li [ id entry.id, onClick <| ShowEntry entry ]
-        [ case currentEntry of
-            Just ent ->
-                if ent == entry then
-                    div [ class "active-entry" ] []
+listEntry query showTitles selectedEntries idx listIdx entry =
+    let
+        selectedIds =
+            selectedEntries |> map .id |> Set.fromList
+    in
+    li
+        [ id entry.id
+        , Decode.map3 ClickWithKeys
+            (Decode.field "ctrlKey" Decode.bool)
+            (Decode.field "metaKey" Decode.bool)
+            (Decode.field "shiftKey" Decode.bool)
+            |> Decode.map (EntryClick entry)
+            |> on "click"
+        ]
+        [ if Set.member entry.id selectedIds then
+            div [ class "active-entry" ] []
 
-                else
-                    text ""
-
-            _ ->
-                text ""
+          else
+            text ""
         , blockquote
             []
             (case query of
