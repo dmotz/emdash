@@ -220,25 +220,29 @@ update message model =
         ResetError ->
             ( { model | parsingError = False }, none )
 
-        ShowEntry entry ->
+        SelectEntries entries ->
             let
                 sidebarView =
                     getViewportOf sidebarId
             in
             store
-                ( { model | currentEntry = Just entry }
-                , batch
-                    [ attempt
-                        GotDomEl
-                        (sequence
-                            [ Task.map (.viewport >> .y) sidebarView
-                            , Task.map (.viewport >> .height) sidebarView
-                            ]
-                        )
-                    , attempt
-                        DidScroll
-                        (setViewportOf viewerId 0 0)
-                    ]
+                ( { model | selectedEntries = entries }
+                , if length entries == 1 then
+                    batch
+                        [ attempt
+                            GotDomEl
+                            (sequence
+                                [ Task.map (.viewport >> .y) sidebarView
+                                , Task.map (.viewport >> .height) sidebarView
+                                ]
+                            )
+                        , attempt
+                            DidScroll
+                            (setViewportOf viewerId 0 0)
+                        ]
+
+                  else
+                    none
                 )
 
         ShowByIndex i ->
