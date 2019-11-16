@@ -357,7 +357,9 @@ update message model =
                     length list
 
                 currentIndex =
-                    Maybe.map (getIndex list) model.currentEntry
+                    model.selectedEntries
+                        |> head
+                        |> andThen (getIndex list >> Just)
             in
             case len of
                 0 ->
