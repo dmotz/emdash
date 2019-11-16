@@ -685,7 +685,18 @@ update message model =
 
         KeyDown { key, control, meta } ->
             if control || meta then
-                noOp
+                case key of
+                    "a" ->
+                        update
+                            (SelectEntries <|
+                                withDefault
+                                    model.entries
+                                    model.shownEntries
+                            )
+                            model
+
+                    _ ->
+                        noOp
 
             else if model.inputFocused then
                 if key == "Enter" then
