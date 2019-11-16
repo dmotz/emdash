@@ -9,8 +9,18 @@ import Html.Parser
 import Html.Parser.Util
 import InfiniteList as IL
 import Json.Decode as Decode exposing (Decoder)
-import List exposing (concat, filter, head, isEmpty, length, member, reverse)
-import Maybe exposing (withDefault)
+import List
+    exposing
+        ( concat
+        , filter
+        , foldr
+        , head
+        , isEmpty
+        , length
+        , member
+        , reverse
+        )
+import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Entry, Filter(..), Model, Tag, Title)
 import Msg exposing (..)
 import Regex
@@ -328,6 +338,20 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                                 _ ->
                                     text ""
                         ]
+                    , tagSection
+                        (foldr
+                            (\e set -> Set.intersect set (Set.fromList e.tags))
+                            (withDefault
+                                Set.empty
+                                (entries
+                                    |> head
+                                    |> Maybe.map (.tags >> Set.fromList)
+                                )
+                            )
+                            entries
+                            |> Set.toList
+                        )
+                        pendingTag
                     ]
         ]
 
