@@ -142,16 +142,15 @@ init maybeModel =
                     getViewport
                 )
     in
-    case restored.currentEntry of
-        Just entry ->
-            let
-                ( m, cmd ) =
-                    update (ShowEntry entry) model
-            in
-            ( m, batch [ getSize, cmd ] )
+    if isEmpty restored.selectedEntries then
+        ( model, getSize )
 
-        _ ->
-            ( model, getSize )
+    else
+        let
+            ( m, cmd ) =
+                update (SelectEntries model.selectedEntries) model
+        in
+        ( m, batch [ getSize, cmd ] )
 
 
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
