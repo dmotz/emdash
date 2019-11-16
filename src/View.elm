@@ -9,13 +9,14 @@ import Html.Parser
 import Html.Parser.Util
 import InfiniteList as IL
 import Json.Decode as Decode exposing (Decoder)
-import List exposing (filter, head, isEmpty, length, member, reverse)
+import List exposing (concat, filter, head, isEmpty, length, member, reverse)
 import Maybe exposing (withDefault)
 import Model exposing (Author, Entry, Filter(..), Model, Tag, Title)
 import Msg exposing (..)
 import Regex
-import String exposing (fromChar, slice, toList)
-import Utils exposing (formatNumber, getEntryHeight, needsTitles, queryCharMin)
+import Set
+import String exposing (fromChar, fromInt, slice, toList)
+import Utils exposing (ClickWithKeys, formatNumber, getEntryHeight, needsTitles, queryCharMin)
 
 
 view : Model -> Html Msg
@@ -203,10 +204,10 @@ view model =
                         Nothing
                     )
                     (needsTitles model)
-                    model.currentEntry
+                    model.selectedEntries
             , lazy5
                 viewer
-                model.currentEntry
+                model.selectedEntries
                 model.parsingError
                 noEntries
                 model.tags
@@ -226,13 +227,13 @@ view model =
 
 
 viewer :
-    Maybe Entry
+    List Entry
     -> Bool
     -> Bool
     -> List Tag
     -> Maybe Tag
     -> Html Msg
-viewer mEntry parsingError noEntries tags pendingTag =
+viewer selectedEntries parsingError noEntries tags pendingTag =
     div
         (id "viewer"
             :: (if parsingError then
@@ -246,8 +247,8 @@ viewer mEntry parsingError noEntries tags pendingTag =
             pendTag =
                 Maybe.withDefault "" pendingTag
           in
-          case mEntry of
-            Just entry ->
+          case selectedEntries of
+            [ entry ] ->
                 div []
                     [ blockquote [] [ text entry.text ]
                     , Html.cite [ id "meta" ]
@@ -369,7 +370,7 @@ viewer mEntry parsingError noEntries tags pendingTag =
                         ]
                     ]
 
-            Nothing ->
+            [] ->
                 div [ id "intro", class "info-page" ]
                     [ if parsingError then
                         p [ class "error" ] [ text "Error parsing file." ]
@@ -379,6 +380,42 @@ viewer mEntry parsingError noEntries tags pendingTag =
 
                       else
                         text ""
+                    ]
+
+            entries ->
+                let
+                    titleCount =
+                        entries
+                            |> map .title
+                            |> Set.fromList
+                            |> Set.size
+                in
+                div []
+                    [ h3 []
+                        [ text <|
+                            (entries |> length |> fromInt)
+                                ++ " entries from "
+                                ++ fromInt titleCount
+                                ++ " title"
+                                ++ (if titleCount > 1 then
+                                        "s"
+
+                                    else
+                                        ""
+                                   )
+                                ++ " selected."
+                        ]
+                    , h3 []
+                        [ text <|
+                            (entries
+                                |> map .tags
+                                |> concat
+                                |> Set.fromList
+                                |> Set.size
+                                |> fromInt
+                            )
+                                ++ " tags"
+                        ]
                     ]
         ]
 
