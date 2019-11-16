@@ -9,6 +9,7 @@ import Utils exposing (ClickWithKeys, KeyEvent)
 
 type Msg
     = SelectEntries (List Entry)
+    | EntryClick Entry ClickWithKeys
     | ShowRandom
     | ShowByIndex Int
     | ShowNext
