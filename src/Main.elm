@@ -615,9 +615,9 @@ update message model =
             case result of
                 Ok [ offset, height ] ->
                     case
-                        model.currentEntry
+                        model.selectedEntries
                     of
-                        Just entry ->
+                        entry :: _ ->
                             let
                                 elHeight =
                                     needsTitles model
