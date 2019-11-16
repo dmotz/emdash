@@ -426,9 +426,7 @@ hideButton : List Entry -> Html Msg
 hideButton entries =
     section []
         [ div
-            [ class "hide-button"
-            , onClick <| HideEntries entries
-            ]
+            [ class "hide-button", onClick <| HideEntries entries ]
             [ div [] [ text "×" ]
             , span []
                 [ text <|

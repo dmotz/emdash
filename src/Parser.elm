@@ -1,7 +1,18 @@
 module Parser exposing (getAuthors, getTags, getTitles, process)
 
 import Char exposing (isDigit)
-import List exposing (all, concat, filter, foldr, head, map, reverse, sortWith)
+import List
+    exposing
+        ( all
+        , concat
+        , filter
+        , filterMap
+        , foldr
+        , head
+        , map
+        , reverse
+        , sortWith
+        )
 import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Entry, Tag, Title)
@@ -18,8 +29,7 @@ process =
         >> (\( xs, x ) -> x :: xs)
         >> foldr findNotes []
         >> map makeEntry
-        >> filter ((/=) Nothing)
-        >> map (withDefault <| Entry "" "" "" "" Nothing [] "")
+        >> filterMap identity
         >> reverse
 
 
