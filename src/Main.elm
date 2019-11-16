@@ -315,7 +315,7 @@ update message model =
                     |> head
             of
                 Just entry ->
-                    update (ShowEntry entry) model
+                    update (SelectEntries [ entry ]) model
 
                 _ ->
                     noOp
