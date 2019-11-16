@@ -204,7 +204,13 @@ update message model =
                     ( { model
                         | parsingError = False
                         , entries = entries
-                        , currentEntry = head entries
+                        , selectedEntries =
+                            case head entries of
+                                Just entry ->
+                                    [ entry ]
+
+                                _ ->
+                                    []
                         , titles = Parser.getTitles entries
                         , authors = Parser.getAuthors entries
                       }
