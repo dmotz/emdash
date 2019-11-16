@@ -497,65 +497,65 @@ update message model =
                 ( { model | pendingTag = Nothing }, none )
 
             else
-                case model.currentEntry of
-                    Just entry ->
-                        let
-                            newEntry =
+                let
+                    updatedSelection =
+                        map
+                            (\entry ->
                                 { entry | tags = insertOnce entry.tags tagN }
-                        in
-                        store
-                            ( { model
-                                | tags = insertOnce model.tags tagN
-                                , entries =
-                                    updateItem
-                                        model.entries
-                                        entry
-                                        newEntry
-                                , shownEntries =
-                                    Maybe.map
-                                        (\entries ->
-                                            updateItem
-                                                entries
-                                                entry
-                                                newEntry
-                                        )
-                                        model.shownEntries
-                                , currentEntry = Just newEntry
-                                , pendingTag = Nothing
-                              }
-                            , none
                             )
+                            model.selectedEntries
 
-                    _ ->
-                        noOp
+                    updateMapping =
+                        map (\entry -> ( entry.id, entry )) updatedSelection
+                            |> Dict.fromList
+                in
+                store
+                    ( { model
+                        | tags = insertOnce model.tags tagN
+                        , entries =
+                            updateItems
+                                model.entries
+                                updateMapping
+                        , shownEntries =
+                            Maybe.map
+                                (\entries -> updateItems entries updateMapping)
+                                model.shownEntries
+                        , selectedEntries = updatedSelection
+                        , pendingTag = Nothing
+                      }
+                    , none
+                    )
 
         RemoveTag tag ->
-            case model.currentEntry of
-                Just entry ->
-                    let
-                        newEntry =
+            let
+                updatedSelection =
+                    map
+                        (\entry ->
                             { entry | tags = removeItem entry.tags tag }
-
-                        newEntries =
-                            updateItem model.entries entry newEntry
-                    in
-                    store
-                        ( { model
-                            | entries = newEntries
-                            , tags = Parser.getTags newEntries
-                            , currentEntry = Just newEntry
-                            , shownEntries =
-                                Maybe.map
-                                    (\entries ->
-                                        updateItem entries entry newEntry
-                                    )
-                                    model.shownEntries
-                          }
-                        , none
                         )
+                        model.selectedEntries
 
-                _ ->
-                    noOp
+                updateMapping =
+                    map (\entry -> ( entry.id, entry )) updatedSelection
+                        |> Dict.fromList
+
+                newEntries =
+                    updateItems
+                        model.entries
+                        updateMapping
+            in
+            store
+                ( { model
+                    | entries = newEntries
+                    , tags = Parser.getTags newEntries
+                    , selectedEntries = updatedSelection
+                    , shownEntries =
+                        Maybe.map
+                            (\entries -> updateItems entries updateMapping)
+                            model.shownEntries
+                  }
+                , none
+                )
 
         ToggleFocusMode ->
             store ( { model | focusMode = not model.focusMode }, none )
