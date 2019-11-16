@@ -24,7 +24,7 @@ type Msg
     | PickFile
     | KeyDown KeyEvent
     | SetInputFocus Bool
-    | HideEntry Entry
+    | HideEntries (List Entry)
     | UpdateNotes String
     | UpdatePendingTag Tag
     | AddTag Tag
