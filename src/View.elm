@@ -287,8 +287,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                                 , onBlurVal UpdateNotes
                                 , value entry.notes
                                 ]
-                                [ text entry.notes
-                                ]
+                                [ text entry.notes ]
                             ]
                         , section []
                             [ div
@@ -338,20 +337,24 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                                 _ ->
                                     text ""
                         ]
-                    , tagSection
-                        (foldr
-                            (\e set -> Set.intersect set (Set.fromList e.tags))
-                            (withDefault
-                                Set.empty
-                                (entries
-                                    |> head
-                                    |> Maybe.map (.tags >> Set.fromList)
+                    , div [ id "entry-tools" ]
+                        [ tagSection
+                            (foldr
+                                (\entry set ->
+                                    Set.intersect set (Set.fromList entry.tags)
                                 )
+                                (withDefault
+                                    Set.empty
+                                    (entries
+                                        |> head
+                                        |> Maybe.map (.tags >> Set.fromList)
+                                    )
+                                )
+                                entries
+                                |> Set.toList
                             )
-                            entries
-                            |> Set.toList
-                        )
-                        pendingTag
+                            pendingTag
+                        ]
                     ]
         ]
 
@@ -363,7 +366,8 @@ tagSection tags pendingTag =
             Maybe.withDefault "" pendingTag
     in
     section []
-        [ if length tags > 0 then
+        [ div [] [ text "tags:" ]
+        , if length tags > 0 then
             div
                 [ id "tags" ]
                 [ ul
@@ -373,16 +377,12 @@ tagSection tags pendingTag =
                             li
                                 [ class "tag" ]
                                 [ span
-                                    [ onClick <|
-                                        RemoveTag tag
+                                    [ onClick <| RemoveTag tag
                                     , class "x"
                                     ]
                                     [ text "×" ]
                                 , span
-                                    [ onClick <|
-                                        FilterBy
-                                            TagFilter
-                                            tag
+                                    [ onClick <| FilterBy TagFilter tag
                                     , class "tag-title"
                                     ]
                                     [ text tag ]
@@ -411,11 +411,7 @@ tagSection tags pendingTag =
                         (\tag ->
                             member tag tags
                                 |> not
-                                |> (&&)
-                                    (String.contains
-                                        pendTag
-                                        tag
-                                    )
+                                |> (&&) (String.contains pendTag tag)
                         )
                         tags
               in
@@ -423,13 +419,7 @@ tagSection tags pendingTag =
                 ul
                     [ class "tag-list" ]
                     (map
-                        (\tag ->
-                            li
-                                [ onClick <|
-                                    AddTag tag
-                                ]
-                                [ text tag ]
-                        )
+                        (\tag -> li [ onClick <| AddTag tag ] [ text tag ])
                         tagList
                     )
 
