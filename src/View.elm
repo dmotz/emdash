@@ -243,11 +243,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                     []
                )
         )
-        [ let
-            pendTag =
-                Maybe.withDefault "" pendingTag
-          in
-          case selectedEntries of
+        [ case selectedEntries of
             [ entry ] ->
                 div []
                     [ blockquote [] [ text entry.text ]
@@ -273,81 +269,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                         ]
                     , div
                         [ id "entry-tools" ]
-                        [ section []
-                            [ if length entry.tags > 0 then
-                                div
-                                    [ id "tags" ]
-                                    [ ul
-                                        []
-                                        (map
-                                            (\tag ->
-                                                li
-                                                    [ class "tag" ]
-                                                    [ span
-                                                        [ onClick <|
-                                                            RemoveTag tag
-                                                        , class "x"
-                                                        ]
-                                                        [ text "×" ]
-                                                    , span
-                                                        [ onClick <|
-                                                            FilterBy
-                                                                TagFilter
-                                                                tag
-                                                        , class "tag-title"
-                                                        ]
-                                                        [ text tag ]
-                                                    ]
-                                            )
-                                            entry.tags
-                                        )
-                                    ]
-
-                              else
-                                text ""
-                            , div [ class "tag-input" ]
-                                [ input
-                                    [ onInput UpdatePendingTag
-                                    , onFocus <| SetInputFocus True
-                                    , onBlur <| SetInputFocus False
-                                    , value pendTag
-                                    , placeholder "add tag"
-                                    , autocomplete False
-                                    , spellcheck False
-                                    ]
-                                    []
-                                , let
-                                    tagList =
-                                        filter
-                                            (\tag ->
-                                                member tag entry.tags
-                                                    |> not
-                                                    |> (&&)
-                                                        (String.contains
-                                                            pendTag
-                                                            tag
-                                                        )
-                                            )
-                                            tags
-                                  in
-                                  if length tagList > 0 then
-                                    ul
-                                        [ class "tag-list" ]
-                                        (map
-                                            (\tag ->
-                                                li
-                                                    [ onClick <|
-                                                        AddTag tag
-                                                    ]
-                                                    [ text tag ]
-                                            )
-                                            tagList
-                                        )
-
-                                  else
-                                    text ""
-                                ]
-                            ]
+                        [ tagSection entry.tags pendingTag
                         , section []
                             [ div [] [ text "notes:" ]
                             , textarea
@@ -407,6 +329,89 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                                     text ""
                         ]
                     ]
+        ]
+
+
+tagSection : List Tag -> Maybe Tag -> Html Msg
+tagSection tags pendingTag =
+    let
+        pendTag =
+            Maybe.withDefault "" pendingTag
+    in
+    section []
+        [ if length tags > 0 then
+            div
+                [ id "tags" ]
+                [ ul
+                    []
+                    (map
+                        (\tag ->
+                            li
+                                [ class "tag" ]
+                                [ span
+                                    [ onClick <|
+                                        RemoveTag tag
+                                    , class "x"
+                                    ]
+                                    [ text "×" ]
+                                , span
+                                    [ onClick <|
+                                        FilterBy
+                                            TagFilter
+                                            tag
+                                    , class "tag-title"
+                                    ]
+                                    [ text tag ]
+                                ]
+                        )
+                        tags
+                    )
+                ]
+
+          else
+            text ""
+        , div [ class "tag-input" ]
+            [ input
+                [ onInput UpdatePendingTag
+                , onFocus <| SetInputFocus True
+                , onBlur <| SetInputFocus False
+                , value pendTag
+                , placeholder "add tag"
+                , autocomplete False
+                , spellcheck False
+                ]
+                []
+            , let
+                tagList =
+                    filter
+                        (\tag ->
+                            member tag tags
+                                |> not
+                                |> (&&)
+                                    (String.contains
+                                        pendTag
+                                        tag
+                                    )
+                        )
+                        tags
+              in
+              if length tagList > 0 then
+                ul
+                    [ class "tag-list" ]
+                    (map
+                        (\tag ->
+                            li
+                                [ onClick <|
+                                    AddTag tag
+                                ]
+                                [ text tag ]
+                        )
+                        tagList
+                    )
+
+              else
+                text ""
+            ]
         ]
 
 
