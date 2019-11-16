@@ -395,26 +395,16 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                         [ text <|
                             (entries |> length |> fromInt)
                                 ++ " entries from "
-                                ++ fromInt titleCount
-                                ++ " title"
-                                ++ (if titleCount > 1 then
-                                        "s"
+                        , if titleCount > 1 then
+                            text <| fromInt titleCount ++ " titles"
 
-                                    else
-                                        ""
-                                   )
-                                ++ " selected."
-                        ]
-                    , h3 []
-                        [ text <|
-                            (entries
-                                |> map .tags
-                                |> concat
-                                |> Set.fromList
-                                |> Set.size
-                                |> fromInt
-                            )
-                                ++ " tags"
+                          else
+                            case entries of
+                                entry :: _ ->
+                                    em [] [ text entry.title ]
+
+                                _ ->
+                                    text ""
                         ]
                     ]
         ]
