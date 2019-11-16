@@ -292,7 +292,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                         , section []
                             [ div
                                 [ class "hide-button"
-                                , onClick <| HideEntry entry
+                                , onClick <| HideEntries [ entry ]
                                 ]
                                 [ div [] [ text "×" ]
                                 , span [] [ text "delete entry" ]
