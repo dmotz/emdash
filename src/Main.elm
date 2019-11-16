@@ -321,8 +321,8 @@ update message model =
                     noOp
 
         ShowNext ->
-            case model.currentEntry of
-                Just entry ->
+            case model.selectedEntries of
+                entry :: _ ->
                     update
                         (ShowByIndex <|
                             getNextIndex
@@ -331,7 +331,7 @@ update message model =
                         )
                         model
 
-                _ ->
+                [] ->
                     noOp
 
         ShowPrev ->
