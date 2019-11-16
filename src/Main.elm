@@ -454,8 +454,8 @@ update message model =
                                         (toLower entry.text)
 
         UpdateNotes text ->
-            case model.currentEntry of
-                Just entry ->
+            case model.selectedEntries of
+                [ entry ] ->
                     let
                         newEntry =
                             { entry | notes = text }
@@ -476,7 +476,7 @@ update message model =
                                             newEntry
                                     )
                                     model.shownEntries
-                            , currentEntry = Just newEntry
+                            , selectedEntries = [ newEntry ]
                             , inputFocused = False
                           }
                         , none
