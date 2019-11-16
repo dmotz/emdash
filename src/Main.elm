@@ -245,6 +245,70 @@ update message model =
                     none
                 )
 
+        EntryClick entry { control, meta, shift } ->
+            if shift then
+                let
+                    entries =
+                        (if model.reverseList then
+                            reverse
+
+                         else
+                            identity
+                        )
+                        <|
+                            withDefault model.entries model.shownEntries
+
+                    selectedIndices =
+                        map (getIndex entries) model.selectedEntries
+
+                    targetIndex =
+                        getIndex entries entry
+
+                    minIndex =
+                        withDefault 0 (List.minimum selectedIndices)
+
+                    maxIndex =
+                        withDefault 0 (List.maximum selectedIndices)
+
+                    start =
+                        if targetIndex < minIndex then
+                            targetIndex
+
+                        else
+                            minIndex
+
+                    end =
+                        if targetIndex < minIndex then
+                            maxIndex
+
+                        else
+                            targetIndex
+                in
+                update
+                    (SelectEntries
+                        (entries
+                            |> drop start
+                            |> take (end - start + 1)
+                        )
+                    )
+                    model
+
+            else if control || meta then
+                update
+                    (SelectEntries <|
+                        (if List.member entry model.selectedEntries then
+                            filter ((/=) entry)
+
+                         else
+                            (::) entry
+                        )
+                            model.selectedEntries
+                    )
+                    model
+
+            else
+                update (SelectEntries [ entry ]) model
+
         ShowByIndex i ->
             case
                 drop i (withDefault model.entries model.shownEntries)
