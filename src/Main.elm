@@ -39,7 +39,7 @@ import Parser
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Regex
-import Set exposing (insert)
+import Set exposing (union)
 import String exposing (toLower, trim)
 import Task exposing (attempt, perform, sequence)
 import Tuple exposing (first)
@@ -563,16 +563,16 @@ update message model =
         ToggleAboutMode ->
             ( { model | aboutMode = not model.aboutMode }, none )
 
-        HideEntry entry ->
+        HideEntries entries ->
             let
                 list =
                     withDefault model.entries model.shownEntries
 
                 idx =
-                    getIndex list entry
+                    withDefault 0 (entries |> head |> Maybe.map (getIndex list))
 
                 fn =
-                    filter ((/=) entry)
+                    filter (\entry -> member entry entries |> not)
 
                 len =
                     length list
@@ -592,7 +592,10 @@ update message model =
                         idx
                 )
                 { model
-                    | hiddenEntries = insert entry.id model.hiddenEntries
+                    | hiddenEntries =
+                        union
+                            (entries |> map .id |> Set.fromList)
+                            model.hiddenEntries
                     , entries = fn model.entries
                     , shownEntries =
                         if soleEntry then
