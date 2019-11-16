@@ -346,6 +346,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                                 |> Set.toList
                             )
                             pendingTag
+                        , hideButton entries
                         ]
                     ]
         ]
