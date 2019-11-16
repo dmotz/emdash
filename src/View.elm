@@ -281,7 +281,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                         [ id "entry-tools" ]
                         [ tagSection entry.tags pendingTag
                         , section []
-                            [ div [] [ text "notes:" ]
+                            [ h5 [] [ text "notes:" ]
                             , textarea
                                 [ onFocus <| SetInputFocus True
                                 , onBlurVal UpdateNotes
@@ -366,7 +366,7 @@ tagSection tags pendingTag =
             Maybe.withDefault "" pendingTag
     in
     section []
-        [ div [] [ text "tags:" ]
+        [ h5 [] [ text "tags:" ]
         , if length tags > 0 then
             div
                 [ id "tags" ]
