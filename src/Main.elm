@@ -8,11 +8,23 @@ import Browser.Dom
         , setViewportOf
         )
 import Browser.Events exposing (onKeyDown, onResize)
+import Dict
 import File
 import File.Select as Select
 import Json.Decode as Decode
-import List exposing (drop, filter, head, isEmpty, length, map, member, reverse)
-import Maybe exposing (withDefault)
+import List
+    exposing
+        ( drop
+        , filter
+        , head
+        , isEmpty
+        , length
+        , map
+        , member
+        , reverse
+        , take
+        )
+import Maybe exposing (andThen, withDefault)
 import Model
     exposing
         ( Filter(..)
@@ -45,6 +57,7 @@ import Utils
         , removeItem
         , rx
         , updateItem
+        , updateItems
         )
 import View exposing (sidebarId, view, viewerId)
 
@@ -91,10 +104,15 @@ init maybeModel =
         filterType =
             stringToFilter restored.filterType
 
+        selectedIds =
+            restored.entries |> map .id |> Set.fromList
+
         model_ =
             { initialModel
                 | entries = restored.entries
-                , currentEntry = restored.currentEntry
+                , selectedEntries =
+                    filter (\entry -> Set.member entry.id selectedIds)
+                        restored.entries
                 , titles = Parser.getTitles restored.entries
                 , authors = Parser.getAuthors restored.entries
                 , tags = Parser.getTags restored.entries
