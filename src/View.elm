@@ -429,7 +429,17 @@ hideButton entries =
             , onClick <| HideEntries entries
             ]
             [ div [] [ text "×" ]
-            , span [] [ text "delete entry" ]
+            , span []
+                [ text <|
+                    "delete entr"
+                        ++ (case entries of
+                                [ _ ] ->
+                                    "y"
+
+                                _ ->
+                                    "ies"
+                           )
+                ]
             ]
         ]
 
