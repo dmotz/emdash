@@ -289,15 +289,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                                 ]
                                 [ text entry.notes ]
                             ]
-                        , section []
-                            [ div
-                                [ class "hide-button"
-                                , onClick <| HideEntries [ entry ]
-                                ]
-                                [ div [] [ text "×" ]
-                                , span [] [ text "delete entry" ]
-                                ]
-                            ]
+                        , hideButton [ entry ]
                         ]
                     ]
 
@@ -425,6 +417,19 @@ tagSection tags pendingTag =
 
               else
                 text ""
+            ]
+        ]
+
+
+hideButton : List Entry -> Html Msg
+hideButton entries =
+    section []
+        [ div
+            [ class "hide-button"
+            , onClick <| HideEntries entries
+            ]
+            [ div [] [ text "×" ]
+            , span [] [ text "delete entry" ]
             ]
         ]
 
