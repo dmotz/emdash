@@ -1,5 +1,6 @@
 module Utils exposing
-    ( KeyEvent
+    ( ClickWithKeys
+    , KeyEvent
     , formatNumber
     , getEntryHeight
     , getIndex
@@ -12,9 +13,12 @@ module Utils exposing
     , removeItem
     , rx
     , updateItem
+    , updateItems
     )
 
+import Dict exposing (Dict)
 import List exposing (length, map)
+import Maybe exposing (withDefault)
 import Model exposing (Filter(..), Model, StoredModel, filterToString)
 import Regex exposing (Regex)
 import Set
@@ -24,6 +28,13 @@ type alias KeyEvent =
     { key : String
     , control : Bool
     , meta : Bool
+    }
+
+
+type alias ClickWithKeys =
+    { control : Bool
+    , meta : Bool
+    , shift : Bool
     }
 
 
@@ -61,6 +72,18 @@ updateItem list old new =
 
             else
                 x
+        )
+        list
+
+
+updateItems :
+    List { a | id : comparable }
+    -> Dict comparable { a | id : comparable }
+    -> List { a | id : comparable }
+updateItems list mapping =
+    map
+        (\x ->
+            withDefault x (Dict.get x.id mapping)
         )
         list
 
@@ -112,7 +135,7 @@ getPrevIndex list item =
 modelToStoredModel : Model -> StoredModel
 modelToStoredModel model =
     { entries = model.entries
-    , currentEntry = model.currentEntry
+    , selectedEntries = map .id model.selectedEntries
     , hiddenEntries = Set.toList model.hiddenEntries
     , filterType = filterToString model.filterType
     , filterValue = model.filterValue

@@ -54,7 +54,7 @@ type alias Model =
     { entries : List Entry
     , shownEntries : Maybe (List Entry)
     , hiddenEntries : Set Id
-    , currentEntry : Maybe Entry
+    , selectedEntries : List Entry
     , titles : List Title
     , authors : List Author
     , tags : List Tag
@@ -78,7 +78,7 @@ initialModel =
     { entries = []
     , shownEntries = Nothing
     , hiddenEntries = Set.empty
-    , currentEntry = Nothing
+    , selectedEntries = []
     , titles = []
     , authors = []
     , tags = []
@@ -99,7 +99,7 @@ initialModel =
 
 type alias StoredModel =
     { entries : List Entry
-    , currentEntry : Maybe Entry
+    , selectedEntries : List Id
     , hiddenEntries : List Id
     , filterType : String
     , filterValue : Maybe String
@@ -112,7 +112,7 @@ type alias StoredModel =
 initialStoredModel : StoredModel
 initialStoredModel =
     { entries = []
-    , currentEntry = Nothing
+    , selectedEntries = []
     , hiddenEntries = []
     , filterType = filterToString initialModel.filterType
     , filterValue = initialModel.filterValue

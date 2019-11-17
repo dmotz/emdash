@@ -9,13 +9,24 @@ import Html.Parser
 import Html.Parser.Util
 import InfiniteList as IL
 import Json.Decode as Decode exposing (Decoder)
-import List exposing (filter, head, isEmpty, length, member, reverse)
-import Maybe exposing (withDefault)
+import List
+    exposing
+        ( concat
+        , filter
+        , foldr
+        , head
+        , isEmpty
+        , length
+        , member
+        , reverse
+        )
+import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Entry, Filter(..), Model, Tag, Title)
 import Msg exposing (..)
 import Regex
-import String exposing (fromChar, slice, toList)
-import Utils exposing (formatNumber, getEntryHeight, needsTitles, queryCharMin)
+import Set
+import String exposing (fromChar, fromInt, slice, toList)
+import Utils exposing (ClickWithKeys, formatNumber, getEntryHeight, needsTitles, queryCharMin)
 
 
 view : Model -> Html Msg
@@ -203,10 +214,10 @@ view model =
                         Nothing
                     )
                     (needsTitles model)
-                    model.currentEntry
+                    model.selectedEntries
             , lazy5
                 viewer
-                model.currentEntry
+                model.selectedEntries
                 model.parsingError
                 noEntries
                 model.tags
@@ -226,13 +237,13 @@ view model =
 
 
 viewer :
-    Maybe Entry
+    List Entry
     -> Bool
     -> Bool
     -> List Tag
     -> Maybe Tag
     -> Html Msg
-viewer mEntry parsingError noEntries tags pendingTag =
+viewer selectedEntries parsingError noEntries tags pendingTag =
     div
         (id "viewer"
             :: (if parsingError then
@@ -242,12 +253,8 @@ viewer mEntry parsingError noEntries tags pendingTag =
                     []
                )
         )
-        [ let
-            pendTag =
-                Maybe.withDefault "" pendingTag
-          in
-          case mEntry of
-            Just entry ->
+        [ case selectedEntries of
+            [ entry ] ->
                 div []
                     [ blockquote [] [ text entry.text ]
                     , Html.cite [ id "meta" ]
@@ -272,104 +279,21 @@ viewer mEntry parsingError noEntries tags pendingTag =
                         ]
                     , div
                         [ id "entry-tools" ]
-                        [ section []
-                            [ if length entry.tags > 0 then
-                                div
-                                    [ id "tags" ]
-                                    [ ul
-                                        []
-                                        (map
-                                            (\tag ->
-                                                li
-                                                    [ class "tag" ]
-                                                    [ span
-                                                        [ onClick <|
-                                                            RemoveTag tag
-                                                        , class "x"
-                                                        ]
-                                                        [ text "×" ]
-                                                    , span
-                                                        [ onClick <|
-                                                            FilterBy
-                                                                TagFilter
-                                                                tag
-                                                        , class "tag-title"
-                                                        ]
-                                                        [ text tag ]
-                                                    ]
-                                            )
-                                            entry.tags
-                                        )
-                                    ]
-
-                              else
-                                text ""
-                            , div [ class "tag-input" ]
-                                [ input
-                                    [ onInput UpdatePendingTag
-                                    , onFocus <| SetInputFocus True
-                                    , onBlur <| SetInputFocus False
-                                    , value pendTag
-                                    , placeholder "add tag"
-                                    , autocomplete False
-                                    , spellcheck False
-                                    ]
-                                    []
-                                , let
-                                    tagList =
-                                        filter
-                                            (\tag ->
-                                                member tag entry.tags
-                                                    |> not
-                                                    |> (&&)
-                                                        (String.contains
-                                                            pendTag
-                                                            tag
-                                                        )
-                                            )
-                                            tags
-                                  in
-                                  if length tagList > 0 then
-                                    ul
-                                        [ class "tag-list" ]
-                                        (map
-                                            (\tag ->
-                                                li
-                                                    [ onClick <|
-                                                        AddTag tag
-                                                    ]
-                                                    [ text tag ]
-                                            )
-                                            tagList
-                                        )
-
-                                  else
-                                    text ""
-                                ]
-                            ]
+                        [ tagSection entry.tags pendingTag
                         , section []
-                            [ div [] [ text "notes:" ]
+                            [ h5 [] [ text "notes:" ]
                             , textarea
                                 [ onFocus <| SetInputFocus True
                                 , onBlurVal UpdateNotes
                                 , value entry.notes
                                 ]
-                                [ text entry.notes
-                                ]
+                                [ text entry.notes ]
                             ]
-                        , section []
-                            [ div
-                                [ class "hide-button"
-                                , onClick <| HideEntry entry
-                                ]
-                                [ div [] [ text "×" ]
-                                , span [] [ text "delete entry" ]
-                                ]
-                            ]
+                        , hideButton [ entry ]
                         ]
                     ]
 
-            Nothing ->
+            [] ->
                 div [ id "intro", class "info-page" ]
                     [ if parsingError then
                         p [ class "error" ] [ text "Error parsing file." ]
@@ -380,6 +304,142 @@ viewer mEntry parsingError noEntries tags pendingTag =
                       else
                         text ""
                     ]
+
+            entries ->
+                let
+                    titleCount =
+                        entries
+                            |> map .title
+                            |> Set.fromList
+                            |> Set.size
+                in
+                div []
+                    [ h3 []
+                        [ text <|
+                            (entries |> length |> fromInt)
+                                ++ " entries from "
+                        , if titleCount > 1 then
+                            text <| fromInt titleCount ++ " titles"
+
+                          else
+                            case entries of
+                                entry :: _ ->
+                                    em [] [ text entry.title ]
+
+                                _ ->
+                                    text ""
+                        ]
+                    , div [ id "entry-tools" ]
+                        [ tagSection
+                            (foldr
+                                (\entry set ->
+                                    Set.intersect set (Set.fromList entry.tags)
+                                )
+                                (withDefault
+                                    Set.empty
+                                    (entries
+                                        |> head
+                                        |> Maybe.map (.tags >> Set.fromList)
+                                    )
+                                )
+                                entries
+                                |> Set.toList
+                            )
+                            pendingTag
+                        , hideButton entries
+                        ]
+                    ]
+        ]
+
+
+tagSection : List Tag -> Maybe Tag -> Html Msg
+tagSection tags pendingTag =
+    let
+        pendTag =
+            Maybe.withDefault "" pendingTag
+    in
+    section []
+        [ h5 [] [ text "tags:" ]
+        , if length tags > 0 then
+            div
+                [ id "tags" ]
+                [ ul
+                    []
+                    (map
+                        (\tag ->
+                            li
+                                [ class "tag" ]
+                                [ span
+                                    [ onClick <| RemoveTag tag
+                                    , class "x"
+                                    ]
+                                    [ text "×" ]
+                                , span
+                                    [ onClick <| FilterBy TagFilter tag
+                                    , class "tag-title"
+                                    ]
+                                    [ text tag ]
+                                ]
+                        )
+                        tags
+                    )
+                ]
+
+          else
+            text ""
+        , div [ class "tag-input" ]
+            [ input
+                [ onInput UpdatePendingTag
+                , onFocus <| SetInputFocus True
+                , onBlur <| SetInputFocus False
+                , value pendTag
+                , placeholder "add tag"
+                , autocomplete False
+                , spellcheck False
+                ]
+                []
+            , let
+                tagList =
+                    filter
+                        (\tag ->
+                            member tag tags
+                                |> not
+                                |> (&&) (String.contains pendTag tag)
+                        )
+                        tags
+              in
+              if length tagList > 0 then
+                ul
+                    [ class "tag-list" ]
+                    (map
+                        (\tag -> li [ onClick <| AddTag tag ] [ text tag ])
+                        tagList
+                    )
+
+              else
+                text ""
+            ]
+        ]
+
+
+hideButton : List Entry -> Html Msg
+hideButton entries =
+    section []
+        [ div
+            [ class "hide-button", onClick <| HideEntries entries ]
+            [ div [] [ text "×" ]
+            , span []
+                [ text <|
+                    "delete entr"
+                        ++ (case entries of
+                                [ _ ] ->
+                                    "y"
+
+                                _ ->
+                                    "ies"
+                           )
+                ]
+            ]
         ]
 
 
@@ -389,9 +449,9 @@ sidebar :
     -> List Entry
     -> Maybe String
     -> Bool
-    -> Maybe Entry
+    -> List Entry
     -> Html Msg
-sidebar infiniteList ( _, h ) entries query showTitles currentEntry =
+sidebar infiniteList ( _, h ) entries query showTitles selectedEntries =
     div
         [ id sidebarId
         , classList [ ( "no-titles", not showTitles ) ]
@@ -403,7 +463,7 @@ sidebar infiniteList ( _, h ) entries query showTitles currentEntry =
           else
             IL.view
                 (IL.config
-                    { itemView = listEntry query showTitles currentEntry
+                    { itemView = listEntry query showTitles selectedEntries
                     , itemHeight =
                         IL.withConstantHeight <| getEntryHeight showTitles
                     , containerHeight = h
@@ -475,23 +535,30 @@ addHighlighting str query =
 listEntry :
     Maybe String
     -> Bool
-    -> Maybe Entry
+    -> List Entry
     -> Int
     -> Int
     -> Entry
     -> Html Msg
-listEntry query showTitles currentEntry idx listIdx entry =
-    li [ id entry.id, onClick <| ShowEntry entry ]
-        [ case currentEntry of
-            Just ent ->
-                if ent == entry then
-                    div [ class "active-entry" ] []
+listEntry query showTitles selectedEntries idx listIdx entry =
+    let
+        selectedIds =
+            selectedEntries |> map .id |> Set.fromList
+    in
+    li
+        [ id entry.id
+        , Decode.map3 ClickWithKeys
+            (Decode.field "ctrlKey" Decode.bool)
+            (Decode.field "metaKey" Decode.bool)
+            (Decode.field "shiftKey" Decode.bool)
+            |> Decode.map (EntryClick entry)
+            |> on "click"
+        ]
+        [ if Set.member entry.id selectedIds then
+            div [ class "active-entry" ] []
 
-                else
-                    text ""
-
-            _ ->
-                text ""
+          else
+            text ""
         , blockquote
             []
             (case query of
@@ -713,7 +780,7 @@ on event decoder =
 
 onBlurVal : (String -> msg) -> Attribute msg
 onBlurVal ev =
-    Html.Events.on "blur" (Decode.map ev targetValue)
+    on "blur" (Decode.map ev targetValue)
 
 
 charLimit : Int

@@ -4,11 +4,12 @@ import Browser.Dom exposing (Error)
 import File exposing (File)
 import InfiniteList as IL
 import Model exposing (Entry, Filter, Tag)
-import Utils exposing (KeyEvent)
+import Utils exposing (ClickWithKeys, KeyEvent)
 
 
 type Msg
-    = ShowEntry Entry
+    = SelectEntries (List Entry)
+    | EntryClick Entry ClickWithKeys
     | ShowRandom
     | ShowByIndex Int
     | ShowNext
@@ -23,7 +24,7 @@ type Msg
     | PickFile
     | KeyDown KeyEvent
     | SetInputFocus Bool
-    | HideEntry Entry
+    | HideEntries (List Entry)
     | UpdateNotes String
     | UpdatePendingTag Tag
     | AddTag Tag

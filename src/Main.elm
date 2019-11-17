@@ -8,11 +8,23 @@ import Browser.Dom
         , setViewportOf
         )
 import Browser.Events exposing (onKeyDown, onResize)
+import Dict
 import File
 import File.Select as Select
 import Json.Decode as Decode
-import List exposing (drop, filter, head, isEmpty, length, map, member, reverse)
-import Maybe exposing (withDefault)
+import List
+    exposing
+        ( drop
+        , filter
+        , head
+        , isEmpty
+        , length
+        , map
+        , member
+        , reverse
+        , take
+        )
+import Maybe exposing (andThen, withDefault)
 import Model
     exposing
         ( Filter(..)
@@ -27,7 +39,7 @@ import Parser
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Regex
-import Set exposing (insert)
+import Set exposing (union)
 import String exposing (toLower, trim)
 import Task exposing (attempt, perform, sequence)
 import Tuple exposing (first)
@@ -45,6 +57,7 @@ import Utils
         , removeItem
         , rx
         , updateItem
+        , updateItems
         )
 import View exposing (sidebarId, view, viewerId)
 
@@ -91,10 +104,15 @@ init maybeModel =
         filterType =
             stringToFilter restored.filterType
 
+        selectedIds =
+            Set.fromList restored.selectedEntries
+
         model_ =
             { initialModel
                 | entries = restored.entries
-                , currentEntry = restored.currentEntry
+                , selectedEntries =
+                    filter (\entry -> Set.member entry.id selectedIds)
+                        restored.entries
                 , titles = Parser.getTitles restored.entries
                 , authors = Parser.getAuthors restored.entries
                 , tags = Parser.getTags restored.entries
@@ -124,16 +142,15 @@ init maybeModel =
                     getViewport
                 )
     in
-    case restored.currentEntry of
-        Just entry ->
-            let
-                ( m, cmd ) =
-                    update (ShowEntry entry) model
-            in
-            ( m, batch [ getSize, cmd ] )
+    if isEmpty restored.selectedEntries then
+        ( model, getSize )
 
-        _ ->
-            ( model, getSize )
+    else
+        let
+            ( m, cmd ) =
+                update (SelectEntries model.selectedEntries) model
+        in
+        ( m, batch [ getSize, cmd ] )
 
 
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
@@ -187,7 +204,13 @@ update message model =
                     ( { model
                         | parsingError = False
                         , entries = entries
-                        , currentEntry = head entries
+                        , selectedEntries =
+                            case head entries of
+                                Just entry ->
+                                    [ entry ]
+
+                                _ ->
+                                    []
                         , titles = Parser.getTitles entries
                         , authors = Parser.getAuthors entries
                       }
@@ -197,26 +220,94 @@ update message model =
         ResetError ->
             ( { model | parsingError = False }, none )
 
-        ShowEntry entry ->
+        SelectEntries entries ->
             let
                 sidebarView =
                     getViewportOf sidebarId
             in
             store
-                ( { model | currentEntry = Just entry }
-                , batch
-                    [ attempt
-                        GotDomEl
-                        (sequence
-                            [ Task.map (.viewport >> .y) sidebarView
-                            , Task.map (.viewport >> .height) sidebarView
-                            ]
-                        )
-                    , attempt
-                        DidScroll
-                        (setViewportOf viewerId 0 0)
-                    ]
+                ( { model | selectedEntries = entries }
+                , if length entries == 1 then
+                    batch
+                        [ attempt
+                            GotDomEl
+                            (sequence
+                                [ Task.map (.viewport >> .y) sidebarView
+                                , Task.map (.viewport >> .height) sidebarView
+                                ]
+                            )
+                        , attempt
+                            DidScroll
+                            (setViewportOf viewerId 0 0)
+                        ]
+
+                  else
+                    none
                 )
+
+        EntryClick entry { control, meta, shift } ->
+            if shift then
+                let
+                    entries =
+                        (if model.reverseList then
+                            reverse
+
+                         else
+                            identity
+                        )
+                        <|
+                            withDefault model.entries model.shownEntries
+
+                    selectedIndices =
+                        map (getIndex entries) model.selectedEntries
+
+                    targetIndex =
+                        getIndex entries entry
+
+                    minIndex =
+                        withDefault 0 (List.minimum selectedIndices)
+
+                    maxIndex =
+                        withDefault 0 (List.maximum selectedIndices)
+
+                    start =
+                        if targetIndex < minIndex then
+                            targetIndex
+
+                        else
+                            minIndex
+
+                    end =
+                        if targetIndex < minIndex then
+                            maxIndex
+
+                        else
+                            targetIndex
+                in
+                update
+                    (SelectEntries
+                        (entries
+                            |> drop start
+                            |> take (end - start + 1)
+                        )
+                    )
+                    model
+
+            else if control || meta then
+                update
+                    (SelectEntries <|
+                        (if List.member entry model.selectedEntries then
+                            filter ((/=) entry)
+
+                         else
+                            (::) entry
+                        )
+                            model.selectedEntries
+                    )
+                    model
+
+            else
+                update (SelectEntries [ entry ]) model
 
         ShowByIndex i ->
             case
@@ -224,14 +315,14 @@ update message model =
                     |> head
             of
                 Just entry ->
-                    update (ShowEntry entry) model
+                    update (SelectEntries [ entry ]) model
 
                 _ ->
                     noOp
 
         ShowNext ->
-            case model.currentEntry of
-                Just entry ->
+            case model.selectedEntries of
+                entry :: _ ->
                     update
                         (ShowByIndex <|
                             getNextIndex
@@ -240,12 +331,12 @@ update message model =
                         )
                         model
 
-                _ ->
+                [] ->
                     noOp
 
         ShowPrev ->
-            case model.currentEntry of
-                Just entry ->
+            case model.selectedEntries of
+                entry :: _ ->
                     update
                         (ShowByIndex <|
                             getPrevIndex
@@ -266,7 +357,9 @@ update message model =
                     length list
 
                 currentIndex =
-                    Maybe.map (getIndex list) model.currentEntry
+                    model.selectedEntries
+                        |> head
+                        |> andThen (getIndex list >> Just)
             in
             case len of
                 0 ->
@@ -361,8 +454,8 @@ update message model =
                                         (toLower entry.text)
 
         UpdateNotes text ->
-            case model.currentEntry of
-                Just entry ->
+            case model.selectedEntries of
+                [ entry ] ->
                     let
                         newEntry =
                             { entry | notes = text }
@@ -383,7 +476,7 @@ update message model =
                                             newEntry
                                     )
                                     model.shownEntries
-                            , currentEntry = Just newEntry
+                            , selectedEntries = [ newEntry ]
                             , inputFocused = False
                           }
                         , none
@@ -404,65 +497,65 @@ update message model =
                 ( { model | pendingTag = Nothing }, none )
 
             else
-                case model.currentEntry of
-                    Just entry ->
-                        let
-                            newEntry =
+                let
+                    updatedSelection =
+                        map
+                            (\entry ->
                                 { entry | tags = insertOnce entry.tags tagN }
-                        in
-                        store
-                            ( { model
-                                | tags = insertOnce model.tags tagN
-                                , entries =
-                                    updateItem
-                                        model.entries
-                                        entry
-                                        newEntry
-                                , shownEntries =
-                                    Maybe.map
-                                        (\entries ->
-                                            updateItem
-                                                entries
-                                                entry
-                                                newEntry
-                                        )
-                                        model.shownEntries
-                                , currentEntry = Just newEntry
-                                , pendingTag = Nothing
-                              }
-                            , none
                             )
+                            model.selectedEntries
 
-                    _ ->
-                        noOp
+                    updateMapping =
+                        map (\entry -> ( entry.id, entry )) updatedSelection
+                            |> Dict.fromList
+                in
+                store
+                    ( { model
+                        | tags = insertOnce model.tags tagN
+                        , entries =
+                            updateItems
+                                model.entries
+                                updateMapping
+                        , shownEntries =
+                            Maybe.map
+                                (\entries -> updateItems entries updateMapping)
+                                model.shownEntries
+                        , selectedEntries = updatedSelection
+                        , pendingTag = Nothing
+                      }
+                    , none
+                    )
 
         RemoveTag tag ->
-            case model.currentEntry of
-                Just entry ->
-                    let
-                        newEntry =
+            let
+                updatedSelection =
+                    map
+                        (\entry ->
                             { entry | tags = removeItem entry.tags tag }
-
-                        newEntries =
-                            updateItem model.entries entry newEntry
-                    in
-                    store
-                        ( { model
-                            | entries = newEntries
-                            , tags = Parser.getTags newEntries
-                            , currentEntry = Just newEntry
-                            , shownEntries =
-                                Maybe.map
-                                    (\entries ->
-                                        updateItem entries entry newEntry
-                                    )
-                                    model.shownEntries
-                          }
-                        , none
                         )
+                        model.selectedEntries
 
-                _ ->
-                    noOp
+                updateMapping =
+                    map (\entry -> ( entry.id, entry )) updatedSelection
+                        |> Dict.fromList
+
+                newEntries =
+                    updateItems
+                        model.entries
+                        updateMapping
+            in
+            store
+                ( { model
+                    | entries = newEntries
+                    , tags = Parser.getTags newEntries
+                    , selectedEntries = updatedSelection
+                    , shownEntries =
+                        Maybe.map
+                            (\entries -> updateItems entries updateMapping)
+                            model.shownEntries
+                  }
+                , none
+                )
 
         ToggleFocusMode ->
             store ( { model | focusMode = not model.focusMode }, none )
@@ -470,16 +563,16 @@ update message model =
         ToggleAboutMode ->
             ( { model | aboutMode = not model.aboutMode }, none )
 
-        HideEntry entry ->
+        HideEntries entries ->
             let
                 list =
                     withDefault model.entries model.shownEntries
 
                 idx =
-                    getIndex list entry
+                    withDefault 0 (entries |> head |> Maybe.map (getIndex list))
 
                 fn =
-                    filter ((/=) entry)
+                    filter (\entry -> member entry entries |> not)
 
                 len =
                     length list
@@ -499,7 +592,10 @@ update message model =
                         idx
                 )
                 { model
-                    | hiddenEntries = insert entry.id model.hiddenEntries
+                    | hiddenEntries =
+                        union
+                            (entries |> map .id |> Set.fromList)
+                            model.hiddenEntries
                     , entries = fn model.entries
                     , shownEntries =
                         if soleEntry then
@@ -522,9 +618,9 @@ update message model =
             case result of
                 Ok [ offset, height ] ->
                     case
-                        model.currentEntry
+                        model.selectedEntries
                     of
-                        Just entry ->
+                        entry :: _ ->
                             let
                                 elHeight =
                                     needsTitles model
@@ -592,7 +688,18 @@ update message model =
 
         KeyDown { key, control, meta } ->
             if control || meta then
-                noOp
+                case key of
+                    "a" ->
+                        update
+                            (SelectEntries <|
+                                withDefault
+                                    model.entries
+                                    model.shownEntries
+                            )
+                            model
+
+                    _ ->
+                        noOp
 
             else if model.inputFocused then
                 if key == "Enter" then

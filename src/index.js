@@ -41,6 +41,12 @@ app.ports.importJson.subscribe(text => {
   }
 })
 
+window.addEventListener('keydown', e => {
+  if (e.key.toLowerCase() === 'a' && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault()
+  }
+})
+
 if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () =>
     navigator.serviceWorker.register('sw.js')
