@@ -45,7 +45,7 @@ queryCharMin =
 
 rx : String -> Regex
 rx =
-    Regex.fromString >> Maybe.withDefault Regex.never
+    Regex.fromString >> withDefault Regex.never
 
 
 formatNumber : Int -> String
