@@ -279,7 +279,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                         ]
                     , div
                         [ id "entry-tools" ]
-                        [ tagSection entry.tags pendingTag
+                        [ tagSection entry.tags tags pendingTag
                         , section []
                             [ h5 [] [ text "notes:" ]
                             , textarea
@@ -345,6 +345,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                                 entries
                                 |> Set.toList
                             )
+                            tags
                             pendingTag
                         , hideButton entries
                         ]
@@ -352,8 +353,8 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
         ]
 
 
-tagSection : List Tag -> Maybe Tag -> Html Msg
-tagSection tags pendingTag =
+tagSection : List Tag -> List Tag -> Maybe Tag -> Html Msg
+tagSection tags globalTags pendingTag =
     let
         pendTag =
             Maybe.withDefault "" pendingTag
@@ -406,7 +407,7 @@ tagSection tags pendingTag =
                                 |> not
                                 |> (&&) (String.contains pendTag tag)
                         )
-                        tags
+                        globalTags
               in
               if length tagList > 0 then
                 ul
