@@ -27,7 +27,8 @@ import List
 import Maybe exposing (andThen, withDefault)
 import Model
     exposing
-        ( Filter(..)
+        ( Entry
+        , Filter(..)
         , Model
         , StoredModel
         , initialModel
@@ -112,7 +113,8 @@ init maybeModel =
                 | entries = restored.entries
                 , hiddenEntries = Set.fromList restored.hiddenEntries
                 , selectedEntries =
-                    filter (\entry -> Set.member entry.id selectedIds)
+                    filter
+                        (\entry -> Set.member entry.id selectedIds)
                         restored.entries
                 , titles = Parser.getTitles restored.entries
                 , authors = Parser.getAuthors restored.entries
@@ -157,6 +159,11 @@ init maybeModel =
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 store ( model, cmd ) =
     ( model, batch [ cmd, model |> modelToStoredModel |> setStorage ] )
+
+
+getEntries : Model -> List Entry
+getEntries model =
+    withDefault model.entries model.shownEntries
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -257,7 +264,7 @@ update message model =
                             identity
                         )
                         <|
-                            withDefault model.entries model.shownEntries
+                            getEntries model
 
                     selectedIndices =
                         map (getIndex entries) model.selectedEntries
@@ -312,7 +319,7 @@ update message model =
 
         ShowByIndex i ->
             case
-                drop i (withDefault model.entries model.shownEntries)
+                drop i (getEntries model)
                     |> head
             of
                 Just entry ->
@@ -327,7 +334,7 @@ update message model =
                     update
                         (ShowByIndex <|
                             getNextIndex
-                                (withDefault model.entries model.shownEntries)
+                                (getEntries model)
                                 entry
                         )
                         model
@@ -341,7 +348,7 @@ update message model =
                     update
                         (ShowByIndex <|
                             getPrevIndex
-                                (withDefault model.entries model.shownEntries)
+                                (getEntries model)
                                 entry
                         )
                         model
@@ -352,7 +359,7 @@ update message model =
         ShowRandom ->
             let
                 list =
-                    withDefault model.entries model.shownEntries
+                    getEntries model
 
                 len =
                     length list
@@ -567,7 +574,7 @@ update message model =
         HideEntries entries ->
             let
                 list =
-                    withDefault model.entries model.shownEntries
+                    getEntries model
 
                 idx =
                     withDefault 0 (entries |> head |> Maybe.map (getIndex list))
