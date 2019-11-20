@@ -5,7 +5,6 @@ import List
     exposing
         ( all
         , concat
-        , filter
         , filterMap
         , foldr
         , head
