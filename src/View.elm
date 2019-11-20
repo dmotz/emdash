@@ -806,9 +806,9 @@ listViewConfig :
     -> Maybe String
     -> Bool
     -> IL.Config Entry Msg
-listViewConfig ( _, h ) entries query showTitles =
+listViewConfig ( _, h ) selectedEntries query showTitles =
     IL.config
-        { itemView = listEntry query showTitles entries
+        { itemView = listEntry query showTitles selectedEntries
         , itemHeight =
             IL.withConstantHeight <| getEntryHeight showTitles
         , containerHeight = h
