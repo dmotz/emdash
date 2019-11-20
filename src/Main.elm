@@ -110,6 +110,7 @@ init maybeModel =
         model_ =
             { initialModel
                 | entries = restored.entries
+                , hiddenEntries = Set.fromList restored.hiddenEntries
                 , selectedEntries =
                     filter (\entry -> Set.member entry.id selectedIds)
                         restored.entries
