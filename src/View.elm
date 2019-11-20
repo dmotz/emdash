@@ -461,7 +461,7 @@ sidebar infiniteList uiSize entries query showTitles selectedEntries =
 
           else
             IL.view
-                (listConfig uiSize selectedEntries query showTitles)
+                (listViewConfig uiSize selectedEntries query showTitles)
                 infiniteList
                 entries
         ]
@@ -800,13 +800,13 @@ map =
     List.map
 
 
-listConfig :
+listViewConfig :
     ( Int, Int )
     -> List Entry
     -> Maybe String
     -> Bool
     -> IL.Config Entry Msg
-listConfig ( _, h ) entries query showTitles =
+listViewConfig ( _, h ) entries query showTitles =
     IL.config
         { itemView = listEntry query showTitles entries
         , itemHeight =
