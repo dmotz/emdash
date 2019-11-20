@@ -450,7 +450,7 @@ sidebar :
     -> Bool
     -> List Entry
     -> Html Msg
-sidebar infiniteList ( _, h ) entries query showTitles selectedEntries =
+sidebar infiniteList uiSize entries query showTitles selectedEntries =
     div
         [ id sidebarId
         , classList [ ( "no-titles", not showTitles ) ]
@@ -461,14 +461,7 @@ sidebar infiniteList ( _, h ) entries query showTitles selectedEntries =
 
           else
             IL.view
-                (IL.config
-                    { itemView = listEntry query showTitles selectedEntries
-                    , itemHeight =
-                        IL.withConstantHeight <| getEntryHeight showTitles
-                    , containerHeight = h
-                    }
-                    |> IL.withCustomContainer entriesContainer
-                )
+                (listConfig uiSize selectedEntries query showTitles)
                 infiniteList
                 entries
         ]
@@ -805,3 +798,19 @@ sidebarId =
 map : (a -> b) -> List a -> List b
 map =
     List.map
+
+
+listConfig :
+    ( Int, Int )
+    -> List Entry
+    -> Maybe String
+    -> Bool
+    -> IL.Config Entry Msg
+listConfig ( _, h ) entries query showTitles =
+    IL.config
+        { itemView = listEntry query showTitles entries
+        , itemHeight =
+            IL.withConstantHeight <| getEntryHeight showTitles
+        , containerHeight = h
+        }
+        |> IL.withCustomContainer entriesContainer
