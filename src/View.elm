@@ -9,17 +9,7 @@ import Html.Parser
 import Html.Parser.Util
 import InfiniteList as IL
 import Json.Decode as Decode exposing (Decoder)
-import List
-    exposing
-        ( concat
-        , filter
-        , foldr
-        , head
-        , isEmpty
-        , length
-        , member
-        , reverse
-        )
+import List exposing (filter, foldr, head, isEmpty, length, member, reverse)
 import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Entry, Filter(..), Model, Tag, Title)
 import Msg exposing (..)
