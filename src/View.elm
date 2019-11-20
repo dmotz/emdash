@@ -248,25 +248,33 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                 div []
                     [ blockquote [] [ text entry.text ]
                     , Html.cite [ id "meta" ]
-                        [ div
-                            [ onClick <| FilterBy TitleFilter entry.title
-                            , class "title"
+                        ([ span
+                            [ class "title"
+                            , onClick <| FilterBy TitleFilter entry.title
                             ]
                             [ text entry.title ]
-                        , div
-                            [ onClick <| FilterBy AuthorFilter entry.author
-                            , class "author"
+                         , span [ class "sep" ] [ text "•" ]
+                         , span
+                            [ class "author"
+                            , onClick <| FilterBy AuthorFilter entry.author
                             ]
                             [ text entry.author ]
-                        , case entry.page of
-                            Just n ->
-                                div
-                                    [ class "page" ]
-                                    [ text <| "p. " ++ String.fromInt n ]
+                         ]
+                            ++ (case entry.page of
+                                    Just n ->
+                                        [ span [ class "sep" ] [ text "•" ]
+                                        , span
+                                            [ class "page" ]
+                                            [ text <|
+                                                "p. "
+                                                    ++ String.fromInt n
+                                            ]
+                                        ]
 
-                            _ ->
-                                text ""
-                        ]
+                                    _ ->
+                                        []
+                               )
+                        )
                     , div
                         [ id "entry-tools" ]
                         [ tagSection entry.tags tags pendingTag
