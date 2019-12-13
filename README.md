@@ -25,18 +25,19 @@ by [Dan Motzenbecker](https://oxism.com)
 
 ## Keyboard shortcuts
 
-|      key       | action                      |
-| :------------: | --------------------------- |
-|  <kbd>→</kbd>  | show next entry in list     |
-|  <kbd>←</kbd>  | show previous entry in list |
-|  <kbd>r</kbd>  | show random entry from list |
-|  <kbd>s</kbd>  | toggle list sort order      |
-|  <kbd>f</kbd>  | toggle focus mode           |
-| <kbd>esc</kbd> | clear current filter        |
-|  <kbd>1</kbd>  | set title filter mode       |
-|  <kbd>2</kbd>  | set author filter mode      |
-|  <kbd>3</kbd>  | set tag filter mode         |
-|  <kbd>4</kbd>  | set text filter mode        |
+|                key                 | action                      |
+| :--------------------------------: | --------------------------- |
+|            <kbd>→</kbd>            | show next entry in list     |
+|            <kbd>←</kbd>            | show previous entry in list |
+|            <kbd>r</kbd>            | show random entry from list |
+| <kbd>cmd/ctrl</kbd> + <kbd>a</kbd> | select all entries in list  |
+|            <kbd>s</kbd>            | toggle list sort order      |
+|            <kbd>f</kbd>            | toggle focus mode           |
+|           <kbd>esc</kbd>           | clear current filter        |
+|            <kbd>1</kbd>            | set title filter mode       |
+|            <kbd>2</kbd>            | set author filter mode      |
+|            <kbd>3</kbd>            | set tag filter mode         |
+|            <kbd>4</kbd>            | set text filter mode        |
 
 ## Current limitations
 
