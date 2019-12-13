@@ -118,11 +118,7 @@ ul, li
   justify-content: space-between
 
   > div
-    display: inline-block
     vertical-align: top
-
-    &:first-child
-      margin-right: 10rem
 
 main
   position: relative
@@ -657,3 +653,7 @@ select
   #intro
     justify-content: flex-start
     padding-top: 6rem !important
+
+@media (max-width: 720px)
+  .col-2
+    display: block
