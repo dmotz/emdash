@@ -530,7 +530,7 @@ listEntry :
     -> Int
     -> Entry
     -> Html Msg
-listEntry query showTitles selectedEntries idx listIdx entry =
+listEntry query showTitles selectedEntries _ _ entry =
     let
         selectedIds =
             selectedEntries |> map .id |> Set.fromList
