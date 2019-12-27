@@ -674,7 +674,7 @@ aboutView entries titles authors tags =
             [ div
                 [ class "hide-button", onClick ToggleAboutMode ]
                 [ div [] [ text "×" ] ]
-            , p [ class "big" ]
+            , p []
                 [ text
                     "Marginalia is an open source tool created by "
                 , a [ href "https://oxism.com", target "_blank" ]
