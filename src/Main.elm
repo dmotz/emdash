@@ -398,7 +398,7 @@ update message model =
                     )
 
         SetInputFocus bool ->
-            ( { model | inputFocused = bool, pendingTag = Nothing }, none )
+            ( { model | inputFocused = bool }, none )
 
         FilterBy filterType val ->
             let
