@@ -29,6 +29,7 @@ import Model
     exposing
         ( Entry
         , Filter(..)
+        , InputFocus(..)
         , Model
         , StoredModel
         , initialModel
@@ -397,8 +398,8 @@ update message model =
                         (Random.int 0 (len - 1))
                     )
 
-        SetInputFocus bool ->
-            ( { model | inputFocused = bool }, none )
+        SetInputFocus focus ->
+            ( { model | inputFocused = focus }, none )
 
         FilterBy filterType val ->
             let
@@ -485,13 +486,13 @@ update message model =
                                     )
                                     model.shownEntries
                             , selectedEntries = [ newEntry ]
-                            , inputFocused = False
+                            , inputFocused = Nothing
                           }
                         , none
                         )
 
                 _ ->
-                    ( { model | inputFocused = False }, none )
+                    ( { model | inputFocused = Nothing }, none )
 
         UpdatePendingTag text ->
             ( { model | pendingTag = Just text }, none )
@@ -725,8 +726,8 @@ update message model =
                     _ ->
                         noOp
 
-            else if model.inputFocused then
-                if key == "Enter" then
+            else if model.inputFocused /= Nothing then
+                if key == "Enter" && model.inputFocused == Just TagFocus then
                     update AddTag model
 
                 else
