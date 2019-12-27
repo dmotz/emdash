@@ -235,7 +235,7 @@ viewer :
     -> Html Msg
 viewer selectedEntries parsingError noEntries tags pendingTag =
     div
-        (id "viewer"
+        (id viewerId
             :: (if parsingError then
                     [ onClick ResetError ]
 
