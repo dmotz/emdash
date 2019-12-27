@@ -2,6 +2,7 @@ module Model exposing
     ( Author
     , Entry
     , Filter(..)
+    , InputFocus(..)
     , Model
     , StoredModel
     , Tag
@@ -21,6 +22,12 @@ type Filter
     | AuthorFilter
     | TagFilter
     | TextFilter
+
+
+type InputFocus
+    = NoteFocus
+    | TagFocus
+    | SearchFocus
 
 
 type alias Id =
