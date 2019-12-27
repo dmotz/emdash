@@ -496,43 +496,59 @@ update message model =
         UpdatePendingTag text ->
             ( { model | pendingTag = Just text }, none )
 
-        AddTag tag ->
-            let
-                tagN =
-                    tag |> trim |> toLower
-            in
-            if tagN == "" then
-                ( { model | pendingTag = Nothing }, none )
+        AddTag ->
+            case model.pendingTag of
+                Just tag ->
+                    let
+                        tagN =
+                            tag |> trim |> toLower
+                    in
+                    if tagN == "" then
+                        ( { model | pendingTag = Nothing }, none )
 
-            else
-                let
-                    updatedSelection =
-                        map
-                            (\entry ->
-                                { entry | tags = insertOnce entry.tags tagN }
+                    else
+                        let
+                            updatedSelection =
+                                map
+                                    (\entry ->
+                                        { entry
+                                            | tags =
+                                                insertOnce
+                                                    entry.tags
+                                                    tagN
+                                        }
+                                    )
+                                    model.selectedEntries
+
+                            updateMapping =
+                                map
+                                    (\entry -> ( entry.id, entry ))
+                                    updatedSelection
+                                    |> Dict.fromList
+                        in
+                        store
+                            ( { model
+                                | tags = insertOnce model.tags tagN
+                                , entries =
+                                    updateItems
+                                        model.entries
+                                        updateMapping
+                                , shownEntries =
+                                    Maybe.map
+                                        (\entries ->
+                                            updateItems
+                                                entries
+                                                updateMapping
+                                        )
+                                        model.shownEntries
+                                , selectedEntries = updatedSelection
+                                , pendingTag = Nothing
+                              }
+                            , none
                             )
-                            model.selectedEntries
 
-                    updateMapping =
-                        map (\entry -> ( entry.id, entry )) updatedSelection
-                            |> Dict.fromList
-                in
-                store
-                    ( { model
-                        | tags = insertOnce model.tags tagN
-                        , entries =
-                            updateItems
-                                model.entries
-                                updateMapping
-                        , shownEntries =
-                            Maybe.map
-                                (\entries -> updateItems entries updateMapping)
-                                model.shownEntries
-                        , selectedEntries = updatedSelection
-                        , pendingTag = Nothing
-                      }
-                    , none
-                    )
+                _ ->
+                    noOp
 
         RemoveTag tag ->
             let
@@ -711,12 +727,7 @@ update message model =
 
             else if model.inputFocused then
                 if key == "Enter" then
-                    case model.pendingTag of
-                        Just tag ->
-                            update (AddTag tag) model
-
-                        _ ->
-                            noOp
+                    update AddTag model
 
                 else
                     noOp
