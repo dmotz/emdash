@@ -72,7 +72,7 @@ type alias Model =
     , aboutMode : Bool
     , isDragging : Bool
     , reverseList : Bool
-    , inputFocused : Bool
+    , inputFocused : Maybe InputFocus
     , parsingError : Bool
     , uiSize : ( Int, Int )
     , infiniteList : IL.Model
@@ -96,7 +96,7 @@ initialModel =
     , aboutMode = False
     , isDragging = False
     , reverseList = False
-    , inputFocused = False
+    , inputFocused = Nothing
     , parsingError = False
     , uiSize = ( 1, 1 )
     , infiniteList = IL.init
