@@ -27,7 +27,7 @@ type Msg
     | HideEntries (List Entry)
     | UpdateNotes String
     | UpdatePendingTag Tag
-    | AddTag Tag
+    | AddTag
     | RemoveTag Tag
     | Sort
     | GotDomEl (Result Error (List Float))
