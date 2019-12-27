@@ -11,7 +11,16 @@ import InfiniteList as IL
 import Json.Decode as Decode exposing (Decoder)
 import List exposing (filter, foldr, head, isEmpty, length, member, reverse)
 import Maybe exposing (withDefault)
-import Model exposing (Author, Entry, Filter(..), Model, Tag, Title)
+import Model
+    exposing
+        ( Author
+        , Entry
+        , Filter(..)
+        , InputFocus(..)
+        , Model
+        , Tag
+        , Title
+        )
 import Msg exposing (..)
 import Regex
 import Set
@@ -139,8 +148,10 @@ view model =
                                         [ text "×" ]
                                     , input
                                         [ onInput <| FilterBy TextFilter
-                                        , onFocus <| SetInputFocus True
-                                        , onBlur <| SetInputFocus False
+                                        , onFocus <|
+                                            SetInputFocus
+                                                (Just SearchFocus)
+                                        , onBlur <| SetInputFocus Nothing
                                         , id "search-input"
                                         , value <|
                                             Maybe.withDefault
@@ -281,7 +292,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                         , section []
                             [ h5 [] [ text "notes:" ]
                             , textarea
-                                [ onFocus <| SetInputFocus True
+                                [ onFocus <| SetInputFocus (Just NoteFocus)
                                 , onBlurVal UpdateNotes
                                 , value entry.notes
                                 ]
@@ -405,8 +416,8 @@ tagSection tags globalTags pendingTag =
                 )
             , input
                 [ onInput UpdatePendingTag
-                , onFocus <| SetInputFocus True
-                , onBlur <| SetInputFocus False
+                , onFocus <| SetInputFocus (Just TagFocus)
+                , onBlur <| SetInputFocus Nothing
                 , value pendTag
                 , list datalistId
                 , placeholder "add tag"
