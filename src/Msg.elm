@@ -3,7 +3,7 @@ module Msg exposing (Msg(..))
 import Browser.Dom exposing (Error)
 import File exposing (File)
 import InfiniteList as IL
-import Model exposing (Entry, Filter, Tag)
+import Model exposing (Entry, Filter, InputFocus, Tag)
 import Utils exposing (ClickWithKeys, KeyEvent)
 
 
@@ -23,7 +23,7 @@ type Msg
     | FileLoad String
     | PickFile
     | KeyDown KeyEvent
-    | SetInputFocus Bool
+    | SetInputFocus (Maybe InputFocus)
     | HideEntries (List Entry)
     | UpdateNotes String
     | UpdatePendingTag Tag
