@@ -386,37 +386,35 @@ tagSection tags globalTags pendingTag =
 
           else
             text ""
-        , div [ class "tag-input" ]
-            [ input
-                [ onInput UpdatePendingTag
-                , onFocus <| SetInputFocus True
-                , onBlur <| SetInputFocus False
-                , value pendTag
-                , placeholder "add tag"
-                , autocomplete False
-                , spellcheck False
-                ]
-                []
-            , let
-                tagList =
-                    filter
+        , let
+            datalistId =
+                "tags-datalist"
+          in
+          div [ class "tag-input" ]
+            [ datalist [ id datalistId ]
+                (map
+                    (\tag -> option [ value tag ] [])
+                    (filter
                         (\tag ->
                             member tag tags
                                 |> not
                                 |> (&&) (String.contains pendTag tag)
                         )
                         globalTags
-              in
-              if length tagList > 0 then
-                ul
-                    [ class "tag-list" ]
-                    (map
-                        (\tag -> li [ onClick <| AddTag tag ] [ text tag ])
-                        tagList
                     )
-
-              else
-                text ""
+                )
+            , input
+                [ onInput UpdatePendingTag
+                , onFocus <| SetInputFocus True
+                , onBlur <| SetInputFocus False
+                , value pendTag
+                , list datalistId
+                , placeholder "add tag"
+                , autocomplete False
+                , spellcheck False
+                ]
+                []
+            , button [ onClick AddTag ] [ text "Add" ]
             ]
         ]
 
