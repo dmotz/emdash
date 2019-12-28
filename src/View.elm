@@ -593,6 +593,9 @@ selectMenu values mState inputFn default =
     let
         defaultLabel =
             "(all " ++ default ++ ")"
+
+        val =
+            withDefault defaultLabel mState
     in
     div [ class "select" ]
         [ span
@@ -604,15 +607,18 @@ selectMenu values mState inputFn default =
             ]
             [ text "×" ]
         , div [ class <| "select-" ++ default ]
-            [ select
-                [ onInput inputFn, value <| withDefault "" mState ]
+            [ select [ onInput inputFn ]
                 (option
-                    [ value "" ]
+                    [ value "", selected <| val == defaultLabel ]
                     [ text defaultLabel ]
-                    :: map (\t -> option [ value t ] [ text t ]) values
+                    :: map
+                        (\t ->
+                            option [ value t, selected <| t == val ] [ text t ]
+                        )
+                        values
                 )
             , h5 [ classList [ ( "no-filter", mState == Nothing ) ] ]
-                [ text <| withDefault defaultLabel mState ]
+                [ text val ]
             ]
         ]
 
