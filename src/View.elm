@@ -605,29 +605,14 @@ selectMenu values mState inputFn default =
             [ text "×" ]
         , div [ class <| "select-" ++ default ]
             [ select
-                [ onInput inputFn
-                , value <|
-                    case mState of
-                        Just state ->
-                            state
-
-                        _ ->
-                            ""
-                ]
+                [ onInput inputFn, value <| withDefault "" mState ]
                 (option
                     [ value "" ]
                     [ text defaultLabel ]
                     :: map (\t -> option [ value t ] [ text t ]) values
                 )
             , h5 [ classList [ ( "no-filter", mState == Nothing ) ] ]
-                [ text <|
-                    case mState of
-                        Just state ->
-                            state
-
-                        _ ->
-                            defaultLabel
-                ]
+                [ text <| withDefault defaultLabel mState ]
             ]
         ]
 
