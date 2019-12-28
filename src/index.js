@@ -42,7 +42,7 @@ app.ports.importJson.subscribe(text => {
 })
 
 window.addEventListener('keydown', e => {
-  if (e.key.toLowerCase() === 'a' && (e.metaKey || e.ctrlKey)) {
+  if (e.key && e.key.toLowerCase() === 'a' && (e.metaKey || e.ctrlKey)) {
     e.preventDefault()
   }
 })
