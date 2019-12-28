@@ -425,7 +425,9 @@ tagSection tags globalTags pendingTag =
                 , spellcheck False
                 ]
                 []
-            , button [ onClick AddTag ] [ text "Add" ]
+            , button
+                [ onClick AddTag, disabled <| pendTag == "" ]
+                [ text "Add" ]
             ]
         ]
 
