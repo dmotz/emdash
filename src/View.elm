@@ -21,7 +21,7 @@ import Model
         , Tag
         , Title
         )
-import Msg exposing (..)
+import Msg exposing (Msg(..))
 import Regex
 import Set
 import String exposing (fromInt, slice, toList)
