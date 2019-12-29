@@ -191,13 +191,19 @@ main
     padding: 2rem
     height: 9rem
 
+    &:hover
+      blockquote
+        background-color: $highlight
+
     blockquote
       white-space: nowrap
       text-overflow: ellipsis
       width: 100%
       overflow: hidden
+      transition: background-color .3s ease-out
 
     .title
+      display: block
       color: $gray
       margin-top: 1rem
       white-space: nowrap
