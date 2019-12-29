@@ -24,8 +24,16 @@ import Model
 import Msg exposing (..)
 import Regex
 import Set
-import String exposing (fromChar, fromInt, slice, toList)
-import Utils exposing (ClickWithKeys, formatNumber, getEntryHeight, needsTitles, queryCharMin)
+import String exposing (fromInt, slice, toList)
+import Utils
+    exposing
+        ( ClickWithKeys
+        , charLimit
+        , formatNumber
+        , getEntryHeight
+        , needsTitles
+        , queryCharMin
+        )
 
 
 view : Model -> Html Msg
@@ -276,10 +284,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                                         [ span [ class "sep" ] [ text "•" ]
                                         , span
                                             [ class "page" ]
-                                            [ text <|
-                                                "p. "
-                                                    ++ String.fromInt n
-                                            ]
+                                            [ text <| "p. " ++ fromInt n ]
                                         ]
 
                                     _ ->
@@ -481,24 +486,6 @@ sidebar infiniteList uiSize entries query showTitles selectedEntries =
 entriesContainer : List ( String, String ) -> List (Html msg) -> Html msg
 entriesContainer styles children =
     ul (map (\( k, v ) -> style k v) styles) children
-
-
-takeExcerpt : String -> String
-takeExcerpt text =
-    let
-        f acc chars n =
-            case chars of
-                x :: xs ->
-                    if n < charLimit || n >= charLimit && x /= ' ' then
-                        f (acc ++ fromChar x) xs (n + 1)
-
-                    else
-                        acc
-
-                [] ->
-                    acc
-    in
-    f "" (toList text) 0 ++ " …"
 
 
 addHighlighting : String -> String -> List (Html msg)
@@ -775,11 +762,6 @@ on event decoder =
 onBlurVal : (String -> msg) -> Attribute msg
 onBlurVal ev =
     on "blur" (Decode.map ev targetValue)
-
-
-charLimit : Int
-charLimit =
-    42
 
 
 repoUrl : String

@@ -1,6 +1,7 @@
 module Utils exposing
     ( ClickWithKeys
     , KeyEvent
+    , charLimit
     , formatNumber
     , getEntryHeight
     , getIndex
@@ -12,6 +13,7 @@ module Utils exposing
     , queryCharMin
     , removeItem
     , rx
+    , takeExcerpt
     , updateItem
     , updateItems
     )
@@ -22,6 +24,7 @@ import Maybe exposing (withDefault)
 import Model exposing (Filter(..), Model, StoredModel, filterToString)
 import Regex exposing (Regex)
 import Set
+import String exposing (fromChar, toList)
 
 
 type alias KeyEvent =
@@ -157,3 +160,26 @@ getEntryHeight hasTitle =
 
     else
         60
+
+
+charLimit : Int
+charLimit =
+    42
+
+
+takeExcerpt : String -> String
+takeExcerpt text =
+    let
+        f acc chars n =
+            case chars of
+                x :: xs ->
+                    if n < charLimit || n >= charLimit && x /= ' ' then
+                        f (acc ++ fromChar x) xs (n + 1)
+
+                    else
+                        acc
+
+                [] ->
+                    acc
+    in
+    f "" (toList text) 0 ++ " …"
