@@ -36,7 +36,7 @@ import Model
         , initialStoredModel
         , stringToFilter
         )
-import Msg exposing (..)
+import Msg exposing (Msg(..))
 import Parser
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
