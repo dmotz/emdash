@@ -379,12 +379,12 @@ tagSection tags globalTags pendingTag =
                         (\tag ->
                             li
                                 [ class "tag" ]
-                                [ span
+                                [ div
                                     [ onClick <| RemoveTag tag
-                                    , class "x"
+                                    , class "tag-delete"
                                     ]
                                     [ text "×" ]
-                                , span
+                                , div
                                     [ onClick <| FilterBy TagFilter tag
                                     , class "tag-title"
                                     ]

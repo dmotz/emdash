@@ -527,7 +527,6 @@ select
 
 #entry-tools
   margin-top: 2rem
-  width: 70%
   transition: opacity 0.2s ease-out
   color: $gray
   font-size: 1.4rem
@@ -544,6 +543,9 @@ select
     font-size: 1.4rem
     color: #000
     font-style: italic
+
+    &:first-child
+      margin-bottom: 0
 
 .hide-button
   display: inline-flex
@@ -585,40 +587,45 @@ select
   margin-bottom: 2rem
 
 .tag
-  display: inline-block
-  margin-left: -1.2rem
-  margin-right: 1.4rem
-  font-size: 1.4rem
+  display: inline-flex
+  flex-direction: column
+  color: $black
+  margin-right: 0.8rem
+  font-size: 1.2rem
   position: relative
 
-  .x
+  > div
+    display: flex
+    background-color: $lightGray
+    padding: 0.4rem 0.6rem
+    align-items: center
+
+    &:hover
+      color: $white
+      background-color: $black
+      cursor: pointer
+
+  .tag-title
     position: relative
-    left: -0.2rem
-    top: 0.4rem
-    opacity: 0
-    transition: opacity .2s ease-out
+    z-index: 1
+
+  .tag-delete
+    align-self: flex-end
+    transition: width .2s ease-out
+    font-size: 1.6rem
     line-height: 0
+    padding: 0.8rem 0.4rem
+    transform: translateY(100%)
+    transition: transform .2s ease-out
+
+    &:hover
+      color: $white
+      background-color: $black
+      cursor: pointer
 
   &:hover
-    cursor: pointer
-    .x
-      opacity: 1
-
-      &:hover + .tag-title
-        color: $black
-
-    .tag-title
-      color: $gray
-
-.tag-title
-  border-bottom: $actionUnderline
-  margin-right: 1.2rem
-
-.tag-remove
-  cursor: pointer
-  font-size: 2.2rem
-  color: $black
-  display: none
+    .tag-delete
+      transform: translateY(0)
 
 .edit-mode
   .tag
