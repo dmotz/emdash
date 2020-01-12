@@ -103,7 +103,7 @@ if (MODE === prod) {
       new CopyWebpackPlugin([
         {
           from: 'src/assets',
-          ignore: '.DS_Store'
+          ignore: ['.DS_Store']
         }
       ]),
       new MiniCssExtractPlugin({
