@@ -1,6 +1,7 @@
 port module Epub exposing (export)
 
 import List exposing (concat, filter, indexedMap, map)
+import MD5 exposing (hex)
 import Model exposing (Author, Entry, Title)
 import String exposing (fromInt, replace, toLower)
 
@@ -102,8 +103,13 @@ generateContent titles =
           xmlns:dc="http://purl.org/dc/elements/1.1/"
           xmlns:opf="http://www.idpf.org/2007/opf">
 
-          <dc:identifier id="BookId">546d2ec6-f6af-4eaa-95a4-5e829d0bdb90</dc:identifier>
-          <meta refines="#BookId" property="identifier-type" scheme="onix:codelist5">22</meta>
+          <dc:identifier id="BookId">"""
+        ++ (hex <| String.concat titles)
+        ++ """</dc:identifier>
+          <meta
+            refines="#BookId"
+            property="identifier-type"
+            scheme="onix:codelist5">22</meta>
           <meta property="dcterms:identifier" id="meta-identifier">BookId</meta>
           <dc:title>"""
         ++ globalTitle
@@ -153,7 +159,11 @@ generateContent titles =
                             n =
                                 fromInt (i + 1)
                         in
-                        "<itemref idref=\"content_" ++ n ++ "_item_" ++ n ++ "\"/>"
+                        "<itemref idref=\"content_"
+                            ++ n
+                            ++ "_item_"
+                            ++ n
+                            ++ "\"/>"
                     )
                     titles
            )
