@@ -695,6 +695,12 @@ aboutView entries titles authors tags =
                             , span [ class "small-caps" ] [ text "json" ]
                             ]
                         ]
+                    , p []
+                        [ a [ onClick ExportEpub ]
+                            [ text "Export "
+                            , span [ class "small-caps" ] [ text "epub" ]
+                            ]
+                        ]
                     ]
                 , div []
                     [ h4 [] [ text "Statistics" ]
