@@ -38,3 +38,4 @@ type Msg
     | ResetError
     | Resize ( Int, Int )
     | InfList IL.Model
+    | ExportEpub
