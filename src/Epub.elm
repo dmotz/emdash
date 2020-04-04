@@ -36,15 +36,15 @@ container =
     )
 
 
-slugifyTitle : Int -> Title -> String
-slugifyTitle n title =
+normalizeTitle : Int -> Title -> String
+normalizeTitle n title =
     fromInt (n + 1) ++ "_" ++ replace " " "-" (toLower title) ++ ".xhtml"
 
 
 tocEntry : Int -> ( Title, Author ) -> String
 tocEntry i ( title, author ) =
     "<li><a href=\""
-        ++ slugifyTitle i title
+        ++ normalizeTitle i title
         ++ "\">"
         ++ title
         ++ "<small>"
@@ -141,7 +141,7 @@ generateContent titles =
                             ++ "_item_"
                             ++ n
                             ++ "\" href=\""
-                            ++ slugifyTitle i title
+                            ++ normalizeTitle i title
                             ++ "\" media-type=\"application/xhtml+xml\"/>"
                     )
                     titles
@@ -193,7 +193,7 @@ getAuthor title entries =
 
 generateChapter : Int -> Title -> Author -> List Entry -> ( String, String )
 generateChapter i title author entries =
-    ( "OEBPS/" ++ slugifyTitle i title
+    ( "OEBPS/" ++ normalizeTitle i title
     , """
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE html>
