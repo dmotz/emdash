@@ -677,13 +677,6 @@ aboutView entries titles authors tags =
                 [ div []
                     [ h4 [] [ text "Actions" ]
                     , p []
-                        [ a
-                            [ href repoUrl
-                            , target "_blank"
-                            ]
-                            [ text "Read the source" ]
-                        ]
-                    , p []
                         [ a [ onClick ExportJson ]
                             [ text "Export "
                             , span [ class "small-caps" ] [ text "json" ]
@@ -700,6 +693,13 @@ aboutView entries titles authors tags =
                             [ text "Export "
                             , span [ class "small-caps" ] [ text "epub" ]
                             ]
+                        ]
+                    , p []
+                        [ a
+                            [ href repoUrl
+                            , target "_blank"
+                            ]
+                            [ text "Read the source" ]
                         ]
                     ]
                 , div []
