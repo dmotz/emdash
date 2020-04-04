@@ -319,7 +319,8 @@ export titles entries =
     in
     createEpub <|
         concat
-            [ [ container
+            [ [ ( "mimetype", "application/epub+zip" )
+              , container
               , generateToc titleAuthorPairs
               , generateTocNcx titles
               , generateContent titles
