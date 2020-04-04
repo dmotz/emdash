@@ -1,9 +1,13 @@
+import JsZip from 'jszip'
+
 require('./styles.sass')
+
 const {Elm} = require('./Main')
 const {document, localStorage, URL} = window
 const lsNs = 'marginalia'
 const state = window.localStorage.getItem(lsNs)
 const debounceTime = 1000
+
 let app
 let lsTimer
 
@@ -39,6 +43,23 @@ app.ports.importJson.subscribe(text => {
   } catch (e) {
     console.warn('Failed to parse restored JSON:', e)
   }
+})
+
+app.ports.createEpub.subscribe(async pairs => {
+  const zip = new JsZip()
+
+  zip.folder('META-INF')
+  zip.folder('OEBPS')
+  pairs.forEach(([path, text]) => zip.file(path, text.trim()))
+
+  const data = await zip.generateAsync({type: 'blob'})
+  const a = document.createElement('a')
+  const url = URL.createObjectURL(data)
+
+  a.href = url
+  a.download = 'marginalia-excerpts.epub'
+  a.click()
+  URL.revokeObjectURL(url)
 })
 
 window.addEventListener('keydown', e => {
