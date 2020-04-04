@@ -58,7 +58,7 @@ app.ports.createEpub.subscribe(async pairs => {
   zip.folder('OEBPS')
   pairs.forEach(([path, text]) => zip.file(path, text.trim()))
   downloadFile(
-    'marginalia-excerpts.epub',
+    `marginalia_excerpts_${new Date().toLocaleDateString()}.epub`,
     await zip.generateAsync({type: 'blob'})
   )
 })
