@@ -36,6 +36,9 @@
     "webpack-merge": "^4.2.2",
     "workbox-webpack-plugin": "^4.3.1"
   },
+  "dependencies": {
+    "jszip": "^3.3.0"
+  },
   "babel": {
     "presets": [
       [
