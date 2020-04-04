@@ -43,6 +43,11 @@ titleRx =
     rx "[^a-zA-Z\\d]"
 
 
+trimRx : Regex
+trimRx =
+    rx "[\\s\\n]+"
+
+
 normalizeTitle : Int -> Title -> String
 normalizeTitle n title =
     fromInt (n + 1)
@@ -317,21 +322,25 @@ export titles entries =
         titleAuthorPairs =
             map (\title -> ( title, getAuthor title entries )) titles
     in
-    createEpub <|
-        concat
-            [ [ ( "mimetype", "application/epub+zip" )
-              , container
-              , generateToc titleAuthorPairs
-              , generateTocNcx titles
-              , generateContent titles
-              ]
-            , indexedMap
-                (\i ( title, author ) ->
-                    generateChapter
-                        i
-                        title
-                        author
-                        (filter (\ent -> ent.title == title) entries)
-                )
-                titleAuthorPairs
-            ]
+    [ [ ( "mimetype", "application/epub+zip" )
+      , container
+      , generateToc titleAuthorPairs
+      , generateTocNcx titles
+      , generateContent titles
+      ]
+    , indexedMap
+        (\i ( title, author ) ->
+            generateChapter
+                i
+                title
+                author
+                (filter (\ent -> ent.title == title) entries)
+        )
+        titleAuthorPairs
+    ]
+        |> concat
+        |> map
+            (\( path, text ) ->
+                ( path, Regex.replace trimRx (always " ") text )
+            )
+        |> createEpub
