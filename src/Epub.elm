@@ -58,17 +58,13 @@ normalizeTitle n title =
         ++ ".xhtml"
 
 
-tocEntry : Int -> ( Title, Author ) -> String
-tocEntry i ( title, author ) =
-    "<li><a href=\""
-        ++ normalizeTitle i title
-        ++ "\">"
-        ++ title
-        ++ "</a></li>"
+tocEntry : Int -> Title -> String
+tocEntry i title =
+    "<li><a href=\"" ++ normalizeTitle i title ++ "\">" ++ title ++ "</a></li>"
 
 
-generateToc : List ( Title, Author ) -> ( String, String )
-generateToc pairs =
+generateToc : List Title -> ( String, String )
+generateToc titles =
     ( "OEBPS/toc.xhtml"
     , """
       <?xml version="1.0" encoding="UTF-8"?>
@@ -90,7 +86,7 @@ generateToc pairs =
           <ol>
             <li><a href="toc.xhtml">- Table of Contents -</a></li>
       """
-        ++ (String.concat <| indexedMap tocEntry pairs)
+        ++ (String.concat <| indexedMap tocEntry titles)
         ++ """
           </ol>
         </nav>
@@ -316,13 +312,9 @@ generateChapter i title author entries =
 
 export : List Title -> List Entry -> Cmd msg
 export titles entries =
-    let
-        titleAuthorPairs =
-            map (\title -> ( title, getAuthor title entries )) titles
-    in
     [ [ ( "mimetype", "application/epub+zip" )
       , container
-      , generateToc titleAuthorPairs
+      , generateToc titles
       , generateTocNcx titles
       , generateContent titles
       ]
@@ -334,7 +326,7 @@ export titles entries =
                 author
                 (filter (\ent -> ent.title == title) entries)
         )
-        titleAuthorPairs
+        (map (\title -> ( title, getAuthor title entries )) titles)
     ]
         |> concat
         |> map
