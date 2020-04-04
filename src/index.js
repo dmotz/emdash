@@ -8,6 +8,16 @@ const lsNs = 'marginalia'
 const state = window.localStorage.getItem(lsNs)
 const debounceTime = 1000
 
+const downloadFile = (name, data) => {
+  const a = document.createElement('a')
+  const url = URL.createObjectURL(data)
+
+  a.href = url
+  a.download = name
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 let app
 let lsTimer
 
