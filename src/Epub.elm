@@ -207,7 +207,9 @@ generateChapter i title author entries =
         """
         ++ (String.concat <|
                 map
-                    (\entry -> "<p>" ++ entry.text ++ "</p>")
+                    (\entry ->
+                        "<p>" ++ replace "&" "&amp;" entry.text ++ "</p>"
+                    )
                     entries
            )
         ++ """
