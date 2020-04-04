@@ -9,6 +9,7 @@ import Browser.Dom
         )
 import Browser.Events exposing (onKeyDown, onResize)
 import Dict
+import Epub
 import File
 import File.Select as Select
 import Json.Decode as Decode
@@ -791,3 +792,6 @@ update message model =
 
         Resize size ->
             ( { model | uiSize = size }, none )
+
+        ExportEpub ->
+            ( model, Epub.export model.titles model.entries )
