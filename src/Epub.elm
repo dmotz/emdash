@@ -97,6 +97,75 @@ generateToc pairs =
     )
 
 
+generateTocNcx : List Title -> ( String, String )
+generateTocNcx titles =
+    ( "OEBPS/toc.ncx"
+    , """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
+        <head>
+          <meta name="dtb:uid" content=\""""
+        ++ (hex <| String.concat titles)
+        ++ """" />
+          <meta name="dtb:generator" content="Marginalia"/>
+          <meta name="dtb:depth" content="1"/>
+          <meta name="dtb:totalPageCount" content="0"/>
+          <meta name="dtb:maxPageNumber" content="0"/>
+        </head>
+        <docTitle>
+          <text>"""
+        ++ globalTitle
+        ++ """</text>
+        </docTitle>
+        <navMap>
+          <navPoint id="toc" playOrder="0" class="chapter">
+            <navLabel>
+              <text>Table Of Contents</text>
+            </navLabel>
+            <content src="toc.xhtml"/>
+          </navPoint>
+        """
+        ++ (String.concat <|
+                indexedMap
+                    (\i title ->
+                        let
+                            n =
+                                fromInt i
+
+                            n1 =
+                                fromInt <| i + 1
+                        in
+                        """
+                        <navPoint id="content_"""
+                            ++ n
+                            ++ "_item_"
+                            ++ n
+                            ++ "\" playOrder=\""
+                            ++ n1
+                            ++ "\">"
+                            ++ """
+                          <navLabel>
+                            <text>"""
+                            ++ n1
+                            ++ """. """
+                            ++ title
+                            ++ """</text>
+                          </navLabel>
+                          <content src=\""""
+                            ++ normalizeTitle i title
+                            ++ """"/>
+                        </navPoint>
+                        """
+                    )
+                    titles
+           )
+        ++ """
+          </navMap>
+        </ncx>
+  """
+    )
+
+
 generateContent : List Title -> ( String, String )
 generateContent titles =
     ( "OEBPS/content.opf"
@@ -135,6 +204,7 @@ generateContent titles =
         </metadata>
 
         <manifest>
+          <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
           <item
             id="toc"
             href="toc.xhtml"
@@ -251,6 +321,7 @@ export titles entries =
         concat
             [ [ container
               , generateToc titleAuthorPairs
+              , generateTocNcx titles
               , generateContent titles
               ]
             , indexedMap
