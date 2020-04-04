@@ -57,15 +57,10 @@ app.ports.createEpub.subscribe(async pairs => {
   zip.folder('META-INF')
   zip.folder('OEBPS')
   pairs.forEach(([path, text]) => zip.file(path, text.trim()))
-
-  const data = await zip.generateAsync({type: 'blob'})
-  const a = document.createElement('a')
-  const url = URL.createObjectURL(data)
-
-  a.href = url
-  a.download = 'marginalia-excerpts.epub'
-  a.click()
-  URL.revokeObjectURL(url)
+  downloadFile(
+    'marginalia-excerpts.epub',
+    await zip.generateAsync({type: 'blob'})
+  )
 })
 
 window.addEventListener('keydown', e => {
