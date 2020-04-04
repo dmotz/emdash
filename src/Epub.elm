@@ -3,7 +3,9 @@ port module Epub exposing (export)
 import List exposing (concat, filter, indexedMap, map)
 import MD5 exposing (hex)
 import Model exposing (Author, Entry, Title)
+import Regex exposing (Regex)
 import String exposing (fromInt, replace, toLower)
+import Utils exposing (rx)
 
 
 type alias Epub =
@@ -36,9 +38,19 @@ container =
     )
 
 
+titleRx : Regex
+titleRx =
+    rx "[^a-zA-Z\\d]"
+
+
 normalizeTitle : Int -> Title -> String
 normalizeTitle n title =
-    fromInt (n + 1) ++ "_" ++ replace " " "-" (toLower title) ++ ".xhtml"
+    fromInt (n + 1)
+        ++ "_"
+        ++ (replace " " "-" (toLower title)
+                |> Regex.replace titleRx (always "")
+           )
+        ++ ".xhtml"
 
 
 tocEntry : Int -> ( Title, Author ) -> String
