@@ -1,6 +1,6 @@
 port module Epub exposing (export)
 
-import List exposing (concat, filter, indexedMap, map)
+import List exposing (concat, filter, indexedMap, map, reverse)
 import MD5 exposing (hex)
 import Model exposing (Author, Entry, Title)
 import Regex exposing (Regex)
@@ -305,7 +305,7 @@ generateChapter i title author entries =
                     (\entry ->
                         "<p>" ++ replace "&" "&amp;" entry.text ++ "</p>"
                     )
-                    entries
+                    (reverse entries)
            )
         ++ """
       </body>
