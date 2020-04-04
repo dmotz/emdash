@@ -64,9 +64,7 @@ tocEntry i ( title, author ) =
         ++ normalizeTitle i title
         ++ "\">"
         ++ title
-        ++ "<small>"
-        ++ author
-        ++ "</small></a></li>"
+        ++ "</a></li>"
 
 
 generateToc : List ( Title, Author ) -> ( String, String )
