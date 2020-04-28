@@ -20,6 +20,11 @@ globalTitle =
     "Marginalia Excerpts"
 
 
+globalAuthor : String
+globalAuthor =
+    "Marginalia"
+
+
 container : ( String, String )
 container =
     ( "META-INF/container.xml"
@@ -116,6 +121,11 @@ generateTocNcx titles =
         ++ globalTitle
         ++ """</text>
         </docTitle>
+        <docAuthor>
+          <text>"""
+        ++ globalAuthor
+        ++ """</text>
+        </docAuthor>
         <navMap>
           <navPoint id="toc" playOrder="0" class="chapter">
             <navLabel>
@@ -196,6 +206,12 @@ generateContent titles =
         ++ """</dc:title>
           <meta property="dcterms:title" id="meta-title">"""
         ++ globalTitle
+        ++ """</meta>
+          <dc:creator id="creator">"""
+        ++ globalAuthor
+        ++ """</dc:creator>
+          <meta refines="#creator" property="file-as">"""
+        ++ globalAuthor
         ++ """</meta>
           <dc:language>en</dc:language>
           <meta property="dcterms:language" id="meta-language">en</meta>
