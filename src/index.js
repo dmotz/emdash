@@ -1,7 +1,6 @@
 import {Elm} from './Main'
 import JsZip from 'jszip'
-
-require('./styles.sass')
+import './styles.sass'
 
 const {document, localStorage, URL} = window
 const lsNs = 'marginalia'
