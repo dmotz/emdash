@@ -1,8 +1,8 @@
+import {Elm} from './Main'
 import JsZip from 'jszip'
 
 require('./styles.sass')
 
-const {Elm} = require('./Main')
 const {document, localStorage, URL} = window
 const lsNs = 'marginalia'
 const state = localStorage.getItem(lsNs)
