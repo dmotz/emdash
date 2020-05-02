@@ -738,60 +738,54 @@ update message model =
                     noOp
 
             else
-                case key of
-                    "ArrowRight" ->
-                        update
-                            (if model.reverseList then
+                update
+                    (case key of
+                        "ArrowRight" ->
+                            if model.reverseList then
                                 ShowPrev
 
-                             else
-                                ShowNext
-                            )
-                            model
-
-                    "ArrowLeft" ->
-                        update
-                            (if model.reverseList then
+                            else
                                 ShowNext
 
-                             else
+                        "ArrowLeft" ->
+                            if model.reverseList then
+                                ShowNext
+
+                            else
                                 ShowPrev
-                            )
-                            model
 
-                    "r" ->
-                        update ShowRandom model
+                        "r" ->
+                            ShowRandom
 
-                    "f" ->
-                        update ToggleFocusMode model
+                        "f" ->
+                            ToggleFocusMode
 
-                    "s" ->
-                        update Sort model
+                        "s" ->
+                            Sort
 
-                    "1" ->
-                        update (FilterBy TitleFilter "") model
+                        "1" ->
+                            FilterBy TitleFilter ""
 
-                    "2" ->
-                        update (FilterBy AuthorFilter "") model
+                        "2" ->
+                            FilterBy AuthorFilter ""
 
-                    "3" ->
-                        update (FilterBy TagFilter "") model
+                        "3" ->
+                            FilterBy TagFilter ""
 
-                    "4" ->
-                        update (FilterBy TextFilter "") model
+                        "4" ->
+                            FilterBy TextFilter ""
 
-                    "Escape" ->
-                        update
-                            (if model.aboutMode then
+                        "Escape" ->
+                            if model.aboutMode then
                                 ToggleAboutMode
 
-                             else
+                            else
                                 FilterBy model.filterType ""
-                            )
-                            model
 
-                    _ ->
-                        noOp
+                        _ ->
+                            NoOp
+                    )
+                    model
 
         Resize size ->
             ( { model | uiSize = size }, none )
