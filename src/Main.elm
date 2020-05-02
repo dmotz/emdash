@@ -175,6 +175,9 @@ update message model =
             ( model, none )
     in
     case message of
+        NoOp ->
+            noOp
+
         DragEnter ->
             ( { model | isDragging = True }, none )
 
