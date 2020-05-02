@@ -8,7 +8,8 @@ import Utils exposing (ClickWithKeys, KeyEvent)
 
 
 type Msg
-    = SelectEntries (List Entry)
+    = NoOp
+    | SelectEntries (List Entry)
     | EntryClick Entry ClickWithKeys
     | ShowRandom
     | ShowByIndex Int
