@@ -642,6 +642,8 @@ introView =
                 [ text <|
                     "You can easily export your data (tags, notes, &c.) as "
                 , span [ class "small-caps" ] [ text "json" ]
+                , text " or "
+                , span [ class "small-caps" ] [ text "epub" ]
                 , text "."
                 ]
             , li []
