@@ -15,7 +15,7 @@ import List
 import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Entry, Tag, Title)
-import Regex exposing (Regex, replace)
+import Regex exposing (Match, Regex, replace)
 import Set
 import String exposing (lines, repeat, startsWith, toInt, toLower, trim)
 import Utils exposing (rx)
@@ -100,7 +100,7 @@ footnoteRx =
     rx "([^\\s\\d]{2,})(\\d+)"
 
 
-footnoteReplacer : Regex.Match -> String
+footnoteReplacer : Match -> String
 footnoteReplacer match =
     String.concat <|
         map
@@ -123,7 +123,7 @@ apostropheRx =
     rx "(\\w)(')(\\w)"
 
 
-apostropheReplacer : Regex.Match -> String
+apostropheReplacer : Match -> String
 apostropheReplacer match =
     String.concat <|
         map
