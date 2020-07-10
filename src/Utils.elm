@@ -2,6 +2,7 @@ module Utils exposing
     ( ClickWithKeys
     , KeyEvent
     , charLimit
+    , find
     , formatNumber
     , getEntryHeight
     , getIndex
@@ -183,3 +184,17 @@ takeExcerpt text =
                     acc
     in
     f "" (toList text) 0 ++ " …"
+
+
+find : List a -> (a -> Bool) -> Maybe a
+find l f =
+    case l of
+        x :: xs ->
+            if f x then
+                Just x
+
+            else
+                find xs f
+
+        [] ->
+            Nothing
