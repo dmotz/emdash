@@ -21,7 +21,9 @@ import List
         , isEmpty
         , length
         , map
+        , maximum
         , member
+        , minimum
         , reverse
         , take
         )
@@ -278,10 +280,10 @@ update message model =
                         getIndex entries entry
 
                     minIndex =
-                        withDefault 0 (List.minimum selectedIndices)
+                        withDefault 0 (minimum selectedIndices)
 
                     maxIndex =
-                        withDefault 0 (List.maximum selectedIndices)
+                        withDefault 0 (maximum selectedIndices)
 
                     start =
                         if targetIndex < minIndex then
