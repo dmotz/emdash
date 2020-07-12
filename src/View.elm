@@ -192,10 +192,17 @@ view model =
                                     ]
                                 ]
                         )
-                        [ ( "focus", ToggleFocusMode )
-                        , ( "random", ShowRandom )
-                        , ( "about", ToggleAboutMode )
-                        ]
+                        (reverse <|
+                            ( "about", ToggleAboutMode )
+                                :: (if noEntries then
+                                        []
+
+                                    else
+                                        [ ( "random", ShowRandom )
+                                        , ( "focus", ToggleFocusMode )
+                                        ]
+                                   )
+                        )
                     )
                 ]
             ]
