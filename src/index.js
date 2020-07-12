@@ -4,10 +4,42 @@ import './styles.sass'
 
 const {document, localStorage, URL} = window
 const lsNs = 'marginalia'
-const state = localStorage.getItem(lsNs)
 const debounceTime = 1000
 
-const downloadFile = (name, data) => {
+let app
+let lsTimer
+
+init()
+
+function init() {
+  const restored = localStorage.getItem(lsNs)
+
+  try {
+    app = Elm.Main.init({flags: restored ? JSON.parse(restored) : null})
+  } catch (e) {
+    console.warn('Failed to handle persisted state:', e)
+    app = Elm.Main.init({flags: null})
+  }
+
+  app.ports.importJson.subscribe(importJson)
+  app.ports.exportJson.subscribe(exportJson)
+  app.ports.setStorage.subscribe(setStorage)
+  app.ports.createEpub.subscribe(createEpub)
+
+  window.addEventListener('keydown', e => {
+    if (e.key && e.key.toLowerCase() === 'a' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault()
+    }
+  })
+
+  if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+    window.addEventListener('load', () =>
+      navigator.serviceWorker.register('sw.js')
+    )
+  }
+}
+
+function downloadFile(name, data) {
   const a = document.createElement('a')
   const url = URL.createObjectURL(data)
 
@@ -17,40 +49,30 @@ const downloadFile = (name, data) => {
   URL.revokeObjectURL(url)
 }
 
-let app
-let lsTimer
-
-try {
-  app = Elm.Main.init({flags: state ? JSON.parse(state) : null})
-} catch (e) {
-  console.warn('Failed to handle persisted state:', e)
-  app = Elm.Main.init({flags: null})
-}
-
-app.ports.setStorage.subscribe(state => {
+function setStorage(state) {
   clearTimeout(lsTimer)
   lsTimer = setTimeout(
     () => localStorage.setItem(lsNs, JSON.stringify(state)),
     debounceTime
   )
-})
+}
 
-app.ports.exportJson.subscribe(state =>
-  downloadFile(
-    `marginalia_backup_${new Date().toLocaleDateString()}.json`,
-    new Blob([JSON.stringify(state)], {type: 'text/plain'})
-  )
-)
-
-app.ports.importJson.subscribe(text => {
+function importJson(text) {
   try {
     app = Elm.Main.init({flags: JSON.parse(text)})
   } catch (e) {
     console.warn('Failed to parse restored JSON:', e)
   }
-})
+}
 
-app.ports.createEpub.subscribe(async pairs => {
+function exportJson(state) {
+  downloadFile(
+    `marginalia_backup_${new Date().toLocaleDateString()}.json`,
+    new Blob([JSON.stringify(state)], {type: 'text/plain'})
+  )
+}
+
+async function createEpub(pairs) {
   const zip = new JsZip()
 
   zip.folder('META-INF')
@@ -59,17 +81,5 @@ app.ports.createEpub.subscribe(async pairs => {
   downloadFile(
     `marginalia_excerpts_${new Date().toLocaleDateString()}.epub`,
     await zip.generateAsync({type: 'blob'})
-  )
-})
-
-window.addEventListener('keydown', e => {
-  if (e.key && e.key.toLowerCase() === 'a' && (e.metaKey || e.ctrlKey)) {
-    e.preventDefault()
-  }
-})
-
-if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
-  window.addEventListener('load', () =>
-    navigator.serviceWorker.register('sw.js')
   )
 }
