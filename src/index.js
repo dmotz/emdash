@@ -1,23 +1,28 @@
 import {Elm} from './Main'
+import {Store, get, set, keys} from 'idb-keyval'
 import JsZip from 'jszip'
 import './styles.sass'
 
-const {document, localStorage, URL} = window
-const lsNs = 'marginalia'
-const debounceTime = 1000
+const dbNs = 'marginalia'
+const stateKey = 'state'
+const embeddingsKey = 'embeddings'
+const stateStore = new Store(`${dbNs}:${stateKey}`, stateKey)
+const embeddingsStore = new Store(`${dbNs}:${embeddingsKey}`, embeddingsKey)
+const writeMs = 1000
 
+let embeddings = {}
 let app
-let lsTimer
+let writeTimer
 
 init()
 
-function init() {
-  const restored = localStorage.getItem(lsNs)
+async function init() {
+  console.log(`Marginalia v${require('../package.json').version}`)
 
   try {
-    app = Elm.Main.init({flags: restored ? JSON.parse(restored) : null})
+    app = Elm.Main.init({flags: (await get(stateKey, stateStore)) || null})
   } catch (e) {
-    console.warn('Failed to handle persisted state:', e)
+    console.warn('malformed restored state')
     app = Elm.Main.init({flags: null})
   }
 
@@ -50,11 +55,8 @@ function downloadFile(name, data) {
 }
 
 function setStorage(state) {
-  clearTimeout(lsTimer)
-  lsTimer = setTimeout(
-    () => localStorage.setItem(lsNs, JSON.stringify(state)),
-    debounceTime
-  )
+  clearTimeout(writeTimer)
+  writeTimer = setTimeout(() => set(stateKey, state, stateStore), writeMs)
 }
 
 function importJson(text) {
