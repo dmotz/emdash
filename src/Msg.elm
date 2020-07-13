@@ -3,7 +3,7 @@ module Msg exposing (Msg(..))
 import Browser.Dom exposing (Error)
 import File exposing (File)
 import InfiniteList as IL
-import Model exposing (Entry, Filter, InputFocus, Tag)
+import Model exposing (Entry, Filter, Id, InputFocus, Tag)
 import Utils exposing (ClickWithKeys, KeyEvent)
 
 
@@ -40,3 +40,6 @@ type Msg
     | Resize ( Int, Int )
     | InfList IL.Model
     | ExportEpub
+    | CalculateEmbeddings
+    | RequestNeighbors Entry
+    | ReceiveNeighbors ( Id, List ( Id, Float ) )
