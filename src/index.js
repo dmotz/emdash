@@ -13,6 +13,7 @@ const neighborsK = 5
 const writeMs = 1000
 
 let embeddings = {}
+let titleMap = {}
 let app
 let writeTimer
 
@@ -21,8 +22,10 @@ init()
 async function init() {
   console.log(`Marginalia v${require('../package.json').version}`)
 
+  const restored = await get(stateKey, stateStore)
+
   try {
-    app = Elm.Main.init({flags: (await get(stateKey, stateStore)) || null})
+    app = Elm.Main.init({flags: restored || null})
   } catch (e) {
     console.warn('malformed restored state')
     app = Elm.Main.init({flags: null})
@@ -39,6 +42,10 @@ async function init() {
   const vals = await Promise.all(ids.map(id => get(id, embeddingsStore)))
 
   embeddings = Object.fromEntries(ids.map((id, i) => [id, vals[i]]))
+
+  if (restored) {
+    titleMap = Object.fromEntries(restored.entries.map(e => [e.id, e.title]))
+  }
 
   window.addEventListener('keydown', e => {
     if (e.key && e.key.toLowerCase() === 'a' && (e.metaKey || e.ctrlKey)) {
@@ -122,6 +129,7 @@ function requestNeighbors(id) {
       a.push([k, similarity(target, v)])
       return a
     }, [])
+    .filter(([k]) => titleMap[k] !== titleMap[id])
     .sort(([, a], [, b]) => b - a)
     .slice(0, neighborsK)
 
