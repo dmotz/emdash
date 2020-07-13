@@ -2,6 +2,7 @@ module Model exposing
     ( Author
     , Entry
     , Filter(..)
+    , Id
     , InputFocus(..)
     , Model
     , StoredModel
