@@ -33,6 +33,11 @@ async function init() {
   app.ports.createEpub.subscribe(createEpub)
   app.ports.calculateEmbeddings.subscribe(calculateEmbeddings)
 
+  const ids = await keys(embeddingsStore)
+  const vals = await Promise.all(ids.map(id => get(id, embeddingsStore)))
+
+  embeddings = Object.fromEntries(ids.map((id, i) => [id, vals[i]]))
+
   window.addEventListener('keydown', e => {
     if (e.key && e.key.toLowerCase() === 'a' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault()
