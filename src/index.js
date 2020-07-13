@@ -1,6 +1,7 @@
 import {Elm} from './Main'
 import {Store, get, set, keys} from 'idb-keyval'
 import JsZip from 'jszip'
+import EmbedWorker from 'worker-loader!./embed-worker'
 import './styles.sass'
 
 const dbNs = 'marginalia'
@@ -30,6 +31,7 @@ async function init() {
   app.ports.exportJson.subscribe(exportJson)
   app.ports.setStorage.subscribe(setStorage)
   app.ports.createEpub.subscribe(createEpub)
+  app.ports.calculateEmbeddings.subscribe(calculateEmbeddings)
 
   window.addEventListener('keydown', e => {
     if (e.key && e.key.toLowerCase() === 'a' && (e.metaKey || e.ctrlKey)) {
@@ -84,4 +86,14 @@ async function createEpub(pairs) {
     `marginalia_excerpts_${new Date().toLocaleDateString()}.epub`,
     await zip.generateAsync({type: 'blob'})
   )
+}
+
+function calculateEmbeddings([ids, texts]) {
+  const worker = new EmbedWorker()
+  worker.postMessage([ids, texts])
+  worker.onmessage = ({data}) =>
+    Object.entries(data).forEach(([k, v]) => {
+      embeddings[k] = v
+      set(k, v, embeddingsStore)
+    })
 }
