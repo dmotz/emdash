@@ -27,7 +27,7 @@ async function init() {
   try {
     app = Elm.Main.init({flags: restored || null})
   } catch (e) {
-    console.warn('malformed restored state')
+    console.warn('malformed restored state', restored)
     app = Elm.Main.init({flags: null})
   }
 
