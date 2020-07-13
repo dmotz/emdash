@@ -9,6 +9,7 @@ const stateKey = 'state'
 const embeddingsKey = 'embeddings'
 const stateStore = new Store(`${dbNs}:${stateKey}`, stateKey)
 const embeddingsStore = new Store(`${dbNs}:${embeddingsKey}`, embeddingsKey)
+const neighborsK = 5
 const writeMs = 1000
 
 let embeddings = {}
@@ -32,6 +33,7 @@ async function init() {
   app.ports.setStorage.subscribe(setStorage)
   app.ports.createEpub.subscribe(createEpub)
   app.ports.calculateEmbeddings.subscribe(calculateEmbeddings)
+  app.ports.requestNeighbors.subscribe(requestNeighbors)
 
   const ids = await keys(embeddingsStore)
   const vals = await Promise.all(ids.map(id => get(id, embeddingsStore)))
@@ -101,4 +103,35 @@ function calculateEmbeddings([ids, texts]) {
       embeddings[k] = v
       set(k, v, embeddingsStore)
     })
+}
+
+function requestNeighbors(id) {
+  const target = embeddings[id]
+
+  if (!target) {
+    console.warn(`no embeddings yet for ${id}`)
+    return
+  }
+
+  const ranked = Object.entries(embeddings)
+    .reduce((a, [k, v]) => {
+      if (k === id) {
+        return a
+      }
+
+      a.push([k, similarity(target, v)])
+      return a
+    }, [])
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, neighborsK)
+
+  app.ports.receiveNeighbors.send([id, ranked])
+}
+
+function dot(a, b) {
+  return a.reduce((a, c, i) => a + c * b[i], 0)
+}
+
+function similarity(a, b) {
+  return dot(a, b) / (Math.sqrt(dot(a, a)) * Math.sqrt(dot(b, b)))
 }
