@@ -32,6 +32,7 @@ import Model
     exposing
         ( Entry
         , Filter(..)
+        , Id
         , InputFocus(..)
         , Model
         , StoredModel
@@ -74,6 +75,15 @@ port exportJson : StoredModel -> Cmd msg
 
 
 port importJson : String -> Cmd msg
+
+
+port calculateEmbeddings : ( List Id, List String ) -> Cmd msg
+
+
+port requestNeighbors : Id -> Cmd msg
+
+
+port receiveNeighbors : (( Id, List ( Id, Float ) ) -> msg) -> Sub msg
 
 
 main : Program (Maybe StoredModel) Model Msg
