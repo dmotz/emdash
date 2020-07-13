@@ -106,6 +106,7 @@ main =
                         (Decode.field "metaKey" Decode.bool)
                         |> Decode.map KeyDown
                         |> onKeyDown
+                    , receiveNeighbors ReceiveNeighbors
                     ]
         }
 
