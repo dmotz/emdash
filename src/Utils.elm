@@ -9,6 +9,7 @@ module Utils exposing
     , getNextIndex
     , getPrevIndex
     , insertOnce
+    , mapIdsToEntries
     , modelToStoredModel
     , needsTitles
     , queryCharMin
@@ -22,7 +23,15 @@ module Utils exposing
 import Dict exposing (Dict)
 import List exposing (length, map)
 import Maybe exposing (withDefault)
-import Model exposing (Filter(..), Model, StoredModel, filterToString)
+import Model
+    exposing
+        ( Entry
+        , Filter(..)
+        , Id
+        , Model
+        , StoredModel
+        , filterToString
+        )
 import Regex exposing (Regex)
 import Set
 import String exposing (fromChar, toList)
@@ -198,3 +207,8 @@ find l f =
 
         [] ->
             Nothing
+
+
+mapIdsToEntries : List Entry -> Dict Id Entry
+mapIdsToEntries entries =
+    map (\e -> ( e.id, e )) entries |> Dict.fromList
