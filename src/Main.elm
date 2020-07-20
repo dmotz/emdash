@@ -126,6 +126,8 @@ init maybeModel =
         model_ =
             { initialModel
                 | entries = restored.entries
+                , idsToEntries =
+                    map (\e -> ( e.id, e )) restored.entries |> Dict.fromList
                 , hiddenEntries = Set.fromList restored.hiddenEntries
                 , selectedEntries =
                     filter
