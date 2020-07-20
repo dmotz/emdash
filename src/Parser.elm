@@ -62,7 +62,7 @@ findNotes block acc =
             if text == limitNotice then
                 acc
 
-            else if startsWith "- Your Note on Page " meta then
+            else if isNote meta then
                 case acc of
                     [ ( x, _ ) ] ->
                         [ ( x, text ) ]
@@ -78,6 +78,11 @@ findNotes block acc =
 
         _ ->
             acc
+
+
+isNote : String -> Bool
+isNote =
+    startsWith "- Your Note on Page "
 
 
 limitNotice : String
