@@ -57,6 +57,7 @@ import Utils
         , getNextIndex
         , getPrevIndex
         , insertOnce
+        , mapIdsToEntries
         , modelToStoredModel
         , needsTitles
         , queryCharMin
@@ -126,8 +127,7 @@ init maybeModel =
         model_ =
             { initialModel
                 | entries = restored.entries
-                , idsToEntries =
-                    map (\e -> ( e.id, e )) restored.entries |> Dict.fromList
+                , idsToEntries = mapIdsToEntries restored.entries
                 , hiddenEntries = Set.fromList restored.hiddenEntries
                 , selectedEntries =
                     filter
@@ -232,6 +232,7 @@ update message model =
                     ( { model
                         | parsingError = False
                         , entries = entries
+                        , idsToEntries = mapIdsToEntries entries
                         , selectedEntries =
                             case head entries of
                                 Just entry ->
