@@ -62,6 +62,7 @@ type alias Entry =
 type alias Model =
     { entries : List Entry
     , idsToEntries : Dict Id Entry
+    , neighborMap : Dict Id (List ( Entry, Float ))
     , shownEntries : Maybe (List Entry)
     , hiddenEntries : Set Id
     , selectedEntries : List Entry
@@ -87,6 +88,7 @@ initialModel : Model
 initialModel =
     { entries = []
     , idsToEntries = Dict.empty
+    , neighborMap = Dict.empty
     , shownEntries = Nothing
     , hiddenEntries = Set.empty
     , selectedEntries = []
