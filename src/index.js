@@ -48,7 +48,15 @@ async function init() {
   }
 
   window.addEventListener('keydown', e => {
-    if (e.key && e.key.toLowerCase() === 'a' && (e.metaKey || e.ctrlKey)) {
+    if (
+      e.key &&
+      e.key.toLowerCase() === 'a' &&
+      (e.metaKey || e.ctrlKey) &&
+      !(
+        document.activeElement.nodeName === 'INPUT' ||
+        document.activeElement.nodeName === 'TEXTAREA'
+      )
+    ) {
       e.preventDefault()
     }
   })
