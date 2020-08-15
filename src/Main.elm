@@ -732,7 +732,7 @@ update message model =
             ( model, importJson jsonText )
 
         KeyDown { key, control, meta } ->
-            if control || meta then
+            if (model.inputFocused == Nothing) && (control || meta) then
                 case key of
                     "a" ->
                         update
