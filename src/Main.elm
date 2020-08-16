@@ -46,7 +46,7 @@ import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Regex
 import Set exposing (union)
-import String exposing (toLower, trim)
+import String exposing (join, split, toLower, trim)
 import Task exposing (attempt, perform, sequence)
 import Tuple exposing (first)
 import Utils
@@ -455,10 +455,10 @@ update message model =
 
                     TextFilter ->
                         let
-                            term =
+                            query =
                                 toLower val
                         in
-                        if trim term == "" then
+                        if trim query == "" then
                             ( { model
                                 | filterValue = Nothing
                                 , shownEntries = Nothing
@@ -467,7 +467,7 @@ update message model =
                             , none
                             )
 
-                        else if String.length term < queryCharMin then
+                        else if String.length query < queryCharMin then
                             ( { model
                                 | filterValue = Just val
                                 , filterType = filterType
@@ -476,11 +476,53 @@ update message model =
                             )
 
                         else
-                            applyFilter <|
-                                \entry ->
-                                    Regex.contains
-                                        (rx <| "\\b" ++ term)
-                                        (toLower entry.text)
+                            ( { model
+                                | filterValue = Just val
+                                , filterType = filterType
+                                , shownEntries =
+                                    let
+                                        phraseMatches =
+                                            filter
+                                                (\entry ->
+                                                    Regex.contains
+                                                        (rx <| "\\b" ++ query)
+                                                        (toLower entry.text)
+                                                )
+                                                model.entries
+
+                                        phraseMatchIds =
+                                            map .id phraseMatches
+                                                |> Set.fromList
+
+                                        pattern =
+                                            split " " query
+                                                |> map
+                                                    (\word ->
+                                                        "(?=.*\\b"
+                                                            ++ word
+                                                            ++ ")"
+                                                    )
+                                                |> join ""
+
+                                        wordsRx =
+                                            "^" ++ pattern ++ ".*$" |> rx
+                                    in
+                                    phraseMatches
+                                        ++ filter
+                                            (\entry ->
+                                                (not <|
+                                                    Set.member entry.id
+                                                        phraseMatchIds
+                                                )
+                                                    && Regex.contains
+                                                        wordsRx
+                                                        (toLower entry.text)
+                                            )
+                                            model.entries
+                                        |> Just
+                              }
+                            , none
+                            )
 
         UpdateNotes text ->
             case model.selectedEntries of
