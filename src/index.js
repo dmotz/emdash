@@ -134,8 +134,11 @@ function requestEmbeddings(pairs) {
   }
 }
 
-function requestNeighbors(id) {
+function requestNeighbors([id, ignoreSameTitle]) {
   const target = embeddings[id]
+  const predicate = ignoreSameTitle
+    ? ([k]) => titleMap[k] !== titleMap[id]
+    : x => x
 
   if (!target) {
     console.warn(`no embeddings yet for ${id}`)
@@ -151,7 +154,7 @@ function requestNeighbors(id) {
       a.push([k, similarity(target, v)])
       return a
     }, [])
-    .filter(([k]) => titleMap[k] !== titleMap[id])
+    .filter(predicate)
     .sort(([, a], [, b]) => b - a)
     .slice(0, neighborsK)
 
