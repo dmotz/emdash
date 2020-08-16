@@ -110,9 +110,15 @@ async function createEpub(pairs) {
   )
 }
 
-function calculateEmbeddings([ids, texts]) {
+function calculateEmbeddings(pairs) {
+  const targets = pairs.filter(([id]) => !embeddings[id])
+
+  if (!targets.length) {
+    return
+  }
+
   const worker = new EmbedWorker()
-  worker.postMessage([ids, texts])
+  worker.postMessage(targets)
   worker.onmessage = ({data}) => {
     Object.entries(data).forEach(([k, v]) => {
       embeddings[k] = v
