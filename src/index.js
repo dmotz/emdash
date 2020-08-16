@@ -113,11 +113,13 @@ async function createEpub(pairs) {
 function calculateEmbeddings([ids, texts]) {
   const worker = new EmbedWorker()
   worker.postMessage([ids, texts])
-  worker.onmessage = ({data}) =>
+  worker.onmessage = ({data}) => {
     Object.entries(data).forEach(([k, v]) => {
       embeddings[k] = v
       set(k, v, embeddingsStore)
     })
+    worker.terminate()
+  }
 }
 
 function requestNeighbors(id) {
