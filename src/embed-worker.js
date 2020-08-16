@@ -9,9 +9,7 @@ self.addEventListener('message', async ({data}) => {
   ).dataSync()
 
   self.postMessage(
-    Object.fromEntries(
-      data.map(([id], i) => [id, embeddings.slice(i * step, (i + 1) * step)])
-    )
+    data.map(([id], i) => [id, embeddings.slice(i * step, (i + 1) * step)])
   )
 })
 

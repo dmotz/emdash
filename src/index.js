@@ -120,7 +120,7 @@ function requestEmbeddings(pairs) {
   const worker = new EmbedWorker()
   worker.postMessage(targets)
   worker.onmessage = ({data}) => {
-    Object.entries(data).forEach(([k, v]) => {
+    data.forEach(([k, v]) => {
       embeddings[k] = v
       set(k, v, embeddingsStore)
     })
