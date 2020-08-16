@@ -46,7 +46,7 @@ import Parser
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Regex
-import Set exposing (union)
+import Set exposing (diff, union)
 import String exposing (join, split, toLower, trim)
 import Task exposing (attempt, perform, sequence)
 import Tuple exposing (first, second)
@@ -677,6 +677,9 @@ update message model =
 
                 ids =
                     map .id entries
+
+                idSet =
+                    Set.fromList ids
             in
             update
                 (ShowByIndex <|
@@ -690,8 +693,7 @@ update message model =
                         idx
                 )
                 { model
-                    | hiddenEntries =
-                        union (Set.fromList ids) model.hiddenEntries
+                    | hiddenEntries = union model.hiddenEntries idSet
                     , entries = fn model.entries
                     , shownEntries =
                         if soleEntry then
@@ -699,6 +701,7 @@ update message model =
 
                         else
                             Maybe.map fn model.shownEntries
+                    , completedEmbeddings = diff model.completedEmbeddings idSet
                     , filterValue =
                         if soleEntry then
                             Nothing
