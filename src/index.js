@@ -1,5 +1,5 @@
 import {Elm} from './Main'
-import {Store, get, set, keys} from 'idb-keyval'
+import {Store, get, set, del, keys} from 'idb-keyval'
 import JsZip from 'jszip'
 import EmbedWorker from 'worker-loader!./embed-worker'
 import './styles.sass'
@@ -36,6 +36,7 @@ async function init() {
   app.ports.setStorage.subscribe(setStorage)
   app.ports.createEpub.subscribe(createEpub)
   app.ports.requestEmbeddings.subscribe(requestEmbeddings)
+  app.ports.deleteEmbedding.subscribe(deleteEmbedding)
   app.ports.requestNeighbors.subscribe(requestNeighbors)
 
   const ids = await keys(embeddingsStore)
@@ -132,6 +133,11 @@ function requestEmbeddings(pairs) {
     returnIds()
     worker.terminate()
   }
+}
+
+function deleteEmbedding(id) {
+  delete embeddings[id]
+  del(id, embeddingsStore)
 }
 
 function requestNeighbors([id, ignoreSameTitle]) {
