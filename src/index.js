@@ -35,7 +35,7 @@ async function init() {
   app.ports.exportJson.subscribe(exportJson)
   app.ports.setStorage.subscribe(setStorage)
   app.ports.createEpub.subscribe(createEpub)
-  app.ports.calculateEmbeddings.subscribe(calculateEmbeddings)
+  app.ports.requestEmbeddings.subscribe(requestEmbeddings)
   app.ports.requestNeighbors.subscribe(requestNeighbors)
 
   const ids = await keys(embeddingsStore)
@@ -110,7 +110,7 @@ async function createEpub(pairs) {
   )
 }
 
-function calculateEmbeddings(pairs) {
+function requestEmbeddings(pairs) {
   const targets = pairs.filter(([id]) => !embeddings[id])
 
   if (!targets.length) {
