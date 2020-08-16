@@ -36,7 +36,7 @@ async function init() {
   app.ports.setStorage.subscribe(setStorage)
   app.ports.createEpub.subscribe(createEpub)
   app.ports.requestEmbeddings.subscribe(requestEmbeddings)
-  app.ports.deleteEmbedding.subscribe(deleteEmbedding)
+  app.ports.deleteEmbeddings.subscribe(deleteEmbeddings)
   app.ports.requestNeighbors.subscribe(requestNeighbors)
 
   const ids = await keys(embeddingsStore)
@@ -135,9 +135,11 @@ function requestEmbeddings(pairs) {
   }
 }
 
-function deleteEmbedding(id) {
-  delete embeddings[id]
-  del(id, embeddingsStore)
+function deleteEmbeddings(ids) {
+  ids.forEach(id => {
+    delete embeddings[id]
+    del(id, embeddingsStore)
+  })
 }
 
 function requestNeighbors([id, ignoreSameTitle]) {
