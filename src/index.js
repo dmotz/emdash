@@ -111,9 +111,13 @@ async function createEpub(pairs) {
 }
 
 function requestEmbeddings(pairs) {
+  const returnIds = () =>
+    app.ports.receiveEmbeddings.send(pairs.map(([id]) => id))
+
   const targets = pairs.filter(([id]) => !embeddings[id])
 
   if (!targets.length) {
+    returnIds()
     return
   }
 
@@ -124,6 +128,8 @@ function requestEmbeddings(pairs) {
       embeddings[k] = v
       set(k, v, embeddingsStore)
     })
+
+    returnIds()
     worker.terminate()
   }
 }
