@@ -215,7 +215,15 @@ view model =
                     sidebar
                     model.infiniteList
                     model.uiSize
-                    ((if model.reverseList then
+                    ((if
+                        model.reverseList
+                            && not
+                                (model.filterType
+                                    == TextFilter
+                                    && model.filterValue
+                                    /= Nothing
+                                )
+                      then
                         reverse
 
                       else
