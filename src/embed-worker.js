@@ -4,12 +4,13 @@ const step = 512
 const model = use.load()
 
 self.addEventListener('message', async ({data}) => {
-  const [ids, excerpts] = data
-  const embeddings = (await (await model).embed(excerpts)).dataSync()
+  const embeddings = (
+    await (await model).embed(data.map(([, text]) => text))
+  ).dataSync()
 
   self.postMessage(
     Object.fromEntries(
-      ids.map((id, i) => [id, embeddings.slice(i * step, (i + 1) * step)])
+      data.map(([id], i) => [id, embeddings.slice(i * step, (i + 1) * step)])
     )
   )
 })
