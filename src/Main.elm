@@ -17,6 +17,7 @@ import List
     exposing
         ( drop
         , filter
+        , filterMap
         , head
         , isEmpty
         , length
@@ -48,7 +49,7 @@ import Regex
 import Set exposing (union)
 import String exposing (join, split, toLower, trim)
 import Task exposing (attempt, perform, sequence)
-import Tuple exposing (first)
+import Tuple exposing (first, second)
 import Utils
     exposing
         ( KeyEvent
@@ -84,7 +85,7 @@ port requestEmbeddings : List ( Id, String ) -> Cmd msg
 port receiveEmbeddings : (List Id -> msg) -> Sub msg
 
 
-port deleteEmbedding : Id -> Cmd msg
+port deleteEmbeddings : List Id -> Cmd msg
 
 
 port requestNeighbors : ( Id, Bool ) -> Cmd msg
@@ -332,7 +333,7 @@ update message model =
             else if control || meta then
                 update
                     (SelectEntries <|
-                        (if List.member entry model.selectedEntries then
+                        (if member entry model.selectedEntries then
                             filter ((/=) entry)
 
                          else
@@ -673,6 +674,9 @@ update message model =
 
                 soleEntry =
                     len == 1
+
+                ids =
+                    map .id entries
             in
             update
                 (ShowByIndex <|
@@ -687,9 +691,7 @@ update message model =
                 )
                 { model
                     | hiddenEntries =
-                        union
-                            (entries |> map .id |> Set.fromList)
-                            model.hiddenEntries
+                        union (Set.fromList ids) model.hiddenEntries
                     , entries = fn model.entries
                     , shownEntries =
                         if soleEntry then
@@ -704,6 +706,7 @@ update message model =
                         else
                             model.filterValue
                 }
+                |> (\( m, cmd ) -> ( m, batch [ cmd, deleteEmbeddings ids ] ))
 
         Sort ->
             store ( { model | reverseList = not model.reverseList }, none )
