@@ -41,5 +41,6 @@ type Msg
     | InfList IL.Model
     | ExportEpub
     | RequestEmbeddings
+    | ReceiveEmbeddings (List Id)
     | RequestNeighbors Entry
     | ReceiveNeighbors ( Id, List ( Id, Float ) )
