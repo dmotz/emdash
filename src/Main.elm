@@ -81,6 +81,9 @@ port importJson : String -> Cmd msg
 port requestEmbeddings : List ( Id, String ) -> Cmd msg
 
 
+port receiveEmbeddings : (List Id -> msg) -> Sub msg
+
+
 port requestNeighbors : Id -> Cmd msg
 
 
@@ -108,6 +111,7 @@ main =
                         |> Decode.map KeyDown
                         |> onKeyDown
                     , receiveNeighbors ReceiveNeighbors
+                    , receiveEmbeddings ReceiveEmbeddings
                     ]
         }
 
