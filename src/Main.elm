@@ -78,7 +78,7 @@ port exportJson : StoredModel -> Cmd msg
 port importJson : String -> Cmd msg
 
 
-port calculateEmbeddings : ( List Id, List String ) -> Cmd msg
+port requestEmbeddings : List ( Id, String ) -> Cmd msg
 
 
 port requestNeighbors : Id -> Cmd msg
@@ -170,7 +170,7 @@ init maybeModel =
             ( m, cmd ) =
                 update (SelectEntries model.selectedEntries) model
         in
-        ( m, batch [ getSize, cmd ] )
+        ( m, batch [ getSize, cmd, second <| update RequestEmbeddings m ] )
 
 
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )

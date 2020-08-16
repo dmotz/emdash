@@ -40,6 +40,6 @@ type Msg
     | Resize ( Int, Int )
     | InfList IL.Model
     | ExportEpub
-    | CalculateEmbeddings
+    | RequestEmbeddings
     | RequestNeighbors Entry
     | ReceiveNeighbors ( Id, List ( Id, Float ) )
