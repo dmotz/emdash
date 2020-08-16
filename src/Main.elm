@@ -84,6 +84,9 @@ port requestEmbeddings : List ( Id, String ) -> Cmd msg
 port receiveEmbeddings : (List Id -> msg) -> Sub msg
 
 
+port deleteEmbedding : Id -> Cmd msg
+
+
 port requestNeighbors : ( Id, Bool ) -> Cmd msg
 
 
