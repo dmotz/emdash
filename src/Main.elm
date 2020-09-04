@@ -672,6 +672,12 @@ update message model =
         ToggleAboutMode ->
             ( { model | aboutMode = not model.aboutMode }, none )
 
+        PromptHide ->
+            ( { model | hidePromptActive = True }, none )
+
+        CancelHide ->
+            ( { model | hidePromptActive = False }, none )
+
         HideEntries entries ->
             let
                 list =
