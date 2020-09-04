@@ -66,6 +66,8 @@ type alias Model =
     , shownEntries : Maybe (List Entry)
     , hiddenEntries : Set Id
     , selectedEntries : List Entry
+    , completedEmbeddings : Set Id
+    , embeddingsReady : Bool
     , titles : List Title
     , authors : List Author
     , tags : List Tag
@@ -92,6 +94,8 @@ initialModel =
     , shownEntries = Nothing
     , hiddenEntries = Set.empty
     , selectedEntries = []
+    , completedEmbeddings = Set.empty
+    , embeddingsReady = False
     , titles = []
     , authors = []
     , tags = []
