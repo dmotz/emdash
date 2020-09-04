@@ -26,6 +26,8 @@ type Msg
     | KeyDown KeyEvent
     | SetInputFocus (Maybe InputFocus)
     | HideEntries (List Entry)
+    | PromptHide
+    | CancelHide
     | UpdateNotes String
     | UpdatePendingTag Tag
     | AddTag
