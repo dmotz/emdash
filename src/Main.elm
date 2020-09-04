@@ -901,9 +901,38 @@ update message model =
                 )
 
         ReceiveEmbeddings ids ->
+            -- let
+            --     _ =
+            --         Debug.log "elm ReceiveEmbeddings" ids
+            -- in
             update
                 RequestEmbeddings
                 { model
                     | completedEmbeddings =
                         union model.completedEmbeddings (Set.fromList ids)
                 }
+
+        ReceiveNeighbors ( targetId, idScores ) ->
+            if Dict.member targetId model.idsToEntries then
+                ( { model
+                    | neighborMap =
+                        Dict.insert
+                            targetId
+                            (filterMap
+                                (\( id, score ) ->
+                                    case Dict.get id model.idsToEntries of
+                                        Just entry ->
+                                            Just ( entry, score )
+
+                                        _ ->
+                                            Nothing
+                                )
+                                idScores
+                            )
+                            model.neighborMap
+                  }
+                , none
+                )
+
+            else
+                noOp
