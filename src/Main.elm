@@ -258,13 +258,13 @@ update message model =
             ( { model | parsingError = False }, none )
 
         SelectEntries entries ->
-            let
-                sidebarView =
-                    getViewportOf sidebarId
-            in
             store
                 ( { model | selectedEntries = entries }
                 , if length entries == 1 then
+                    let
+                        sidebarView =
+                            getViewportOf sidebarId
+                    in
                     batch
                         [ attempt
                             GotDomEl
