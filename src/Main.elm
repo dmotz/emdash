@@ -731,6 +731,7 @@ update message model =
 
                         else
                             model.filterValue
+                    , hidePromptActive = False
                 }
                 |> (\( m, cmd ) -> ( m, batch [ cmd, deleteEmbeddings ids ] ))
 
