@@ -903,7 +903,14 @@ update message model =
                         |> take 20
             in
             if isEmpty nextBatch then
-                ( { model | embeddingsReady = True }, none )
+                ( { model | embeddingsReady = True }
+                , case model.selectedEntries of
+                    [ entry ] ->
+                        requestNeighbors ( entry.id, True )
+
+                    _ ->
+                        none
+                )
 
             else
                 ( { model | embeddingsReady = False }
