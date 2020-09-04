@@ -78,6 +78,7 @@ type alias Model =
     , aboutMode : Bool
     , isDragging : Bool
     , reverseList : Bool
+    , hidePromptActive : Bool
     , inputFocused : Maybe InputFocus
     , parsingError : Bool
     , uiSize : ( Int, Int )
@@ -106,6 +107,7 @@ initialModel =
     , aboutMode = False
     , isDragging = False
     , reverseList = False
+    , hidePromptActive = False
     , inputFocused = Nothing
     , parsingError = False
     , uiSize = ( 1, 1 )
