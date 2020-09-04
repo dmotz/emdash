@@ -20,15 +20,17 @@ let writeTimer
 init()
 
 async function init() {
-  console.log(`Marginalia v${require('../package.json').version}`)
-
   const restored = await get(stateKey, stateStore)
+  let didFail = false
+
+  console.log(`Marginalia v${require('../package.json').version}`)
 
   try {
     app = Elm.Main.init({flags: restored || null})
   } catch (e) {
     console.warn('malformed restored state', restored)
     app = Elm.Main.init({flags: null})
+    didFail = true
   }
 
   app.ports.importJson.subscribe(importJson)
@@ -39,13 +41,12 @@ async function init() {
   app.ports.deleteEmbeddings.subscribe(deleteEmbeddings)
   app.ports.requestNeighbors.subscribe(requestNeighbors)
 
-  const ids = await keys(embeddingsStore)
-  const vals = await Promise.all(ids.map(id => get(id, embeddingsStore)))
-
-  embeddings = Object.fromEntries(ids.map((id, i) => [id, vals[i]]))
-
-  if (restored) {
+  if (restored && !didFail) {
+    const ids = await keys(embeddingsStore)
+    const vals = await Promise.all(ids.map(id => get(id, embeddingsStore)))
+    embeddings = Object.fromEntries(ids.map((id, i) => [id, vals[i]]))
     titleMap = Object.fromEntries(restored.entries.map(e => [e.id, e.title]))
+    app.ports.receiveEmbeddings.send(ids)
   }
 
   window.addEventListener('keydown', e => {
