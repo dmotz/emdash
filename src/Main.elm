@@ -899,3 +899,11 @@ update message model =
                 ( { model | embeddingsReady = False }
                 , requestEmbeddings nextBatch
                 )
+
+        ReceiveEmbeddings ids ->
+            update
+                RequestEmbeddings
+                { model
+                    | completedEmbeddings =
+                        union model.completedEmbeddings (Set.fromList ids)
+                }
