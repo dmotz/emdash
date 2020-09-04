@@ -877,3 +877,25 @@ update message model =
 
         ExportEpub ->
             ( model, Epub.export model.titles model.entries )
+
+        RequestEmbeddings ->
+            let
+                nextBatch =
+                    diff
+                        (diff
+                            (model.entries |> map .id |> Set.fromList)
+                            model.completedEmbeddings
+                        )
+                        model.hiddenEntries
+                        |> toList
+                        |> filterMap (\id -> Dict.get id model.idsToEntries)
+                        |> map (\entry -> ( entry.id, entry.text ))
+                        |> take 20
+            in
+            if isEmpty nextBatch then
+                ( { model | embeddingsReady = True }, none )
+
+            else
+                ( { model | embeddingsReady = False }
+                , requestEmbeddings nextBatch
+                )
