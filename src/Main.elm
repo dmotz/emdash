@@ -901,10 +901,6 @@ update message model =
                 )
 
         ReceiveEmbeddings ids ->
-            -- let
-            --     _ =
-            --         Debug.log "elm ReceiveEmbeddings" ids
-            -- in
             update
                 RequestEmbeddings
                 { model
