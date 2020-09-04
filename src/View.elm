@@ -62,7 +62,12 @@ view model =
         , on "dragleave" (Decode.succeed DragLeave)
         , on "drop" dropDecoder
         ]
-        [ header
+        [ if model.hidePromptActive then
+            hidePrompt model.selectedEntries
+
+          else
+            text ""
+        , header
             []
             [ div []
                 [ img
@@ -456,7 +461,7 @@ hideButton : List Entry -> Html Msg
 hideButton entries =
     section []
         [ div
-            [ class "hide-button", onClick <| HideEntries entries ]
+            [ class "hide-button", onClick <| PromptHide ]
             [ div [] [ text "×" ]
             , span []
                 [ text <|
@@ -468,6 +473,29 @@ hideButton entries =
                                 _ ->
                                     "ies"
                            )
+                ]
+            ]
+        ]
+
+
+hidePrompt : List Entry -> Html Msg
+hidePrompt entries =
+    div [ class "prompt-bg" ]
+        [ div [ class "prompt" ]
+            [ p []
+                [ text <|
+                    "Remove "
+                        ++ (if length entries == 1 then
+                                "this entry?"
+
+                            else
+                                "these entries?"
+                           )
+                ]
+            , div
+                []
+                [ button [ onClick <| HideEntries entries ] [ text "Yes" ]
+                , button [ onClick CancelHide ] [ text "No" ]
                 ]
             ]
         ]
