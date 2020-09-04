@@ -259,7 +259,10 @@ update message model =
 
         SelectEntries entries ->
             store
-                ( { model | selectedEntries = entries }
+                ( { model
+                    | selectedEntries = entries
+                    , hidePromptActive = False
+                  }
                 , if length entries == 1 then
                     let
                         sidebarView =
