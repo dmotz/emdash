@@ -276,6 +276,20 @@ update message model =
                         , attempt
                             DidScroll
                             (setViewportOf viewerId 0 0)
+                        , case head entries of
+                            Just entry ->
+                                if
+                                    model.embeddingsReady
+                                        && Dict.get entry.id model.neighborMap
+                                        == Nothing
+                                then
+                                    requestNeighbors ( entry.id, True )
+
+                                else
+                                    none
+
+                            Nothing ->
+                                none
                         ]
 
                   else
