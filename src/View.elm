@@ -311,6 +311,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                                         []
                                )
                         )
+                    , neighbors entry neighborMap completed total
                     , div
                         [ id "entry-tools" ]
                         [ tagSection entry.tags tags pendingTag
@@ -510,7 +511,7 @@ sidebar :
     -> List Entry
     -> Html Msg
 sidebar infiniteList uiSize entries query showTitles selectedEntries =
-    div
+    nav
         [ id sidebarId
         , classList [ ( "no-titles", not showTitles ) ]
         , IL.onScroll InfList
@@ -650,6 +651,75 @@ selectMenu values mState inputFn default =
             , h5 [ classList [ ( "no-filter", mState == Nothing ) ] ]
                 [ text val ]
             ]
+        ]
+
+
+neighbors : Entry -> Dict Id (List ( Entry, Float )) -> Int -> Int -> Html Msg
+neighbors entry neighborMap completed total =
+    div []
+        [ h4 [] [ text "Related" ]
+        , case Dict.get entry.id neighborMap of
+            Just entries ->
+                ul
+                    [ id "related" ]
+                    (map
+                        (\( neighbor, score ) ->
+                            li
+                                [ onClick <| SelectEntries [ neighbor ]
+                                , class "neighbor"
+                                ]
+                                [ div
+                                    [ class "score" ]
+                                    [ div
+                                        [ style
+                                            "width"
+                                            (fromFloat (score * 100) ++ "%")
+                                        ]
+                                        []
+                                    ]
+                                , blockquote
+                                    []
+                                    [ neighbor.text
+                                        |> words
+                                        |> take 40
+                                        |> (\xs -> xs ++ [ "…" ])
+                                        |> join " "
+                                        |> text
+                                    ]
+                                , Html.cite
+                                    [ id "meta" ]
+                                    [ span
+                                        [ class "title"
+                                        , onClick <|
+                                            FilterBy
+                                                TitleFilter
+                                                neighbor.title
+                                        ]
+                                        [ text neighbor.title ]
+                                    , span [ class "sep" ] [ text "•" ]
+                                    , span
+                                        [ class "author"
+                                        , onClick <|
+                                            FilterBy
+                                                AuthorFilter
+                                                neighbor.author
+                                        ]
+                                        [ text neighbor.author ]
+                                    ]
+                                ]
+                        )
+                        entries
+                    )
+
+            _ ->
+                div []
+                    [ text <|
+                        "still calculating ("
+                            ++ fromInt completed
+                            ++ "/"
+                            ++ fromInt total
+                            ++ ")"
+                    ]
         ]
 
 
