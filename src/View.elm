@@ -662,12 +662,12 @@ selectMenu values mState inputFn default =
 
 neighbors : Entry -> Dict Id (List ( Entry, Float )) -> Int -> Int -> Html Msg
 neighbors entry neighborMap completed total =
-    section []
-        [ h4 [] [ text "Related" ]
+    details [ id "related" ]
+        [ summary [] [ text "Related" ]
         , case Dict.get entry.id neighborMap of
             Just entries ->
                 ul
-                    [ id "related" ]
+                    []
                     (map
                         (\( neighbor, score ) ->
                             li
