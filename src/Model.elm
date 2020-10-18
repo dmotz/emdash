@@ -2,6 +2,7 @@ module Model exposing
     ( Author
     , Entry
     , Filter(..)
+    , Id
     , InputFocus(..)
     , Model
     , StoredModel
@@ -13,6 +14,7 @@ module Model exposing
     , stringToFilter
     )
 
+import Dict exposing (Dict)
 import InfiniteList as IL
 import Set exposing (Set)
 
@@ -59,9 +61,13 @@ type alias Entry =
 
 type alias Model =
     { entries : List Entry
+    , idsToEntries : Dict Id Entry
+    , neighborMap : Dict Id (List ( Entry, Float ))
     , shownEntries : Maybe (List Entry)
     , hiddenEntries : Set Id
     , selectedEntries : List Entry
+    , completedEmbeddings : Set Id
+    , embeddingsReady : Bool
     , titles : List Title
     , authors : List Author
     , tags : List Tag
@@ -72,6 +78,7 @@ type alias Model =
     , aboutMode : Bool
     , isDragging : Bool
     , reverseList : Bool
+    , hidePromptActive : Bool
     , inputFocused : Maybe InputFocus
     , parsingError : Bool
     , uiSize : ( Int, Int )
@@ -83,9 +90,13 @@ type alias Model =
 initialModel : Model
 initialModel =
     { entries = []
+    , idsToEntries = Dict.empty
+    , neighborMap = Dict.empty
     , shownEntries = Nothing
     , hiddenEntries = Set.empty
     , selectedEntries = []
+    , completedEmbeddings = Set.empty
+    , embeddingsReady = False
     , titles = []
     , authors = []
     , tags = []
@@ -96,6 +107,7 @@ initialModel =
     , aboutMode = False
     , isDragging = False
     , reverseList = False
+    , hidePromptActive = False
     , inputFocused = Nothing
     , parsingError = False
     , uiSize = ( 1, 1 )

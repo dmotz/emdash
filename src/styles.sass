@@ -286,6 +286,32 @@ main
     font-weight: normal
     margin-bottom: 5rem
 
+.prompt-bg
+  position: fixed
+  top: 0
+  bottom: 0
+  left: 0
+  right: 0
+  z-index: 1999
+  background-color: rgba($white, 0.8)
+  display: flex
+  align-items: center
+  justify-content: center
+
+.prompt
+  background-color: $white
+  border: 1px solid $black
+  box-shadow: 2px 2px 0 0 $black
+  padding: 3rem 5rem
+  text-align: center
+
+  p
+    font-size: 1.4rem
+    margin-bottom: 2rem
+
+  button
+    margin: 0 1rem
+
 .active-entry
   position: absolute
   width: 4rem
@@ -353,6 +379,28 @@ header
     flex: 3
     display: flex
     align-items: center
+
+#related
+  margin-top: 4rem
+
+  summary:focus
+    outline: none
+
+  h4
+    margin-bottom: 2rem
+    font-size: 1.6rem
+
+  li
+    border: 1px solid $lightGray
+    padding: 2rem
+    font-size: 1.4rem
+    margin-bottom: 2rem
+
+  .score
+    font-family: monospace
+
+.neighbor
+  cursor: pointer
 
 #entry-count
   font-size: 1.4rem
@@ -456,6 +504,7 @@ input, textarea
   outline: none
   border: 1px solid $lightGray
   color: $black
+  background-color: $white
 
   &::placeholder
     color: $gray

@@ -2,12 +2,14 @@ module Utils exposing
     ( ClickWithKeys
     , KeyEvent
     , charLimit
+    , find
     , formatNumber
     , getEntryHeight
     , getIndex
     , getNextIndex
     , getPrevIndex
     , insertOnce
+    , mapIdsToEntries
     , modelToStoredModel
     , needsTitles
     , queryCharMin
@@ -21,7 +23,15 @@ module Utils exposing
 import Dict exposing (Dict)
 import List exposing (length, map)
 import Maybe exposing (withDefault)
-import Model exposing (Filter(..), Model, StoredModel, filterToString)
+import Model
+    exposing
+        ( Entry
+        , Filter(..)
+        , Id
+        , Model
+        , StoredModel
+        , filterToString
+        )
 import Regex exposing (Regex)
 import Set
 import String exposing (fromChar, toList)
@@ -183,3 +193,22 @@ takeExcerpt text =
                     acc
     in
     f "" (toList text) 0 ++ " …"
+
+
+find : List a -> (a -> Bool) -> Maybe a
+find l f =
+    case l of
+        x :: xs ->
+            if f x then
+                Just x
+
+            else
+                find xs f
+
+        [] ->
+            Nothing
+
+
+mapIdsToEntries : List Entry -> Dict Id Entry
+mapIdsToEntries entries =
+    map (\e -> ( e.id, e )) entries |> Dict.fromList

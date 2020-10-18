@@ -1,21 +1,23 @@
 module View exposing (sidebarId, view, viewerId)
 
+import Dict exposing (Dict)
 import File
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Html.Lazy exposing (lazy4, lazy5, lazy6)
+import Html.Lazy exposing (lazy4, lazy5, lazy6, lazy7)
 import Html.Parser
 import Html.Parser.Util
 import InfiniteList as IL
 import Json.Decode as Decode exposing (Decoder)
-import List exposing (filter, foldr, head, isEmpty, length, member, reverse)
+import List exposing (filter, foldr, head, isEmpty, length, member, reverse, take)
 import Maybe exposing (withDefault)
 import Model
     exposing
         ( Author
         , Entry
         , Filter(..)
+        , Id
         , InputFocus(..)
         , Model
         , Tag
@@ -24,7 +26,7 @@ import Model
 import Msg exposing (Msg(..))
 import Regex
 import Set
-import String exposing (fromInt, slice, toList)
+import String exposing (fromFloat, fromInt, join, slice, toList, words)
 import Utils
     exposing
         ( ClickWithKeys
@@ -62,7 +64,12 @@ view model =
         , on "dragleave" (Decode.succeed DragLeave)
         , on "drop" dropDecoder
         ]
-        [ header
+        [ if model.hidePromptActive then
+            hidePrompt model.selectedEntries
+
+          else
+            text ""
+        , header
             []
             [ div []
                 [ img
@@ -192,10 +199,17 @@ view model =
                                     ]
                                 ]
                         )
-                        [ ( "focus", ToggleFocusMode )
-                        , ( "random", ShowRandom )
-                        , ( "about", ToggleAboutMode )
-                        ]
+                        (reverse <|
+                            ( "about", ToggleAboutMode )
+                                :: (if noEntries then
+                                        []
+
+                                    else
+                                        [ ( "random", ShowRandom )
+                                        , ( "focus", ToggleFocusMode )
+                                        ]
+                                   )
+                        )
                     )
                 ]
             ]
@@ -208,7 +222,15 @@ view model =
                     sidebar
                     model.infiniteList
                     model.uiSize
-                    ((if model.reverseList then
+                    ((if
+                        model.reverseList
+                            && not
+                                (model.filterType
+                                    == TextFilter
+                                    && model.filterValue
+                                    /= Nothing
+                                )
+                      then
                         reverse
 
                       else
@@ -224,13 +246,15 @@ view model =
                     )
                     (needsTitles model)
                     model.selectedEntries
-            , lazy5
+            , lazy7
                 viewer
                 model.selectedEntries
                 model.parsingError
                 noEntries
                 model.tags
                 model.pendingTag
+                model.neighborMap
+                ( Set.size model.completedEmbeddings, length model.entries )
             , if model.aboutMode then
                 lazy4
                     aboutView
@@ -251,9 +275,11 @@ viewer :
     -> Bool
     -> List Tag
     -> Maybe Tag
+    -> Dict Id (List ( Entry, Float ))
+    -> ( Int, Int )
     -> Html Msg
-viewer selectedEntries parsingError noEntries tags pendingTag =
-    div
+viewer selectedEntries parsingError noEntries tags pendingTag neighborMap ( completed, total ) =
+    article
         (id viewerId
             :: (if parsingError then
                     [ onClick ResetError ]
@@ -291,7 +317,8 @@ viewer selectedEntries parsingError noEntries tags pendingTag =
                                         []
                                )
                         )
-                    , div
+                    , neighbors entry neighborMap completed total
+                    , section
                         [ id "entry-tools" ]
                         [ tagSection entry.tags tags pendingTag
                         , section []
@@ -441,7 +468,7 @@ hideButton : List Entry -> Html Msg
 hideButton entries =
     section []
         [ div
-            [ class "hide-button", onClick <| HideEntries entries ]
+            [ class "hide-button", onClick <| PromptHide ]
             [ div [] [ text "×" ]
             , span []
                 [ text <|
@@ -458,6 +485,29 @@ hideButton entries =
         ]
 
 
+hidePrompt : List Entry -> Html Msg
+hidePrompt entries =
+    div [ class "prompt-bg" ]
+        [ div [ class "prompt" ]
+            [ p []
+                [ text <|
+                    "Remove "
+                        ++ (if length entries == 1 then
+                                "this entry?"
+
+                            else
+                                "these entries?"
+                           )
+                ]
+            , div
+                []
+                [ button [ onClick <| HideEntries entries ] [ text "Yes" ]
+                , button [ onClick CancelHide ] [ text "No" ]
+                ]
+            ]
+        ]
+
+
 sidebar :
     IL.Model
     -> ( Int, Int )
@@ -467,7 +517,7 @@ sidebar :
     -> List Entry
     -> Html Msg
 sidebar infiniteList uiSize entries query showTitles selectedEntries =
-    div
+    nav
         [ id sidebarId
         , classList [ ( "no-titles", not showTitles ) ]
         , IL.onScroll InfList
@@ -607,6 +657,75 @@ selectMenu values mState inputFn default =
             , h5 [ classList [ ( "no-filter", mState == Nothing ) ] ]
                 [ text val ]
             ]
+        ]
+
+
+neighbors : Entry -> Dict Id (List ( Entry, Float )) -> Int -> Int -> Html Msg
+neighbors entry neighborMap completed total =
+    details [ id "related" ]
+        [ summary [] [ text "Related" ]
+        , case Dict.get entry.id neighborMap of
+            Just entries ->
+                ul
+                    []
+                    (map
+                        (\( neighbor, score ) ->
+                            li
+                                [ onClick <| SelectEntries [ neighbor ]
+                                , class "neighbor"
+                                ]
+                                [ div
+                                    [ class "score" ]
+                                    [ div
+                                        [ style
+                                            "width"
+                                            (fromFloat (score * 100) ++ "%")
+                                        ]
+                                        []
+                                    ]
+                                , blockquote
+                                    []
+                                    [ neighbor.text
+                                        |> words
+                                        |> take 40
+                                        |> (\xs -> xs ++ [ "…" ])
+                                        |> join " "
+                                        |> text
+                                    ]
+                                , Html.cite
+                                    [ id "meta" ]
+                                    [ span
+                                        [ class "title"
+                                        , onClick <|
+                                            FilterBy
+                                                TitleFilter
+                                                neighbor.title
+                                        ]
+                                        [ text neighbor.title ]
+                                    , span [ class "sep" ] [ text "•" ]
+                                    , span
+                                        [ class "author"
+                                        , onClick <|
+                                            FilterBy
+                                                AuthorFilter
+                                                neighbor.author
+                                        ]
+                                        [ text neighbor.author ]
+                                    ]
+                                ]
+                        )
+                        entries
+                    )
+
+            _ ->
+                div []
+                    [ text <|
+                        "still calculating ("
+                            ++ fromInt completed
+                            ++ "/"
+                            ++ fromInt total
+                            ++ ")"
+                    ]
         ]
 
 

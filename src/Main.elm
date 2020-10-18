@@ -17,11 +17,14 @@ import List
     exposing
         ( drop
         , filter
+        , filterMap
         , head
         , isEmpty
         , length
         , map
+        , maximum
         , member
+        , minimum
         , reverse
         , take
         )
@@ -30,6 +33,7 @@ import Model
     exposing
         ( Entry
         , Filter(..)
+        , Id
         , InputFocus(..)
         , Model
         , StoredModel
@@ -42,10 +46,10 @@ import Parser
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Regex
-import Set exposing (union)
-import String exposing (toLower, trim)
+import Set exposing (diff, union)
+import String exposing (join, split, toLower, trim)
 import Task exposing (attempt, perform, sequence)
-import Tuple exposing (first)
+import Tuple exposing (first, second)
 import Utils
     exposing
         ( KeyEvent
@@ -54,6 +58,7 @@ import Utils
         , getNextIndex
         , getPrevIndex
         , insertOnce
+        , mapIdsToEntries
         , modelToStoredModel
         , needsTitles
         , queryCharMin
@@ -72,6 +77,21 @@ port exportJson : StoredModel -> Cmd msg
 
 
 port importJson : String -> Cmd msg
+
+
+port requestEmbeddings : List ( Id, String ) -> Cmd msg
+
+
+port receiveEmbeddings : (List Id -> msg) -> Sub msg
+
+
+port deleteEmbeddings : List Id -> Cmd msg
+
+
+port requestNeighbors : ( Id, Bool ) -> Cmd msg
+
+
+port receiveNeighbors : (( Id, List ( Id, Float ) ) -> msg) -> Sub msg
 
 
 main : Program (Maybe StoredModel) Model Msg
@@ -94,6 +114,8 @@ main =
                         (Decode.field "metaKey" Decode.bool)
                         |> Decode.map KeyDown
                         |> onKeyDown
+                    , receiveNeighbors ReceiveNeighbors
+                    , receiveEmbeddings ReceiveEmbeddings
                     ]
         }
 
@@ -113,6 +135,7 @@ init maybeModel =
         model_ =
             { initialModel
                 | entries = restored.entries
+                , idsToEntries = mapIdsToEntries restored.entries
                 , hiddenEntries = Set.fromList restored.hiddenEntries
                 , selectedEntries =
                     filter
@@ -155,7 +178,7 @@ init maybeModel =
             ( m, cmd ) =
                 update (SelectEntries model.selectedEntries) model
         in
-        ( m, batch [ getSize, cmd ] )
+        ( m, batch [ getSize, cmd, second <| update RequestEmbeddings m ] )
 
 
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
@@ -217,6 +240,7 @@ update message model =
                     ( { model
                         | parsingError = False
                         , entries = entries
+                        , idsToEntries = mapIdsToEntries entries
                         , selectedEntries =
                             case head entries of
                                 Just entry ->
@@ -234,13 +258,16 @@ update message model =
             ( { model | parsingError = False }, none )
 
         SelectEntries entries ->
-            let
-                sidebarView =
-                    getViewportOf sidebarId
-            in
             store
-                ( { model | selectedEntries = entries }
+                ( { model
+                    | selectedEntries = entries
+                    , hidePromptActive = False
+                  }
                 , if length entries == 1 then
+                    let
+                        sidebarView =
+                            getViewportOf sidebarId
+                    in
                     batch
                         [ attempt
                             GotDomEl
@@ -252,6 +279,20 @@ update message model =
                         , attempt
                             DidScroll
                             (setViewportOf viewerId 0 0)
+                        , case head entries of
+                            Just entry ->
+                                if
+                                    model.embeddingsReady
+                                        && Dict.get entry.id model.neighborMap
+                                        == Nothing
+                                then
+                                    requestNeighbors ( entry.id, True )
+
+                                else
+                                    none
+
+                            Nothing ->
+                                none
                         ]
 
                   else
@@ -278,10 +319,10 @@ update message model =
                         getIndex entries entry
 
                     minIndex =
-                        withDefault 0 (List.minimum selectedIndices)
+                        withDefault 0 (minimum selectedIndices)
 
                     maxIndex =
-                        withDefault 0 (List.maximum selectedIndices)
+                        withDefault 0 (maximum selectedIndices)
 
                     start =
                         if targetIndex < minIndex then
@@ -309,7 +350,7 @@ update message model =
             else if control || meta then
                 update
                     (SelectEntries <|
-                        (if List.member entry model.selectedEntries then
+                        (if member entry model.selectedEntries then
                             filter ((/=) entry)
 
                          else
@@ -439,10 +480,10 @@ update message model =
 
                     TextFilter ->
                         let
-                            term =
+                            query =
                                 toLower val
                         in
-                        if trim term == "" then
+                        if trim query == "" then
                             ( { model
                                 | filterValue = Nothing
                                 , shownEntries = Nothing
@@ -451,7 +492,7 @@ update message model =
                             , none
                             )
 
-                        else if String.length term < queryCharMin then
+                        else if String.length query < queryCharMin then
                             ( { model
                                 | filterValue = Just val
                                 , filterType = filterType
@@ -460,11 +501,53 @@ update message model =
                             )
 
                         else
-                            applyFilter <|
-                                \entry ->
-                                    Regex.contains
-                                        (rx <| "\\b" ++ term)
-                                        (toLower entry.text)
+                            ( { model
+                                | filterValue = Just val
+                                , filterType = filterType
+                                , shownEntries =
+                                    let
+                                        phraseMatches =
+                                            filter
+                                                (\entry ->
+                                                    Regex.contains
+                                                        (rx <| "\\b" ++ query)
+                                                        (toLower entry.text)
+                                                )
+                                                model.entries
+
+                                        phraseMatchIds =
+                                            map .id phraseMatches
+                                                |> Set.fromList
+
+                                        pattern =
+                                            split " " query
+                                                |> map
+                                                    (\word ->
+                                                        "(?=.*\\b"
+                                                            ++ word
+                                                            ++ ")"
+                                                    )
+                                                |> join ""
+
+                                        wordsRx =
+                                            "^" ++ pattern ++ ".*$" |> rx
+                                    in
+                                    phraseMatches
+                                        ++ filter
+                                            (\entry ->
+                                                (not <|
+                                                    Set.member entry.id
+                                                        phraseMatchIds
+                                                )
+                                                    && Regex.contains
+                                                        wordsRx
+                                                        (toLower entry.text)
+                                            )
+                                            model.entries
+                                        |> Just
+                              }
+                            , none
+                            )
 
         UpdateNotes text ->
             case model.selectedEntries of
@@ -592,6 +675,12 @@ update message model =
         ToggleAboutMode ->
             ( { model | aboutMode = not model.aboutMode }, none )
 
+        PromptHide ->
+            ( { model | hidePromptActive = True }, none )
+
+        CancelHide ->
+            ( { model | hidePromptActive = False }, none )
+
         HideEntries entries ->
             let
                 list =
@@ -608,6 +697,12 @@ update message model =
 
                 soleEntry =
                     len == 1
+
+                ids =
+                    map .id entries
+
+                idSet =
+                    Set.fromList ids
             in
             update
                 (ShowByIndex <|
@@ -621,10 +716,7 @@ update message model =
                         idx
                 )
                 { model
-                    | hiddenEntries =
-                        union
-                            (entries |> map .id |> Set.fromList)
-                            model.hiddenEntries
+                    | hiddenEntries = union model.hiddenEntries idSet
                     , entries = fn model.entries
                     , shownEntries =
                         if soleEntry then
@@ -632,13 +724,16 @@ update message model =
 
                         else
                             Maybe.map fn model.shownEntries
+                    , completedEmbeddings = diff model.completedEmbeddings idSet
                     , filterValue =
                         if soleEntry then
                             Nothing
 
                         else
                             model.filterValue
+                    , hidePromptActive = False
                 }
+                |> (\( m, cmd ) -> ( m, batch [ cmd, deleteEmbeddings ids ] ))
 
         Sort ->
             store ( { model | reverseList = not model.reverseList }, none )
@@ -716,7 +811,7 @@ update message model =
             ( model, importJson jsonText )
 
         KeyDown { key, control, meta } ->
-            if control || meta then
+            if (model.inputFocused == Nothing) && (control || meta) then
                 case key of
                     "a" ->
                         update
@@ -792,3 +887,65 @@ update message model =
 
         ExportEpub ->
             ( model, Epub.export model.titles model.entries )
+
+        RequestEmbeddings ->
+            let
+                nextBatch =
+                    diff
+                        (diff
+                            (model.entries |> map .id |> Set.fromList)
+                            model.completedEmbeddings
+                        )
+                        model.hiddenEntries
+                        |> toList
+                        |> filterMap (\id -> Dict.get id model.idsToEntries)
+                        |> map (\entry -> ( entry.id, entry.text ))
+                        |> take 20
+            in
+            if isEmpty nextBatch then
+                ( { model | embeddingsReady = True }
+                , case model.selectedEntries of
+                    [ entry ] ->
+                        requestNeighbors ( entry.id, True )
+
+                    _ ->
+                        none
+                )
+
+            else
+                ( { model | embeddingsReady = False }
+                , requestEmbeddings nextBatch
+                )
+
+        ReceiveEmbeddings ids ->
+            update
+                RequestEmbeddings
+                { model
+                    | completedEmbeddings =
+                        union model.completedEmbeddings (Set.fromList ids)
+                }
+
+        ReceiveNeighbors ( targetId, idScores ) ->
+            if Dict.member targetId model.idsToEntries then
+                ( { model
+                    | neighborMap =
+                        Dict.insert
+                            targetId
+                            (filterMap
+                                (\( id, score ) ->
+                                    case Dict.get id model.idsToEntries of
+                                        Just entry ->
+                                            Just ( entry, score )
+
+                                        _ ->
+                                            Nothing
+                                )
+                                idScores
+                            )
+                            model.neighborMap
+                  }
+                , none
+                )
+
+            else
+                noOp
