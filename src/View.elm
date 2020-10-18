@@ -1,21 +1,23 @@
 module View exposing (sidebarId, view, viewerId)
 
+import Dict exposing (Dict)
 import File
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Html.Lazy exposing (lazy4, lazy5, lazy6)
+import Html.Lazy exposing (lazy4, lazy5, lazy6, lazy7)
 import Html.Parser
 import Html.Parser.Util
 import InfiniteList as IL
 import Json.Decode as Decode exposing (Decoder)
-import List exposing (filter, foldr, head, isEmpty, length, member, reverse)
+import List exposing (filter, foldr, head, isEmpty, length, member, reverse, take)
 import Maybe exposing (withDefault)
 import Model
     exposing
         ( Author
         , Entry
         , Filter(..)
+        , Id
         , InputFocus(..)
         , Model
         , Tag
@@ -24,7 +26,7 @@ import Model
 import Msg exposing (Msg(..))
 import Regex
 import Set
-import String exposing (fromInt, slice, toList)
+import String exposing (fromFloat, fromInt, join, slice, toList, words)
 import Utils
     exposing
         ( ClickWithKeys
@@ -244,13 +246,15 @@ view model =
                     )
                     (needsTitles model)
                     model.selectedEntries
-            , lazy5
+            , lazy7
                 viewer
                 model.selectedEntries
                 model.parsingError
                 noEntries
                 model.tags
                 model.pendingTag
+                model.neighborMap
+                ( Set.size model.completedEmbeddings, length model.entries )
             , if model.aboutMode then
                 lazy4
                     aboutView
@@ -271,9 +275,11 @@ viewer :
     -> Bool
     -> List Tag
     -> Maybe Tag
+    -> Dict Id (List ( Entry, Float ))
+    -> ( Int, Int )
     -> Html Msg
-viewer selectedEntries parsingError noEntries tags pendingTag =
-    div
+viewer selectedEntries parsingError noEntries tags pendingTag neighborMap ( completed, total ) =
+    article
         (id viewerId
             :: (if parsingError then
                     [ onClick ResetError ]
