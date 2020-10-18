@@ -318,7 +318,7 @@ viewer selectedEntries parsingError noEntries tags pendingTag neighborMap ( comp
                                )
                         )
                     , neighbors entry neighborMap completed total
-                    , div
+                    , section
                         [ id "entry-tools" ]
                         [ tagSection entry.tags tags pendingTag
                         , section []
@@ -662,7 +662,7 @@ selectMenu values mState inputFn default =
 
 neighbors : Entry -> Dict Id (List ( Entry, Float )) -> Int -> Int -> Html Msg
 neighbors entry neighborMap completed total =
-    div []
+    section []
         [ h4 [] [ text "Related" ]
         , case Dict.get entry.id neighborMap of
             Just entries ->
