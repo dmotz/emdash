@@ -67,7 +67,9 @@ import Utils
         , updateItem
         , updateItems
         )
-import Views.Base exposing (sidebarId, view, viewerId)
+import Views.Base exposing (view)
+import Views.Sidebar exposing (sidebarId)
+import Views.Viewer exposing (viewerId)
 
 
 port setStorage : StoredModel -> Cmd msg
