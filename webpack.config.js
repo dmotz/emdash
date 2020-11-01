@@ -10,10 +10,9 @@ const WorkboxPlugin = require('workbox-webpack-plugin')
 
 const dev = 'development'
 const prod = 'production'
-
 const MODE = process.env.npm_lifecycle_event === 'build' ? prod : dev
-
 const filename = MODE === prod ? '[name]-[hash].js' : 'index.js'
+const assetsDir = 'assets'
 
 const common = {
   mode: MODE,
@@ -82,7 +81,7 @@ if (MODE === dev) {
     devServer: {
       inline: true,
       stats: 'errors-only',
-      contentBase: path.join(__dirname, 'src/assets'),
+      contentBase: path.join(__dirname, assetsDir),
       historyApiFallback: true
     }
   })
@@ -103,20 +102,13 @@ if (MODE === prod) {
         verbose: true,
         dry: false
       }),
-      new CopyWebpackPlugin([
-        {
-          from: 'src/assets',
-          ignore: ['.DS_Store']
-        }
-      ]),
-      new MiniCssExtractPlugin({
-        filename: '[name]-[hash].css'
-      }),
+      new CopyWebpackPlugin([{from: assetsDir, ignore: ['.DS_Store']}]),
+      new MiniCssExtractPlugin({filename: '[name]-[hash].css'}),
       new WorkboxPlugin.GenerateSW({
         swDest: 'sw.js',
         clientsClaim: true,
         skipWaiting: true,
-        globDirectory: 'src/assets',
+        globDirectory: assetsDir,
         globPatterns: ['**/*.{js,css,html,svg,png}'],
         runtimeCaching: [
           {
