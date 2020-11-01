@@ -1,4 +1,4 @@
-module View exposing (sidebarId, view, viewerId)
+module Views.Base exposing (sidebarId, view, viewerId)
 
 import Dict exposing (Dict)
 import File
