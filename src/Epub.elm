@@ -349,7 +349,7 @@ export titles entries =
                 i
                 title
                 author
-                (filter (\ent -> ent.title == title) entries)
+                (filter (.title >> (==) title) entries)
         )
         (map (\title -> ( title, getAuthor title entries )) titles)
     ]
