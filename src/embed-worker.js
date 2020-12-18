@@ -1,3 +1,4 @@
+import '@tensorflow/tfjs'
 import * as use from '@tensorflow-models/universal-sentence-encoder'
 
 const step = 512
