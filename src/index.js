@@ -11,11 +11,14 @@ const stateStore = new Store(`${dbNs}:${stateKey}`, stateKey)
 const embeddingsStore = new Store(`${dbNs}:${embeddingsKey}`, embeddingsKey)
 const neighborsK = 5
 const writeMs = 1000
+const batchIds = {}
 
 let embeddings = {}
 let titleMap = {}
+let workerBatch = 0
 let app
 let writeTimer
+let worker
 
 init()
 
@@ -113,27 +116,30 @@ async function createEpub(pairs) {
 }
 
 function requestEmbeddings(pairs) {
-  const returnIds = () =>
-    app.ports.receiveEmbeddings.send(pairs.map(([id]) => id))
+  if (!worker) {
+    worker = new EmbedWorker()
+    worker.onmessage = ({data}) => {
+      data.targets.forEach(([k, v]) => {
+        embeddings[k] = v
+        set(k, v, embeddingsStore)
+      })
 
+      app.ports.receiveEmbeddings.send(batchIds[data.batchId])
+      delete batchIds[data.batchId]
+    }
+  }
+
+  const batchId = workerBatch++
   const targets = pairs.filter(([id]) => !embeddings[id])
+  const ids = pairs.map(([id]) => id)
 
   if (!targets.length) {
-    returnIds()
+    app.ports.receiveEmbeddings.send(ids)
     return
   }
 
-  const worker = new EmbedWorker()
-  worker.postMessage(targets)
-  worker.onmessage = ({data}) => {
-    data.forEach(([k, v]) => {
-      embeddings[k] = v
-      set(k, v, embeddingsStore)
-    })
-
-    returnIds()
-    worker.terminate()
-  }
+  batchIds[batchId] = ids
+  worker.postMessage({targets, batchId})
 }
 
 function deleteEmbeddings(ids) {
