@@ -6,12 +6,16 @@ const model = use.load()
 
 self.addEventListener('message', async ({data}) => {
   const embeddings = (
-    await (await model).embed(data.map(([, text]) => text))
+    await (await model).embed(data.targets.map(([, text]) => text))
   ).dataSync()
 
-  self.postMessage(
-    data.map(([id], i) => [id, embeddings.slice(i * step, (i + 1) * step)])
-  )
+  self.postMessage({
+    targets: data.targets.map(([id], i) => [
+      id,
+      embeddings.slice(i * step, (i + 1) * step)
+    ]),
+    batchId: data.batchId
+  })
 })
 
 export default () => {}
