@@ -11,7 +11,7 @@ const WorkboxPlugin = require('workbox-webpack-plugin')
 const dev = 'development'
 const prod = 'production'
 const MODE = process.env.npm_lifecycle_event === 'build' ? prod : dev
-const filename = MODE === prod ? '[name]-[hash].js' : 'index.js'
+const filename = MODE === prod ? '[name]-[contenthash].js' : 'index.js'
 const assetsDir = 'assets'
 
 const common = {
@@ -106,7 +106,7 @@ if (MODE === prod) {
         dry: false
       }),
       new CopyWebpackPlugin({patterns: [{from: assetsDir}]}),
-      new MiniCssExtractPlugin({filename: '[name]-[hash].css'}),
+      new MiniCssExtractPlugin({filename: '[name]-[contenthash].css'}),
       new WorkboxPlugin.GenerateSW({
         swDest: 'sw.js',
         clientsClaim: true,
