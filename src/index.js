@@ -1,5 +1,5 @@
 import {Elm} from './Main'
-import {Store, get, set, del, keys} from 'idb-keyval'
+import {get, set, del, keys, createStore} from 'idb-keyval'
 import JsZip from 'jszip'
 import EmbedWorker from 'worker-loader!./embed-worker'
 import './styles.sass'
@@ -7,8 +7,8 @@ import './styles.sass'
 const dbNs = 'marginalia'
 const stateKey = 'state'
 const embeddingsKey = 'embeddings'
-const stateStore = new Store(`${dbNs}:${stateKey}`, stateKey)
-const embeddingsStore = new Store(`${dbNs}:${embeddingsKey}`, embeddingsKey)
+const stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
+const embeddingsStore = createStore(`${dbNs}:${embeddingsKey}`, embeddingsKey)
 const neighborsK = 5
 const writeMs = 1000
 const batchIds = {}
