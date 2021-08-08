@@ -1,6 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
-const merge = require('webpack-merge')
+const {merge} = require('webpack-merge')
 const elmMinify = require('elm-minify')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
@@ -47,7 +47,11 @@ const common = {
       {
         test: /\.sass$/,
         exclude: [/elm-stuff/, /node_modules/],
-        loaders: ['style-loader', 'css-loader?url=false', 'sass-loader']
+        use: [
+          {loader: 'style-loader'},
+          {loader: 'css-loader', options: {url: false}},
+          {loader: 'sass-loader'}
+        ]
       }
     ]
   }
@@ -56,10 +60,10 @@ const common = {
 if (MODE === dev) {
   console.log('Building for dev...')
   module.exports = merge(common, {
-    plugins: [
-      new webpack.NamedModulesPlugin(),
-      new webpack.NoEmitOnErrorsPlugin()
-    ],
+    optimization: {
+      moduleIds: 'named'
+    },
+    plugins: [new webpack.NoEmitOnErrorsPlugin()],
     module: {
       rules: [
         {
@@ -67,14 +71,13 @@ if (MODE === dev) {
           exclude: [/elm-stuff/, /node_modules/],
           use: [
             {loader: 'elm-hot-webpack-loader'},
-            {
-              loader: 'elm-webpack-loader',
-              options: {
-                debug: false,
-                forceWatch: true
-              }
-            }
+            {loader: 'elm-webpack-loader', options: {debug: false}}
           ]
+        },
+        {
+          test: /\.js$/,
+          enforce: 'pre',
+          use: ['source-map-loader']
         }
       ]
     },
@@ -102,7 +105,7 @@ if (MODE === prod) {
         verbose: true,
         dry: false
       }),
-      new CopyWebpackPlugin([{from: assetsDir, ignore: ['.DS_Store']}]),
+      new CopyWebpackPlugin({patterns: [{from: assetsDir}]}),
       new MiniCssExtractPlugin({filename: '[name]-[hash].css'}),
       new WorkboxPlugin.GenerateSW({
         swDest: 'sw.js',
@@ -137,15 +140,18 @@ if (MODE === prod) {
         {
           test: /\.css$/,
           exclude: [/elm-stuff/, /node_modules/],
-          loaders: [MiniCssExtractPlugin.loader, 'css-loader?url=false']
+          use: [
+            {loader: MiniCssExtractPlugin.loader},
+            {loader: 'css-loader', options: {url: false}}
+          ]
         },
         {
           test: /\.sass$/,
           exclude: [/elm-stuff/, /node_modules/],
-          loaders: [
-            MiniCssExtractPlugin.loader,
-            'css-loader?url=false',
-            'sass-loader'
+          use: [
+            {loader: MiniCssExtractPlugin.loader},
+            {loader: 'css-loader', options: {url: false}},
+            {loader: 'sass-loader'}
           ]
         }
       ]
