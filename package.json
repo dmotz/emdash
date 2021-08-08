@@ -9,8 +9,8 @@
   "description": "Book excerpt organizer",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --hot --colors --port 1999",
-    "build": "webpack -p"
+    "start": "webpack serve --hot --port 1999",
+    "build": "webpack --mode production"
   },
   "license": "GPL-3.0",
   "private": true,
