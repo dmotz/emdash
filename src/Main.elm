@@ -46,7 +46,7 @@ import Parser
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Regex
-import Set exposing (diff, union)
+import Set exposing (diff, union, toList)
 import String exposing (join, split, toLower, trim)
 import Task exposing (attempt, perform, sequence)
 import Tuple exposing (first, second)
