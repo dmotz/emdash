@@ -1,5 +1,5 @@
 import {Elm} from './Main'
-import {get, set, del, keys, createStore} from 'idb-keyval'
+import {get, set, setMany, del, keys, createStore} from 'idb-keyval'
 import JsZip from 'jszip'
 import EmbedWorker from 'worker-loader!./embed-worker'
 import './styles.sass'
@@ -119,13 +119,10 @@ function requestEmbeddings(pairs) {
   if (!worker) {
     worker = new EmbedWorker()
     worker.onmessage = ({data}) => {
-      data.targets.forEach(([k, v]) => {
-        embeddings[k] = v
-        set(k, v, embeddingsStore)
-      })
-
       app.ports.receiveEmbeddings.send(batchIds[data.batchId])
+      data.targets.forEach(([k, v]) => (embeddings[k] = v))
       delete batchIds[data.batchId]
+      setMany(data.targets, embeddingsStore)
     }
   }
 
