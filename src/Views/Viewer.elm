@@ -39,9 +39,10 @@ viewer :
     -> List Tag
     -> Maybe Tag
     -> Dict Id (List ( Entry, Float ))
+    -> Bool
     -> ( Int, Int )
     -> Html Msg
-viewer selectedEntries parsingError noEntries tags pendingTag neighborMap ( completed, total ) =
+viewer selectedEntries parsingError noEntries tags pendingTag neighborMap embeddingsReady ( completed, total ) =
     article
         (id viewerId
             :: (if parsingError then
@@ -80,7 +81,12 @@ viewer selectedEntries parsingError noEntries tags pendingTag neighborMap ( comp
                                         []
                                )
                         )
-                    , neighbors entry neighborMap completed total
+                    , neighbors
+                        entry
+                        neighborMap
+                        embeddingsReady
+                        completed
+                        total
                     , section
                         [ id "entry-tools" ]
                         [ tagSection entry.tags tags pendingTag

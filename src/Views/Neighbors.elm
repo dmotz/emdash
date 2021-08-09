@@ -18,11 +18,18 @@ import Html.Events exposing (..)
 import List exposing (map, take)
 import Model exposing (Entry, Filter(..), Id)
 import Msg exposing (Msg(..))
-import String exposing (fromFloat, fromInt, join, words)
+import String exposing (fromFloat, join, words)
+import Utils exposing (formatNumber)
 
 
-neighbors : Entry -> Dict Id (List ( Entry, Float )) -> Int -> Int -> Html Msg
-neighbors entry neighborMap completed total =
+neighbors :
+    Entry
+    -> Dict Id (List ( Entry, Float ))
+    -> Bool
+    -> Int
+    -> Int
+    -> Html Msg
+neighbors entry neighborMap embeddingsReady completed total =
     details [ id "related" ]
         [ summary [] [ text "Related" ]
         , case Dict.get entry.id neighborMap of
@@ -81,10 +88,14 @@ neighbors entry neighborMap completed total =
             _ ->
                 div []
                     [ text <|
-                        "still calculating ("
-                            ++ fromInt completed
-                            ++ "/"
-                            ++ fromInt total
-                            ++ ")"
+                        if embeddingsReady then
+                            ""
+
+                        else
+                            "analyzing excerpts ("
+                                ++ formatNumber completed
+                                ++ " / "
+                                ++ formatNumber total
+                                ++ ")"
                     ]
         ]

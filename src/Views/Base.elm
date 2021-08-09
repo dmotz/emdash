@@ -33,7 +33,7 @@ import Html.Attributes
         , value
         )
 import Html.Events exposing (onBlur, onClick, onFocus, onInput)
-import Html.Lazy exposing (lazy4, lazy6, lazy7)
+import Html.Lazy exposing (lazy4, lazy6, lazy8)
 import Json.Decode as Decode exposing (Decoder)
 import List exposing (isEmpty, length, map, reverse)
 import Maybe exposing (withDefault)
@@ -255,7 +255,7 @@ view model =
                     )
                     (needsTitles model)
                     model.selectedEntries
-            , lazy7
+            , lazy8
                 viewer
                 model.selectedEntries
                 model.parsingError
@@ -263,6 +263,7 @@ view model =
                 model.tags
                 model.pendingTag
                 model.neighborMap
+                model.embeddingsReady
                 ( Set.size model.completedEmbeddings, length model.entries )
             , if model.aboutMode then
                 lazy4 about model.entries model.titles model.authors model.tags
