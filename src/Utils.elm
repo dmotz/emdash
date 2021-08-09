@@ -2,6 +2,7 @@ module Utils exposing
     ( ClickWithKeys
     , KeyEvent
     , charLimit
+    , embeddingBatchSize
     , find
     , formatNumber
     , getEntryHeight
@@ -175,6 +176,11 @@ getEntryHeight hasTitle =
 charLimit : Int
 charLimit =
     42
+
+
+embeddingBatchSize : Int
+embeddingBatchSize =
+    10
 
 
 takeExcerpt : String -> String

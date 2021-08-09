@@ -53,6 +53,7 @@ import Tuple exposing (first, second)
 import Utils
     exposing
         ( KeyEvent
+        , embeddingBatchSize
         , getEntryHeight
         , getIndex
         , getNextIndex
@@ -902,7 +903,7 @@ update message model =
                         |> toList
                         |> filterMap (\id -> Dict.get id model.idsToEntries)
                         |> map (\entry -> ( entry.id, entry.text ))
-                        |> take 20
+                        |> take embeddingBatchSize
             in
             if isEmpty nextBatch then
                 ( { model | embeddingsReady = True }
