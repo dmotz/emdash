@@ -8,7 +8,7 @@ import Browser.Dom
         , setViewportOf
         )
 import Browser.Events exposing (onKeyDown, onResize)
-import Dict
+import Dict exposing (get)
 import Epub
 import File
 import File.Select as Select
@@ -46,10 +46,10 @@ import Parser
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Regex
-import Set exposing (diff, union, toList)
+import Set exposing (diff, toList, union)
 import String exposing (join, split, toLower, trim)
 import Task exposing (attempt, perform, sequence)
-import Tuple exposing (first, second)
+import Tuple exposing (first)
 import Utils
     exposing
         ( KeyEvent
@@ -181,7 +181,7 @@ init maybeModel =
             ( m, cmd ) =
                 update (SelectEntries model.selectedEntries) model
         in
-        ( m, batch [ getSize, cmd, second <| update RequestEmbeddings m ] )
+        ( m, batch [ getSize, cmd ] )
 
 
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
@@ -286,7 +286,7 @@ update message model =
                             Just entry ->
                                 if
                                     model.embeddingsReady
-                                        && Dict.get entry.id model.neighborMap
+                                        && get entry.id model.neighborMap
                                         == Nothing
                                 then
                                     requestNeighbors ( entry.id, True )
@@ -901,7 +901,7 @@ update message model =
                         )
                         model.hiddenEntries
                         |> toList
-                        |> filterMap (\id -> Dict.get id model.idsToEntries)
+                        |> filterMap (\id -> get id model.idsToEntries)
                         |> map (\entry -> ( entry.id, entry.text ))
                         |> take embeddingBatchSize
             in
@@ -936,7 +936,7 @@ update message model =
                             targetId
                             (filterMap
                                 (\( id, score ) ->
-                                    case Dict.get id model.idsToEntries of
+                                    case get id model.idsToEntries of
                                         Just entry ->
                                             Just ( entry, score )
 
