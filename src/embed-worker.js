@@ -5,9 +5,8 @@ const step = 512
 const model = use.load()
 
 self.addEventListener('message', async ({data}) => {
-  const embeddings = (
-    await (await model).embed(data.targets.map(([, text]) => text))
-  ).dataSync()
+  const tensor = await (await model).embed(data.targets.map(([, text]) => text))
+  const embeddings = await tensor.data()
 
   self.postMessage({
     targets: data.targets.map(([id], i) => [
@@ -16,6 +15,7 @@ self.addEventListener('message', async ({data}) => {
     ]),
     batchId: data.batchId
   })
+  tensor.dispose()
 })
 
 export default () => {}
