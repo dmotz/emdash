@@ -82,7 +82,7 @@ view model =
             []
             [ div []
                 [ img
-                    [ src "logo.svg"
+                    [ src "/logo.svg"
                     , draggable "false"
                     , onClick ToggleAboutMode
                     ]
@@ -194,7 +194,7 @@ view model =
                         (\( s, action ) ->
                             div [ onClick action ]
                                 [ img
-                                    [ src <| s ++ ".svg"
+                                    [ src <| "/" ++ s ++ ".svg"
                                     , draggable "false"
                                     ]
                                     []
