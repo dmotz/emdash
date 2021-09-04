@@ -4,6 +4,7 @@ import Dict exposing (Dict)
 import Html
     exposing
         ( Html
+        , a
         , blockquote
         , details
         , div
@@ -13,11 +14,12 @@ import Html
         , text
         , ul
         )
-import Html.Attributes exposing (class, id, style)
+import Html.Attributes exposing (class, href, id, style)
 import Html.Events exposing (..)
 import List exposing (map, take)
 import Model exposing (Entry, Filter(..), Id)
 import Msg exposing (Msg(..))
+import Router exposing (entryToRoute)
 import String exposing (fromFloat, join, words)
 import Utils exposing (formatNumber)
 
@@ -39,46 +41,47 @@ neighbors entry neighborMap embeddingsReady completed total =
                     (map
                         (\( neighbor, score ) ->
                             li
-                                [ onClick <| SelectEntries [ neighbor ]
-                                , class "neighbor"
-                                ]
-                                [ div
-                                    [ class "score" ]
+                                [ class "neighbor" ]
+                                [ a
+                                    [ href <| entryToRoute neighbor ]
                                     [ div
-                                        [ style
-                                            "width"
-                                            (fromFloat (score * 100) ++ "%")
+                                        [ class "score" ]
+                                        [ div
+                                            [ style
+                                                "width"
+                                                (fromFloat (score * 100) ++ "%")
+                                            ]
+                                            []
                                         ]
+                                    , blockquote
                                         []
-                                    ]
-                                , blockquote
-                                    []
-                                    [ neighbor.text
-                                        |> words
-                                        |> take 40
-                                        |> (\xs -> xs ++ [ "…" ])
-                                        |> join " "
-                                        |> text
-                                    ]
-                                , Html.cite
-                                    [ id "meta" ]
-                                    [ span
-                                        [ class "title"
-                                        , onClick <|
-                                            FilterBy
-                                                TitleFilter
-                                                neighbor.title
+                                        [ neighbor.text
+                                            |> words
+                                            |> take 40
+                                            |> (\xs -> xs ++ [ "…" ])
+                                            |> join " "
+                                            |> text
                                         ]
-                                        [ text neighbor.title ]
-                                    , span [ class "sep" ] [ text "•" ]
-                                    , span
-                                        [ class "author"
-                                        , onClick <|
-                                            FilterBy
-                                                AuthorFilter
-                                                neighbor.author
+                                    , Html.cite
+                                        [ id "meta" ]
+                                        [ span
+                                            [ class "title"
+                                            , onClick <|
+                                                FilterBy
+                                                    TitleFilter
+                                                    neighbor.title
+                                            ]
+                                            [ text neighbor.title ]
+                                        , span [ class "sep" ] [ text "•" ]
+                                        , span
+                                            [ class "author"
+                                            , onClick <|
+                                                FilterBy
+                                                    AuthorFilter
+                                                    neighbor.author
+                                            ]
+                                            [ text neighbor.author ]
                                         ]
-                                        [ text neighbor.author ]
                                     ]
                                 ]
                         )
