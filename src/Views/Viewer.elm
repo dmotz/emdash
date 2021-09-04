@@ -5,6 +5,7 @@ import Html
     exposing
         ( Attribute
         , Html
+        , a
         , article
         , blockquote
         , div
@@ -17,13 +18,14 @@ import Html
         , text
         , textarea
         )
-import Html.Attributes exposing (class, id, value)
+import Html.Attributes exposing (class, href, id, value)
 import Html.Events exposing (onClick, onFocus, targetValue)
 import Json.Decode as Decode
 import List exposing (foldr, head, length, map)
 import Maybe exposing (withDefault)
 import Model exposing (Entry, Filter(..), Id, InputFocus(..), Tag)
 import Msg exposing (Msg(..))
+import Router exposing (authorToRoute, titleToRoute)
 import Set
 import String exposing (fromInt)
 import Views.Common exposing (on)
@@ -57,15 +59,15 @@ viewer selectedEntries parsingError noEntries tags pendingTag neighborMap embedd
                 div []
                     [ blockquote [] [ text entry.text ]
                     , Html.cite [ id "meta" ]
-                        ([ span
+                        ([ a
                             [ class "title"
-                            , onClick <| FilterBy TitleFilter entry.title
+                            , href <| titleToRoute entry.title
                             ]
                             [ text entry.title ]
                          , span [ class "sep" ] [ text "•" ]
-                         , span
+                         , a
                             [ class "author"
-                            , onClick <| FilterBy AuthorFilter entry.author
+                            , href <| authorToRoute entry.author
                             ]
                             [ text entry.author ]
                          ]
