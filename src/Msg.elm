@@ -1,9 +1,11 @@
 module Msg exposing (Msg(..))
 
+import Browser exposing (UrlRequest)
 import Browser.Dom exposing (Error)
 import File exposing (File)
 import InfiniteList as IL
 import Model exposing (Entry, Filter, Id, InputFocus, Tag)
+import Url exposing (Url)
 import Utils exposing (ClickWithKeys, KeyEvent)
 
 
@@ -45,3 +47,5 @@ type Msg
     | RequestEmbeddings
     | ReceiveEmbeddings (List Id)
     | ReceiveNeighbors ( Id, List ( Id, Float ) )
+    | LinkClicked UrlRequest
+    | UrlChanged Url
