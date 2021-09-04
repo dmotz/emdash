@@ -1,8 +1,8 @@
 import '@tensorflow/tfjs'
-import * as use from '@tensorflow-models/universal-sentence-encoder'
+import {load} from '@tensorflow-models/universal-sentence-encoder'
 
 const step = 512
-const model = use.load()
+const model = load()
 
 self.addEventListener('message', async ({data}) => {
   const tensor = await (await model).embed(data.targets.map(([, text]) => text))
