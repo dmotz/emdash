@@ -1,7 +1,7 @@
 module Views.Sidebar exposing (sidebar, sidebarId)
 
-import Html exposing (Html, blockquote, div, li, nav, text, ul)
-import Html.Attributes exposing (class, classList, id, style)
+import Html exposing (Html, a, blockquote, div, li, nav, text, ul)
+import Html.Attributes exposing (class, classList, href, id, style)
 import Html.Parser
 import Html.Parser.Util
 import InfiniteList as IL
@@ -11,6 +11,7 @@ import Maybe exposing (withDefault)
 import Model exposing (Entry)
 import Msg exposing (Msg(..))
 import Regex
+import Router exposing (entryToRoute)
 import Set
 import String exposing (slice)
 import Utils exposing (ClickWithKeys, charLimit, getEntryHeight, queryCharMin)
@@ -103,29 +104,32 @@ listEntry query showTitles selectedEntries _ _ entry =
             |> Decode.map (EntryClick entry)
             |> on "click"
         ]
-        [ if Set.member entry.id selectedIds then
-            div [ class "active-entry" ] []
+        [ a
+            [ href <| entryToRoute entry ]
+            [ if Set.member entry.id selectedIds then
+                div [ class "active-entry" ] []
 
-          else
-            text ""
-        , blockquote
-            []
-            (case query of
-                Nothing ->
-                    [ text entry.text ]
-
-                Just q ->
-                    if String.length q < queryCharMin then
+              else
+                text ""
+            , blockquote
+                []
+                (case query of
+                    Nothing ->
                         [ text entry.text ]
 
-                    else
-                        addHighlighting entry.text q
-            )
-        , if showTitles then
-            Html.cite [ class "title" ] [ text entry.title ]
+                    Just q ->
+                        if String.length q < queryCharMin then
+                            [ text entry.text ]
 
-          else
-            text ""
+                        else
+                            addHighlighting entry.text q
+                )
+            , if showTitles then
+                Html.cite [ class "title" ] [ text entry.title ]
+
+              else
+                text ""
+            ]
         ]
 
 
