@@ -6,6 +6,7 @@ import Html
         ( Html
         , a
         , blockquote
+        , cite
         , details
         , div
         , li
@@ -62,7 +63,7 @@ neighbors entry neighborMap embeddingsReady completed total =
                                             |> join " "
                                             |> text
                                         ]
-                                    , Html.cite
+                                    , cite
                                         [ id "meta" ]
                                         [ span
                                             [ class "title"
