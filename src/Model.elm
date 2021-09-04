@@ -9,14 +9,15 @@ module Model exposing
     , Tag
     , Title
     , filterToString
-    , initialModel
     , initialStoredModel
     , stringToFilter
     )
 
+import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import InfiniteList as IL
 import Set exposing (Set)
+import Url exposing (Url)
 
 
 type Filter
@@ -84,35 +85,8 @@ type alias Model =
     , uiSize : ( Int, Int )
     , infiniteList : IL.Model
     , schemaVersion : Int
-    }
-
-
-initialModel : Model
-initialModel =
-    { entries = []
-    , idsToEntries = Dict.empty
-    , neighborMap = Dict.empty
-    , shownEntries = Nothing
-    , hiddenEntries = Set.empty
-    , selectedEntries = []
-    , completedEmbeddings = Set.empty
-    , embeddingsReady = False
-    , titles = []
-    , authors = []
-    , tags = []
-    , filterType = TitleFilter
-    , filterValue = Nothing
-    , pendingTag = Nothing
-    , focusMode = False
-    , aboutMode = False
-    , isDragging = False
-    , reverseList = False
-    , hidePromptActive = False
-    , inputFocused = Nothing
-    , parsingError = False
-    , uiSize = ( 1, 1 )
-    , infiniteList = IL.init
-    , schemaVersion = 0
+    , url : Url
+    , key : Nav.Key
     }
 
 
@@ -133,11 +107,11 @@ initialStoredModel =
     { entries = []
     , selectedEntries = []
     , hiddenEntries = []
-    , filterType = filterToString initialModel.filterType
-    , filterValue = initialModel.filterValue
-    , focusMode = initialModel.focusMode
-    , reverseList = initialModel.reverseList
-    , schemaVersion = initialModel.schemaVersion
+    , filterType = filterToString TitleFilter
+    , filterValue = Nothing
+    , focusMode = False
+    , reverseList = False
+    , schemaVersion = 0
     }
 
 
