@@ -1,6 +1,6 @@
 port module Main exposing (main)
 
-import Browser exposing (document)
+import Browser exposing (application)
 import Browser.Dom
     exposing
         ( getViewport
@@ -8,10 +8,12 @@ import Browser.Dom
         , setViewportOf
         )
 import Browser.Events exposing (onKeyDown, onResize)
+import Browser.Navigation as Nav
 import Dict exposing (get)
 import Epub
 import File
 import File.Select as Select
+import InfiniteList as IL
 import Json.Decode as Decode
 import List
     exposing
@@ -37,7 +39,6 @@ import Model
         , InputFocus(..)
         , Model
         , StoredModel
-        , initialModel
         , initialStoredModel
         , stringToFilter
         )
@@ -46,10 +47,13 @@ import Parser
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Regex
+import Router exposing (Route(..), deslugify, routeParser)
 import Set exposing (diff, toList, union)
-import String exposing (join, split, toLower, trim)
+import String exposing (fromInt, join, split, toLower, trim)
 import Task exposing (attempt, perform, sequence)
 import Tuple exposing (first)
+import Url exposing (Url)
+import Url.Parser exposing (parse)
 import Utils
     exposing
         ( KeyEvent
@@ -99,12 +103,42 @@ port receiveNeighbors : (( Id, List ( Id, Float ) ) -> msg) -> Sub msg
 
 main : Program (Maybe StoredModel) Model Msg
 main =
-    document
+    application
         { init = init
         , update = update
         , view =
             \m ->
-                { title = "Marginalia"
+                { title =
+                    join
+                        " - "
+                        [ "Marginalia"
+                        , case m.filterValue of
+                            Just val ->
+                                case m.filterType of
+                                    TitleFilter ->
+                                        val
+
+                                    AuthorFilter ->
+                                        val
+
+                                    _ ->
+                                        ""
+
+                            _ ->
+                                case m.selectedEntries of
+                                    [ entry ] ->
+                                        entry.title
+                                            ++ (case entry.page of
+                                                    Just n ->
+                                                        " p. " ++ fromInt n
+
+                                                    _ ->
+                                                        ""
+                                               )
+
+                                    _ ->
+                                        ""
+                        ]
                 , body = [ view m ]
                 }
         , subscriptions =
@@ -120,11 +154,13 @@ main =
                     , receiveNeighbors ReceiveNeighbors
                     , receiveEmbeddings ReceiveEmbeddings
                     ]
+        , onUrlChange = UrlChanged
+        , onUrlRequest = LinkClicked
         }
 
 
-init : Maybe StoredModel -> ( Model, Cmd Msg )
-init maybeModel =
+init : Maybe StoredModel -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init maybeModel url key =
     let
         restored =
             withDefault initialStoredModel maybeModel
@@ -136,20 +172,35 @@ init maybeModel =
             Set.fromList restored.selectedEntries
 
         model_ =
-            { initialModel
-                | entries = restored.entries
-                , idsToEntries = mapIdsToEntries restored.entries
-                , hiddenEntries = Set.fromList restored.hiddenEntries
-                , selectedEntries =
-                    filter
-                        (\entry -> Set.member entry.id selectedIds)
-                        restored.entries
-                , titles = Parser.getTitles restored.entries
-                , authors = Parser.getAuthors restored.entries
-                , tags = Parser.getTags restored.entries
-                , filterType = filterType
-                , focusMode = restored.focusMode
-                , reverseList = restored.reverseList
+            { entries = restored.entries
+            , idsToEntries = mapIdsToEntries restored.entries
+            , neighborMap = Dict.empty
+            , shownEntries = Nothing
+            , hiddenEntries = Set.fromList restored.hiddenEntries
+            , selectedEntries =
+                filter
+                    (\entry -> Set.member entry.id selectedIds)
+                    restored.entries
+            , completedEmbeddings = Set.empty
+            , embeddingsReady = False
+            , titles = Parser.getTitles restored.entries
+            , authors = Parser.getAuthors restored.entries
+            , tags = Parser.getTags restored.entries
+            , filterType = filterType
+            , filterValue = Nothing
+            , pendingTag = Nothing
+            , focusMode = restored.focusMode
+            , aboutMode = False
+            , isDragging = False
+            , reverseList = restored.reverseList
+            , hidePromptActive = False
+            , inputFocused = Nothing
+            , parsingError = False
+            , uiSize = ( 1, 1 )
+            , infiniteList = IL.init
+            , schemaVersion = 0
+            , url = url
+            , key = key
             }
 
         model =
@@ -364,7 +415,7 @@ update message model =
                     model
 
             else
-                update (SelectEntries [ entry ]) model
+                noOp
 
         ShowByIndex i ->
             case
@@ -952,3 +1003,56 @@ update message model =
 
             else
                 noOp
+
+        LinkClicked urlRequest ->
+            case urlRequest of
+                Browser.Internal url ->
+                    if url == model.url then
+                        noOp
+
+                    else
+                        ( model, Nav.pushUrl model.key (Url.toString url) )
+
+                Browser.External href ->
+                    ( model, Nav.load href )
+
+        UrlChanged url ->
+            let
+                model_ =
+                    { model | url = url }
+
+                noOp_ =
+                    ( model_, none )
+            in
+            case
+                parse routeParser url
+            of
+                Just (TitleRoute title) ->
+                    update (FilterBy TitleFilter (deslugify title)) model_
+
+                Just (AuthorRoute author) ->
+                    update (FilterBy AuthorFilter (deslugify author)) model_
+
+                Just (EntryRoute _ id) ->
+                    case
+                        get id model.idsToEntries
+                    of
+                        Just entry ->
+                            update (SelectEntries [ entry ]) model_
+
+                        _ ->
+                            noOp_
+
+                Just (TagRoute tag) ->
+                    update (FilterBy TagFilter (deslugify tag)) model_
+
+                Just (TextRoute query) ->
+                    case query of
+                        Just text ->
+                            update (FilterBy TextFilter text) model_
+
+                        _ ->
+                            noOp_
+
+                _ ->
+                    noOp_
