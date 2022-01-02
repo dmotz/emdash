@@ -47,7 +47,7 @@ import Parser
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Regex
-import Router exposing (Route(..), deslugify, routeParser)
+import Router exposing (Route(..), deslugify, entryToRoute, routeParser)
 import Set exposing (diff, toList, union)
 import String exposing (fromInt, join, split, toLower, trim)
 import Task exposing (attempt, perform, sequence)
@@ -419,11 +419,10 @@ update message model =
 
         ShowByIndex i ->
             case
-                drop i (getEntries model)
-                    |> head
+                drop i (getEntries model) |> head
             of
                 Just entry ->
-                    update (SelectEntries [ entry ]) model
+                    ( model, Nav.pushUrl model.key (entryToRoute entry) )
 
                 _ ->
                     noOp
