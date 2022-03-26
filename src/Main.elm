@@ -155,8 +155,11 @@ init maybeModel url key =
         titles =
             Parser.getTitles restored.entries
 
+        bookMap =
+            Parser.getBookMap restored.entries
+
         books =
-            Parser.getBooks restored.entries titleTimeSort
+            Parser.getBooks bookMap titleTimeSort
 
         model_ =
             { entries = restored.entries
@@ -170,10 +173,10 @@ init maybeModel url key =
             , titles = titles
             , authors = Parser.getAuthors restored.entries
             , books = books
-            , bookMap = Dict.fromList books
+            , bookMap = bookMap
             , tags = Parser.getTags restored.entries
             , titleTimeSort = titleTimeSort
-            , titleRouteMap = Parser.getRouteMap titles
+            , titleRouteMap = Parser.getRouteMap books
             , filterType = TitleFilter
             , filterValue = Nothing
             , pendingTag = Nothing
