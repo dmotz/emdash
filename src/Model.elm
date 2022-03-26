@@ -60,7 +60,11 @@ type alias Tag =
 
 
 type alias Book =
-    ( Title, Author )
+    { id : Id
+    , title : Title
+    , author : Author
+    , count : Int
+    }
 
 
 type alias Entry =
@@ -86,10 +90,10 @@ type alias Model =
     , titles : List Title
     , authors : List Author
     , books : List Book
-    , bookMap : Dict Title Author
+    , bookMap : Dict Id Book
     , tags : List Tag
     , titleTimeSort : Dict Title Int
-    , titleRouteMap : Dict String Title
+    , titleRouteMap : Dict String Book
     , filterType : Filter
     , filterValue : Maybe String
     , pendingTag : Maybe Tag
