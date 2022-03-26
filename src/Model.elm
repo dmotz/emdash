@@ -104,8 +104,6 @@ type alias Model =
     , hidePromptActive : Bool
     , inputFocused : Maybe InputFocus
     , parsingError : Bool
-    , uiSize : ( Int, Int )
-    , infiniteList : IL.Model
     , schemaVersion : Int
     , url : Url
     , key : Nav.Key

@@ -51,7 +51,7 @@ import Random exposing (generate)
 import Regex
 import Router exposing (Route(..), deslugify, entryToRoute, routeParser)
 import Set exposing (diff, toList, union)
-import String exposing (fromInt, join, split, toLower, trim)
+import String exposing (join, split, toLower, trim)
 import Task exposing (attempt, perform, sequence)
 import Tuple exposing (first)
 import Url exposing (Url)
@@ -129,8 +129,7 @@ main =
         , subscriptions =
             \_ ->
                 Sub.batch
-                    [ onResize (\w h -> Resize ( w, h ))
-                    , Decode.map3 KeyEvent
+                    [ Decode.map3 KeyEvent
                         (Decode.field "key" Decode.string)
                         (Decode.field "ctrlKey" Decode.bool)
                         (Decode.field "metaKey" Decode.bool)
@@ -188,8 +187,6 @@ init maybeModel url key =
             , hidePromptActive = False
             , inputFocused = Nothing
             , parsingError = False
-            , uiSize = ( 1, 1 )
-            , infiniteList = IL.init
             , schemaVersion = 0
             , url = url
             , key = key
@@ -199,21 +196,8 @@ init maybeModel url key =
 
         model =
             update (UrlChanged url) model_ |> first
-
-        getSize =
-            perform Resize
-                (Task.map
-                    (.viewport
-                        >> (\v ->
-                                ( v |> .width |> floor
-                                , v |> .height |> floor
-                                )
-                           )
-                    )
-                    getViewport
-                )
     in
-    ( model, getSize )
+    ( model, none )
 
 
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
@@ -830,9 +814,6 @@ update message model =
         DidScroll _ ->
             noOp
 
-        InfList infiniteList ->
-            ( { model | infiniteList = infiniteList }, none )
-
         ExportJson ->
             ( model, model |> modelToStoredModel |> exportJson )
 
@@ -915,9 +896,6 @@ update message model =
                             NoOp
                     )
                     model
-
-        Resize size ->
-            ( { model | uiSize = size }, none )
 
         ExportEpub ->
             ( model, Epub.export model.titles model.entries )

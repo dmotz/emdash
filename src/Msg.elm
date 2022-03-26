@@ -41,8 +41,6 @@ type Msg
     | ImportJson
     | JsonFileLoad String
     | ResetError
-    | Resize ( Int, Int )
-    | InfList IL.Model
     | ExportEpub
     | RequestEmbeddings
     | ReceiveEmbeddings (List Id)
