@@ -297,6 +297,6 @@ getTitleTimeSort =
         >> first
 
 
-getRouteMap : List String -> Dict String String
+getRouteMap : List Book -> Dict String Book
 getRouteMap =
-    map (\s -> ( slugify s, s )) >> Dict.fromList
+    map (\book -> ( slugify (.title book), book )) >> Dict.fromList
