@@ -257,5 +257,18 @@ getTags : List Entry -> List Tag
 getTags =
     map .tags
         >> concat
-        >> Set.fromList
-        >> Set.toList
+        >> dedupe
+
+
+getTitleTimeSort : List Entry -> Dict Title Int
+getTitleTimeSort =
+    foldr
+        (\entry ( dict, n ) ->
+            if member entry.title dict then
+                ( dict, n )
+
+            else
+                ( insert entry.title n dict, n + 1 )
+        )
+        ( Dict.empty, 0 )
+        >> first
