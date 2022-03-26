@@ -101,6 +101,11 @@ port requestNeighbors : ( Id, Bool ) -> Cmd msg
 port receiveNeighbors : (( Id, List ( Id, Float ) ) -> msg) -> Sub msg
 
 
+appName : String
+appName =
+    "Marginalia"
+
+
 main : Program (Maybe StoredModel) Model Msg
 main =
     application
@@ -109,36 +114,14 @@ main =
         , view =
             \m ->
                 { title =
-                    join
-                        " - "
-                        [ "Marginalia"
-                        , case m.filterValue of
-                            Just val ->
-                                case m.filterType of
-                                    TitleFilter ->
-                                        val
+                    (case m.filterValue of
+                        Just val ->
+                            val ++ " - "
 
-                                    AuthorFilter ->
-                                        val
-
-                                    _ ->
-                                        ""
-
-                            _ ->
-                                case m.selectedEntries of
-                                    [ entry ] ->
-                                        entry.title
-                                            ++ (case entry.page of
-                                                    Just n ->
-                                                        " p. " ++ fromInt n
-
-                                                    _ ->
-                                                        ""
-                                               )
-
-                                    _ ->
-                                        ""
-                        ]
+                        _ ->
+                            ""
+                    )
+                        ++ appName
                 , body = [ view m ]
                 }
         , subscriptions =
