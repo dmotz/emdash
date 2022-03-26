@@ -4,19 +4,22 @@ module Router exposing
     , deslugify
     , entryToRoute
     , routeParser
+    , slugify
+    , tagToRoute
     , titleToRoute
     )
 
-import Model exposing (Author, Entry, Title)
-import Regex
+import Model exposing (Author, Entry, Tag, Title)
+import Regex exposing (replace)
 import Url.Builder exposing (absolute)
-import Url.Parser exposing ((</>), (<?>), Parser, map, oneOf, s, string)
+import Url.Parser exposing ((</>), (<?>), Parser, map, oneOf, s, string, top)
 import Url.Parser.Query as Query
 import Utils exposing (rx)
 
 
 type Route
-    = TitleRoute String
+    = RootRoute
+    | TitleRoute String
     | EntryRoute String String
     | AuthorRoute String
     | TagRoute String
@@ -27,7 +30,8 @@ type Route
 routeParser : Parser (Route -> a) a
 routeParser =
     oneOf
-        [ map TitleRoute (s "title" </> string)
+        [ map RootRoute top
+        , map TitleRoute (s "title" </> string)
         , map EntryRoute (s "title" </> string </> string)
         , map AuthorRoute (s "author" </> string)
         , map TagRoute (s "tag" </> string)
@@ -51,11 +55,17 @@ authorToRoute author =
     absolute [ "author", slugify author ] []
 
 
+tagToRoute : Tag -> String
+tagToRoute tag =
+    absolute [ "tag", slugify tag ] []
+
+
 slugify : String -> String
 slugify =
-    Regex.replace (rx "\\s") (always "-")
+    replace (rx "\\s") (always "-")
+        >> replace (rx "[^\\w-]") (always "")
 
 
 deslugify : String -> String
 deslugify =
-    Regex.replace (rx "-") (always " ")
+    replace (rx "-") (always " ")
