@@ -1006,8 +1006,16 @@ update message model =
             case
                 parse routeParser url
             of
-                Just (TitleRoute title) ->
-                    update (FilterBy TitleFilter (deslugify title)) model_
+                Just RootRoute ->
+                    update (FilterBy TextFilter "") model_
+
+                Just (TitleRoute slug) ->
+                    case get slug model.titleRouteMap of
+                        Just book ->
+                            update (FilterBy TitleFilter (.title book)) model_
+
+                        _ ->
+                            noOp_
 
                 Just (AuthorRoute author) ->
                     update (FilterBy AuthorFilter (deslugify author)) model_
