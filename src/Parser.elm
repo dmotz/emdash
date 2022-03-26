@@ -1,6 +1,15 @@
-module Parser exposing (getAuthors, getTags, getTitles, process)
+module Parser exposing
+    ( getAuthors
+    , getBooks
+    , getRouteMap
+    , getTags
+    , getTitleTimeSort
+    , getTitles
+    , process
+    )
 
 import Char exposing (isDigit)
+import Dict exposing (Dict, insert, member)
 import List
     exposing
         ( all
@@ -14,11 +23,13 @@ import List
         )
 import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Author, Entry, Tag, Title)
+import Model exposing (Author, Book, Entry, Tag, Title)
 import Regex exposing (Match, Regex, replace)
+import Router exposing (slugify)
 import Set
 import String exposing (lines, repeat, startsWith, toInt, toLower, trim)
-import Utils exposing (rx)
+import Tuple exposing (first)
+import Utils exposing (dedupe, rx)
 
 
 process : String -> List Entry
@@ -211,6 +222,20 @@ getTitles =
 getAuthors : List Entry -> List Author
 getAuthors =
     getUniques .author compare
+
+
+getBooks : List Entry -> Dict Title Int -> List Book
+getBooks entries sortDict =
+    map (\e -> ( .title e, .author e )) entries
+        |> dedupe
+        |> sortWith (bookSorter sortDict)
+
+
+bookSorter : Dict Title Int -> Book -> Book -> Order
+bookSorter sortDict a b =
+    compare
+        (withDefault 0 (Dict.get (first b) sortDict))
+        (withDefault 0 (Dict.get (first a) sortDict))
 
 
 titleSorter : String -> String -> Order
