@@ -28,19 +28,20 @@ import List
         , member
         , minimum
         , reverse
+        , sortWith
         , take
         )
 import Maybe exposing (andThen, withDefault)
 import Model
     exposing
-        ( Entry
+        ( BookSort(..)
+        , Entry
         , Filter(..)
         , Id
         , InputFocus(..)
         , Model
         , StoredModel
         , initialStoredModel
-        , stringToFilter
         )
 import Msg exposing (Msg(..))
 import Parser
@@ -148,11 +149,14 @@ init maybeModel url key =
         restored =
             withDefault initialStoredModel maybeModel
 
-        filterType =
-            stringToFilter restored.filterType
+        titleTimeSort =
+            Parser.getTitleTimeSort restored.entries
 
-        selectedIds =
-            Set.fromList restored.selectedEntries
+        titles =
+            Parser.getTitles restored.entries
+
+        books =
+            Parser.getBooks restored.entries titleTimeSort
 
         model_ =
             { entries = restored.entries
@@ -160,16 +164,17 @@ init maybeModel url key =
             , neighborMap = Dict.empty
             , shownEntries = Nothing
             , hiddenEntries = Set.fromList restored.hiddenEntries
-            , selectedEntries =
-                filter
-                    (\entry -> Set.member entry.id selectedIds)
-                    restored.entries
+            , selectedEntries = []
             , completedEmbeddings = Set.empty
             , embeddingsReady = False
-            , titles = Parser.getTitles restored.entries
+            , titles = titles
             , authors = Parser.getAuthors restored.entries
+            , books = books
+            , bookMap = Dict.fromList books
             , tags = Parser.getTags restored.entries
-            , filterType = filterType
+            , titleTimeSort = titleTimeSort
+            , titleRouteMap = Parser.getRouteMap titles
+            , filterType = TitleFilter
             , filterValue = Nothing
             , pendingTag = Nothing
             , focusMode = restored.focusMode
@@ -184,15 +189,12 @@ init maybeModel url key =
             , schemaVersion = 0
             , url = url
             , key = key
+            , bookSort = RecencySort
+            , bookSortOrder = True
             }
 
         model =
-            case restored.filterValue of
-                Just val ->
-                    first <| update (FilterBy filterType val) model_
-
-                _ ->
-                    model_
+            update (UrlChanged url) model_ |> first
 
         getSize =
             perform Resize
@@ -207,15 +209,7 @@ init maybeModel url key =
                     getViewport
                 )
     in
-    if isEmpty restored.selectedEntries then
-        ( model, getSize )
-
-    else
-        let
-            ( m, cmd ) =
-                update (SelectEntries model.selectedEntries) model
-        in
-        ( m, batch [ getSize, cmd ] )
+    ( model, getSize )
 
 
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
