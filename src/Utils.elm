@@ -2,6 +2,7 @@ module Utils exposing
     ( ClickWithKeys
     , KeyEvent
     , charLimit
+    , dedupe
     , embeddingBatchSize
     , find
     , formatNumber
@@ -144,6 +145,11 @@ getPrevIndex list item =
 
     else
         idx - 1
+
+
+dedupe : List comparable -> List comparable
+dedupe =
+    Set.fromList >> Set.toList
 
 
 modelToStoredModel : Model -> StoredModel
