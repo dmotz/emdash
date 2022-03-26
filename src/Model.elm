@@ -1,5 +1,7 @@
 module Model exposing
     ( Author
+    , Book
+    , BookSort(..)
     , Entry
     , Filter(..)
     , Id
@@ -10,7 +12,9 @@ module Model exposing
     , Title
     , filterToString
     , initialStoredModel
+    , sortToString
     , stringToFilter
+    , stringToSort
     )
 
 import Browser.Navigation as Nav
@@ -33,6 +37,12 @@ type InputFocus
     | SearchFocus
 
 
+type BookSort
+    = RecencySort
+    | TitleSort
+    | NumSort
+
+
 type alias Id =
     String
 
@@ -47,6 +57,10 @@ type alias Author =
 
 type alias Tag =
     String
+
+
+type alias Book =
+    ( Title, Author )
 
 
 type alias Entry =
@@ -71,7 +85,11 @@ type alias Model =
     , embeddingsReady : Bool
     , titles : List Title
     , authors : List Author
+    , books : List Book
+    , bookMap : Dict Title Author
     , tags : List Tag
+    , titleTimeSort : Dict Title Int
+    , titleRouteMap : Dict String Title
     , filterType : Filter
     , filterValue : Maybe String
     , pendingTag : Maybe Tag
@@ -87,6 +105,8 @@ type alias Model =
     , schemaVersion : Int
     , url : Url
     , key : Nav.Key
+    , bookSort : BookSort
+    , bookSortOrder : Bool
     }
 
 
@@ -107,7 +127,7 @@ initialStoredModel =
     { entries = []
     , selectedEntries = []
     , hiddenEntries = []
-    , filterType = filterToString TitleFilter
+    , filterType = "title"
     , filterValue = Nothing
     , focusMode = False
     , reverseList = False
@@ -145,3 +165,29 @@ filterToString f =
 
         _ ->
             "text"
+
+
+stringToSort : String -> BookSort
+stringToSort s =
+    case s of
+        "recent" ->
+            RecencySort
+
+        "title" ->
+            TitleSort
+
+        _ ->
+            NumSort
+
+
+sortToString : BookSort -> String
+sortToString t =
+    case t of
+        RecencySort ->
+            "recent"
+
+        TitleSort ->
+            "title"
+
+        _ ->
+            "number of entries"
