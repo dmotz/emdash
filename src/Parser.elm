@@ -1,5 +1,6 @@
 module Parser exposing
     ( getAuthors
+    , getBookMap
     , getBooks
     , getRouteMap
     , getTags
@@ -9,7 +10,7 @@ module Parser exposing
     )
 
 import Char exposing (isDigit)
-import Dict exposing (Dict, insert, member)
+import Dict exposing (Dict, get, insert, member, values)
 import List
     exposing
         ( all
@@ -23,7 +24,7 @@ import List
         )
 import MD5 exposing (hex)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Author, Book, Entry, Tag, Title)
+import Model exposing (Author, Book, Entry, Id, Tag, Title)
 import Regex exposing (Match, Regex, replace)
 import Router exposing (slugify)
 import Set
@@ -224,18 +225,40 @@ getAuthors =
     getUniques .author compare
 
 
-getBooks : List Entry -> Dict Title Int -> List Book
-getBooks entries sortDict =
-    map (\e -> ( .title e, .author e )) entries
-        |> dedupe
+getBookMap : List Entry -> Dict Id Book
+getBookMap =
+    foldr
+        (\{ title, author } acc ->
+            let
+                id =
+                    hex <| title ++ " " ++ author
+            in
+            insert
+                id
+                (case get id acc of
+                    Just book ->
+                        { book | count = .count book + 1 }
+
+                    _ ->
+                        Book id title author 1
+                )
+                acc
+        )
+        Dict.empty
+
+
+getBooks : Dict Id Book -> Dict Title Int -> List Book
+getBooks bookMap sortDict =
+    bookMap
+        |> values
         |> sortWith (bookSorter sortDict)
 
 
 bookSorter : Dict Title Int -> Book -> Book -> Order
 bookSorter sortDict a b =
     compare
-        (withDefault 0 (Dict.get (first b) sortDict))
-        (withDefault 0 (Dict.get (first a) sortDict))
+        (withDefault 0 (get (.title b) sortDict))
+        (withDefault 0 (get (.title a) sortDict))
 
 
 titleSorter : String -> String -> Order
