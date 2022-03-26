@@ -272,3 +272,8 @@ getTitleTimeSort =
         )
         ( Dict.empty, 0 )
         >> first
+
+
+getRouteMap : List String -> Dict String String
+getRouteMap =
+    map (\s -> ( slugify s, s )) >> Dict.fromList
