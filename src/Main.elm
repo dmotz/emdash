@@ -28,6 +28,7 @@ import List
         , member
         , minimum
         , reverse
+        , sortBy
         , sortWith
         , take
         )
@@ -1043,3 +1044,14 @@ update message model =
 
                 _ ->
                     noOp_
+
+        SortBooks sort ->
+            case sort of
+                RecencySort ->
+                    ( { model | books = Parser.getBooks model.bookMap (Parser.getTitleTimeSort model.entries) }, none )
+
+                TitleSort ->
+                    ( { model | books = sortBy .title model.books }, none )
+
+                NumSort ->
+                    ( { model | books = sortBy .count model.books |> reverse }, none )
