@@ -4,6 +4,7 @@ module Parser exposing
     , getRouteMap
     , getTags
     , getTitles
+    , normalizeTitle
     , process
     )
 

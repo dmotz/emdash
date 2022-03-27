@@ -44,7 +44,7 @@ import Model
         , initialStoredModel
         )
 import Msg exposing (Msg(..))
-import Parser
+import Parser exposing (normalizeTitle)
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Regex
@@ -971,7 +971,14 @@ update message model =
 
                 TitleSort ->
                     { model_
-                        | books = sortBy .title model.books
+                        | books =
+                            sortWith
+                                (\a b ->
+                                    compare
+                                        (a |> .title |> normalizeTitle)
+                                        (b |> .title |> normalizeTitle)
+                                )
+                                model.books
                         , reverseSort = True
                     }
 
