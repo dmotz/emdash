@@ -9,7 +9,7 @@ import Browser.Dom
         )
 import Browser.Events exposing (onKeyDown, onResize)
 import Browser.Navigation as Nav
-import Dict exposing (get)
+import Dict exposing (get, values)
 import Epub
 import File
 import File.Select as Select
@@ -152,9 +152,6 @@ init maybeModel url key =
         restored =
             withDefault initialStoredModel maybeModel
 
-        titleTimeSort =
-            Parser.getTitleTimeSort restored.entries
-
         titles =
             Parser.getTitles restored.entries
 
@@ -162,7 +159,7 @@ init maybeModel url key =
             Parser.getBookMap restored.entries
 
         books =
-            Parser.getBooks bookMap titleTimeSort
+            values bookMap
 
         model_ =
             { entries = restored.entries
@@ -178,7 +175,6 @@ init maybeModel url key =
             , books = books
             , bookMap = bookMap
             , tags = Parser.getTags restored.entries
-            , titleTimeSort = titleTimeSort
             , titleRouteMap = Parser.getRouteMap books
             , filter = Nothing
             , pendingTag = Nothing
@@ -466,108 +462,38 @@ update message model =
         SetInputFocus focus ->
             ( { model | inputFocused = focus }, none )
 
-        FilterBy filterType val ->
+        FilterBy f ->
             let
-                applyFilter fn =
-                    if val == "" then
-                        ( { model
-                            | shownEntries = Nothing
-                            , filterValue = Nothing
-                            , filterType = filterType
-                          }
-                        , none
-                        )
-
-                    else
-                        ( { model
-                            | filterValue = Just val
-                            , shownEntries = Just <| filter fn model.entries
-                            , filterType = filterType
-                          }
-                        , none
-                        )
+                model_ =
+                    { model | filter = f }
             in
-            store <|
-                case filterType of
-                    TitleFilter ->
-                        applyFilter <| .title >> (==) val
+            case f of
+                Just (TitleFilter book) ->
+                    ( { model_
+                        | shownEntries =
+                            Just <|
+                                filter
+                                    (.title >> (==) book.title)
+                                    model.entries
+                      }
+                    , none
+                    )
 
-                    AuthorFilter ->
-                        applyFilter <| .author >> (==) val
+                Just (AuthorFilter author) ->
+                    ( { model_
+                        | shownEntries = Nothing
+                        , books = filter (.author >> (==) author) model.books
+                      }
+                    , none
+                    )
 
-                    TagFilter ->
-                        applyFilter <| .tags >> member val
-
-                    TextFilter ->
-                        let
-                            query =
-                                toLower val
-                        in
-                        if trim query == "" then
-                            ( { model
-                                | filterValue = Nothing
-                                , shownEntries = Nothing
-                                , filterType = filterType
-                              }
-                            , none
-                            )
-
-                        else if String.length query < queryCharMin then
-                            ( { model
-                                | filterValue = Just val
-                                , filterType = filterType
-                              }
-                            , none
-                            )
-
-                        else
-                            ( { model
-                                | filterValue = Just val
-                                , filterType = filterType
-                                , shownEntries =
-                                    let
-                                        phraseMatches =
-                                            filter
-                                                (\entry ->
-                                                    Regex.contains
-                                                        (rx <| "\\b" ++ query)
-                                                        (toLower entry.text)
-                                                )
-                                                model.entries
-
-                                        phraseMatchIds =
-                                            map .id phraseMatches
-                                                |> Set.fromList
-
-                                        pattern =
-                                            split " " query
-                                                |> map
-                                                    (\word ->
-                                                        "(?=.*\\b"
-                                                            ++ word
-                                                            ++ ")"
-                                                    )
-                                                |> join ""
-
-                                        wordsRx =
-                                            "^" ++ pattern ++ ".*$" |> rx
-                                    in
-                                    phraseMatches
-                                        ++ filter
-                                            (\entry ->
-                                                (not <|
-                                                    Set.member entry.id
-                                                        phraseMatchIds
-                                                )
-                                                    && Regex.contains
-                                                        wordsRx
-                                                        (toLower entry.text)
-                                            )
-                                            model.entries
-                                        |> Just
-                              }
-                            , none
-                            )
+                _ ->
+                    update
+                        (SortBooks model.bookSort)
+                        { model_
+                            | shownEntries = Nothing
+                            , books = values model.bookMap
+                        }
 
         UpdateNotes text ->
             case model.selectedEntries of
@@ -1039,10 +965,7 @@ update message model =
             ( case sort of
                 RecencySort ->
                     { model_
-                        | books =
-                            Parser.getBooks
-                                model.bookMap
-                                (Parser.getTitleTimeSort model.entries)
+                        | books = sortBy .sortIndex model.books |> reverse
                         , reverseSort = False
                     }
 

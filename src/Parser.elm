@@ -1,16 +1,14 @@
 module Parser exposing
     ( getAuthors
     , getBookMap
-    , getBooks
     , getRouteMap
     , getTags
-    , getTitleTimeSort
     , getTitles
     , process
     )
 
 import Char exposing (isDigit)
-import Dict exposing (Dict, get, insert, member, values)
+import Dict exposing (Dict, get, insert)
 import List
     exposing
         ( all
@@ -248,20 +246,6 @@ getBookMap =
         >> first
 
 
-getBooks : Dict Id Book -> Dict Title Int -> List Book
-getBooks bookMap sortDict =
-    bookMap
-        |> values
-        |> sortWith (bookSorter sortDict)
-
-
-bookSorter : Dict Title Int -> Book -> Book -> Order
-bookSorter sortDict a b =
-    compare
-        (withDefault 0 (get (.title b) sortDict))
-        (withDefault 0 (get (.title a) sortDict))
-
-
 titleSorter : String -> String -> Order
 titleSorter a b =
     compare (normalizeTitle a) (normalizeTitle b)
@@ -282,20 +266,6 @@ getTags =
     map .tags
         >> concat
         >> dedupe
-
-
-getTitleTimeSort : List Entry -> Dict Title Int
-getTitleTimeSort =
-    foldr
-        (\entry ( dict, n ) ->
-            if member entry.title dict then
-                ( dict, n )
-
-            else
-                ( insert entry.title n dict, n + 1 )
-        )
-        ( Dict.empty, 0 )
-        >> first
 
 
 getRouteMap : List Book -> Dict String Book
