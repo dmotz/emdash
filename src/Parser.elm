@@ -27,7 +27,17 @@ import Model exposing (Author, Book, Entry, Id, Tag, Title)
 import Regex exposing (Match, Regex, replace)
 import Router exposing (slugify)
 import Set
-import String exposing (lines, repeat, startsWith, toInt, toLower, trim)
+import String
+    exposing
+        ( lines
+        , repeat
+        , right
+        , split
+        , startsWith
+        , toInt
+        , toLower
+        , trim
+        )
 import Tuple exposing (first)
 import Utils exposing (dedupe, rx)
 
@@ -167,12 +177,17 @@ makeEntry ( raw, notes ) =
     case raw of
         [ text, meta, titleAuthor ] ->
             let
-                split =
-                    Regex.find titleAuthorRx titleAuthor
-                        |> map .submatches
-                        |> head
-                        |> withDefault []
-                        |> map (withDefault "")
+                pair =
+                    (if right 1 titleAuthor == ")" then
+                        Regex.find titleAuthorRx titleAuthor
+                            |> map .submatches
+                            |> head
+                            |> withDefault []
+                            |> map (withDefault "")
+
+                     else
+                        split "-" titleAuthor
+                    )
                         |> map trim
 
                 page =
@@ -183,7 +198,7 @@ makeEntry ( raw, notes ) =
                         |> andThen identity
                         |> andThen toInt
             in
-            case split of
+            case pair of
                 [ title, author ] ->
                     Just <|
                         Entry
