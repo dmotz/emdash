@@ -96,7 +96,7 @@ type alias Model =
     , focusMode : Bool
     , aboutMode : Bool
     , isDragging : Bool
-    , reverseList : Bool
+    , reverseSort : Bool
     , hidePromptActive : Bool
     , inputFocused : Maybe InputFocus
     , parsingError : Bool
@@ -113,7 +113,7 @@ type alias StoredModel =
     , selectedEntries : List Id
     , hiddenEntries : List Id
     , focusMode : Bool
-    , reverseList : Bool
+    , reverseSort : Bool
     , schemaVersion : Int
     }
 
@@ -124,7 +124,7 @@ initialStoredModel =
     , selectedEntries = []
     , hiddenEntries = []
     , focusMode = False
-    , reverseList = False
+    , reverseSort = False
     , schemaVersion = 0
     }
 

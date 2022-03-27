@@ -66,7 +66,6 @@ import Utils
         , insertOnce
         , mapIdsToEntries
         , modelToStoredModel
-        , needsTitles
         , queryCharMin
         , removeItem
         , rx
@@ -186,7 +185,7 @@ init maybeModel url key =
             , focusMode = restored.focusMode
             , aboutMode = False
             , isDragging = False
-            , reverseList = restored.reverseList
+            , reverseSort = False
             , hidePromptActive = False
             , inputFocused = Nothing
             , parsingError = False
@@ -757,7 +756,13 @@ update message model =
                 |> (\( m, cmd ) -> ( m, batch [ cmd, deleteEmbeddings ids ] ))
 
         Sort ->
-            store ( { model | reverseList = not model.reverseList }, none )
+            store
+                ( { model
+                    | reverseSort = not model.reverseSort
+                    , books = reverse model.books
+                  }
+                , none
+                )
 
         GotDomEl result ->
             case result of
@@ -774,7 +779,7 @@ update message model =
 
                                 targetY =
                                     getIndex
-                                        ((if model.reverseList then
+                                        ((if model.reverseSort then
                                             reverse
 
                                           else
@@ -1029,10 +1034,28 @@ update message model =
         SortBooks sort ->
             case sort of
                 RecencySort ->
-                    ( { model | books = Parser.getBooks model.bookMap (Parser.getTitleTimeSort model.entries) }, none )
+                    ( { model
+                        | books =
+                            Parser.getBooks
+                                model.bookMap
+                                (Parser.getTitleTimeSort model.entries)
+                        , reverseSort = False
+                      }
+                    , none
+                    )
 
                 TitleSort ->
-                    ( { model | books = sortBy .title model.books }, none )
+                    ( { model
+                        | books = sortBy .title model.books
+                        , reverseSort = True
+                      }
+                    , none
+                    )
 
                 NumSort ->
-                    ( { model | books = sortBy .count model.books |> reverse }, none )
+                    ( { model
+                        | books = sortBy .count model.books |> reverse
+                        , reverseSort = False
+                      }
+                    , none
+                    )
