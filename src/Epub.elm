@@ -314,16 +314,15 @@ generateChapter i title author entries =
         """
         ++ (String.concat <|
                 map
-                    (\entry ->
+                    (\{ text, page } ->
                         "<p>"
-                            ++ replace "&" "&amp;" entry.text
+                            ++ replace "&" "&amp;" text
                             ++ "</p>"
-                            ++ (case entry.page of
-                                    Just n ->
-                                        "<cite>- p. " ++ fromInt n ++ "</cite>"
+                            ++ (if page /= -1 then
+                                    "<cite>- p. " ++ fromInt page ++ "</cite>"
 
-                                    _ ->
-                                        ""
+                                else
+                                    ""
                                )
                     )
                     (reverse entries)

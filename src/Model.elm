@@ -70,7 +70,7 @@ type alias Entry =
     , text : String
     , title : Title
     , author : String
-    , page : Maybe Int
+    , page : Int
     , tags : List Tag
     , notes : String
     }
@@ -90,7 +90,6 @@ type alias Model =
     , books : List Book
     , bookMap : Dict Id Book
     , tags : List Tag
-    , titleTimeSort : Dict Title Int
     , titleRouteMap : Dict String Book
     , filter : Maybe Filter
     , pendingTag : Maybe Tag

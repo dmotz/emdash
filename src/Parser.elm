@@ -206,7 +206,7 @@ makeEntry ( raw, notes ) =
                             (replace footnoteRx footnoteReplacer text)
                             (replaceApostrophes title)
                             (replaceApostrophes author)
-                            page
+                            (withDefault -1 page)
                             []
                             notes
 
