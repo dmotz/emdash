@@ -10,25 +10,22 @@ module Model exposing
     , StoredModel
     , Tag
     , Title
-    , filterToString
     , initialStoredModel
     , sortToString
-    , stringToFilter
     , stringToSort
     )
 
 import Browser.Navigation as Nav
 import Dict exposing (Dict)
-import InfiniteList as IL
 import Set exposing (Set)
 import Url exposing (Url)
 
 
 type Filter
-    = TitleFilter
-    | AuthorFilter
-    | TagFilter
-    | TextFilter
+    = TitleFilter Book
+    | AuthorFilter Author
+    | TagFilter Tag
+    | TextFilter String
 
 
 type InputFocus
@@ -94,8 +91,7 @@ type alias Model =
     , tags : List Tag
     , titleTimeSort : Dict Title Int
     , titleRouteMap : Dict String Book
-    , filterType : Filter
-    , filterValue : Maybe String
+    , filter : Maybe Filter
     , pendingTag : Maybe Tag
     , focusMode : Bool
     , aboutMode : Bool
@@ -116,8 +112,6 @@ type alias StoredModel =
     { entries : List Entry
     , selectedEntries : List Id
     , hiddenEntries : List Id
-    , filterType : String
-    , filterValue : Maybe String
     , focusMode : Bool
     , reverseList : Bool
     , schemaVersion : Int
@@ -129,44 +123,10 @@ initialStoredModel =
     { entries = []
     , selectedEntries = []
     , hiddenEntries = []
-    , filterType = "title"
-    , filterValue = Nothing
     , focusMode = False
     , reverseList = False
     , schemaVersion = 0
     }
-
-
-stringToFilter : String -> Filter
-stringToFilter s =
-    case s of
-        "title" ->
-            TitleFilter
-
-        "author" ->
-            AuthorFilter
-
-        "tag" ->
-            TagFilter
-
-        _ ->
-            TextFilter
-
-
-filterToString : Filter -> String
-filterToString f =
-    case f of
-        TitleFilter ->
-            "title"
-
-        AuthorFilter ->
-            "author"
-
-        TagFilter ->
-            "tag"
-
-        _ ->
-            "text"
 
 
 stringToSort : String -> BookSort

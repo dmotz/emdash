@@ -3,7 +3,6 @@ module Msg exposing (Msg(..))
 import Browser exposing (UrlRequest)
 import Browser.Dom exposing (Error)
 import File exposing (File)
-import InfiniteList as IL
 import Model exposing (BookSort, Entry, Filter, Id, InputFocus, Tag)
 import Url exposing (Url)
 import Utils exposing (ClickWithKeys, KeyEvent)
@@ -17,7 +16,7 @@ type Msg
     | ShowByIndex Int
     | ShowNext
     | ShowPrev
-    | FilterBy Filter String
+    | FilterBy (Maybe Filter)
     | ToggleFocusMode
     | ToggleAboutMode
     | DragEnter

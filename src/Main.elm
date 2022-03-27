@@ -13,7 +13,6 @@ import Dict exposing (get)
 import Epub
 import File
 import File.Select as Select
-import InfiniteList as IL
 import Json.Decode as Decode
 import List
     exposing
@@ -116,9 +115,14 @@ main =
         , view =
             \m ->
                 { title =
-                    (case m.filterValue of
-                        Just val ->
-                            val ++ " - "
+                    (case m.filter of
+                        Just filter ->
+                            case filter of
+                                TitleFilter book ->
+                                    book.title ++ " - "
+
+                                _ ->
+                                    ""
 
                         _ ->
                             ""
@@ -177,8 +181,7 @@ init maybeModel url key =
             , tags = Parser.getTags restored.entries
             , titleTimeSort = titleTimeSort
             , titleRouteMap = Parser.getRouteMap books
-            , filterType = TitleFilter
-            , filterValue = Nothing
+            , filter = Nothing
             , pendingTag = Nothing
             , focusMode = restored.focusMode
             , aboutMode = False
@@ -986,18 +989,18 @@ update message model =
                 parse routeParser url
             of
                 Just RootRoute ->
-                    update (FilterBy TextFilter "") model_
+                    update (FilterBy Nothing) model_
 
                 Just (TitleRoute slug) ->
                     case get slug model.titleRouteMap of
                         Just book ->
-                            update (FilterBy TitleFilter (.title book)) model_
+                            update (FilterBy (Just (TitleFilter book))) model_
 
                         _ ->
                             noOp_
 
                 Just (AuthorRoute author) ->
-                    update (FilterBy AuthorFilter (deslugify author)) model_
+                    update (FilterBy (Just (AuthorFilter (deslugify author)))) model_
 
                 Just (EntryRoute _ id) ->
                     case
@@ -1010,12 +1013,12 @@ update message model =
                             noOp_
 
                 Just (TagRoute tag) ->
-                    update (FilterBy TagFilter (deslugify tag)) model_
+                    update (FilterBy (Just (TagFilter (deslugify tag)))) model_
 
                 Just (TextRoute query) ->
                     case query of
                         Just text ->
-                            update (FilterBy TextFilter text) model_
+                            update (FilterBy (Just (TextFilter text))) model_
 
                         _ ->
                             noOp_
