@@ -228,23 +228,24 @@ getAuthors =
 getBookMap : List Entry -> Dict Id Book
 getBookMap =
     foldr
-        (\{ title, author } acc ->
+        (\{ title, author } ( acc, sortIndex ) ->
             let
                 id =
                     hex <| title ++ " " ++ author
             in
-            insert
-                id
-                (case get id acc of
-                    Just book ->
-                        { book | count = .count book + 1 }
+            case get id acc of
+                Just book ->
+                    ( insert id { book | count = .count book + 1 } acc
+                    , sortIndex
+                    )
 
-                    _ ->
-                        Book id title author 1
-                )
-                acc
+                _ ->
+                    ( insert id (Book id title author 1 (sortIndex + 1)) acc
+                    , sortIndex + 1
+                    )
         )
-        Dict.empty
+        ( Dict.empty, -1 )
+        >> first
 
 
 getBooks : Dict Id Book -> Dict Title Int -> List Book

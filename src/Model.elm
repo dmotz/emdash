@@ -61,6 +61,7 @@ type alias Book =
     , title : Title
     , author : Author
     , count : Int
+    , sortIndex : Int
     }
 
 
