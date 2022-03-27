@@ -471,10 +471,10 @@ update message model =
                 Just (TitleFilter book) ->
                     ( { model_
                         | shownEntries =
-                            Just <|
-                                filter
-                                    (.title >> (==) book.title)
-                                    model.entries
+                            model.entries
+                                |> filter (.title >> (==) book.title)
+                                |> sortBy .page
+                                |> Just
                       }
                     , none
                     )
