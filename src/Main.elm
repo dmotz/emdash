@@ -1032,30 +1032,30 @@ update message model =
                     noOp_
 
         SortBooks sort ->
-            case sort of
+            let
+                model_ =
+                    { model | bookSort = sort }
+            in
+            ( case sort of
                 RecencySort ->
-                    ( { model
+                    { model_
                         | books =
                             Parser.getBooks
                                 model.bookMap
                                 (Parser.getTitleTimeSort model.entries)
                         , reverseSort = False
-                      }
-                    , none
-                    )
+                    }
 
                 TitleSort ->
-                    ( { model
+                    { model_
                         | books = sortBy .title model.books
                         , reverseSort = True
-                      }
-                    , none
-                    )
+                    }
 
                 NumSort ->
-                    ( { model
+                    { model_
                         | books = sortBy .count model.books |> reverse
                         , reverseSort = False
-                      }
-                    , none
-                    )
+                    }
+            , none
+            )
