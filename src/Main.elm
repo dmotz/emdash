@@ -398,6 +398,15 @@ update message model =
             let
                 model_ =
                     { model | filter = f }
+
+                reset =
+                    \() ->
+                        update
+                            (SortBooks model.bookSort)
+                            { model_
+                                | shownEntries = Nothing
+                                , books = values model.bookMap
+                            }
             in
             case f of
                 Just (TitleFilter book) ->
@@ -419,13 +428,29 @@ update message model =
                     , none
                     )
 
+                Just (TextFilter val) ->
+                    let
+                        query =
+                            val |> toLower |> trim
+                    in
+                    if String.length query < queryCharMin then
+                        reset ()
+
+                    else
+                        ( { model_
+                            | shownEntries =
+                                Just (findMatches query .text model.entries)
+                            , books =
+                                findMatches
+                                    query
+                                    (\b -> b.title ++ " " ++ b.author)
+                                    (values model.bookMap)
+                          }
+                        , none
+                        )
+
                 _ ->
-                    update
-                        (SortBooks model.bookSort)
-                        { model_
-                            | shownEntries = Nothing
-                            , books = values model.bookMap
-                        }
+                    reset ()
 
         UpdateNotes text ->
             case model.selectedEntries of
