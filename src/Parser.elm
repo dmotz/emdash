@@ -39,7 +39,7 @@ import String
         , trim
         )
 import Tuple exposing (first)
-import Utils exposing (dedupe, rx)
+import Utils exposing (dedupe, rx, rx_)
 
 
 process : String -> List Entry
@@ -118,7 +118,7 @@ titleAuthorRx =
 
 pageRx : Regex
 pageRx =
-    rx " on page (\\d+)"
+    rx_ " on page (\\d+)"
 
 
 footnoteRx : Regex
@@ -249,7 +249,7 @@ getBookMap =
             in
             case get id acc of
                 Just book ->
-                    ( insert id { book | count = .count book + 1 } acc
+                    ( insert id { book | count = book.count + 1 } acc
                     , sortIndex
                     )
 

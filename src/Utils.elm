@@ -17,6 +17,7 @@ module Utils exposing
     , queryCharMin
     , removeItem
     , rx
+    , rx_
     , takeExcerpt
     , updateItem
     , updateItems
@@ -61,6 +62,12 @@ queryCharMin =
 rx : String -> Regex
 rx =
     Regex.fromString >> withDefault Regex.never
+
+
+rx_ : String -> Regex
+rx_ =
+    Regex.fromStringWith { caseInsensitive = True, multiline = False }
+        >> withDefault Regex.never
 
 
 formatNumber : Int -> String
