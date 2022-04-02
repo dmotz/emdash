@@ -6,7 +6,7 @@ import Browser.Dom
         ( getViewportOf
         , setViewportOf
         )
-import Browser.Events exposing (onKeyDown, onResize)
+import Browser.Events exposing (onKeyDown)
 import Browser.Navigation as Nav
 import Dict exposing (get, values)
 import Epub
@@ -46,7 +46,7 @@ import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Router exposing (Route(..), deslugify, entryToRoute, routeParser)
 import Set exposing (diff, toList, union)
-import String exposing (join, split, toLower, trim)
+import String exposing (toLower, trim)
 import Task exposing (attempt, perform, sequence)
 import Tuple exposing (first)
 import Url exposing (Url)
@@ -626,12 +626,6 @@ update message model =
                         else
                             Maybe.map fn model.shownEntries
                     , completedEmbeddings = diff model.completedEmbeddings idSet
-                    , filterValue =
-                        if soleEntry then
-                            Nothing
-
-                        else
-                            model.filterValue
                     , hidePromptActive = False
                 }
                 |> (\( m, cmd ) -> ( m, batch [ cmd, deleteEmbeddings ids ] ))
@@ -654,9 +648,7 @@ update message model =
                         entry :: _ ->
                             let
                                 elHeight =
-                                    needsTitles model
-                                        |> getEntryHeight
-                                        |> toFloat
+                                    5
 
                                 targetY =
                                     getIndex
@@ -739,20 +731,6 @@ update message model =
             else
                 update
                     (case key of
-                        "ArrowRight" ->
-                            if model.reverseList then
-                                ShowPrev
-
-                            else
-                                ShowNext
-
-                        "ArrowLeft" ->
-                            if model.reverseList then
-                                ShowNext
-
-                            else
-                                ShowPrev
-
                         "r" ->
                             ShowRandom
 
@@ -761,25 +739,6 @@ update message model =
 
                         "s" ->
                             Sort
-
-                        "1" ->
-                            FilterBy TitleFilter ""
-
-                        "2" ->
-                            FilterBy AuthorFilter ""
-
-                        "3" ->
-                            FilterBy TagFilter ""
-
-                        "4" ->
-                            FilterBy TextFilter ""
-
-                        "Escape" ->
-                            if model.aboutMode then
-                                ToggleAboutMode
-
-                            else
-                                FilterBy model.filterType ""
 
                         _ ->
                             NoOp
