@@ -3,8 +3,7 @@ port module Main exposing (main)
 import Browser exposing (application)
 import Browser.Dom
     exposing
-        ( getViewport
-        , getViewportOf
+        ( getViewportOf
         , setViewportOf
         )
 import Browser.Events exposing (onKeyDown, onResize)
@@ -23,9 +22,7 @@ import List
         , isEmpty
         , length
         , map
-        , maximum
         , member
-        , minimum
         , reverse
         , sortBy
         , sortWith
@@ -47,7 +44,6 @@ import Msg exposing (Msg(..))
 import Parser exposing (normalizeTitle)
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
-import Regex
 import Router exposing (Route(..), deslugify, entryToRoute, routeParser)
 import Set exposing (diff, toList, union)
 import String exposing (join, split, toLower, trim)
@@ -59,7 +55,7 @@ import Utils
     exposing
         ( KeyEvent
         , embeddingBatchSize
-        , getEntryHeight
+        , findMatches
         , getIndex
         , getNextIndex
         , getPrevIndex
@@ -69,7 +65,6 @@ import Utils
         , modelToStoredModel
         , queryCharMin
         , removeItem
-        , rx
         , updateItem
         , updateItems
         )
@@ -316,70 +311,6 @@ update message model =
                   else
                     none
                 )
-
-        EntryClick entry { control, meta, shift } ->
-            if shift then
-                let
-                    entries =
-                        (if model.reverseList then
-                            reverse
-
-                         else
-                            identity
-                        )
-                        <|
-                            getEntries model
-
-                    selectedIndices =
-                        map (getIndex entries) model.selectedEntries
-
-                    targetIndex =
-                        getIndex entries entry
-
-                    minIndex =
-                        withDefault 0 (minimum selectedIndices)
-
-                    maxIndex =
-                        withDefault 0 (maximum selectedIndices)
-
-                    start =
-                        if targetIndex < minIndex then
-                            targetIndex
-
-                        else
-                            minIndex
-
-                    end =
-                        if targetIndex < minIndex then
-                            maxIndex
-
-                        else
-                            targetIndex
-                in
-                update
-                    (SelectEntries
-                        (entries
-                            |> drop start
-                            |> take (end - start + 1)
-                        )
-                    )
-                    model
-
-            else if control || meta then
-                update
-                    (SelectEntries <|
-                        (if member entry model.selectedEntries then
-                            filter ((/=) entry)
-
-                         else
-                            (::) entry
-                        )
-                            model.selectedEntries
-                    )
-                    model
-
-            else
-                noOp
 
         ShowByIndex i ->
             case

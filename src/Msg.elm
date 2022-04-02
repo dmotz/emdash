@@ -11,7 +11,6 @@ import Utils exposing (ClickWithKeys, KeyEvent)
 type Msg
     = NoOp
     | SelectEntries (List Entry)
-    | EntryClick Entry ClickWithKeys
     | ShowRandom
     | ShowByIndex Int
     | ShowNext
