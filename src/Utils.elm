@@ -12,6 +12,7 @@ module Utils exposing
     , getNextIndex
     , getPrevIndex
     , insertOnce
+    , juxt
     , mapIdsToEntries
     , modelToStoredModel
     , queryCharMin
@@ -220,9 +221,14 @@ find l f =
             Nothing
 
 
+juxt : (a -> b) -> (a -> c) -> a -> ( b, c )
+juxt f g x =
+    ( f x, g x )
+
+
 mapIdsToEntries : List Entry -> Dict Id Entry
 mapIdsToEntries entries =
-    map (\e -> ( e.id, e )) entries |> Dict.fromList
+    map (juxt .id identity) entries |> Dict.fromList
 
 
 findMatches : String -> (a -> String) -> List a -> List a

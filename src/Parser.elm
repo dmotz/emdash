@@ -39,7 +39,7 @@ import String
         , trim
         )
 import Tuple exposing (first)
-import Utils exposing (dedupe, rx, rx_)
+import Utils exposing (dedupe, juxt, rx, rx_)
 
 
 process : String -> List Entry
@@ -286,4 +286,4 @@ getTags =
 
 getRouteMap : List Book -> Dict String Book
 getRouteMap =
-    map (\book -> ( slugify (.title book), book )) >> Dict.fromList
+    map (juxt (.title >> slugify) identity) >> Dict.fromList

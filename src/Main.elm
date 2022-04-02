@@ -64,6 +64,7 @@ import Utils
         , getNextIndex
         , getPrevIndex
         , insertOnce
+        , juxt
         , mapIdsToEntries
         , modelToStoredModel
         , queryCharMin
@@ -555,9 +556,7 @@ update message model =
                                     model.selectedEntries
 
                             updateMapping =
-                                map
-                                    (\entry -> ( entry.id, entry ))
-                                    updatedSelection
+                                map (juxt .id identity) updatedSelection
                                     |> Dict.fromList
                         in
                         store
@@ -594,7 +593,7 @@ update message model =
                         model.selectedEntries
 
                 updateMapping =
-                    map (\entry -> ( entry.id, entry )) updatedSelection
+                    map (juxt .id identity) updatedSelection
                         |> Dict.fromList
 
                 newEntries =
