@@ -5,6 +5,7 @@ module Utils exposing
     , dedupe
     , embeddingBatchSize
     , find
+    , findMatches
     , formatNumber
     , getEntryHeight
     , getIndex
@@ -13,7 +14,6 @@ module Utils exposing
     , insertOnce
     , mapIdsToEntries
     , modelToStoredModel
-    , needsTitles
     , queryCharMin
     , removeItem
     , rx
@@ -24,7 +24,7 @@ module Utils exposing
     )
 
 import Dict exposing (Dict)
-import List exposing (length, map)
+import List exposing (filter, length, map, partition)
 import Maybe exposing (withDefault)
 import Model
     exposing
@@ -33,11 +33,10 @@ import Model
         , Id
         , Model
         , StoredModel
-        , filterToString
         )
 import Regex exposing (Regex)
 import Set
-import String exposing (fromChar, toList)
+import String exposing (fromChar, join, split, toList, toLower)
 
 
 type alias KeyEvent =
@@ -164,17 +163,10 @@ modelToStoredModel model =
     { entries = model.entries
     , selectedEntries = map .id model.selectedEntries
     , hiddenEntries = Set.toList model.hiddenEntries
-    , filterType = filterToString model.filterType
-    , filterValue = model.filterValue
     , focusMode = model.focusMode
-    , reverseList = model.reverseList
+    , reverseSort = model.reverseSort
     , schemaVersion = model.schemaVersion
     }
-
-
-needsTitles : Model -> Bool
-needsTitles model =
-    model.filterType /= TitleFilter || model.filterValue == Nothing
 
 
 getEntryHeight : Bool -> Int
@@ -231,3 +223,29 @@ find l f =
 mapIdsToEntries : List Entry -> Dict Id Entry
 mapIdsToEntries entries =
     map (\e -> ( e.id, e )) entries |> Dict.fromList
+
+
+findMatches : String -> (a -> String) -> List a -> List a
+findMatches query accessor xs =
+    let
+        ( phraseMatches, rest ) =
+            partition
+                (\x ->
+                    Regex.contains
+                        (rx <| "\\b" ++ query)
+                        (toLower (accessor x))
+                )
+                xs
+
+        pattern =
+            split " " query
+                |> map (\word -> "(?=.*\\b" ++ word ++ ")")
+                |> join ""
+
+        wordsRx =
+            "^" ++ pattern ++ ".*$" |> rx
+    in
+    phraseMatches
+        ++ filter
+            (\x -> Regex.contains wordsRx (toLower (accessor x)))
+            rest
