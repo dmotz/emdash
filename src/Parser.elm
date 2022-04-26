@@ -8,6 +8,8 @@ module Parser exposing
     , process
     )
 
+import Base64 exposing (fromBytes)
+import Bytes.Encode exposing (encode, sequence, unsignedInt8)
 import Char exposing (isDigit)
 import Dict exposing (Dict, get, insert)
 import List
@@ -21,7 +23,7 @@ import List
         , reverse
         , sortWith
         )
-import MD5 exposing (hex)
+import MD5 exposing (bytes)
 import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Book, Entry, Id, Tag, Title)
 import Regex exposing (Match, Regex, replace)
@@ -56,6 +58,19 @@ process =
 separator : String
 separator =
     repeat 10 "="
+
+
+hashId : String -> String
+hashId =
+    bytes
+        >> map unsignedInt8
+        >> sequence
+        >> encode
+        >> fromBytes
+        >> withDefault ""
+        >> String.replace "==" ""
+        >> String.replace "+" "-"
+        >> String.replace "/" "_"
 
 
 folder :
@@ -202,7 +217,7 @@ makeEntry ( raw, notes ) =
                 [ title, author ] ->
                     Just <|
                         Entry
-                            (hex <| text ++ meta)
+                            (hashId <| text ++ meta)
                             (replace footnoteRx footnoteReplacer text)
                             (replaceApostrophes title)
                             (replaceApostrophes author)
@@ -245,7 +260,7 @@ getBookMap =
         (\{ title, author } ( acc, sortIndex ) ->
             let
                 id =
-                    hex <| title ++ " " ++ author
+                    hashId <| title ++ " " ++ author
             in
             case get id acc of
                 Just book ->
