@@ -105,6 +105,9 @@ type alias Model =
     , key : Nav.Key
     , bookSort : BookSort
     , bookSortOrder : Bool
+    , currentBookId : Maybe Id
+    , lastTitleSlug : String
+    , bookIdToLastRead : Dict Id Id
     }
 
 
@@ -115,6 +118,7 @@ type alias StoredModel =
     , focusMode : Bool
     , reverseSort : Bool
     , schemaVersion : Int
+    , bookIdToLastRead : List ( Id, Id )
     }
 
 
@@ -126,6 +130,7 @@ initialStoredModel =
     , focusMode = False
     , reverseSort = False
     , schemaVersion = 0
+    , bookIdToLastRead = []
     }
 
 
