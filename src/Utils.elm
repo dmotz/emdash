@@ -167,6 +167,7 @@ modelToStoredModel model =
     , focusMode = model.focusMode
     , reverseSort = model.reverseSort
     , schemaVersion = model.schemaVersion
+    , bookIdToLastRead = Dict.toList model.bookIdToLastRead
     }
 
 
