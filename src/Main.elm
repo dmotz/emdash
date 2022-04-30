@@ -273,7 +273,7 @@ update message model =
 
         ShowByIndex i ->
             case
-                drop i (getEntries model) |> head
+                drop i model.entries |> head
             of
                 Just entry ->
                     ( model, Nav.pushUrl model.key (entryToRoute entry) )
@@ -310,45 +310,11 @@ update message model =
                     noOp
 
         ShowRandom ->
-            let
-                list =
-                    getEntries model
-
-                len =
-                    length list
-
-                currentIndex =
-                    model.selectedEntries
-                        |> head
-                        |> andThen (getIndex list >> Just)
-            in
-            case len of
-                0 ->
-                    noOp
-
-                1 ->
-                    noOp
-
-                2 ->
-                    update ShowNext model
-
-                _ ->
-                    ( model
-                    , generate
-                        (\n ->
-                            case currentIndex of
-                                Just index ->
-                                    if n == index then
-                                        ShowRandom
-
-                                    else
-                                        ShowByIndex n
-
-                                _ ->
-                                    ShowByIndex n
-                        )
-                        (Random.int 0 (len - 1))
-                    )
+            ( model
+            , generate
+                ShowByIndex
+                (Random.int 0 (length model.entries - 1))
+            )
 
         SetInputFocus focus ->
             ( { model | inputFocused = focus }, none )
@@ -623,8 +589,11 @@ update message model =
         JsonFileLoad jsonText ->
             ( model, importJson jsonText )
 
-        KeyDown { key } ->
-            if model.inputFocused /= Nothing then
+        KeyDown { key, control, meta } ->
+            if control || meta then
+                noOp
+
+            else if model.inputFocused /= Nothing then
                 if key == "Enter" && model.inputFocused == Just TagFocus then
                     update AddTag model
 
