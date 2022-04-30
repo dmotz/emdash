@@ -12,6 +12,16 @@ const embeddingsStore = createStore(`${dbNs}:${embeddingsKey}`, embeddingsKey)
 const neighborsK = 5
 const writeMs = 1000
 const batchIds = {}
+const observer = new IntersectionObserver(
+  obs => {
+    const visible = obs.find(ob => ob.intersectionRatio > 0)
+
+    if (visible) {
+      app.ports.onIntersect.send(visible.target.id.replace(/^entry/, ''))
+    }
+  },
+  {rootMargin: '-20% 0% -60% 0%'}
+)
 
 let embeddings = {}
 let titleMap = {}
@@ -43,6 +53,7 @@ async function init() {
   app.ports.requestEmbeddings.subscribe(requestEmbeddings)
   app.ports.deleteEmbeddings.subscribe(deleteEmbeddings)
   app.ports.requestNeighbors.subscribe(requestNeighbors)
+  app.ports.setObservers.subscribe(setObservers)
 
   if (restored && !didFail) {
     const ids = await keys(embeddingsStore)
@@ -176,4 +187,10 @@ function dot(a, b) {
 
 function similarity(a, b) {
   return dot(a, b) / (Math.sqrt(dot(a, a)) * Math.sqrt(dot(b, b)))
+}
+
+function setObservers(ids) {
+  requestAnimationFrame(() =>
+    ids.forEach(id => observer.observe(document.getElementById('entry' + id)))
+  )
 }
