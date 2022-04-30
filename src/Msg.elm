@@ -46,3 +46,4 @@ type Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
     | SortBooks BookSort
+    | OnIntersect Id
