@@ -69,8 +69,12 @@ import Utils
         , updateItems
         )
 import Views.Base exposing (view)
-import Views.Sidebar exposing (sidebarId)
-import Views.Viewer exposing (viewerId)
+
+
+port onIntersect : (Id -> msg) -> Sub msg
+
+
+port setObservers : List Id -> Cmd msg
 
 
 port setStorage : StoredModel -> Cmd msg
@@ -136,6 +140,7 @@ main =
                         |> onKeyDown
                     , receiveNeighbors ReceiveNeighbors
                     , receiveEmbeddings ReceiveEmbeddings
+                    , onIntersect OnIntersect
                     ]
         , onUrlChange = UrlChanged
         , onUrlRequest = LinkClicked
@@ -903,3 +908,24 @@ update message model =
                     }
             , none
             )
+
+        OnIntersect id ->
+            case get id model.idsToEntries of
+                Just entry ->
+                    ( case model.currentBookId of
+                        Just bookId ->
+                            { model
+                                | bookIdToLastRead =
+                                    insert
+                                        bookId
+                                        id
+                                        model.bookIdToLastRead
+                            }
+
+                        _ ->
+                            model
+                    , Nav.replaceUrl model.key (entryToRoute entry)
+                    )
+
+                _ ->
+                    noOp
