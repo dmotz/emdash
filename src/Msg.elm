@@ -1,11 +1,11 @@
 module Msg exposing (Msg(..))
 
 import Browser exposing (UrlRequest)
-import Browser.Dom exposing (Error)
+import Browser.Dom exposing (Element, Error)
 import File exposing (File)
 import Model exposing (BookSort, Entry, Filter, Id, InputFocus, Tag)
 import Url exposing (Url)
-import Utils exposing (ClickWithKeys, KeyEvent)
+import Utils exposing (KeyEvent)
 
 
 type Msg
@@ -33,7 +33,7 @@ type Msg
     | AddTag
     | RemoveTag Tag
     | Sort
-    | GotDomEl (Result Error (List Float))
+    | GotDomEl (Result Error Element)
     | DidScroll (Result Error ())
     | ExportJson
     | ImportJson
