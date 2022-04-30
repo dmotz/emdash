@@ -10,7 +10,6 @@ import Utils exposing (KeyEvent)
 
 type Msg
     = NoOp
-    | SelectEntries (List Entry)
     | ShowRandom
     | ShowByIndex Int
     | ShowNext

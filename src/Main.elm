@@ -1,14 +1,10 @@
 port module Main exposing (main)
 
 import Browser exposing (application)
-import Browser.Dom
-    exposing
-        ( getViewportOf
-        , setViewportOf
-        )
+import Browser.Dom exposing (getElement, setViewport)
 import Browser.Events exposing (onKeyDown)
 import Browser.Navigation as Nav
-import Dict exposing (get, values)
+import Dict exposing (get, insert, values)
 import Epub
 import File
 import File.Select as Select
@@ -47,7 +43,7 @@ import Random exposing (generate)
 import Router exposing (Route(..), deslugify, entryToRoute, routeParser)
 import Set exposing (diff, toList, union)
 import String exposing (toLower, trim)
-import Task exposing (attempt, perform, sequence)
+import Task exposing (attempt, perform)
 import Tuple exposing (first)
 import Url exposing (Url)
 import Url.Parser exposing (parse)
@@ -191,12 +187,12 @@ init maybeModel url key =
             , key = key
             , bookSort = RecencySort
             , bookSortOrder = True
+            , lastTitleSlug = ""
+            , bookIdToLastRead = restored.bookIdToLastRead |> Dict.fromList
+            , currentBookId = Nothing
             }
-
-        model =
-            update (UrlChanged url) model_ |> first
     in
-    ( model, none )
+    update (UrlChanged url) model_
 
 
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
@@ -274,48 +270,6 @@ update message model =
 
         ResetError ->
             ( { model | parsingError = False }, none )
-
-        SelectEntries entries ->
-            store
-                ( { model
-                    | selectedEntries = entries
-                    , hidePromptActive = False
-                  }
-                , if length entries == 1 then
-                    let
-                        sidebarView =
-                            getViewportOf sidebarId
-                    in
-                    batch
-                        [ attempt
-                            GotDomEl
-                            (sequence
-                                [ Task.map (.viewport >> .y) sidebarView
-                                , Task.map (.viewport >> .height) sidebarView
-                                ]
-                            )
-                        , attempt
-                            DidScroll
-                            (setViewportOf viewerId 0 0)
-                        , case head entries of
-                            Just entry ->
-                                if
-                                    model.embeddingsReady
-                                        && get entry.id model.neighborMap
-                                        == Nothing
-                                then
-                                    requestNeighbors ( entry.id, True )
-
-                                else
-                                    none
-
-                            Nothing ->
-                                none
-                        ]
-
-                  else
-                    none
-                )
 
         ShowByIndex i ->
             case
