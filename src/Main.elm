@@ -356,7 +356,7 @@ update message model =
         FilterBy f ->
             let
                 model_ =
-                    { model | filter = f }
+                    { model | filter = f, currentBookId = Nothing }
 
                 reset =
                     \() ->
@@ -369,14 +369,17 @@ update message model =
             in
             case f of
                 Just (TitleFilter book) ->
-                    ( { model_
-                        | shownEntries =
+                    let
+                        entries =
                             model.entries
                                 |> filter (.title >> (==) book.title)
                                 |> sortBy .page
-                                |> Just
+                    in
+                    ( { model_
+                        | shownEntries = Just entries
+                        , currentBookId = Just book.id
                       }
-                    , none
+                    , setObservers <| map .id entries
                     )
 
                 Just (AuthorFilter author) ->
@@ -600,53 +603,8 @@ update message model =
 
         GotDomEl result ->
             case result of
-                Ok [ offset, height ] ->
-                    case
-                        model.selectedEntries
-                    of
-                        entry :: _ ->
-                            let
-                                elHeight =
-                                    5
-
-                                targetY =
-                                    getIndex
-                                        ((if model.reverseSort then
-                                            reverse
-
-                                          else
-                                            identity
-                                         )
-                                            (withDefault
-                                                model.entries
-                                                model.shownEntries
-                                            )
-                                        )
-                                        entry
-                                        |> toFloat
-                                        |> (*) elHeight
-                            in
-                            if
-                                targetY
-                                    + elHeight
-                                    > (offset + height)
-                                    || targetY
-                                    < offset
-                            then
-                                ( model
-                                , attempt
-                                    DidScroll
-                                    (setViewportOf sidebarId 0 targetY)
-                                )
-
-                            else
-                                noOp
-
-                        _ ->
-                            noOp
-
-                Ok _ ->
-                    noOp
+                Ok element ->
+                    ( model, perform (always NoOp) (setViewport 0 element.element.y) )
 
                 Err _ ->
                     noOp
@@ -665,22 +623,8 @@ update message model =
         JsonFileLoad jsonText ->
             ( model, importJson jsonText )
 
-        KeyDown { key, control, meta } ->
-            if (model.inputFocused == Nothing) && (control || meta) then
-                case key of
-                    "a" ->
-                        update
-                            (SelectEntries <|
-                                withDefault
-                                    model.entries
-                                    model.shownEntries
-                            )
-                            model
-
-                    _ ->
-                        noOp
-
-            else if model.inputFocused /= Nothing then
+        KeyDown { key } ->
+            if model.inputFocused /= Nothing then
                 if key == "Enter" && model.inputFocused == Just TagFocus then
                     update AddTag model
 
@@ -748,7 +692,7 @@ update message model =
             if Dict.member targetId model.idsToEntries then
                 ( { model
                     | neighborMap =
-                        Dict.insert
+                        insert
                             targetId
                             (filterMap
                                 (\( id, score ) ->
@@ -788,6 +732,17 @@ update message model =
 
                 noOp_ =
                     ( model_, none )
+
+                titleView =
+                    \slug ->
+                        case get slug model.titleRouteMap of
+                            Just book ->
+                                update
+                                    (FilterBy (Just (TitleFilter book)))
+                                    { model_ | lastTitleSlug = slug }
+
+                            _ ->
+                                noOp_
             in
             case
                 parse routeParser url
@@ -796,25 +751,56 @@ update message model =
                     update (FilterBy Nothing) model_
 
                 Just (TitleRoute slug) ->
-                    case get slug model.titleRouteMap of
-                        Just book ->
-                            update (FilterBy (Just (TitleFilter book))) model_
+                    let
+                        ( m, cmd ) =
+                            titleView slug
+                    in
+                    ( m
+                    , batch
+                        [ cmd
+                        , case get slug model.titleRouteMap of
+                            Just book ->
+                                case get book.id model.bookIdToLastRead of
+                                    Just lastId ->
+                                        attempt
+                                            GotDomEl
+                                            (getElement <| "entry" ++ lastId)
 
-                        _ ->
-                            noOp_
+                                    _ ->
+                                        perform (always NoOp) (setViewport 0 0)
+
+                            _ ->
+                                none
+                        ]
+                    )
+
+                Just (EntryRoute slug id) ->
+                    let
+                        ( m, cmd ) =
+                            titleView slug
+                    in
+                    ( m
+                    , batch
+                        [ cmd
+                        , if model.lastTitleSlug /= slug then
+                            attempt GotDomEl (getElement <| "entry" ++ id)
+
+                          else
+                            none
+                        ]
+                    )
 
                 Just (AuthorRoute author) ->
-                    update (FilterBy (Just (AuthorFilter (deslugify author)))) model_
-
-                Just (EntryRoute _ id) ->
-                    case
-                        get id model.idsToEntries
-                    of
-                        Just entry ->
-                            update (SelectEntries [ entry ]) model_
-
-                        _ ->
-                            noOp_
+                    ( update
+                        (FilterBy
+                            (Just (AuthorFilter (deslugify author)))
+                        )
+                        model_
+                        |> first
+                    , perform
+                        (always NoOp)
+                        (setViewport 0 0)
+                    )
 
                 Just (TagRoute tag) ->
                     update (FilterBy (Just (TagFilter (deslugify tag)))) model_
