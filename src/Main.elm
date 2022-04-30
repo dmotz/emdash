@@ -567,10 +567,12 @@ update message model =
                 , none
                 )
 
-        GotDomEl result ->
+        ScrollToElement result ->
             case result of
                 Ok element ->
-                    ( model, perform (always NoOp) (setViewport 0 element.element.y) )
+                    ( model
+                    , perform (always NoOp) (setViewport 0 element.element.y)
+                    )
 
                 Err _ ->
                     noOp
@@ -729,7 +731,7 @@ update message model =
                                 case get book.id model.bookIdToLastRead of
                                     Just lastId ->
                                         attempt
-                                            GotDomEl
+                                            ScrollToElement
                                             (getElement <| "entry" ++ lastId)
 
                                     _ ->
@@ -749,7 +751,7 @@ update message model =
                     , batch
                         [ cmd
                         , if model.lastTitleSlug /= slug then
-                            attempt GotDomEl (getElement <| "entry" ++ id)
+                            attempt ScrollToElement (getElement <| "entry" ++ id)
 
                           else
                             none

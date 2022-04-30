@@ -32,7 +32,7 @@ type Msg
     | AddTag
     | RemoveTag Tag
     | Sort
-    | GotDomEl (Result Error Element)
+    | ScrollToElement (Result Error Element)
     | ExportJson
     | ImportJson
     | JsonFileLoad String
