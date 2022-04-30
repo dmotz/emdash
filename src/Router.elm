@@ -9,7 +9,7 @@ module Router exposing
     , titleToRoute
     )
 
-import Model exposing (Author, Entry, Tag, Title)
+import Model exposing (Author, Entry, Id, Tag, Title)
 import Regex exposing (replace)
 import Url.Builder exposing (absolute)
 import Url.Parser exposing ((</>), (<?>), Parser, map, oneOf, s, string, top)
@@ -19,10 +19,10 @@ import Utils exposing (rx)
 
 type Route
     = RootRoute
-    | TitleRoute String
-    | EntryRoute String String
-    | AuthorRoute String
-    | TagRoute String
+    | TitleRoute Title
+    | EntryRoute Title Id
+    | AuthorRoute Author
+    | TagRoute Tag
     | TextRoute (Maybe String)
     | SettingsRoute
 
