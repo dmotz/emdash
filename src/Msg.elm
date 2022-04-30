@@ -33,7 +33,6 @@ type Msg
     | RemoveTag Tag
     | Sort
     | GotDomEl (Result Error Element)
-    | DidScroll (Result Error ())
     | ExportJson
     | ImportJson
     | JsonFileLoad String

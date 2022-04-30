@@ -24,7 +24,7 @@ import List
         , sortWith
         , take
         )
-import Maybe exposing (andThen, withDefault)
+import Maybe exposing (withDefault)
 import Model
     exposing
         ( BookSort(..)
@@ -574,9 +574,6 @@ update message model =
 
                 Err _ ->
                     noOp
-
-        DidScroll _ ->
-            noOp
 
         ExportJson ->
             ( model, model |> modelToStoredModel |> exportJson )
