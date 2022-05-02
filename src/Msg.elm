@@ -45,3 +45,4 @@ type Msg
     | UrlChanged Url
     | SortBooks BookSort
     | OnIntersect Id
+    | ToggleDetails Id

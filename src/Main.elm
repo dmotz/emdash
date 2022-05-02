@@ -190,6 +190,7 @@ init maybeModel url key =
             , lastTitleSlug = ""
             , bookIdToLastRead = restored.bookIdToLastRead |> Dict.fromList
             , currentBookId = Nothing
+            , idToShowDetails = Dict.empty
             }
     in
     update (UrlChanged url) model_
@@ -837,3 +838,17 @@ update message model =
 
                 _ ->
                     noOp
+
+        ToggleDetails id ->
+            ( { model
+                | idToShowDetails =
+                    insert
+                        id
+                        (get id model.idToShowDetails
+                            |> withDefault False
+                            |> not
+                        )
+                        model.idToShowDetails
+              }
+            , requestNeighbors ( id, True )
+            )
