@@ -54,6 +54,7 @@ async function init() {
   app.ports.deleteEmbeddings.subscribe(deleteEmbeddings)
   app.ports.requestNeighbors.subscribe(requestNeighbors)
   app.ports.setObservers.subscribe(setObservers)
+  app.ports.scrollToTop.subscribe(scrollToTop)
 
   if (restored && !didFail) {
     const ids = await keys(embeddingsStore)
@@ -193,4 +194,8 @@ function setObservers(ids) {
   requestAnimationFrame(() =>
     ids.forEach(id => observer.observe(document.getElementById('entry' + id)))
   )
+}
+
+function scrollToTop() {
+  window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
 }

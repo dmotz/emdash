@@ -76,6 +76,9 @@ port setObservers : List Id -> Cmd msg
 port setStorage : StoredModel -> Cmd msg
 
 
+port scrollToTop : () -> Cmd msg
+
+
 port exportJson : StoredModel -> Cmd msg
 
 
@@ -852,3 +855,6 @@ update message model =
               }
             , requestNeighbors ( id, True )
             )
+
+        ScrollToTop ->
+            ( model, scrollToTop () )

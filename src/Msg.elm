@@ -46,3 +46,4 @@ type Msg
     | SortBooks BookSort
     | OnIntersect Id
     | ToggleDetails Id
+    | ScrollToTop
