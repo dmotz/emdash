@@ -393,37 +393,23 @@ update message model =
                 _ ->
                     reset ()
 
-        UpdateNotes text ->
-            case model.selectedEntries of
-                [ entry ] ->
-                    let
-                        newEntry =
+        UpdateNotes id text ->
+            let
+                f =
+                    \entry ->
+                        if entry.id == id then
                             { entry | notes = text }
-                    in
-                    store
-                        ( { model
-                            | entries =
-                                updateItem
-                                    model.entries
-                                    entry
-                                    newEntry
-                            , shownEntries =
-                                Maybe.map
-                                    (\entries ->
-                                        updateItem
-                                            entries
-                                            entry
-                                            newEntry
-                                    )
-                                    model.shownEntries
-                            , selectedEntries = [ newEntry ]
-                            , inputFocused = Nothing
-                          }
-                        , none
-                        )
 
-                _ ->
-                    ( { model | inputFocused = Nothing }, none )
+                        else
+                            entry
+            in
+            store
+                ( { model
+                    | entries = map f model.entries
+                    , shownEntries = Maybe.map (map f) model.shownEntries
+                  }
+                , none
+                )
 
         UpdatePendingTag text ->
             ( { model | pendingTag = Just text }, none )

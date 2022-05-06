@@ -27,7 +27,7 @@ type Msg
     | HideEntries (List Entry)
     | PromptHide
     | CancelHide
-    | UpdateNotes String
+    | UpdateNotes Id String
     | UpdatePendingTag Tag
     | AddTag
     | RemoveTag Tag
