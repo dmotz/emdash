@@ -47,3 +47,4 @@ type Msg
     | OnIntersect Id
     | ToggleDetails Id
     | ScrollToTop
+    | OnSearch String

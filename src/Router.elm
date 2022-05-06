@@ -4,6 +4,7 @@ module Router exposing
     , deslugify
     , entryToRoute
     , routeParser
+    , searchToRoute
     , slugify
     , tagToRoute
     , titleToRoute
@@ -35,7 +36,7 @@ routeParser =
         , map EntryRoute (s "title" </> string </> string)
         , map AuthorRoute (s "author" </> string)
         , map TagRoute (s "tag" </> string)
-        , map TextRoute (s "text" <?> Query.string "q")
+        , map TextRoute (s "search" <?> Query.string "q")
         , map SettingsRoute (s "settings")
         ]
 
@@ -58,6 +59,11 @@ authorToRoute author =
 tagToRoute : Tag -> String
 tagToRoute tag =
     absolute [ "tag", slugify tag ] []
+
+
+searchToRoute : String -> String
+searchToRoute query =
+    absolute [ "search" ] [ Url.Builder.string "q" query ]
 
 
 slugify : String -> String

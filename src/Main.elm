@@ -40,7 +40,14 @@ import Msg exposing (Msg(..))
 import Parser exposing (normalizeTitle)
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
-import Router exposing (Route(..), deslugify, entryToRoute, routeParser)
+import Router
+    exposing
+        ( Route(..)
+        , deslugify
+        , entryToRoute
+        , routeParser
+        , searchToRoute
+        )
 import Set exposing (diff, toList, union)
 import String exposing (toLower, trim)
 import Task exposing (attempt, perform)
@@ -194,6 +201,8 @@ init maybeModel url key =
             , bookIdToLastRead = restored.bookIdToLastRead |> Dict.fromList
             , currentBookId = Nothing
             , idToShowDetails = Dict.empty
+            , smoothScroll = False
+            , searchQuery = ""
             }
     in
     update (UrlChanged url) model_
@@ -720,14 +729,14 @@ update message model =
                 parse routeParser url
             of
                 Just RootRoute ->
-                    update (FilterBy Nothing) model_
+                    update (FilterBy Nothing) { model_ | searchQuery = "" }
 
                 Just (TitleRoute slug) ->
                     let
                         ( m, cmd ) =
                             titleView slug
                     in
-                    ( m
+                    ( { m | searchQuery = "" }
                     , batch
                         [ cmd
                         , case get slug model.titleRouteMap of
@@ -751,11 +760,13 @@ update message model =
                         ( m, cmd ) =
                             titleView slug
                     in
-                    ( m
+                    ( { m | searchQuery = "" }
                     , batch
                         [ cmd
                         , if model.lastTitleSlug /= slug then
-                            attempt ScrollToElement (getElement <| "entry" ++ id)
+                            attempt
+                                ScrollToElement
+                                (getElement <| "entry" ++ id)
 
                           else
                             none
@@ -767,7 +778,7 @@ update message model =
                         (FilterBy
                             (Just (AuthorFilter (deslugify author)))
                         )
-                        model_
+                        { model_ | searchQuery = "" }
                         |> first
                     , perform
                         (always NoOp)
@@ -775,15 +786,19 @@ update message model =
                     )
 
                 Just (TagRoute tag) ->
-                    update (FilterBy (Just (TagFilter (deslugify tag)))) model_
+                    update
+                        (FilterBy (Just (TagFilter (deslugify tag))))
+                        { model_ | searchQuery = "" }
 
                 Just (TextRoute query) ->
                     case query of
                         Just text ->
-                            update (FilterBy (Just (TextFilter text))) model_
+                            update
+                                (FilterBy (Just (TextFilter text)))
+                                { model_ | searchQuery = text }
 
                         _ ->
-                            noOp_
+                            ( { model_ | searchQuery = "" }, none )
 
                 _ ->
                     noOp_
@@ -858,3 +873,10 @@ update message model =
 
         ScrollToTop ->
             ( model, scrollToTop () )
+
+        OnSearch query ->
+            if String.isEmpty query then
+                ( { model | searchQuery = "" }, Nav.replaceUrl model.key "/" )
+
+            else
+                ( model, Nav.replaceUrl model.key (searchToRoute query) )
