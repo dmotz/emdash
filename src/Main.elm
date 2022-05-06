@@ -858,17 +858,18 @@ update message model =
                     noOp
 
         ToggleDetails id ->
+            let
+                newState =
+                    get id model.idToShowDetails |> withDefault False |> not
+            in
             ( { model
-                | idToShowDetails =
-                    insert
-                        id
-                        (get id model.idToShowDetails
-                            |> withDefault False
-                            |> not
-                        )
-                        model.idToShowDetails
+                | idToShowDetails = insert id newState model.idToShowDetails
               }
-            , requestNeighbors ( id, True )
+            , if newState && get id model.neighborMap == Nothing then
+                requestNeighbors ( id, True )
+
+              else
+                none
             )
 
         ScrollToTop ->
