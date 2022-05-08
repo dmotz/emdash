@@ -3,6 +3,7 @@ module Model exposing
     , Book
     , BookSort(..)
     , Entry
+    , EntryTab(..)
     , Filter(..)
     , Id
     , InputFocus(..)
@@ -38,6 +39,12 @@ type BookSort
     = RecencySort
     | TitleSort
     | NumSort
+
+
+type EntryTab
+    = Related
+    | Notes
+    | Etc
 
 
 type alias Id =
@@ -108,6 +115,8 @@ type alias Model =
     , currentBookId : Maybe Id
     , lastTitleSlug : String
     , bookIdToLastRead : Dict Id Id
+    , idToShowDetails : Dict Id Bool
+    , idToActiveTab : Dict Id EntryTab
     }
 
 

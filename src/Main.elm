@@ -201,7 +201,7 @@ init maybeModel url key =
             , bookIdToLastRead = restored.bookIdToLastRead |> Dict.fromList
             , currentBookId = Nothing
             , idToShowDetails = Dict.empty
-            , smoothScroll = False
+            , idToActiveTab = Dict.empty
             , searchQuery = ""
             }
     in
@@ -856,6 +856,13 @@ update message model =
 
               else
                 none
+            )
+
+        SetEntryTab id tab ->
+            ( { model
+                | idToActiveTab = insert id tab model.idToActiveTab
+              }
+            , none
             )
 
         ScrollToTop ->
