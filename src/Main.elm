@@ -819,26 +819,29 @@ update message model =
                         | books = sortBy .count model.books |> reverse
                         , reverseSort = False
                     }
+              -- RandomSort ->
+              --     model_
             , none
             )
 
         OnIntersect id ->
             case get id model.idsToEntries of
                 Just entry ->
-                    ( case model.currentBookId of
-                        Just bookId ->
-                            { model
-                                | bookIdToLastRead =
-                                    insert
-                                        bookId
-                                        id
-                                        model.bookIdToLastRead
-                            }
+                    store
+                        ( case model.currentBookId of
+                            Just bookId ->
+                                { model
+                                    | bookIdToLastRead =
+                                        insert
+                                            bookId
+                                            id
+                                            model.bookIdToLastRead
+                                }
 
-                        _ ->
-                            model
-                    , Nav.replaceUrl model.key (entryToRoute entry)
-                    )
+                            _ ->
+                                model
+                        , Nav.replaceUrl model.key (entryToRoute entry)
+                        )
 
                 _ ->
                     noOp
