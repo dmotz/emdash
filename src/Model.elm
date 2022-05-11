@@ -17,6 +17,7 @@ module Model exposing
     )
 
 import Browser.Navigation as Nav
+import Debounce exposing (Debounce)
 import Dict exposing (Dict)
 import Set exposing (Set)
 import Url exposing (Url)
@@ -117,6 +118,7 @@ type alias Model =
     , bookIdToLastRead : Dict Id Id
     , idToShowDetails : Dict Id Bool
     , idToActiveTab : Dict Id EntryTab
+    , searchDebounce : Debounce String
     }
 
 

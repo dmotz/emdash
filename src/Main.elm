@@ -4,6 +4,7 @@ import Browser exposing (application)
 import Browser.Dom exposing (getElement, setViewport)
 import Browser.Events exposing (onKeyDown)
 import Browser.Navigation as Nav
+import Debounce
 import Dict exposing (get, insert, values)
 import Epub
 import File
@@ -107,9 +108,22 @@ port requestNeighbors : ( Id, Bool ) -> Cmd msg
 port receiveNeighbors : (( Id, List ( Id, Float ) ) -> msg) -> Sub msg
 
 
+port requestUnicodeNormalized : String -> Cmd msg
+
+
+port receiveUnicodeNormalized : (String -> msg) -> Sub msg
+
+
 appName : String
 appName =
     "Marginalia"
+
+
+debounceConfig : Debounce.Config Msg
+debounceConfig =
+    { strategy = Debounce.soon 999
+    , transform = DebounceMsg
+    }
 
 
 main : Program (Maybe StoredModel) Model Msg
@@ -203,6 +217,7 @@ init maybeModel url key =
             , idToShowDetails = Dict.empty
             , idToActiveTab = Dict.empty
             , searchQuery = ""
+            , searchDebounce = Debounce.init
             }
     in
     update (UrlChanged url) model_
@@ -374,13 +389,15 @@ update message model =
                         query =
                             val |> toLower |> trim
                     in
-                    if String.length query < queryCharMin then
+                    if String.isEmpty query then
                         reset ()
 
                     else
                         ( { model_
                             | shownEntries =
-                                Just (findMatches query .text model.entries)
+                                findMatches query .text model.entries
+                                    |> take maxSearchResults
+                                    |> Just
                             , books =
                                 findMatches
                                     query
@@ -779,9 +796,19 @@ update message model =
                 Just (TextRoute query) ->
                     case query of
                         Just text ->
-                            update
-                                (FilterBy (Just (TextFilter text)))
-                                { model_ | searchQuery = text }
+                            let
+                                ( debounce, cmd ) =
+                                    Debounce.push
+                                        debounceConfig
+                                        text
+                                        model.searchDebounce
+                            in
+                            ( { model
+                                | searchDebounce = debounce
+                                , searchQuery = text
+                              }
+                            , cmd
+                            )
 
                         _ ->
                             ( { model_ | searchQuery = "" }, none )
@@ -877,3 +904,22 @@ update message model =
 
             else
                 ( model, Nav.replaceUrl model.key (searchToRoute query) )
+
+        DebounceMsg msg ->
+            let
+                ( debounce, cmd ) =
+                    Debounce.update
+                        debounceConfig
+                        (Debounce.takeLast
+                            (\text ->
+                                Task.perform
+                                    (\t -> FilterBy (Just (TextFilter t)))
+                                    (Task.succeed text)
+                            )
+                        )
+                        msg
+                        model.searchDebounce
+            in
+            ( { model | searchDebounce = debounce }
+            , cmd
+            )
