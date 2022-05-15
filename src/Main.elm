@@ -122,6 +122,11 @@ appName =
     "Marginalia"
 
 
+maxSearchResults : Int
+maxSearchResults =
+    20
+
+
 headerHeight : Float
 headerHeight =
     75
