@@ -78,6 +78,9 @@ import Views.Base exposing (view)
 port onIntersect : (Id -> msg) -> Sub msg
 
 
+port onScroll : (Float -> msg) -> Sub msg
+
+
 port setObservers : List Id -> Cmd msg
 
 
@@ -161,6 +164,7 @@ main =
                     , receiveNeighbors ReceiveNeighbors
                     , receiveEmbeddings ReceiveEmbeddings
                     , onIntersect OnIntersect
+                    , onScroll OnScroll
                     ]
         , onUrlChange = UrlChanged
         , onUrlRequest = LinkClicked
@@ -217,6 +221,7 @@ init maybeModel url key =
             , idToShowDetails = Dict.empty
             , idToActiveTab = Dict.empty
             , searchQuery = ""
+            , hideHeader = False
             , searchDebounce = Debounce.init
             }
     in
@@ -904,6 +909,13 @@ update message model =
 
             else
                 ( model, Nav.replaceUrl model.key (searchToRoute query) )
+
+        OnScroll delta ->
+            ( { model
+                | hideHeader = model.shownEntries /= Nothing && delta > 0
+              }
+            , none
+            )
 
         DebounceMsg msg ->
             let

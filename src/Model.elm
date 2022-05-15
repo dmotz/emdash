@@ -119,6 +119,7 @@ type alias Model =
     , idToShowDetails : Dict Id Bool
     , idToActiveTab : Dict Id EntryTab
     , searchQuery : String
+    , hideHeader : Bool
     , searchDebounce : Debounce String
     }
 
