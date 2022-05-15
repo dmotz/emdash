@@ -122,6 +122,11 @@ appName =
     "Marginalia"
 
 
+headerHeight : Float
+headerHeight =
+    75
+
+
 debounceConfig : Debounce.Config Msg
 debounceConfig =
     { strategy = Debounce.soon 999
@@ -592,7 +597,10 @@ update message model =
             case result of
                 Ok element ->
                     ( model
-                    , perform (always NoOp) (setViewport 0 element.element.y)
+                    , perform (always NoOp)
+                        (setViewport 0
+                            (element.element.y - headerHeight)
+                        )
                     )
 
                 Err _ ->
