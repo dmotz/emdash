@@ -118,6 +118,7 @@ type alias Model =
     , bookIdToLastRead : Dict Id Id
     , idToShowDetails : Dict Id Bool
     , idToActiveTab : Dict Id EntryTab
+    , searchQuery : String
     , searchDebounce : Debounce String
     }
 
