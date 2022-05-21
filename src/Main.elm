@@ -199,7 +199,6 @@ init maybeModel url key =
             , neighborMap = Dict.empty
             , shownEntries = Nothing
             , hiddenEntries = Set.fromList restored.hiddenEntries
-            , selectedEntries = []
             , completedEmbeddings = Set.empty
             , embeddingsReady = False
             , books = books
@@ -662,14 +661,7 @@ update message model =
                         |> take embeddingBatchSize
             in
             if isEmpty nextBatch then
-                ( { model | embeddingsReady = True }
-                , case model.selectedEntries of
-                    [ entry ] ->
-                        requestNeighbors ( entry.id, True )
-
-                    _ ->
-                        none
-                )
+                ( { model | embeddingsReady = True }, none )
 
             else
                 ( { model | embeddingsReady = False }
