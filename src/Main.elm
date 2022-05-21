@@ -67,7 +67,6 @@ import Utils
         , juxt
         , mapIdsToEntries
         , modelToStoredModel
-        , queryCharMin
         , removeItem
         , updateItem
         , updateItems
@@ -288,28 +287,24 @@ update message model =
                         )
                         new
                         ++ model.entries
+
+                bookMap =
+                    Parser.getBookMap entries
             in
             if isEmpty new then
                 ( { model | parsingError = True }, none )
 
             else
-                store
-                    ( { model
-                        | parsingError = False
-                        , entries = entries
-                        , idsToEntries = mapIdsToEntries entries
-                        , selectedEntries =
-                            case head entries of
-                                Just entry ->
-                                    [ entry ]
-
-                                _ ->
-                                    []
-                        , titles = Parser.getTitles entries
-                        , authors = Parser.getAuthors entries
-                      }
-                    , none
-                    )
+                store <|
+                    update
+                        (SortBooks model.bookSort)
+                        { model
+                            | parsingError = False
+                            , entries = entries
+                            , books = values bookMap
+                            , bookMap = bookMap
+                            , idsToEntries = mapIdsToEntries entries
+                        }
 
         ResetError ->
             ( { model | parsingError = False }, none )
