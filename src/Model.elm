@@ -112,7 +112,7 @@ type alias Model =
     , key : Nav.Key
     , bookSort : BookSort
     , bookSortOrder : Bool
-    , currentBookId : Maybe Id
+    , currentBook : Maybe Book
     , lastTitleSlug : String
     , bookIdToLastRead : Dict Id Id
     , idToShowDetails : Dict Id Bool

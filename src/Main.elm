@@ -224,7 +224,7 @@ init maybeModel url key =
             , bookSortOrder = True
             , lastTitleSlug = ""
             , bookIdToLastRead = restored.bookIdToLastRead |> Dict.fromList
-            , currentBookId = Nothing
+            , currentBook = Nothing
             , idToShowDetails = Dict.empty
             , idToActiveTab = Dict.empty
             , searchQuery = ""
@@ -365,7 +365,7 @@ update message model =
         FilterBy f ->
             let
                 model_ =
-                    { model | filter = f, currentBookId = Nothing }
+                    { model | filter = f, currentBook = Nothing }
 
                 reset =
                     \() ->
@@ -386,7 +386,7 @@ update message model =
                     in
                     ( { model_
                         | shownEntries = Just entries
-                        , currentBookId = Just book.id
+                        , currentBook = Just book
                       }
                     , setObservers <| map .id entries
                     )
@@ -873,12 +873,12 @@ update message model =
             case get id model.idsToEntries of
                 Just entry ->
                     store
-                        ( case model.currentBookId of
-                            Just bookId ->
+                        ( case model.currentBook of
+                            Just book ->
                                 { model
                                     | bookIdToLastRead =
                                         insert
-                                            bookId
+                                            book.id
                                             id
                                             model.bookIdToLastRead
                                 }
