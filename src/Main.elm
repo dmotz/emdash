@@ -630,67 +630,21 @@ update message model =
                     noOp
 
             else
-                case key of
-                    "ArrowRight" ->
-                        ( model
-                        , case model.currentBook of
-                            Just book ->
-                                case get book.id model.bookIdToLastRead of
-                                    Just entryId ->
-                                        case model.shownEntries of
-                                            Just entries ->
-                                                let
-                                                    ids =
-                                                        map .id entries
+                update
+                    (case key of
+                        "r" ->
+                            ShowRandom
 
-                                                    idx =
-                                                        getIndex ids entryId
-                                                in
-                                                if idx == -1 || idx == (length ids - 1) then
-                                                    none
+                        "f" ->
+                            ToggleFocusMode
 
-                                                else
-                                                    case
-                                                        drop (idx + 1) ids |> head
-                                                    of
-                                                        Just id ->
-                                                            let
-                                                                _ =
-                                                                    Debug.log "" id
-                                                            in
-                                                            attempt
-                                                                ScrollToElement
-                                                                (getElement <| "entry" ++ id)
+                        "s" ->
+                            Sort
 
-                                                        _ ->
-                                                            none
-
-                                            _ ->
-                                                none
-
-                                    _ ->
-                                        none
-
-                            _ ->
-                                none
-                        )
-
-                    _ ->
-                        update
-                            (case key of
-                                "r" ->
-                                    ShowRandom
-
-                                "f" ->
-                                    ToggleFocusMode
-
-                                "s" ->
-                                    Sort
-
-                                _ ->
-                                    NoOp
-                            )
-                            model
+                        _ ->
+                            NoOp
+                    )
+                    model
 
         ExportEpub ->
             ( model, Epub.export model.books model.entries )
