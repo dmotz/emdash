@@ -94,7 +94,6 @@ type alias Model =
     , selectedEntries : List Entry
     , completedEmbeddings : Set Id
     , embeddingsReady : Bool
-    , authors : List Author
     , books : List Book
     , bookMap : Dict Id Book
     , tags : List Tag

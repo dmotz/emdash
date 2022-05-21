@@ -202,7 +202,6 @@ init maybeModel url key =
             , selectedEntries = []
             , completedEmbeddings = Set.empty
             , embeddingsReady = False
-            , authors = Parser.getAuthors restored.entries
             , books = books
             , bookMap = bookMap
             , tags = Parser.getTags restored.entries
@@ -859,8 +858,6 @@ update message model =
                         | books = sortBy .count model.books |> reverse
                         , reverseSort = False
                     }
-              -- RandomSort ->
-              --     model_
             , none
             )
 
