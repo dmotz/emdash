@@ -26,6 +26,7 @@ const observer = new IntersectionObserver(
 let embeddings = {}
 let titleMap = {}
 let workerBatch = 0
+let lastScrollY = window.scrollY
 let app
 let writeTimer
 let worker
@@ -63,6 +64,15 @@ async function init() {
     titleMap = Object.fromEntries(restored.entries.map(e => [e.id, e.title]))
     app.ports.receiveEmbeddings.send(ids)
   }
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      app.ports.onScroll.send(window.scrollY - lastScrollY)
+      lastScrollY = window.scrollY
+    },
+    {passive: true}
+  )
 
   window.addEventListener('keydown', e => {
     if (
