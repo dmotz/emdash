@@ -1,6 +1,5 @@
 module Parser exposing
-    ( getAuthors
-    , getBookMap
+    ( getBookMap
     , getRouteMap
     , getTags
     , getTitles
@@ -247,11 +246,6 @@ getUniques key sorter entries =
 getTitles : List Entry -> List Title
 getTitles =
     getUniques .title titleSorter
-
-
-getAuthors : List Entry -> List Author
-getAuthors =
-    getUniques .author compare
 
 
 getBookMap : List Entry -> Dict Id Book
