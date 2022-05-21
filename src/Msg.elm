@@ -13,8 +13,6 @@ type Msg
     = NoOp
     | ShowRandom
     | ShowByIndex Int
-    | ShowNext
-    | ShowPrev
     | FilterBy (Maybe Filter)
     | ToggleFocusMode
     | ToggleAboutMode

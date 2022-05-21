@@ -317,34 +317,6 @@ update message model =
                 _ ->
                     noOp
 
-        ShowNext ->
-            case model.selectedEntries of
-                entry :: _ ->
-                    update
-                        (ShowByIndex <|
-                            getNextIndex
-                                (getEntries model)
-                                entry
-                        )
-                        model
-
-                [] ->
-                    noOp
-
-        ShowPrev ->
-            case model.selectedEntries of
-                entry :: _ ->
-                    update
-                        (ShowByIndex <|
-                            getPrevIndex
-                                (getEntries model)
-                                entry
-                        )
-                        model
-
-                _ ->
-                    noOp
-
         ShowRandom ->
             ( model
             , generate
