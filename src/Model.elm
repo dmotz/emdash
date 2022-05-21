@@ -70,6 +70,7 @@ type alias Book =
     , author : Author
     , count : Int
     , sortIndex : Int
+    , tags : List Tag
     }
 
 
