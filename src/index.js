@@ -56,6 +56,7 @@ async function init() {
   app.ports.requestNeighbors.subscribe(requestNeighbors)
   app.ports.setObservers.subscribe(setObservers)
   app.ports.scrollToTop.subscribe(scrollToTop)
+  app.ports.requestUnicodeNormalized.subscribe(requestUnicodeNormalized)
 
   if (restored && !didFail) {
     const ids = await keys(embeddingsStore)
@@ -208,4 +209,8 @@ function setObservers(ids) {
 
 function scrollToTop() {
   window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
+}
+
+function requestUnicodeNormalized(str) {
+  app.ports.receiveUnicodeNormalized.send(str.normalize('NFKD'))
 }

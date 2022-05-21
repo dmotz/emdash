@@ -2,8 +2,9 @@ module Msg exposing (Msg(..))
 
 import Browser exposing (UrlRequest)
 import Browser.Dom exposing (Element, Error)
+import Debounce
 import File exposing (File)
-import Model exposing (BookSort, Entry, Filter, Id, InputFocus, Tag)
+import Model exposing (BookSort, Entry, EntryTab, Filter, Id, InputFocus, Tag)
 import Url exposing (Url)
 import Utils exposing (KeyEvent)
 
@@ -46,5 +47,9 @@ type Msg
     | SortBooks BookSort
     | OnIntersect Id
     | ToggleDetails Id
+    | SetEntryTab Id EntryTab
     | ScrollToTop
+    | OnScroll Float
     | OnSearch String
+    | ReceiveUnicodeNormalized String
+    | DebounceMsg Debounce.Msg

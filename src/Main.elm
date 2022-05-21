@@ -173,6 +173,7 @@ main =
                         |> onKeyDown
                     , receiveNeighbors ReceiveNeighbors
                     , receiveEmbeddings ReceiveEmbeddings
+                    , receiveUnicodeNormalized ReceiveUnicodeNormalized
                     , onIntersect OnIntersect
                     , onScroll OnScroll
                     ]
@@ -269,6 +270,9 @@ update message model =
             ( model, Select.files [ "text/plain" ] (GotFiles FileLoad) )
 
         FileLoad text ->
+            ( model, requestUnicodeNormalized text )
+
+        ReceiveUnicodeNormalized text ->
             let
                 ids =
                     Set.fromList <| map .id model.entries
