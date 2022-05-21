@@ -125,7 +125,7 @@ type alias Model =
 
 type alias StoredModel =
     { entries : List Entry
-    , selectedEntries : List Id
+    , books : List Book
     , hiddenEntries : List Id
     , focusMode : Bool
     , reverseSort : Bool
@@ -137,7 +137,7 @@ type alias StoredModel =
 initialStoredModel : StoredModel
 initialStoredModel =
     { entries = []
-    , selectedEntries = []
+    , books = []
     , hiddenEntries = []
     , focusMode = False
     , reverseSort = False
