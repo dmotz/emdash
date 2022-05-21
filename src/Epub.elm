@@ -2,7 +2,7 @@ port module Epub exposing (export)
 
 import List exposing (concat, filter, indexedMap, map, reverse)
 import MD5 exposing (hex)
-import Model exposing (Author, Entry, Title)
+import Model exposing (Author, Book, Entry, Title)
 import Regex exposing (Regex)
 import String exposing (fromInt, replace, toLower)
 import Utils exposing (rx)
@@ -274,20 +274,6 @@ generateContent titles =
     )
 
 
-getAuthor : Title -> List Entry -> String
-getAuthor title entries =
-    case entries of
-        entry :: ents ->
-            if entry.title == title then
-                entry.author
-
-            else
-                getAuthor title ents
-
-        [] ->
-            ""
-
-
 generateChapter : Int -> Title -> Author -> List Entry -> ( String, String )
 generateChapter i title author entries =
     ( "OEBPS/" ++ normalizeTitle i title
@@ -334,8 +320,12 @@ generateChapter i title author entries =
     )
 
 
-export : List Title -> List Entry -> Cmd msg
-export titles entries =
+export : List Book -> List Entry -> Cmd msg
+export books entries =
+    let
+        titles =
+            map .title books
+    in
     [ [ ( "mimetype", "application/epub+zip" )
       , container
       , generateToc titles
@@ -343,14 +333,14 @@ export titles entries =
       , generateContent titles
       ]
     , indexedMap
-        (\i ( title, author ) ->
+        (\i { title, author } ->
             generateChapter
                 i
                 title
                 author
                 (filter (.title >> (==) title) entries)
         )
-        (map (\title -> ( title, getAuthor title entries )) titles)
+        books
     ]
         |> concat
         |> map

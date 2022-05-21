@@ -187,9 +187,6 @@ init maybeModel url key =
         restored =
             withDefault initialStoredModel maybeModel
 
-        titles =
-            Parser.getTitles restored.entries
-
         bookMap =
             Parser.getBookMap restored.entries
 
@@ -205,7 +202,6 @@ init maybeModel url key =
             , selectedEntries = []
             , completedEmbeddings = Set.empty
             , embeddingsReady = False
-            , titles = titles
             , authors = Parser.getAuthors restored.entries
             , books = books
             , bookMap = bookMap
@@ -634,24 +630,70 @@ update message model =
                     noOp
 
             else
-                update
-                    (case key of
-                        "r" ->
-                            ShowRandom
+                case key of
+                    "ArrowRight" ->
+                        ( model
+                        , case model.currentBook of
+                            Just book ->
+                                case get book.id model.bookIdToLastRead of
+                                    Just entryId ->
+                                        case model.shownEntries of
+                                            Just entries ->
+                                                let
+                                                    ids =
+                                                        map .id entries
 
-                        "f" ->
-                            ToggleFocusMode
+                                                    idx =
+                                                        getIndex ids entryId
+                                                in
+                                                if idx == -1 || idx == (length ids - 1) then
+                                                    none
 
-                        "s" ->
-                            Sort
+                                                else
+                                                    case
+                                                        drop (idx + 1) ids |> head
+                                                    of
+                                                        Just id ->
+                                                            let
+                                                                _ =
+                                                                    Debug.log "" id
+                                                            in
+                                                            attempt
+                                                                ScrollToElement
+                                                                (getElement <| "entry" ++ id)
 
-                        _ ->
-                            NoOp
-                    )
-                    model
+                                                        _ ->
+                                                            none
+
+                                            _ ->
+                                                none
+
+                                    _ ->
+                                        none
+
+                            _ ->
+                                none
+                        )
+
+                    _ ->
+                        update
+                            (case key of
+                                "r" ->
+                                    ShowRandom
+
+                                "f" ->
+                                    ToggleFocusMode
+
+                                "s" ->
+                                    Sort
+
+                                _ ->
+                                    NoOp
+                            )
+                            model
 
         ExportEpub ->
-            ( model, Epub.export model.titles model.entries )
+            ( model, Epub.export model.books model.entries )
 
         RequestEmbeddings ->
             let
