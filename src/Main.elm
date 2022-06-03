@@ -12,7 +12,8 @@ import File.Select as Select
 import Json.Decode as Decode
 import List
     exposing
-        ( drop
+        ( concatMap
+        , drop
         , filter
         , filterMap
         , head
@@ -58,6 +59,7 @@ import Url.Parser exposing (parse)
 import Utils
     exposing
         ( KeyEvent
+        , dedupe
         , embeddingBatchSize
         , findMatches
         , getIndex
@@ -69,7 +71,6 @@ import Utils
         , modelToStoredModel
         , removeItem
         , updateItem
-        , updateItems
         )
 import Views.Base exposing (view)
 
@@ -187,11 +188,11 @@ init maybeModel url key =
         restored =
             withDefault initialStoredModel maybeModel
 
-        bookMap =
-            Parser.getBookMap restored.entries
-
         books =
-            values bookMap
+            restored.books
+
+        bookMap =
+            Dict.fromList (map (\b -> ( b.id, b )) restored.books)
 
         model_ =
             { entries = restored.entries
@@ -387,6 +388,9 @@ update message model =
                         , none
                         )
 
+                Just (TagFilter tag) ->
+                    ( { model_ | books = filter (.tags >> member tag) model.books, shownEntries = Nothing }, none )
+
                 _ ->
                     reset ()
 
@@ -412,87 +416,85 @@ update message model =
             ( { model | pendingTag = Just text }, none )
 
         AddTag ->
-            case model.pendingTag of
-                Just tag ->
-                    let
-                        tagN =
-                            tag |> trim |> toLower
-                    in
-                    if tagN == "" then
-                        ( { model | pendingTag = Nothing }, none )
+            case model.currentBook of
+                Just book ->
+                    case model.pendingTag of
+                        Just tag ->
+                            let
+                                tagN =
+                                    tag |> trim |> toLower
+                            in
+                            if tagN == "" then
+                                ( { model | pendingTag = Nothing }, none )
 
-                    else
-                        let
-                            updatedSelection =
-                                map
-                                    (\entry ->
-                                        { entry
-                                            | tags =
-                                                insertOnce
-                                                    entry.tags
-                                                    tagN
+                            else
+                                let
+                                    newBook =
+                                        { book
+                                            | tags = insertOnce book.tags tagN
                                         }
+                                in
+                                store
+                                    ( { model
+                                        | tags = insertOnce model.tags tagN
+                                        , books =
+                                            updateItem
+                                                model.books
+                                                book
+                                                newBook
+                                        , bookMap =
+                                            insert
+                                                book.id
+                                                newBook
+                                                model.bookMap
+                                        , titleRouteMap =
+                                            insert
+                                                model.lastTitleSlug
+                                                newBook
+                                                model.titleRouteMap
+                                        , currentBook = Just newBook
+                                        , pendingTag = Nothing
+                                      }
+                                    , none
                                     )
-                                    model.selectedEntries
 
-                            updateMapping =
-                                map (juxt .id identity) updatedSelection
-                                    |> Dict.fromList
-                        in
-                        store
-                            ( { model
-                                | tags = insertOnce model.tags tagN
-                                , entries =
-                                    updateItems
-                                        model.entries
-                                        updateMapping
-                                , shownEntries =
-                                    Maybe.map
-                                        (\entries ->
-                                            updateItems
-                                                entries
-                                                updateMapping
-                                        )
-                                        model.shownEntries
-                                , selectedEntries = updatedSelection
-                                , pendingTag = Nothing
-                              }
-                            , none
-                            )
+                        _ ->
+                            noOp
 
                 _ ->
                     noOp
 
         RemoveTag tag ->
-            let
-                updatedSelection =
-                    map
-                        (\entry ->
-                            { entry | tags = removeItem entry.tags tag }
+            case model.currentBook of
+                Just book ->
+                    let
+                        newBook =
+                            { book | tags = removeItem book.tags tag }
+
+                        newBooks =
+                            updateItem model.books book newBook
+                    in
+                    store
+                        ( { model
+                            | tags = newBooks |> concatMap .tags |> dedupe
+                            , books = newBooks
+                            , bookMap =
+                                insert
+                                    book.id
+                                    newBook
+                                    model.bookMap
+                            , titleRouteMap =
+                                insert
+                                    model.lastTitleSlug
+                                    newBook
+                                    model.titleRouteMap
+                            , currentBook = Just newBook
+                          }
+                        , none
                         )
-                        model.selectedEntries
 
-                updateMapping =
-                    map (juxt .id identity) updatedSelection
-                        |> Dict.fromList
-
-                newEntries =
-                    updateItems
-                        model.entries
-                        updateMapping
-            in
-            store
-                ( { model
-                    | entries = newEntries
-                    , tags = Parser.getTags newEntries
-                    , selectedEntries = updatedSelection
-                    , shownEntries =
-                        Maybe.map
-                            (\entries -> updateItems entries updateMapping)
-                            model.shownEntries
-                  }
-                , none
-                )
+                _ ->
+                    noOp
 
         ToggleFocusMode ->
             store ( { model | focusMode = not model.focusMode }, none )
