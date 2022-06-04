@@ -86,17 +86,16 @@ type alias Entry =
 
 
 type alias Model =
-    { entries : List Entry
-    , idsToEntries : Dict Id Entry
-    , neighborMap : Dict Id (List ( Entry, Float ))
-    , shownEntries : Maybe (List Entry)
+    { entries : Dict Id Entry
+    , books : Dict Id Book
+    , booksShown : List Id
+    , entriesShown : Maybe (List Id)
+    , neighborMap : Dict Id (List ( Id, Float ))
     , hiddenEntries : Set Id
     , completedEmbeddings : Set Id
     , embeddingsReady : Bool
-    , books : List Book
-    , bookMap : Dict Id Book
+    , titleRouteMap : Dict String Id
     , tags : List Tag
-    , titleRouteMap : Dict String Book
     , filter : Maybe Filter
     , pendingTag : Maybe Tag
     , focusMode : Bool
@@ -111,7 +110,7 @@ type alias Model =
     , key : Nav.Key
     , bookSort : BookSort
     , bookSortOrder : Bool
-    , currentBook : Maybe Book
+    , currentBook : Maybe Id
     , lastTitleSlug : String
     , bookIdToLastRead : Dict Id Id
     , idToShowDetails : Dict Id Bool

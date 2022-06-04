@@ -5,7 +5,7 @@ import Browser.Dom exposing (getElement, setViewport)
 import Browser.Events exposing (onKeyDown)
 import Browser.Navigation as Nav
 import Debounce
-import Dict exposing (get, insert, values)
+import Dict exposing (get, insert, keys, values)
 import Epub
 import File
 import File.Select as Select
@@ -26,7 +26,7 @@ import List
         , sortWith
         , take
         )
-import Maybe exposing (withDefault)
+import Maybe exposing (andThen, withDefault)
 import Model
     exposing
         ( BookSort(..)
@@ -39,7 +39,7 @@ import Model
         , initialStoredModel
         )
 import Msg exposing (Msg(..))
-import Parser exposing (normalizeTitle)
+import Parser exposing (getBooks, normalizeTitle)
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Router
@@ -67,8 +67,8 @@ import Utils
         , getPrevIndex
         , insertOnce
         , juxt
-        , mapIdsToEntries
         , modelToStoredModel
+        , pluckIds
         , removeItem
         , updateItem
         )
@@ -188,24 +188,17 @@ init maybeModel url key =
         restored =
             withDefault initialStoredModel maybeModel
 
-        books =
-            restored.books
-
-        bookMap =
-            Dict.fromList (map (\b -> ( b.id, b )) restored.books)
-
         model_ =
-            { entries = restored.entries
-            , idsToEntries = mapIdsToEntries restored.entries
+            { entries = Dict.fromList (map (juxt .id identity) restored.entries)
+            , books = Dict.fromList (map (juxt .id identity) restored.books)
+            , booksShown = map .id restored.books
+            , entriesShown = Nothing
             , neighborMap = Dict.empty
-            , shownEntries = Nothing
             , hiddenEntries = Set.fromList restored.hiddenEntries
             , completedEmbeddings = Set.empty
             , embeddingsReady = False
-            , books = books
-            , bookMap = bookMap
             , tags = Parser.getTags restored.entries
-            , titleRouteMap = Parser.getRouteMap books
+            , titleRouteMap = Parser.getRouteMap restored.books
             , filter = Nothing
             , pendingTag = Nothing
             , focusMode = restored.focusMode
@@ -238,11 +231,6 @@ store ( model, cmd ) =
     ( model, batch [ cmd, model |> modelToStoredModel |> setStorage ] )
 
 
-getEntries : Model -> List Entry
-getEntries model =
-    withDefault model.entries model.shownEntries
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     let
@@ -272,25 +260,18 @@ update message model =
 
         ReceiveUnicodeNormalized text ->
             let
-                ids =
-                    Set.fromList <| map .id model.entries
-
-                new =
+                newEntries =
                     Parser.process text
 
                 entries =
-                    filter
-                        (\entry ->
-                            (not <| Set.member entry.id model.hiddenEntries)
-                                && (not <| Set.member entry.id ids)
-                        )
-                        new
-                        ++ model.entries
+                    Dict.filter
+                        (\id _ -> not <| Set.member id model.hiddenEntries)
+                        (Dict.union model.entries newEntries)
 
-                bookMap =
-                    Parser.getBookMap entries
+                books =
+                    entries |> values |> getBooks
             in
-            if isEmpty new then
+            if Dict.isEmpty newEntries then
                 ( { model | parsingError = True }, none )
 
             else
@@ -300,30 +281,18 @@ update message model =
                         { model
                             | parsingError = False
                             , entries = entries
-                            , books = values bookMap
-                            , bookMap = bookMap
-                            , idsToEntries = mapIdsToEntries entries
+                            , books = books
+                            , booksShown = keys books
                         }
 
         ResetError ->
             ( { model | parsingError = False }, none )
 
         ShowByIndex i ->
-            case
-                drop i model.entries |> head
-            of
-                Just entry ->
-                    ( model, Nav.pushUrl model.key (entryToRoute entry) )
-
-                _ ->
-                    noOp
+            noOp
 
         ShowRandom ->
-            ( model
-            , generate
-                ShowByIndex
-                (Random.int 0 (length model.entries - 1))
-            )
+            noOp
 
         SetInputFocus focus ->
             ( { model | inputFocused = focus }, none )
@@ -338,29 +307,36 @@ update message model =
                         update
                             (SortBooks model.bookSort)
                             { model_
-                                | shownEntries = Nothing
-                                , books = values model.bookMap
+                                | entriesShown = Nothing
+                                , booksShown = keys model.books
                             }
             in
             case f of
                 Just (TitleFilter book) ->
                     let
-                        entries =
+                        entryIds =
                             model.entries
-                                |> filter (.title >> (==) book.title)
+                                |> Dict.filter
+                                    (\_ { title } -> title == book.title)
+                                |> values
                                 |> sortBy .page
+                                |> map .id
                     in
                     ( { model_
-                        | shownEntries = Just entries
-                        , currentBook = Just book
+                        | entriesShown = Just entryIds
+                        , currentBook = Just book.id
                       }
-                    , setObservers <| map .id entries
+                    , setObservers entryIds
                     )
 
                 Just (AuthorFilter author) ->
                     ( { model_
-                        | shownEntries = Nothing
-                        , books = filter (.author >> (==) author) model.books
+                        | entriesShown = Nothing
+                        , booksShown =
+                            Dict.filter
+                                (\_ entry -> entry.author == author)
+                                model.books
+                                |> keys
                       }
                     , none
                     )
@@ -375,39 +351,44 @@ update message model =
 
                     else
                         ( { model_
-                            | shownEntries =
-                                findMatches query .text model.entries
+                            | entriesShown =
+                                findMatches query .text (values model.entries)
                                     |> take maxSearchResults
+                                    |> map .id
                                     |> Just
-                            , books =
+                            , booksShown =
                                 findMatches
                                     query
                                     (\b -> b.title ++ " " ++ b.author)
-                                    (values model.bookMap)
+                                    (values model.books)
+                                    |> map .id
                           }
                         , none
                         )
 
                 Just (TagFilter tag) ->
-                    ( { model_ | books = filter (.tags >> member tag) model.books, shownEntries = Nothing }, none )
+                    ( { model_
+                        | entriesShown = Nothing
+                        , booksShown =
+                            Dict.filter
+                                (\_ book -> member tag book.tags)
+                                model.books
+                                |> keys
+                      }
+                    , none
+                    )
 
                 _ ->
                     reset ()
 
         UpdateNotes id text ->
-            let
-                f =
-                    \entry ->
-                        if entry.id == id then
-                            { entry | notes = text }
-
-                        else
-                            entry
-            in
             store
                 ( { model
-                    | entries = map f model.entries
-                    , shownEntries = Maybe.map (map f) model.shownEntries
+                    | entries =
+                        Dict.update
+                            id
+                            (Maybe.map (\entry -> { entry | notes = text }))
+                            model.entries
                   }
                 , none
                 )
@@ -417,7 +398,7 @@ update message model =
 
         AddTag ->
             case model.currentBook of
-                Just book ->
+                Just bookId ->
                     case model.pendingTag of
                         Just tag ->
                             let
@@ -428,31 +409,22 @@ update message model =
                                 ( { model | pendingTag = Nothing }, none )
 
                             else
-                                let
-                                    newBook =
-                                        { book
-                                            | tags = insertOnce book.tags tagN
-                                        }
-                                in
                                 store
                                     ( { model
                                         | tags = insertOnce model.tags tagN
                                         , books =
-                                            updateItem
+                                            Dict.update bookId
+                                                (Maybe.map
+                                                    (\book ->
+                                                        { book
+                                                            | tags =
+                                                                insertOnce
+                                                                    book.tags
+                                                                    tagN
+                                                        }
+                                                    )
+                                                )
                                                 model.books
-                                                book
-                                                newBook
-                                        , bookMap =
-                                            insert
-                                                book.id
-                                                newBook
-                                                model.bookMap
-                                        , titleRouteMap =
-                                            insert
-                                                model.lastTitleSlug
-                                                newBook
-                                                model.titleRouteMap
-                                        , currentBook = Just newBook
                                         , pendingTag = Nothing
                                       }
                                     , none
@@ -466,29 +438,28 @@ update message model =
 
         RemoveTag tag ->
             case model.currentBook of
-                Just book ->
+                Just bookId ->
                     let
-                        newBook =
-                            { book | tags = removeItem book.tags tag }
-
                         newBooks =
-                            updateItem model.books book newBook
+                            Dict.update bookId
+                                (Maybe.map
+                                    (\book ->
+                                        { book
+                                            | tags =
+                                                removeItem book.tags tag
+                                        }
+                                    )
+                                )
+                                model.books
                     in
                     store
                         ( { model
-                            | tags = newBooks |> concatMap .tags |> dedupe
+                            | tags =
+                                newBooks
+                                    |> values
+                                    |> concatMap .tags
+                                    |> dedupe
                             , books = newBooks
-                            , bookMap =
-                                insert
-                                    book.id
-                                    newBook
-                                    model.bookMap
-                            , titleRouteMap =
-                                insert
-                                    model.lastTitleSlug
-                                    newBook
-                                    model.titleRouteMap
-                            , currentBook = Just newBook
                           }
                         , none
                         )
@@ -509,58 +480,13 @@ update message model =
             ( { model | hidePromptActive = False }, none )
 
         HideEntries entries ->
-            let
-                list =
-                    getEntries model
-
-                idx =
-                    withDefault 0 (entries |> head |> Maybe.map (getIndex list))
-
-                fn =
-                    filter (\entry -> member entry entries |> not)
-
-                len =
-                    length list
-
-                soleEntry =
-                    len == 1
-
-                ids =
-                    map .id entries
-
-                idSet =
-                    Set.fromList ids
-            in
-            update
-                (ShowByIndex <|
-                    if soleEntry then
-                        0
-
-                    else if idx == len - 1 then
-                        idx - 1
-
-                    else
-                        idx
-                )
-                { model
-                    | hiddenEntries = union model.hiddenEntries idSet
-                    , entries = fn model.entries
-                    , shownEntries =
-                        if soleEntry then
-                            Nothing
-
-                        else
-                            Maybe.map fn model.shownEntries
-                    , completedEmbeddings = diff model.completedEmbeddings idSet
-                    , hidePromptActive = False
-                }
-                |> (\( m, cmd ) -> ( m, batch [ cmd, deleteEmbeddings ids ] ))
+            noOp
 
         Sort ->
             store
                 ( { model
                     | reverseSort = not model.reverseSort
-                    , books = reverse model.books
+                    , booksShown = reverse model.booksShown
                   }
                 , none
                 )
@@ -618,19 +544,19 @@ update message model =
                     model
 
         ExportEpub ->
-            ( model, Epub.export model.books model.entries )
+            ( model, Epub.export (values model.books) (values model.entries) )
 
         RequestEmbeddings ->
             let
                 nextBatch =
                     diff
                         (diff
-                            (model.entries |> map .id |> Set.fromList)
+                            (model.entries |> keys |> Set.fromList)
                             model.completedEmbeddings
                         )
                         model.hiddenEntries
                         |> toList
-                        |> filterMap (\id -> get id model.idsToEntries)
+                        |> filterMap (\id -> get id model.entries)
                         |> map (\entry -> ( entry.id, entry.text ))
                         |> take embeddingBatchSize
             in
@@ -651,16 +577,16 @@ update message model =
                 }
 
         ReceiveNeighbors ( targetId, idScores ) ->
-            if Dict.member targetId model.idsToEntries then
+            if Dict.member targetId model.entries then
                 ( { model
                     | neighborMap =
                         insert
                             targetId
                             (filterMap
                                 (\( id, score ) ->
-                                    case get id model.idsToEntries of
+                                    case get id model.entries of
                                         Just entry ->
-                                            Just ( entry, score )
+                                            Just ( entry.id, score )
 
                                         _ ->
                                             Nothing
@@ -697,7 +623,10 @@ update message model =
 
                 titleView =
                     \slug ->
-                        case get slug model.titleRouteMap of
+                        case
+                            get slug model.titleRouteMap
+                                |> andThen (\id -> get id model.books)
+                        of
                             Just book ->
                                 update
                                     (FilterBy (Just (TitleFilter book)))
@@ -721,8 +650,8 @@ update message model =
                     , batch
                         [ cmd
                         , case get slug model.titleRouteMap of
-                            Just book ->
-                                case get book.id model.bookIdToLastRead of
+                            Just bookId ->
+                                case get bookId model.bookIdToLastRead of
                                     Just lastId ->
                                         attempt
                                             ScrollToElement
@@ -802,36 +731,50 @@ update message model =
             ( case sort of
                 RecencySort ->
                     { model_
-                        | books = sortBy .sortIndex model.books |> reverse
+                        | booksShown =
+                            sortBy
+                                .sortIndex
+                                (pluckIds model.books model.booksShown)
+                                |> map .id
+                                |> reverse
                         , reverseSort = False
                     }
 
                 TitleSort ->
                     { model_
-                        | books =
+                        | booksShown =
                             sortWith
                                 (\a b ->
                                     compare
                                         (a |> .title |> normalizeTitle)
                                         (b |> .title |> normalizeTitle)
                                 )
-                                model.books
+                                (pluckIds model.books model.booksShown)
+                                |> map .id
                         , reverseSort = True
                     }
 
                 NumSort ->
                     { model_
-                        | books = sortBy .count model.books |> reverse
+                        | booksShown =
+                            sortBy
+                                .count
+                                (pluckIds model.books model.booksShown)
+                                |> map .id
+                                |> reverse
                         , reverseSort = False
                     }
             , none
             )
 
         OnIntersect id ->
-            case get id model.idsToEntries of
+            case get id model.entries of
                 Just entry ->
                     store
-                        ( case model.currentBook of
+                        ( case
+                            model.currentBook
+                                |> andThen (\bookId -> get bookId model.books)
+                          of
                             Just book ->
                                 { model
                                     | bookIdToLastRead =
@@ -883,7 +826,7 @@ update message model =
 
         OnScroll delta ->
             ( { model
-                | hideHeader = model.shownEntries /= Nothing && delta > 0
+                | hideHeader = model.entriesShown /= Nothing && delta > 0
               }
             , none
             )
