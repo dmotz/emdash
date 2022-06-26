@@ -37,7 +37,6 @@ import Model
 import Msg exposing (Msg(..))
 import Parser exposing (getBooks, normalizeTitle)
 import Platform.Cmd exposing (batch, none)
-import Random exposing (generate)
 import Router
     exposing
         ( Route(..)
