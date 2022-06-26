@@ -4,7 +4,7 @@ import Browser exposing (UrlRequest)
 import Browser.Dom exposing (Element, Error)
 import Debounce
 import File exposing (File)
-import Model exposing (BookSort, Entry, EntryTab, Filter, Id, InputFocus, Tag)
+import Model exposing (BookSort, EntryTab, Filter, Id, InputFocus, Tag)
 import Url exposing (Url)
 import Utils exposing (KeyEvent)
 
