@@ -47,8 +47,6 @@ async function init() {
     didFail = true
   }
 
-  console.log(app.ports)
-
   app.ports.importJson.subscribe(importJson)
   app.ports.exportJson.subscribe(exportJson)
   app.ports.setStorage.subscribe(setStorage)
