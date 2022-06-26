@@ -22,7 +22,7 @@ type Msg
     | PickFile
     | KeyDown KeyEvent
     | SetInputFocus (Maybe InputFocus)
-    | HideEntries (List Entry)
+    | HideEntry Id
     | PromptHide
     | CancelHide
     | UpdateNotes Id String
