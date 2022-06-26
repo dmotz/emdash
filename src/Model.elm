@@ -168,4 +168,4 @@ sortToString t =
             "title"
 
         _ ->
-            "number of entries"
+            "# of entries"
