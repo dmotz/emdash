@@ -300,6 +300,7 @@ makeEntry ( raw, notes ) =
                             (replace footnoteRx footnoteReplacer text)
                             (replaceApostrophes title)
                             (replaceApostrophes author)
+                            (withDefault 0 date)
                             (withDefault -1 page)
                             []
                             notes
@@ -328,27 +329,27 @@ getTitles =
     getUniques .title titleSorter
 
 
-getBookMap : List Entry -> Dict Id Book
-getBookMap =
+getBooks : List Entry -> Dict Id Book
+getBooks =
     foldr
-        (\{ title, author } ( acc, sortIndex ) ->
+        (\{ title, author, date } acc ->
             let
                 id =
                     hashId <| title ++ " " ++ author
             in
             case get id acc of
                 Just book ->
-                    ( insert id { book | count = book.count + 1 } acc
-                    , sortIndex
-                    )
+                    insert id
+                        { book
+                            | count = book.count + 1
+                            , sortIndex = max book.sortIndex date
+                        }
+                        acc
 
                 _ ->
-                    ( insert id (Book id title author 1 (sortIndex + 1)) acc
-                    , sortIndex + 1
-                    )
+                    insert id (Book id title author 1 date []) acc
         )
-        ( Dict.empty, -1 )
-        >> first
+        Dict.empty
 
 
 titleSorter : String -> String -> Order
