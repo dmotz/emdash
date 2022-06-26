@@ -79,6 +79,7 @@ type alias Entry =
     , text : String
     , title : Title
     , author : String
+    , date : Int
     , page : Int
     , tags : List Tag
     , notes : String
