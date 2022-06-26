@@ -47,12 +47,14 @@ async function init() {
     didFail = true
   }
 
+  console.log(app.ports)
+
   app.ports.importJson.subscribe(importJson)
   app.ports.exportJson.subscribe(exportJson)
   app.ports.setStorage.subscribe(setStorage)
   app.ports.createEpub.subscribe(createEpub)
   app.ports.requestEmbeddings.subscribe(requestEmbeddings)
-  app.ports.deleteEmbeddings.subscribe(deleteEmbeddings)
+  app.ports.deleteEmbedding.subscribe(deleteEmbeddings)
   app.ports.requestNeighbors.subscribe(requestNeighbors)
   app.ports.setObservers.subscribe(setObservers)
   app.ports.scrollToTop.subscribe(scrollToTop)

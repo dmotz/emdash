@@ -102,7 +102,7 @@ port requestEmbeddings : List ( Id, String ) -> Cmd msg
 port receiveEmbeddings : (List Id -> msg) -> Sub msg
 
 
-port deleteEmbeddings : List Id -> Cmd msg
+port deleteEmbedding : Id -> Cmd msg
 
 
 port requestNeighbors : ( Id, Bool ) -> Cmd msg
@@ -479,8 +479,15 @@ update message model =
         CancelHide ->
             ( { model | hidePromptActive = False }, none )
 
-        HideEntries entries ->
-            noOp
+        HideEntry id ->
+            store
+                ( { model
+                    | hiddenEntries = Set.insert id model.hiddenEntries
+                    , entriesShown =
+                        Maybe.map (filter ((/=) id)) model.entriesShown
+                  }
+                , deleteEmbedding id
+                )
 
         Sort ->
             store
