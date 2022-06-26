@@ -374,6 +374,6 @@ getTags =
         >> dedupe
 
 
-getRouteMap : List Book -> Dict String Book
+getRouteMap : List Book -> Dict String Id
 getRouteMap =
-    map (juxt (.title >> slugify) identity) >> Dict.fromList
+    map (juxt (.title >> slugify) .id) >> Dict.fromList
