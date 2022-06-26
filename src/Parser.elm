@@ -1,5 +1,5 @@
 module Parser exposing
-    ( getBookMap
+    ( getBooks
     , getRouteMap
     , getTags
     , getTitles
@@ -20,7 +20,6 @@ import List
         , foldr
         , head
         , map
-        , reverse
         , sortWith
         )
 import MD5 exposing (bytes)
@@ -40,11 +39,12 @@ import String
         , toLower
         , trim
         )
+import Time exposing (Month(..), posixToMillis)
 import Tuple exposing (first)
 import Utils exposing (dedupe, juxt, rx, rx_)
 
 
-process : String -> List Entry
+process : String -> Dict Id Entry
 process =
     lines
         >> foldr folder ( [], [] )
@@ -52,7 +52,8 @@ process =
         >> foldr findNotes []
         >> map makeEntry
         >> filterMap identity
-        >> reverse
+        >> map (juxt .id identity)
+        >> Dict.fromList
 
 
 separator : String
