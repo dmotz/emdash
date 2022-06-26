@@ -7,30 +7,29 @@ module Utils exposing
     , find
     , findMatches
     , formatNumber
-    , getEntryHeight
     , getIndex
     , getNextIndex
     , getPrevIndex
     , insertOnce
     , juxt
-    , mapIdsToEntries
     , modelToStoredModel
+    , pluckIds
     , queryCharMin
     , removeItem
     , rx
     , rx_
     , takeExcerpt
+    , toDict
     , updateItem
     , updateItems
     )
 
-import Dict exposing (Dict)
-import List exposing (filter, length, map, partition)
+import Dict exposing (Dict, get, values)
+import List exposing (filter, filterMap, length, map, partition)
 import Maybe exposing (withDefault)
 import Model
     exposing
-        ( Entry
-        , Filter(..)
+        ( Filter(..)
         , Id
         , Model
         , StoredModel
@@ -105,7 +104,7 @@ updateItems :
 updateItems list mapping =
     map
         (\x ->
-            withDefault x (Dict.get x.id mapping)
+            withDefault x (get x.id mapping)
         )
         list
 
@@ -161,23 +160,14 @@ dedupe =
 
 modelToStoredModel : Model -> StoredModel
 modelToStoredModel model =
-    { entries = model.entries
-    , selectedEntries = map .id model.selectedEntries
+    { entries = values model.entries
+    , books = values model.books
     , hiddenEntries = Set.toList model.hiddenEntries
     , focusMode = model.focusMode
     , reverseSort = model.reverseSort
     , schemaVersion = model.schemaVersion
     , bookIdToLastRead = Dict.toList model.bookIdToLastRead
     }
-
-
-getEntryHeight : Bool -> Int
-getEntryHeight hasTitle =
-    if hasTitle then
-        90
-
-    else
-        60
 
 
 charLimit : Int
@@ -227,22 +217,26 @@ juxt f g x =
     ( f x, g x )
 
 
-mapIdsToEntries : List Entry -> Dict Id Entry
-mapIdsToEntries entries =
-    map (juxt .id identity) entries |> Dict.fromList
+pluckIds : Dict Id a -> List Id -> List a
+pluckIds xs ids =
+    filterMap (\id -> get id xs) ids
+
+
+toDict : List { a | id : comparable } -> Dict comparable { a | id : comparable }
+toDict =
+    map (juxt .id identity) >> Dict.fromList
+
+
+phraseMatch : Regex -> (a -> String) -> a -> Bool
+phraseMatch regex accessor x =
+    x |> accessor |> toLower |> Regex.contains regex
 
 
 findMatches : String -> (a -> String) -> List a -> List a
 findMatches query accessor xs =
     let
         ( phraseMatches, rest ) =
-            partition
-                (\x ->
-                    Regex.contains
-                        (rx <| "\\b" ++ query)
-                        (toLower (accessor x))
-                )
-                xs
+            partition (phraseMatch (rx <| "\\b" ++ query) accessor) xs
 
         pattern =
             split " " query
