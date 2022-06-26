@@ -12,7 +12,6 @@ import Utils exposing (KeyEvent)
 type Msg
     = NoOp
     | ShowRandom
-    | ShowByIndex Int
     | FilterBy (Maybe Filter)
     | ToggleFocusMode
     | ToggleAboutMode

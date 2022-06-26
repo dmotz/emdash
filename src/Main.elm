@@ -288,9 +288,6 @@ update message model =
         ResetError ->
             ( { model | parsingError = False }, none )
 
-        ShowByIndex i ->
-            noOp
-
         ShowRandom ->
             noOp
 
