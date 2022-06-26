@@ -10,6 +10,7 @@ module Parser exposing
 import Base64 exposing (fromBytes)
 import Bytes.Encode exposing (encode, sequence, unsignedInt8)
 import Char exposing (isDigit)
+import DateTime exposing (fromRawParts, toPosix)
 import Dict exposing (Dict, get, insert)
 import List
     exposing
@@ -135,6 +136,11 @@ pageRx =
     rx_ " on page (\\d+)"
 
 
+dateRx : Regex
+dateRx =
+    rx " \\| Added on \\w+, (\\w+) (\\d+), (\\d+) (\\d+):(\\d+):(\\d+) (\\w+)"
+
+
 footnoteRx : Regex
 footnoteRx =
     rx "([^\\s\\d]{2,})(\\d+)"
@@ -211,6 +217,79 @@ makeEntry ( raw, notes ) =
                         |> andThen head
                         |> andThen identity
                         |> andThen toInt
+
+                date =
+                    case
+                        Regex.find dateRx meta
+                            |> head
+                            |> Maybe.map .submatches
+                    of
+                        Just [ Just month, Just dayRaw, Just yearRaw, Just hourRaw, Just minuteRaw, Just secondRaw, Just meridian ] ->
+                            case [ toInt yearRaw, toInt dayRaw, toInt hourRaw, toInt minuteRaw, toInt secondRaw ] of
+                                [ Just year, Just day, Just hour, Just minute, Just second ] ->
+                                    fromRawParts
+                                        { day = day
+                                        , month =
+                                            case month of
+                                                "January" ->
+                                                    Jan
+
+                                                "February" ->
+                                                    Feb
+
+                                                "March" ->
+                                                    Mar
+
+                                                "April" ->
+                                                    Apr
+
+                                                "May" ->
+                                                    May
+
+                                                "June" ->
+                                                    Jun
+
+                                                "July" ->
+                                                    Jul
+
+                                                "August" ->
+                                                    Aug
+
+                                                "September" ->
+                                                    Sep
+
+                                                "October" ->
+                                                    Oct
+
+                                                "November" ->
+                                                    Nov
+
+                                                _ ->
+                                                    Dec
+                                        , year = year
+                                        }
+                                        { hours =
+                                            hour
+                                                + (if meridian == "AM" then
+                                                    0
+
+                                                   else if hour < 12 then
+                                                    12
+
+                                                   else
+                                                    0
+                                                  )
+                                        , minutes = minute
+                                        , seconds = second
+                                        , milliseconds = 0
+                                        }
+                                        |> Maybe.map (toPosix >> posixToMillis)
+
+                                _ ->
+                                    Nothing
+
+                        _ ->
+                            Nothing
             in
             case pair of
                 [ title, author ] ->
