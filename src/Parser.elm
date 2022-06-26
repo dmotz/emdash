@@ -24,7 +24,7 @@ import List
         )
 import MD5 exposing (bytes)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Author, Book, Entry, Id, Tag, Title)
+import Model exposing (Book, Entry, Id, Tag, Title)
 import Regex exposing (Match, Regex, replace)
 import Router exposing (slugify)
 import Set
