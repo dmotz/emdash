@@ -13,12 +13,9 @@ import Json.Decode as Decode
 import List
     exposing
         ( concatMap
-        , drop
         , filter
         , filterMap
-        , head
         , isEmpty
-        , length
         , map
         , member
         , reverse
@@ -30,7 +27,6 @@ import Maybe exposing (andThen, withDefault)
 import Model
     exposing
         ( BookSort(..)
-        , Entry
         , Filter(..)
         , Id
         , InputFocus(..)
@@ -62,15 +58,11 @@ import Utils
         , dedupe
         , embeddingBatchSize
         , findMatches
-        , getIndex
-        , getNextIndex
-        , getPrevIndex
         , insertOnce
         , juxt
         , modelToStoredModel
         , pluckIds
         , removeItem
-        , updateItem
         )
 import Views.Base exposing (view)
 
@@ -438,12 +430,12 @@ update message model =
                 Just bookId ->
                     let
                         newBooks =
-                            Dict.update bookId
+                            Dict.update
+                                bookId
                                 (Maybe.map
                                     (\book ->
                                         { book
-                                            | tags =
-                                                removeItem book.tags tag
+                                            | tags = removeItem book.tags tag
                                         }
                                     )
                                 )
