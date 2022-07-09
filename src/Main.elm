@@ -868,7 +868,9 @@ update message model =
 
                             _ ->
                                 model
-                        , Nav.replaceUrl model.key (entryToRoute entry)
+                        , Nav.replaceUrl
+                            model.key
+                            (entryToRoute model.books entry)
                         )
 
                 _ ->
