@@ -333,12 +333,12 @@ export books entries =
       , generateContent titles
       ]
     , indexedMap
-        (\i { title, author } ->
+        (\i { id, title, author } ->
             generateChapter
                 i
                 title
                 author
-                (filter (.title >> (==) title) entries)
+                (filter (.bookId >> (==) id) entries)
         )
         books
     ]
