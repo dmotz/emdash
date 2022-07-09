@@ -590,7 +590,20 @@ update message model =
                         |> take embeddingBatchSize
             in
             if isEmpty nextBatch then
-                ( { model | embeddingsReady = True }, none )
+                ( model
+                , model.books
+                    |> values
+                    |> map
+                        (\{ id } ->
+                            ( id
+                            , model.entries
+                                |> values
+                                |> filter (.bookId >> (==) id)
+                                |> map .id
+                            )
+                        )
+                    |> requestBookEmbeddings
+                )
 
             else
                 ( { model | embeddingsReady = False }
