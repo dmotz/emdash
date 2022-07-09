@@ -1,33 +1,16 @@
-module Parser exposing
-    ( getBooks
-    , getRouteMap
-    , getTags
-    , getTitles
-    , normalizeTitle
-    , process
-    )
+module Parser exposing (getRouteMap, getTags, normalizeTitle, process)
 
 import Base64 exposing (fromBytes)
 import Bytes.Encode exposing (encode, sequence, unsignedInt8)
 import Char exposing (isDigit)
 import DateTime exposing (fromRawParts, toPosix)
-import Dict exposing (Dict, get, insert)
-import List
-    exposing
-        ( all
-        , concat
-        , filterMap
-        , foldr
-        , head
-        , map
-        , sortWith
-        )
+import Dict exposing (Dict, insert, update)
+import List exposing (all, concat, foldr, head, map)
 import MD5 exposing (bytes)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Book, Entry, Id, Tag, Title)
+import Model exposing (Book, Entry, Id, Tag)
 import Regex exposing (Match, Regex, replace)
 import Router exposing (slugify)
-import Set
 import String
     exposing
         ( lines
@@ -40,20 +23,16 @@ import String
         , trim
         )
 import Time exposing (Month(..), posixToMillis)
-import Tuple exposing (first)
 import Utils exposing (dedupe, juxt, rx, rx_)
 
 
-process : String -> Dict Id Entry
+process : String -> ( Dict Id Entry, Dict Id Book )
 process =
     lines
         >> foldr folder ( [], [] )
         >> (\( xs, x ) -> x :: xs)
         >> foldr findNotes []
-        >> map makeEntry
-        >> filterMap identity
-        >> map (juxt .id identity)
-        >> Dict.fromList
+        >> makeDicts
 
 
 separator : String
@@ -193,168 +172,173 @@ replaceApostrophes =
     replace apostropheRx apostropheReplacer
 
 
-makeEntry : ( List String, String ) -> Maybe Entry
-makeEntry ( raw, notes ) =
-    case raw of
-        [ text, meta, titleAuthor ] ->
+makeDicts : List ( List String, String ) -> ( Dict Id Entry, Dict Id Book )
+makeDicts =
+    foldr
+        (\( raw, notes ) ( entries, books ) ->
             let
-                pair =
-                    (if right 1 titleAuthor == ")" then
-                        Regex.find titleAuthorRx titleAuthor
-                            |> map .submatches
-                            |> head
-                            |> withDefault []
-                            |> map (withDefault "")
+                noOp =
+                    ( entries, books )
+            in
+            case raw of
+                [ text, meta, titleAuthor ] ->
+                    let
+                        pair =
+                            (if right 1 titleAuthor == ")" then
+                                Regex.find titleAuthorRx titleAuthor
+                                    |> map .submatches
+                                    |> head
+                                    |> withDefault []
+                                    |> map (withDefault "")
 
-                     else
-                        split "-" titleAuthor
-                    )
-                        |> map trim
+                             else
+                                split "-" titleAuthor
+                            )
+                                |> map trim
 
-                page =
-                    Regex.find pageRx meta
-                        |> head
-                        |> Maybe.map .submatches
-                        |> andThen head
-                        |> andThen identity
-                        |> andThen toInt
+                        page =
+                            Regex.find pageRx meta
+                                |> head
+                                |> Maybe.map .submatches
+                                |> andThen head
+                                |> andThen identity
+                                |> andThen toInt
 
-                date =
-                    case
-                        Regex.find dateRx meta
-                            |> head
-                            |> Maybe.map .submatches
-                    of
-                        Just [ Just month, Just dayRaw, Just yearRaw, Just hourRaw, Just minuteRaw, Just secondRaw, Just meridian ] ->
-                            case [ toInt yearRaw, toInt dayRaw, toInt hourRaw, toInt minuteRaw, toInt secondRaw ] of
-                                [ Just year, Just day, Just hour, Just minute, Just second ] ->
-                                    fromRawParts
-                                        { day = day
-                                        , month =
-                                            case month of
-                                                "January" ->
-                                                    Jan
+                        dateRaw =
+                            case
+                                Regex.find dateRx meta
+                                    |> head
+                                    |> Maybe.map .submatches
+                            of
+                                Just [ Just month, Just dayRaw, Just yearRaw, Just hourRaw, Just minuteRaw, Just secondRaw, Just meridian ] ->
+                                    case [ toInt yearRaw, toInt dayRaw, toInt hourRaw, toInt minuteRaw, toInt secondRaw ] of
+                                        [ Just year, Just day, Just hour, Just minute, Just second ] ->
+                                            fromRawParts
+                                                { day = day
+                                                , month =
+                                                    case month of
+                                                        "January" ->
+                                                            Jan
 
-                                                "February" ->
-                                                    Feb
+                                                        "February" ->
+                                                            Feb
 
-                                                "March" ->
-                                                    Mar
+                                                        "March" ->
+                                                            Mar
 
-                                                "April" ->
-                                                    Apr
+                                                        "April" ->
+                                                            Apr
 
-                                                "May" ->
-                                                    May
+                                                        "May" ->
+                                                            May
 
-                                                "June" ->
-                                                    Jun
+                                                        "June" ->
+                                                            Jun
 
-                                                "July" ->
-                                                    Jul
+                                                        "July" ->
+                                                            Jul
 
-                                                "August" ->
-                                                    Aug
+                                                        "August" ->
+                                                            Aug
 
-                                                "September" ->
-                                                    Sep
+                                                        "September" ->
+                                                            Sep
 
-                                                "October" ->
-                                                    Oct
+                                                        "October" ->
+                                                            Oct
 
-                                                "November" ->
-                                                    Nov
+                                                        "November" ->
+                                                            Nov
 
-                                                _ ->
-                                                    Dec
-                                        , year = year
-                                        }
-                                        { hours =
-                                            hour
-                                                + (if meridian == "AM" then
-                                                    0
+                                                        _ ->
+                                                            Dec
+                                                , year = year
+                                                }
+                                                { hours =
+                                                    hour
+                                                        + (if meridian == "AM" then
+                                                            0
 
-                                                   else if hour < 12 then
-                                                    12
+                                                           else if hour < 12 then
+                                                            12
 
-                                                   else
-                                                    0
-                                                  )
-                                        , minutes = minute
-                                        , seconds = second
-                                        , milliseconds = 0
-                                        }
-                                        |> Maybe.map (toPosix >> posixToMillis)
+                                                           else
+                                                            0
+                                                          )
+                                                , minutes = minute
+                                                , seconds = second
+                                                , milliseconds = 0
+                                                }
+                                                |> Maybe.map
+                                                    (toPosix >> posixToMillis)
+
+                                        _ ->
+                                            Just 0
 
                                 _ ->
-                                    Nothing
+                                    Just 0
+                    in
+                    case pair of
+                        [ titleRaw, authorRaw ] ->
+                            let
+                                id =
+                                    hashId <| text ++ meta
+
+                                title =
+                                    replaceApostrophes titleRaw
+
+                                author =
+                                    replaceApostrophes authorRaw
+
+                                bookId =
+                                    hashId <| title ++ " " ++ author
+
+                                date =
+                                    withDefault 0 dateRaw
+                            in
+                            ( insert id
+                                (Entry
+                                    id
+                                    (replace footnoteRx footnoteReplacer text)
+                                    bookId
+                                    date
+                                    (withDefault -1 page)
+                                    []
+                                    notes
+                                )
+                                entries
+                            , update bookId
+                                (\mBook ->
+                                    Just <|
+                                        case mBook of
+                                            Just book ->
+                                                { book
+                                                    | count = book.count + 1
+                                                    , sortIndex =
+                                                        max
+                                                            book.sortIndex
+                                                            date
+                                                }
+
+                                            _ ->
+                                                Book
+                                                    bookId
+                                                    title
+                                                    author
+                                                    1
+                                                    date
+                                                    []
+                                )
+                                books
+                            )
 
                         _ ->
-                            Nothing
-            in
-            case pair of
-                [ title, author ] ->
-                    Just <|
-                        Entry
-                            (hashId <| text ++ meta)
-                            (replace footnoteRx footnoteReplacer text)
-                            (replaceApostrophes title)
-                            (replaceApostrophes author)
-                            (withDefault 0 date)
-                            (withDefault -1 page)
-                            []
-                            notes
+                            noOp
 
                 _ ->
-                    Nothing
-
-        _ ->
-            Nothing
-
-
-getUniques :
-    (Entry -> String)
-    -> (String -> String -> Order)
-    -> List Entry
-    -> List String
-getUniques key sorter entries =
-    map key entries
-        |> Set.fromList
-        |> Set.toList
-        |> sortWith sorter
-
-
-getTitles : List Entry -> List Title
-getTitles =
-    getUniques .title titleSorter
-
-
-getBooks : List Entry -> Dict Id Book
-getBooks =
-    foldr
-        (\{ title, author, date } acc ->
-            let
-                id =
-                    hashId <| title ++ " " ++ author
-            in
-            case get id acc of
-                Just book ->
-                    insert id
-                        { book
-                            | count = book.count + 1
-                            , sortIndex = max book.sortIndex date
-                        }
-                        acc
-
-                _ ->
-                    insert id (Book id title author 1 date []) acc
+                    noOp
         )
-        Dict.empty
-
-
-titleSorter : String -> String -> Order
-titleSorter a b =
-    compare (normalizeTitle a) (normalizeTitle b)
+        ( Dict.empty, Dict.empty )
 
 
 titlePrefixRx : Regex
