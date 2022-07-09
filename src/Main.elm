@@ -718,21 +718,33 @@ update message model =
                     in
                     ( { m | searchQuery = "" }
                     , batch
-                        [ cmd
-                        , case get slug model.titleRouteMap of
-                            Just bookId ->
-                                case get bookId model.bookIdToLastRead of
-                                    Just lastId ->
-                                        attempt
-                                            ScrollToElement
-                                            (getElement <| "entry" ++ lastId)
+                        (cmd
+                            :: (case get slug model.titleRouteMap of
+                                    Just bookId ->
+                                        [ case
+                                            get
+                                                bookId
+                                                model.bookIdToLastRead
+                                          of
+                                            Just lastId ->
+                                                attempt
+                                                    ScrollToElement
+                                                    (getElement <|
+                                                        "entry"
+                                                            ++ lastId
+                                                    )
+
+                                            _ ->
+                                                perform
+                                                    (always NoOp)
+                                                    (setViewport 0 0)
+                                        , requestBookNeighbors bookId
+                                        ]
 
                                     _ ->
-                                        perform (always NoOp) (setViewport 0 0)
-
-                            _ ->
-                                none
-                        ]
+                                        []
+                               )
+                        )
                     )
 
                 Just (EntryRoute slug id) ->
