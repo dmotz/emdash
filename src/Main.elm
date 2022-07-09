@@ -12,7 +12,8 @@ import File.Select as Select
 import Json.Decode as Decode
 import List
     exposing
-        ( concatMap
+        ( concat
+        , concatMap
         , filter
         , filterMap
         , isEmpty
@@ -203,7 +204,7 @@ init maybeModel url key =
             , hiddenEntries = Set.fromList restored.hiddenEntries
             , completedEmbeddings = Set.empty
             , embeddingsReady = False
-            , tags = Parser.getTags restored.entries
+            , tags = restored.books |> map .tags |> concat |> dedupe
             , titleRouteMap = Parser.getRouteMap restored.books
             , filter = Nothing
             , pendingTag = Nothing

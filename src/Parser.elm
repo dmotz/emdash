@@ -1,4 +1,4 @@
-module Parser exposing (getRouteMap, getTags, normalizeTitle, process)
+module Parser exposing (getRouteMap, normalizeTitle, process)
 
 import Base64 exposing (fromBytes)
 import Bytes.Encode exposing (encode, sequence, unsignedInt8)
@@ -349,13 +349,6 @@ titlePrefixRx =
 normalizeTitle : String -> String
 normalizeTitle =
     toLower >> replace titlePrefixRx (always "")
-
-
-getTags : List Entry -> List Tag
-getTags =
-    map .tags
-        >> concat
-        >> dedupe
 
 
 getRouteMap : List Book -> Dict String Id
