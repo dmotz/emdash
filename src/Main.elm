@@ -320,7 +320,7 @@ update message model =
                         entryIds =
                             model.entries
                                 |> Dict.filter
-                                    (\_ { title } -> title == book.title)
+                                    (\_ { bookId } -> bookId == book.id)
                                 |> values
                                 |> sortBy .page
                                 |> map .id
@@ -336,9 +336,9 @@ update message model =
                     ( { model_
                         | entriesShown = Nothing
                         , booksShown =
-                            Dict.filter
-                                (\_ entry -> entry.author == author)
-                                model.books
+                            model.books
+                                |> Dict.filter
+                                    (\_ book -> book.author == author)
                                 |> keys
                       }
                     , none
