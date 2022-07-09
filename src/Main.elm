@@ -618,6 +618,9 @@ update message model =
                         union model.completedEmbeddings (Set.fromList ids)
                 }
 
+        ReceiveBookEmbeddings _ ->
+            ( { model | embeddingsReady = True }, none )
+
         ReceiveNeighbors ( targetId, idScores ) ->
             if Dict.member targetId model.entries then
                 ( { model
@@ -636,6 +639,31 @@ update message model =
                                 idScores
                             )
                             model.neighborMap
+                  }
+                , none
+                )
+
+            else
+                noOp
+
+        ReceiveBookNeighbors ( targetId, idScores ) ->
+            if Dict.member targetId model.books then
+                ( { model
+                    | bookNeighborMap =
+                        insert
+                            targetId
+                            (filterMap
+                                (\( id, score ) ->
+                                    case get id model.books of
+                                        Just book ->
+                                            Just ( book.id, score )
+
+                                        _ ->
+                                            Nothing
+                                )
+                                idScores
+                            )
+                            model.bookNeighborMap
                   }
                 , none
                 )
