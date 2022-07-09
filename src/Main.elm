@@ -619,7 +619,14 @@ update message model =
                 }
 
         ReceiveBookEmbeddings _ ->
-            ( { model | embeddingsReady = True }, none )
+            ( { model | embeddingsReady = True }
+            , case model.currentBook of
+                Just bookId ->
+                    requestBookNeighbors bookId
+
+                _ ->
+                    none
+            )
 
         ReceiveNeighbors ( targetId, idScores ) ->
             if Dict.member targetId model.entries then
