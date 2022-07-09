@@ -10,7 +10,8 @@ module Router exposing
     , titleToRoute
     )
 
-import Model exposing (Author, Entry, Id, Tag, Title)
+import Dict exposing (Dict, get)
+import Model exposing (Author, Book, Entry, Id, Tag, Title)
 import Regex exposing (replace)
 import Url.Builder exposing (absolute)
 import Url.Parser exposing ((</>), (<?>), Parser, map, oneOf, s, string, top)
@@ -41,9 +42,14 @@ routeParser =
         ]
 
 
-entryToRoute : Entry -> String
-entryToRoute entry =
-    absolute [ "title", slugify entry.title, entry.id ] []
+entryToRoute : Dict Id Book -> Entry -> String
+entryToRoute books entry =
+    case get entry.bookId books of
+        Just book ->
+            absolute [ "title", slugify book.title, entry.id ] []
+
+        _ ->
+            ""
 
 
 titleToRoute : Title -> String
