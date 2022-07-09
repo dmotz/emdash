@@ -77,8 +77,7 @@ type alias Book =
 type alias Entry =
     { id : Id
     , text : String
-    , title : Title
-    , author : String
+    , bookId : Id
     , date : Int
     , page : Int
     , tags : List Tag
