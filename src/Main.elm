@@ -5,7 +5,7 @@ import Browser.Dom exposing (getElement, setViewport)
 import Browser.Events exposing (onKeyDown)
 import Browser.Navigation as Nav
 import Debounce
-import Dict exposing (get, insert, keys, values)
+import Dict exposing (get, insert, keys, remove, values)
 import Epub
 import File
 import File.Select as Select
@@ -93,13 +93,25 @@ port requestEmbeddings : List ( Id, String ) -> Cmd msg
 port receiveEmbeddings : (List Id -> msg) -> Sub msg
 
 
+port requestBookEmbeddings : List ( Id, List Id ) -> Cmd msg
+
+
+port receiveBookEmbeddings : (() -> msg) -> Sub msg
+
+
 port deleteEmbedding : Id -> Cmd msg
 
 
 port requestNeighbors : ( Id, Bool ) -> Cmd msg
 
 
+port requestBookNeighbors : Id -> Cmd msg
+
+
 port receiveNeighbors : (( Id, List ( Id, Float ) ) -> msg) -> Sub msg
+
+
+port receiveBookNeighbors : (( Id, List ( Id, Float ) ) -> msg) -> Sub msg
 
 
 port requestUnicodeNormalized : String -> Cmd msg
@@ -163,7 +175,9 @@ main =
                         |> Decode.map KeyDown
                         |> onKeyDown
                     , receiveNeighbors ReceiveNeighbors
+                    , receiveBookNeighbors ReceiveBookNeighbors
                     , receiveEmbeddings ReceiveEmbeddings
+                    , receiveBookEmbeddings ReceiveBookEmbeddings
                     , receiveUnicodeNormalized ReceiveUnicodeNormalized
                     , onIntersect OnIntersect
                     , onScroll OnScroll
@@ -185,6 +199,7 @@ init maybeModel url key =
             , booksShown = map .id restored.books
             , entriesShown = Nothing
             , neighborMap = Dict.empty
+            , bookNeighborMap = Dict.empty
             , hiddenEntries = Set.fromList restored.hiddenEntries
             , completedEmbeddings = Set.empty
             , embeddingsReady = False
