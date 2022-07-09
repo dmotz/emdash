@@ -91,6 +91,7 @@ type alias Model =
     , booksShown : List Id
     , entriesShown : Maybe (List Id)
     , neighborMap : Dict Id (List ( Id, Float ))
+    , bookNeighborMap : Dict Id (List ( Id, Float ))
     , hiddenEntries : Set Id
     , completedEmbeddings : Set Id
     , embeddingsReady : Bool
