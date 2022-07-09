@@ -38,7 +38,9 @@ type Msg
     | ExportEpub
     | RequestEmbeddings
     | ReceiveEmbeddings (List Id)
+    | ReceiveBookEmbeddings ()
     | ReceiveNeighbors ( Id, List ( Id, Float ) )
+    | ReceiveBookNeighbors ( Id, List ( Id, Float ) )
     | LinkClicked UrlRequest
     | UrlChanged Url
     | SortBooks BookSort
