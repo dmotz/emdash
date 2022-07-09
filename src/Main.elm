@@ -486,8 +486,27 @@ update message model =
             store
                 ( { model
                     | hiddenEntries = Set.insert id model.hiddenEntries
+                    , entries = remove id model.entries
                     , entriesShown =
                         Maybe.map (filter ((/=) id)) model.entriesShown
+                    , books =
+                        withDefault
+                            model.books
+                            (get id model.entries
+                                |> Maybe.map
+                                    (\{ bookId } ->
+                                        Dict.update
+                                            bookId
+                                            (Maybe.map
+                                                (\book ->
+                                                    { book
+                                                        | count = book.count - 1
+                                                    }
+                                                )
+                                            )
+                                            model.books
+                                    )
+                            )
                   }
                 , deleteEmbedding id
                 )
