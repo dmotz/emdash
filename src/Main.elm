@@ -35,7 +35,7 @@ import Model
         , initialStoredModel
         )
 import Msg exposing (Msg(..))
-import Parser exposing (getBooks, normalizeTitle)
+import Parser exposing (normalizeTitle)
 import Platform.Cmd exposing (batch, none)
 import Router
     exposing
@@ -266,16 +266,8 @@ update message model =
 
         ReceiveUnicodeNormalized text ->
             let
-                newEntries =
+                ( newEntries, newBooks ) =
                     Parser.process text
-
-                entries =
-                    Dict.filter
-                        (\id _ -> not <| Set.member id model.hiddenEntries)
-                        (Dict.union model.entries newEntries)
-
-                books =
-                    entries |> values |> getBooks
             in
             if Dict.isEmpty newEntries then
                 ( { model | parsingError = True }, none )
@@ -286,9 +278,17 @@ update message model =
                         (SortBooks model.bookSort)
                         { model
                             | parsingError = False
-                            , entries = entries
-                            , books = books
-                            , booksShown = keys books
+                            , entries =
+                                Dict.filter
+                                    (\id _ ->
+                                        not <|
+                                            Set.member
+                                                id
+                                                model.hiddenEntries
+                                    )
+                                    (Dict.union model.entries newEntries)
+                            , books = newBooks
+                            , booksShown = keys newBooks
                         }
 
         ResetError ->
