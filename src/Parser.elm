@@ -8,7 +8,7 @@ import Dict exposing (Dict, insert, update)
 import List exposing (all, foldr, head, map)
 import MD5 exposing (bytes)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Book, Entry, Id, Tag)
+import Model exposing (Book, Entry, Id)
 import Regex exposing (Match, Regex, replace)
 import Router exposing (slugify)
 import String
@@ -23,7 +23,7 @@ import String
         , trim
         )
 import Time exposing (Month(..), posixToMillis)
-import Utils exposing (dedupe, juxt, rx, rx_)
+import Utils exposing (juxt, rx, rx_)
 
 
 process : String -> ( Dict Id Entry, Dict Id Book )
