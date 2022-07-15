@@ -61,8 +61,16 @@ async function init() {
   if (restored && !didFail) {
     const ids = await keys(embeddingsStore)
     const vals = await Promise.all(ids.map(id => get(id, embeddingsStore)))
+    const bookIdToTitle = Object.fromEntries(
+      restored.books.map(({id, title}) => [id, title])
+    )
+
     embeddings = Object.fromEntries(ids.map((id, i) => [id, vals[i]]))
-    titleMap = Object.fromEntries(restored.entries.map(e => [e.id, e.title]))
+
+    titleMap = Object.fromEntries(
+      restored.entries.map(({id, bookId}) => [id, bookIdToTitle[bookId]])
+    )
+
     app.ports.receiveEmbeddings.send(ids)
   }
 
