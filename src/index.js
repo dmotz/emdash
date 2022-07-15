@@ -179,7 +179,7 @@ function requestEmbeddings(pairs) {
 }
 
 function requestBookEmbeddings(sets) {
-  const embeddings = sets.map(([bookId, ids]) => [
+  const embeddingPairs = sets.map(([bookId, ids]) => [
     bookId,
     ids
       .map(id => embeddings[id])
@@ -188,9 +188,9 @@ function requestBookEmbeddings(sets) {
       .map(n => n / sets[0][1][0].length)
   ])
 
-  bookEmbeddings = Object.fromEntries(bookEmbeddings)
+  bookEmbeddings = Object.fromEntries(embeddingPairs)
   app.ports.receiveBookEmbeddings.send(null)
-  setMany(embeddings, bookEmbeddingsStore)
+  setMany(embeddingPairs, bookEmbeddingsStore)
 }
 
 function deleteEmbedding(id) {
