@@ -303,7 +303,6 @@ makeDicts =
                                     bookId
                                     date
                                     (withDefault -1 page)
-                                    []
                                     notes
                                 )
                                 entries

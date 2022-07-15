@@ -80,7 +80,6 @@ type alias Entry =
     , bookId : Id
     , date : Int
     , page : Int
-    , tags : List Tag
     , notes : String
     }
 
