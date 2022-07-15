@@ -7,8 +7,13 @@ import './styles.sass'
 const dbNs = 'marginalia'
 const stateKey = 'state'
 const embeddingsKey = 'embeddings'
+const bookEmbeddingsKey = 'bookEmbeddings'
 const stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
 const embeddingsStore = createStore(`${dbNs}:${embeddingsKey}`, embeddingsKey)
+const bookEmbeddingsStore = createStore(
+  `${dbNs}:${bookEmbeddingsKey}`,
+  bookEmbeddingsKey
+)
 const neighborsK = 5
 const writeMs = 1000
 const batchIds = {}
@@ -24,6 +29,7 @@ const observer = new IntersectionObserver(
 )
 
 let embeddings = {}
+let bookEmbeddings = {}
 let titleMap = {}
 let workerBatch = 0
 let lastScrollY = window.scrollY
@@ -52,8 +58,10 @@ async function init() {
   app.ports.setStorage.subscribe(setStorage)
   app.ports.createEpub.subscribe(createEpub)
   app.ports.requestEmbeddings.subscribe(requestEmbeddings)
-  app.ports.deleteEmbedding.subscribe(deleteEmbeddings)
+  app.ports.requestBookEmbeddings.subscribe(requestBookEmbeddings)
+  app.ports.deleteEmbedding.subscribe(deleteEmbedding)
   app.ports.requestNeighbors.subscribe(requestNeighbors)
+  app.ports.requestBookNeighbors.subscribe(requestBookNeighbors)
   app.ports.setObservers.subscribe(setObservers)
   app.ports.scrollToTop.subscribe(scrollToTop)
   app.ports.requestUnicodeNormalized.subscribe(requestUnicodeNormalized)
@@ -170,11 +178,24 @@ function requestEmbeddings(pairs) {
   worker.postMessage({targets, batchId})
 }
 
-function deleteEmbeddings(ids) {
-  ids.forEach(id => {
-    delete embeddings[id]
-    del(id, embeddingsStore)
-  })
+function requestBookEmbeddings(sets) {
+  const embeddings = sets.map(([bookId, ids]) => [
+    bookId,
+    ids
+      .map(id => embeddings[id])
+      .filter(x => x)
+      .reduce((a, c) => a.map((n, i) => n + c[i]))
+      .map(n => n / sets[0][1][0].length)
+  ])
+
+  bookEmbeddings = Object.fromEntries(bookEmbeddings)
+  app.ports.receiveBookEmbeddings.send(null)
+  setMany(embeddings, bookEmbeddingsStore)
+}
+
+function deleteEmbedding(id) {
+  delete embeddings[id]
+  del(id, embeddingsStore)
 }
 
 function requestNeighbors([id, ignoreSameTitle]) {
