@@ -770,6 +770,19 @@ update message model =
 
                           else
                             none
+                        , case
+                            m.currentBook
+                          of
+                            Just bookId ->
+                                case get bookId model.bookNeighborMap of
+                                    Nothing ->
+                                        requestBookNeighbors bookId
+
+                                    _ ->
+                                        none
+
+                            _ ->
+                                none
                         ]
                     )
 
