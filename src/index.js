@@ -198,28 +198,41 @@ function deleteEmbedding(id) {
   del(id, embeddingsStore)
 }
 
-function requestNeighbors([id, ignoreSameTitle]) {
-  const target = embeddings[id]
-  const predicate = ignoreSameTitle ? k => titleMap[k] !== titleMap[id] : x => x
+function rank(xs, id, predicate) {
+  const target = xs[id]
 
-  if (!target) {
-    console.warn(`no embeddings yet for ${id}`)
-    return
-  }
-
-  const ranked = Object.entries(embeddings)
+  return Object.entries(xs)
     .reduce((a, [k, v]) => {
       if (k === id || !predicate(k)) {
         return a
       }
 
       a.push([k, similarity(target, v)])
+
       return a
     }, [])
     .sort(([, a], [, b]) => b - a)
     .slice(0, neighborsK)
+}
 
-  app.ports.receiveNeighbors.send([id, ranked])
+function requestNeighbors([id, ignoreSameTitle]) {
+  if (!embeddings[id]) {
+    console.warn(`no embeddings yet for ${id}`)
+    return
+  }
+
+  app.ports.receiveNeighbors.send([
+    id,
+    rank(
+      embeddings,
+      id,
+      ignoreSameTitle ? k => titleMap[k] !== titleMap[id] : x => x
+    )
+  ])
+}
+
+function requestBookNeighbors(id) {
+  app.ports.receiveBookNeighbors.send([id, rank(bookEmbeddings, id, x => x)])
 }
 
 function dot(a, b) {
