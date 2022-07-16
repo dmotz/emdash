@@ -91,20 +91,6 @@ async function init() {
     {passive: true}
   )
 
-  window.addEventListener('keydown', e => {
-    if (
-      e.key &&
-      e.key.toLowerCase() === 'a' &&
-      (e.metaKey || e.ctrlKey) &&
-      !(
-        document.activeElement.nodeName === 'INPUT' ||
-        document.activeElement.nodeName === 'TEXTAREA'
-      )
-    ) {
-      e.preventDefault()
-    }
-  })
-
   if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
     window.addEventListener('load', () =>
       navigator.serviceWorker.register('sw.js')
