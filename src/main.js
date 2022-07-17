@@ -87,7 +87,6 @@ async function init() {
   window.addEventListener(
     'scroll',
     () => {
-      console.log('on scroll')
       app.ports.onScroll.send(window.scrollY - lastScrollY)
       lastScrollY = window.scrollY
     },
