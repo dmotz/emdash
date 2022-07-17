@@ -85,17 +85,12 @@ async function init() {
   window.addEventListener(
     'scroll',
     () => {
+      console.log('on scroll')
       app.ports.onScroll.send(window.scrollY - lastScrollY)
       lastScrollY = window.scrollY
     },
     {passive: true}
   )
-
-  if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
-    window.addEventListener('load', () =>
-      navigator.serviceWorker.register('sw.js')
-    )
-  }
 }
 
 function downloadFile(name, data) {
