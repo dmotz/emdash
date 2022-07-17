@@ -1,7 +1,9 @@
-import {Elm} from './Main'
 import {get, set, setMany, del, keys, createStore} from 'idb-keyval'
 import JsZip from 'jszip'
-import EmbedWorker from 'worker-loader!./embed-worker'
+import {Elm} from './Main.elm'
+import EmbedWorker from './embed-worker?worker'
+import BookEmbedWorker from './book-embed-worker?worker'
+import {version} from '../package.json'
 import './styles.sass'
 
 const dbNs = 'marginalia'
@@ -43,7 +45,7 @@ async function init() {
   const restored = await get(stateKey, stateStore)
   let didFail = false
 
-  console.log(`Marginalia v${require('../package.json').version}`)
+  console.log(`Marginalia v${version}`)
 
   try {
     app = Elm.Main.init({flags: restored || null})
