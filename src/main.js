@@ -158,22 +158,20 @@ function requestEmbeddings(pairs) {
   }
 
   batchIds[batchId] = ids
-  worker.postMessage({targets, batchId})
+  embedWorker.postMessage({targets, batchId})
 }
 
 function requestBookEmbeddings(sets) {
-  const embeddingPairs = sets.map(([bookId, ids]) => [
-    bookId,
-    ids
-      .map(id => embeddings[id])
-      .filter(x => x)
-      .reduce((a, c) => a.map((n, i) => n + c[i]))
-      .map(n => n / sets[0][1][0].length)
-  ])
+  if (!bookEmbedWorker) {
+    bookEmbedWorker = new BookEmbedWorker()
+    bookEmbedWorker.onmessage = ({data}) => {
+      bookEmbeddings = Object.fromEntries(data.embeddingPairs)
+      app.ports.receiveBookEmbeddings.send(null)
+      setMany(data.embeddingPairs, bookEmbeddingsStore)
+    }
+  }
 
-  bookEmbeddings = Object.fromEntries(embeddingPairs)
-  app.ports.receiveBookEmbeddings.send(null)
-  setMany(embeddingPairs, bookEmbeddingsStore)
+  bookEmbedWorker.postMessage({sets, embeddings})
 }
 
 function deleteEmbedding(id) {
