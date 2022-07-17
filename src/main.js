@@ -25,6 +25,16 @@ const observer = new IntersectionObserver(
   {rootMargin: '-20% 0% -60% 0%'}
 )
 
+const downloadFile = (name, data) => {
+  const a = document.createElement('a')
+  const url = URL.createObjectURL(data)
+
+  a.href = url
+  a.download = name
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 let embeddings = {}
 let bookEmbeddings = {}
 let titleMap = {}
@@ -36,10 +46,7 @@ let embedWorker
 let bookEmbedWorker
 let neighborWorker
 let bookNeighborWorker
-
-init()
-
-async function init() {
+;(async () => {
   const restored = await get(stateKey, stateStore)
   let didFail = false
 
@@ -53,18 +60,122 @@ async function init() {
     didFail = true
   }
 
-  app.ports.importJson.subscribe(importJson)
-  app.ports.exportJson.subscribe(exportJson)
-  app.ports.setStorage.subscribe(setStorage)
-  app.ports.createEpub.subscribe(createEpub)
-  app.ports.requestEmbeddings.subscribe(requestEmbeddings)
-  app.ports.requestBookEmbeddings.subscribe(requestBookEmbeddings)
-  app.ports.deleteEmbedding.subscribe(deleteEmbedding)
-  app.ports.requestNeighbors.subscribe(requestNeighbors)
-  app.ports.requestBookNeighbors.subscribe(requestBookNeighbors)
-  app.ports.setObservers.subscribe(setObservers)
-  app.ports.scrollToTop.subscribe(scrollToTop)
-  app.ports.requestUnicodeNormalized.subscribe(requestUnicodeNormalized)
+  app.ports.importJson.subscribe(text => {
+    try {
+      app = Elm.Main.init({flags: JSON.parse(text)})
+    } catch (e) {
+      console.warn('failed to parse restored JSON:', e)
+    }
+  })
+
+  app.ports.exportJson.subscribe(state =>
+    downloadFile(
+      `marginalia_backup_${new Date().toLocaleDateString()}.json`,
+      new Blob([JSON.stringify(state)], {type: 'text/plain'})
+    )
+  )
+
+  app.ports.setStorage.subscribe(state => {
+    clearTimeout(writeTimer)
+    writeTimer = setTimeout(() => set(stateKey, state, stateStore), writeMs)
+  })
+
+  app.ports.createEpub.subscribe(async pairs => {
+    const zip = new JsZip()
+
+    zip.folder('META-INF')
+    zip.folder('OEBPS')
+    pairs.forEach(([path, text]) => zip.file(path, text.trim()))
+    downloadFile(
+      `marginalia_excerpts_${new Date().toLocaleDateString()}.epub`,
+      await zip.generateAsync({type: 'blob'})
+    )
+  })
+
+  app.ports.requestEmbeddings.subscribe(pairs => {
+    if (!embedWorker) {
+      embedWorker = new EmbedWorker()
+      embedWorker.onmessage = ({data}) => {
+        app.ports.receiveEmbeddings.send(batchIds[data.batchId])
+        data.targets.forEach(([k, v]) => (embeddings[k] = v))
+        delete batchIds[data.batchId]
+        setMany(data.targets, embeddingsStore)
+      }
+    }
+
+    const batchId = workerBatch++
+    const targets = pairs.filter(([id]) => !embeddings[id])
+    const ids = pairs.map(([id]) => id)
+
+    if (!targets.length) {
+      app.ports.receiveEmbeddings.send(ids)
+      return
+    }
+
+    batchIds[batchId] = ids
+    embedWorker.postMessage({targets, batchId})
+  })
+
+  app.ports.requestBookEmbeddings.subscribe(sets => {
+    if (!bookEmbedWorker) {
+      bookEmbedWorker = new BookEmbedWorker()
+      bookEmbedWorker.onmessage = ({data}) => {
+        bookEmbeddings = Object.fromEntries(data.embeddingPairs)
+        app.ports.receiveBookEmbeddings.send(null)
+      }
+    }
+
+    bookEmbedWorker.postMessage({sets, embeddings})
+  })
+
+  app.ports.deleteEmbedding.subscribe(id => {
+    delete embeddings[id]
+    del(id, embeddingsStore)
+  })
+
+  app.ports.requestNeighbors.subscribe(([targetId, ignoreSameTitle]) => {
+    if (!embeddings[targetId]) {
+      console.warn(`no embeddings yet for ${targetId}`)
+      return
+    }
+
+    if (!neighborWorker) {
+      neighborWorker = new NeighborWorker()
+      neighborWorker.onmessage = ({data}) =>
+        app.ports.receiveNeighbors.send([data.id, data.neighbors])
+    }
+
+    neighborWorker.postMessage({
+      targetId,
+      titleMap,
+      ignoreSameTitle,
+      embeddingMap: embeddings
+    })
+  })
+
+  app.ports.requestBookNeighbors.subscribe(targetId => {
+    if (!bookNeighborWorker) {
+      bookNeighborWorker = new NeighborWorker()
+      bookNeighborWorker.onmessage = ({data}) =>
+        app.ports.receiveBookNeighbors.send([data.id, data.neighbors])
+    }
+
+    bookNeighborWorker.postMessage({targetId, embeddingMap: bookEmbeddings})
+  })
+
+  app.ports.setObservers.subscribe(ids =>
+    requestAnimationFrame(() =>
+      ids.forEach(id => observer.observe(document.getElementById('entry' + id)))
+    )
+  )
+
+  app.ports.scrollToTop.subscribe(() =>
+    window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
+  )
+
+  app.ports.requestUnicodeNormalized.subscribe(str =>
+    app.ports.receiveUnicodeNormalized.send(str.normalize('NFKD'))
+  )
 
   if (restored && !didFail) {
     const ids = await keys(embeddingsStore)
@@ -90,131 +201,4 @@ async function init() {
     },
     {passive: true}
   )
-}
-
-function downloadFile(name, data) {
-  const a = document.createElement('a')
-  const url = URL.createObjectURL(data)
-
-  a.href = url
-  a.download = name
-  a.click()
-  URL.revokeObjectURL(url)
-}
-
-function setStorage(state) {
-  clearTimeout(writeTimer)
-  writeTimer = setTimeout(() => set(stateKey, state, stateStore), writeMs)
-}
-
-function importJson(text) {
-  try {
-    app = Elm.Main.init({flags: JSON.parse(text)})
-  } catch (e) {
-    console.warn('Failed to parse restored JSON:', e)
-  }
-}
-
-function exportJson(state) {
-  downloadFile(
-    `marginalia_backup_${new Date().toLocaleDateString()}.json`,
-    new Blob([JSON.stringify(state)], {type: 'text/plain'})
-  )
-}
-
-async function createEpub(pairs) {
-  const zip = new JsZip()
-
-  zip.folder('META-INF')
-  zip.folder('OEBPS')
-  pairs.forEach(([path, text]) => zip.file(path, text.trim()))
-  downloadFile(
-    `marginalia_excerpts_${new Date().toLocaleDateString()}.epub`,
-    await zip.generateAsync({type: 'blob'})
-  )
-}
-
-function requestEmbeddings(pairs) {
-  if (!embedWorker) {
-    embedWorker = new EmbedWorker()
-    embedWorker.onmessage = ({data}) => {
-      app.ports.receiveEmbeddings.send(batchIds[data.batchId])
-      data.targets.forEach(([k, v]) => (embeddings[k] = v))
-      delete batchIds[data.batchId]
-      setMany(data.targets, embeddingsStore)
-    }
-  }
-
-  const batchId = workerBatch++
-  const targets = pairs.filter(([id]) => !embeddings[id])
-  const ids = pairs.map(([id]) => id)
-
-  if (!targets.length) {
-    app.ports.receiveEmbeddings.send(ids)
-    return
-  }
-
-  batchIds[batchId] = ids
-  embedWorker.postMessage({targets, batchId})
-}
-
-function requestBookEmbeddings(sets) {
-  if (!bookEmbedWorker) {
-    bookEmbedWorker = new BookEmbedWorker()
-    bookEmbedWorker.onmessage = ({data}) => {
-      bookEmbeddings = Object.fromEntries(data.embeddingPairs)
-      app.ports.receiveBookEmbeddings.send(null)
-    }
-  }
-
-  bookEmbedWorker.postMessage({sets, embeddings})
-}
-
-function deleteEmbedding(id) {
-  delete embeddings[id]
-  del(id, embeddingsStore)
-}
-
-function requestNeighbors([targetId, ignoreSameTitle]) {
-  if (!embeddings[targetId]) {
-    console.warn(`no embeddings yet for ${targetId}`)
-    return
-  }
-
-  if (!neighborWorker) {
-    neighborWorker = new NeighborWorker()
-    neighborWorker.onmessage = ({data}) =>
-      app.ports.receiveNeighbors.send([data.id, data.neighbors])
-  }
-
-  neighborWorker.postMessage({
-    targetId,
-    titleMap,
-    ignoreSameTitle,
-    embeddingMap: embeddings
-  })
-}
-
-function requestBookNeighbors(targetId) {
-  if (!bookNeighborWorker) {
-    bookNeighborWorker = new NeighborWorker()
-    bookNeighborWorker.onmessage = ({data}) =>
-      app.ports.receiveBookNeighbors.send([data.id, data.neighbors])
-  }
-
-  bookNeighborWorker.postMessage({targetId, embeddingMap: bookEmbeddings})
-}
-
-function setObservers(ids) {
-  requestAnimationFrame(() =>
-    ids.forEach(id => observer.observe(document.getElementById('entry' + id)))
-  )
-}
-
-function scrollToTop() {
-  window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
-}
-
-function requestUnicodeNormalized(str) {
-  app.ports.receiveUnicodeNormalized.send(str.normalize('NFKD'))
-}
+})()
