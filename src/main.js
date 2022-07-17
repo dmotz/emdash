@@ -3,6 +3,7 @@ import JsZip from 'jszip'
 import {Elm} from './Main.elm'
 import EmbedWorker from './embed-worker?worker'
 import BookEmbedWorker from './book-embed-worker?worker'
+import NeighborWorker from './neighbor-worker?worker'
 import {version} from '../package.json'
 import './styles.sass'
 
@@ -11,7 +12,6 @@ const stateKey = 'state'
 const embeddingsKey = 'embeddings'
 const stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
 const embeddingsStore = createStore(`${dbNs}:${embeddingsKey}`, embeddingsKey)
-const neighborsK = 5
 const writeMs = 1000
 const batchIds = {}
 const observer = new IntersectionObserver(
@@ -34,6 +34,8 @@ let app
 let writeTimer
 let embedWorker
 let bookEmbedWorker
+let neighborWorker
+let bookNeighborWorker
 
 init()
 
@@ -173,49 +175,34 @@ function deleteEmbedding(id) {
   del(id, embeddingsStore)
 }
 
-function rank(xs, id, predicate) {
-  const target = xs[id]
-
-  return Object.entries(xs)
-    .reduce((a, [k, v]) => {
-      if (k === id || !predicate(k)) {
-        return a
-      }
-
-      a.push([k, similarity(target, v)])
-
-      return a
-    }, [])
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, neighborsK)
-}
-
-function requestNeighbors([id, ignoreSameTitle]) {
-  if (!embeddings[id]) {
-    console.warn(`no embeddings yet for ${id}`)
+function requestNeighbors([targetId, ignoreSameTitle]) {
+  if (!embeddings[targetId]) {
+    console.warn(`no embeddings yet for ${targetId}`)
     return
   }
 
-  app.ports.receiveNeighbors.send([
-    id,
-    rank(
-      embeddings,
-      id,
-      ignoreSameTitle ? k => titleMap[k] !== titleMap[id] : x => x
-    )
-  ])
+  if (!neighborWorker) {
+    neighborWorker = new NeighborWorker()
+    neighborWorker.onmessage = ({data}) =>
+      app.ports.receiveNeighbors.send([data.id, data.neighbors])
+  }
+
+  neighborWorker.postMessage({
+    targetId,
+    titleMap,
+    ignoreSameTitle,
+    embeddingMap: embeddings
+  })
 }
 
-function requestBookNeighbors(id) {
-  app.ports.receiveBookNeighbors.send([id, rank(bookEmbeddings, id, x => x)])
-}
+function requestBookNeighbors(targetId) {
+  if (!bookNeighborWorker) {
+    bookNeighborWorker = new NeighborWorker()
+    bookNeighborWorker.onmessage = ({data}) =>
+      app.ports.receiveBookNeighbors.send([data.id, data.neighbors])
+  }
 
-function dot(a, b) {
-  return a.reduce((a, c, i) => a + c * b[i], 0)
-}
-
-function similarity(a, b) {
-  return dot(a, b) / (Math.sqrt(dot(a, a)) * Math.sqrt(dot(b, b)))
+  bookNeighborWorker.postMessage({targetId, embeddingMap: bookEmbeddings})
 }
 
 function setObservers(ids) {
