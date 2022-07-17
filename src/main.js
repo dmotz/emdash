@@ -1,4 +1,4 @@
-import {get, set, setMany, del, keys, createStore} from 'idb-keyval'
+import {get, getMany, set, setMany, del, keys, createStore} from 'idb-keyval'
 import JsZip from 'jszip'
 import {Elm} from './Main.elm'
 import EmbedWorker from './embed-worker?worker'
@@ -71,7 +71,7 @@ async function init() {
 
   if (restored && !didFail) {
     const ids = await keys(embeddingsStore)
-    const vals = await Promise.all(ids.map(id => get(id, embeddingsStore)))
+    const vals = await getMany(ids, embeddingsStore)
     const bookIdToTitle = Object.fromEntries(
       restored.books.map(({id, title}) => [id, title])
     )
