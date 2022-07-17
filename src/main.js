@@ -9,13 +9,8 @@ import './styles.sass'
 const dbNs = 'marginalia'
 const stateKey = 'state'
 const embeddingsKey = 'embeddings'
-const bookEmbeddingsKey = 'bookEmbeddings'
 const stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
 const embeddingsStore = createStore(`${dbNs}:${embeddingsKey}`, embeddingsKey)
-const bookEmbeddingsStore = createStore(
-  `${dbNs}:${bookEmbeddingsKey}`,
-  bookEmbeddingsKey
-)
 const neighborsK = 5
 const writeMs = 1000
 const batchIds = {}
@@ -167,7 +162,6 @@ function requestBookEmbeddings(sets) {
     bookEmbedWorker.onmessage = ({data}) => {
       bookEmbeddings = Object.fromEntries(data.embeddingPairs)
       app.ports.receiveBookEmbeddings.send(null)
-      setMany(data.embeddingPairs, bookEmbeddingsStore)
     }
   }
 
