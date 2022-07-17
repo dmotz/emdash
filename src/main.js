@@ -37,7 +37,8 @@ let workerBatch = 0
 let lastScrollY = window.scrollY
 let app
 let writeTimer
-let worker
+let embedWorker
+let bookEmbedWorker
 
 init()
 
@@ -137,9 +138,9 @@ async function createEpub(pairs) {
 }
 
 function requestEmbeddings(pairs) {
-  if (!worker) {
-    worker = new EmbedWorker()
-    worker.onmessage = ({data}) => {
+  if (!embedWorker) {
+    embedWorker = new EmbedWorker()
+    embedWorker.onmessage = ({data}) => {
       app.ports.receiveEmbeddings.send(batchIds[data.batchId])
       data.targets.forEach(([k, v]) => (embeddings[k] = v))
       delete batchIds[data.batchId]
