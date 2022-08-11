@@ -3,6 +3,7 @@ module Views.TagSection exposing (tagSection)
 import Html
     exposing
         ( Html
+        , a
         , button
         , datalist
         , div
@@ -10,7 +11,6 @@ import Html
         , input
         , li
         , option
-        , section
         , text
         , ul
         )
@@ -19,6 +19,7 @@ import Html.Attributes
         ( autocomplete
         , class
         , disabled
+        , href
         , id
         , list
         , placeholder
@@ -29,6 +30,7 @@ import Html.Events exposing (onBlur, onClick, onFocus, onInput)
 import List exposing (filter, length, map, member)
 import Model exposing (Filter(..), InputFocus(..), Tag)
 import Msg exposing (Msg(..))
+import Router exposing (tagToRoute)
 
 
 tagSection : List Tag -> List Tag -> Maybe Tag -> Html Msg
@@ -37,27 +39,27 @@ tagSection tags globalTags pendingTag =
         pendTag =
             Maybe.withDefault "" pendingTag
     in
-    section []
-        [ h5 [] [ text "tags:" ]
+    div []
+        [ h5 [] [ text "Tags" ]
         , if length tags > 0 then
             div
-                [ id "tags" ]
+                [ class "tags" ]
                 [ ul
                     []
                     (map
                         (\tag ->
                             li
                                 [ class "tag" ]
-                                [ div
-                                    [ onClick <| RemoveTag tag
-                                    , class "tag-delete"
-                                    ]
-                                    [ text "×" ]
-                                , div
-                                    [ onClick <| FilterBy TagFilter tag
-                                    , class "tag-title"
+                                [ a
+                                    [ href <| tagToRoute tag
+                                    , class "tagTitle"
                                     ]
                                     [ text tag ]
+                                , button
+                                    [ onClick <| RemoveTag tag
+                                    , class "tagDelete"
+                                    ]
+                                    [ text "×" ]
                                 ]
                         )
                         tags
@@ -68,9 +70,9 @@ tagSection tags globalTags pendingTag =
             text ""
         , let
             datalistId =
-                "tags-datalist"
+                "tagDatalist"
           in
-          div [ class "tag-input" ]
+          div [ class "tagInput" ]
             [ datalist [ id datalistId ]
                 (map
                     (\tag -> option [ value tag ] [])
@@ -95,7 +97,7 @@ tagSection tags globalTags pendingTag =
                 ]
                 []
             , button
-                [ onClick AddTag, disabled <| pendTag == "" ]
-                [ text "Add" ]
+                [ class "button", onClick AddTag, disabled <| pendTag == "" ]
+                [ text "+" ]
             ]
         ]
