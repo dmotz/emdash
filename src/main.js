@@ -35,18 +35,26 @@ const downloadFile = (name, data) => {
   URL.revokeObjectURL(url)
 }
 
-let embeddings = {}
-let bookEmbeddings = {}
-let titleMap = {}
-let workerBatch = 0
-let lastScrollY = window.scrollY
-let app
-let writeTimer
-let embedWorker
-let bookEmbedWorker
-let neighborWorker
-let bookNeighborWorker
-;(async () => {
+const handleNewEntries = async state => {
+  const ids = await keys(embeddingsStore)
+  const vals = await getMany(ids, embeddingsStore)
+  const bookIdToTitle = Object.fromEntries(
+    state.books.map(({id, title}) => [id, title])
+  )
+
+  embeddings = Object.fromEntries(ids.map((id, i) => [id, vals[i]]))
+
+  titleMap = {
+    ...titleMap,
+    ...Object.fromEntries(
+      state.entries.map(({id, bookId}) => [id, bookIdToTitle[bookId]])
+    )
+  }
+
+  app.ports.receiveEmbeddings.send(ids)
+}
+
+const init = async () => {
   const restored = await get(stateKey, stateStore)
   let didFail = false
 
@@ -178,19 +186,7 @@ let bookNeighborWorker
   )
 
   if (restored && !didFail) {
-    const ids = await keys(embeddingsStore)
-    const vals = await getMany(ids, embeddingsStore)
-    const bookIdToTitle = Object.fromEntries(
-      restored.books.map(({id, title}) => [id, title])
-    )
-
-    embeddings = Object.fromEntries(ids.map((id, i) => [id, vals[i]]))
-
-    titleMap = Object.fromEntries(
-      restored.entries.map(({id, bookId}) => [id, bookIdToTitle[bookId]])
-    )
-
-    app.ports.receiveEmbeddings.send(ids)
+    handleNewEntries(restored)
   }
 
   window.addEventListener(
@@ -201,4 +197,18 @@ let bookNeighborWorker
     },
     {passive: true}
   )
-})()
+}
+
+let embeddings = {}
+let bookEmbeddings = {}
+let titleMap = {}
+let workerBatch = 0
+let lastScrollY = window.scrollY
+let app
+let writeTimer
+let embedWorker
+let bookEmbedWorker
+let neighborWorker
+let bookNeighborWorker
+
+init()
