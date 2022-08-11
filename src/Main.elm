@@ -88,6 +88,9 @@ port exportJson : StoredModel -> Cmd msg
 port importJson : String -> Cmd msg
 
 
+port handleNewEntries : StoredModel -> Cmd msg
+
+
 port requestEmbeddings : List ( Id, String ) -> Cmd msg
 
 
