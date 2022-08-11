@@ -1,338 +1,178 @@
 module Views.Base exposing (view)
 
+import Dict exposing (get)
 import File
 import Html
     exposing
         ( Html
+        , a
         , button
         , div
-        , h5
-        , header
-        , img
-        , input
-        , label
+        , footer
+        , li
         , main_
-        , nav
-        , option
         , p
-        , select
-        , span
+        , progress
         , text
+        , ul
         )
-import Html.Attributes
-    exposing
-        ( autocomplete
-        , class
-        , classList
-        , draggable
-        , id
-        , placeholder
-        , selected
-        , spellcheck
-        , src
-        , value
-        )
-import Html.Events exposing (onBlur, onClick, onFocus, onInput)
-import Html.Lazy exposing (lazy4, lazy6, lazy8)
+import Html.Attributes exposing (class, href, id, value)
+import Html.Events exposing (onClick)
+import Html.Lazy exposing (lazy4)
 import Json.Decode as Decode exposing (Decoder)
-import List exposing (isEmpty, length, map, reverse)
-import Maybe exposing (withDefault)
-import Model exposing (Entry, Filter(..), InputFocus(..), Model)
+import List exposing (isEmpty, map)
+import Maybe exposing (andThen)
+import Model
+    exposing
+        ( BookSort(..)
+        , EntryTab(..)
+        , Filter(..)
+        , InputFocus(..)
+        , Model
+        )
 import Msg exposing (Msg(..))
-import Set
-import Utils exposing (formatNumber, needsTitles)
-import Views.About exposing (about)
+import Router exposing (tagToRoute)
+import Set exposing (size)
+import String exposing (fromFloat)
+import Utils exposing (formatNumber, pluckIds)
+import Views.BookInfo exposing (bookInfo)
+import Views.BookList exposing (bookList)
 import Views.Common exposing (on)
-import Views.Sidebar exposing (sidebar)
-import Views.Viewer exposing (viewer)
+import Views.EntryList exposing (entryList)
+import Views.Header exposing (headerView)
+import Views.Snippet exposing (snippetView)
+import Views.TagSection exposing (tagSection)
 
 
 view : Model -> Html Msg
 view model =
-    let
-        noEntries =
-            isEmpty model.entries
-
-        entryCount =
-            length <|
-                case model.shownEntries of
-                    Just entries ->
-                        entries
-
-                    _ ->
-                        model.entries
-    in
     div
-        [ id "container"
-        , classList
-            [ ( "focus-mode", model.focusMode )
-            , ( "empty", noEntries )
-            ]
+        [ id "root"
         , on "dragenter" (Decode.succeed DragEnter)
         , on "dragover" (Decode.succeed DragEnter)
         , on "dragleave" (Decode.succeed DragLeave)
         , on "drop" dropDecoder
         ]
-        [ if model.hidePromptActive then
-            hidePrompt model.selectedEntries
+        [ lazy4
+            headerView
+            model.filter
+            model.searchQuery
+            model.reverseSort
+            model.hideHeader
+        , main_ []
+            [ case
+                model.entriesShown
+              of
+                Just entryIds ->
+                    case model.filter of
+                        Just (TextFilter query) ->
+                            div
+                                [ class "searchResults" ]
+                                [ if isEmpty model.booksShown then
+                                    text ""
 
-          else
-            text ""
-        , header
-            []
-            [ div []
-                [ img
-                    [ src "/logo.svg"
-                    , draggable "false"
-                    , onClick ToggleAboutMode
-                    ]
-                    []
-                , if noEntries then
-                    text ""
+                                  else
+                                    bookList <|
+                                        pluckIds model.books model.booksShown
+                                , if isEmpty entryIds then
+                                    text ""
 
-                  else
-                    div [ id "entry-count", onClick Sort ]
-                        [ text <|
-                            formatNumber entryCount
-                                ++ " excerpt"
-                                ++ (if entryCount == 1 then
-                                        " "
+                                  else
+                                    ul
+                                        [ class "snippets" ]
+                                        (map
+                                            (lazy4
+                                                snippetView
+                                                model.books
+                                                Nothing
+                                                (Just query)
+                                            )
+                                            (pluckIds model.entries entryIds)
+                                        )
+                                , if
+                                    isEmpty model.booksShown
+                                        && isEmpty entryIds
+                                  then
+                                    p [ class "noResults" ]
+                                        [ text "No results found." ]
 
-                                    else
-                                        "s "
-                                   )
-                        , span []
-                            [ text <|
-                                if model.reverseList then
-                                    "▲"
+                                  else
+                                    text ""
+                                ]
 
-                                else
-                                    "▼"
-                            ]
-                        ]
-                ]
-            , div [ id "tools" ]
-                [ div [ id "filters", classList [ ( "hidden", noEntries ) ] ]
-                    [ nav [ id "filter-links" ]
-                        (map
-                            (\( mode, label ) ->
-                                span
-                                    [ onClick <| FilterBy mode ""
-                                    , classList
-                                        [ ( "active"
-                                          , model.filterType == mode
-                                          )
-                                        ]
-                                    ]
-                                    [ text label ]
-                            )
-                            [ ( TitleFilter, "title" )
-                            , ( AuthorFilter, "author" )
-                            , ( TagFilter, "tag" )
-                            , ( TextFilter, "text" )
-                            ]
-                        )
-                    , div [ id "filter-controls" ]
-                        [ case model.filterType of
-                            TitleFilter ->
-                                lazy4
-                                    selectMenu
-                                    model.titles
-                                    model.filterValue
-                                    (FilterBy TitleFilter)
-                                    "titles"
+                        _ ->
+                            div []
+                                [ case
+                                    model.currentBook
+                                        |> andThen (\id -> get id model.books)
+                                  of
+                                    Just book ->
+                                        bookInfo
+                                            book
+                                            model.books
+                                            model.tags
+                                            model.pendingTag
+                                            model.bookNeighborMap
 
-                            AuthorFilter ->
-                                lazy4
-                                    selectMenu
-                                    model.authors
-                                    model.filterValue
-                                    (FilterBy AuthorFilter)
-                                    "authors"
+                                    _ ->
+                                        text ""
+                                , entryList
+                                    entryIds
+                                    model.entries
+                                    model.books
+                                    model.neighborMap
+                                    model.idToShowDetails
+                                    model.idToActiveTab
+                                ]
 
-                            TagFilter ->
-                                lazy4
-                                    selectMenu
-                                    model.tags
-                                    model.filterValue
-                                    (FilterBy TagFilter)
-                                    "tags"
+                _ ->
+                    div
+                        []
+                        [ if
+                            not model.embeddingsReady
+                                && Dict.size model.entries
+                                /= 0
+                          then
+                            let
+                                done =
+                                    model.completedEmbeddings |> size
 
-                            TextFilter ->
-                                div [ id "search" ]
-                                    [ span
-                                        [ classList
-                                            [ ( "x", True )
-                                            , ( "hidden"
-                                              , model.filterValue == Nothing
-                                              )
-                                            ]
-                                        , onClick <| FilterBy TextFilter ""
-                                        ]
-                                        [ text "×" ]
-                                    , input
-                                        [ onInput <| FilterBy TextFilter
-                                        , onFocus <|
-                                            SetInputFocus
-                                                (Just SearchFocus)
-                                        , onBlur <| SetInputFocus Nothing
-                                        , id "search-input"
-                                        , value <|
-                                            Maybe.withDefault
-                                                ""
-                                                model.filterValue
-                                        , placeholder "search"
-                                        , autocomplete False
-                                        , spellcheck False
-                                        ]
-                                        []
-                                    ]
-                        ]
-                    ]
-                , div [ id "actions" ]
-                    (map
-                        (\( s, action ) ->
-                            div [ onClick action ]
-                                [ img
-                                    [ src <| "/" ++ s ++ ".svg"
-                                    , draggable "false"
+                                needed =
+                                    Dict.size model.entries
+                            in
+                            div
+                                []
+                                [ progress
+                                    [ toFloat done
+                                        / toFloat needed
+                                        |> fromFloat
+                                        |> value
                                     ]
                                     []
-                                , label []
-                                    [ text <|
-                                        if s == "about" then
-                                            "&c."
-
-                                        else
-                                            s
-                                    ]
+                                , text <|
+                                    formatNumber done
+                                        ++ " / "
+                                        ++ formatNumber needed
                                 ]
-                        )
-                        (reverse <|
-                            ( "about", ToggleAboutMode )
-                                :: (if noEntries then
-                                        []
 
-                                    else
-                                        [ ( "random", ShowRandom )
-                                        , ( "focus", ToggleFocusMode )
+                          else
+                            text ""
+                        , ul []
+                            (map
+                                (\tag ->
+                                    li
+                                        [ class "tag" ]
+                                        [ a
+                                            [ href <| tagToRoute tag ]
+                                            [ text tag ]
                                         ]
-                                   )
-                        )
-                    )
-                ]
-            ]
-        , main_ []
-            [ if noEntries then
-                text ""
-
-              else
-                lazy6
-                    sidebar
-                    model.infiniteList
-                    model.uiSize
-                    ((if
-                        model.reverseList
-                            && not
-                                (model.filterType
-                                    == TextFilter
-                                    && model.filterValue
-                                    /= Nothing
                                 )
-                      then
-                        reverse
-
-                      else
-                        identity
-                     )
-                        (withDefault model.entries model.shownEntries)
-                    )
-                    (if model.filterType == TextFilter then
-                        model.filterValue
-
-                     else
-                        Nothing
-                    )
-                    (needsTitles model)
-                    model.selectedEntries
-            , lazy8
-                viewer
-                model.selectedEntries
-                model.parsingError
-                noEntries
-                model.tags
-                model.pendingTag
-                model.neighborMap
-                model.embeddingsReady
-                ( Set.size model.completedEmbeddings, length model.entries )
-            , if model.aboutMode then
-                lazy4 about model.entries model.titles model.authors model.tags
-
-              else
-                text ""
-            ]
-        ]
-
-
-hidePrompt : List Entry -> Html Msg
-hidePrompt entries =
-    div [ class "prompt-bg" ]
-        [ div [ class "prompt" ]
-            [ p []
-                [ text <|
-                    "Remove "
-                        ++ (if length entries == 1 then
-                                "this entry?"
-
-                            else
-                                "these entries?"
-                           )
-                ]
-            , div
-                []
-                [ button [ onClick <| HideEntries entries ] [ text "Yes" ]
-                , button [ onClick CancelHide ] [ text "No" ]
-                ]
-            ]
-        ]
-
-
-selectMenu :
-    List String
-    -> Maybe String
-    -> (String -> Msg)
-    -> String
-    -> Html Msg
-selectMenu values mState inputFn default =
-    let
-        defaultLabel =
-            "(all " ++ default ++ ")"
-
-        val =
-            withDefault defaultLabel mState
-    in
-    div [ class "select" ]
-        [ span
-            [ classList
-                [ ( "x", True )
-                , ( "hidden", mState == Nothing )
-                ]
-            , onClick <| inputFn ""
-            ]
-            [ text "×" ]
-        , div [ class <| "select-" ++ default ]
-            [ select [ onInput inputFn ]
-                (option
-                    [ value "", selected <| val == defaultLabel ]
-                    [ text defaultLabel ]
-                    :: map
-                        (\t ->
-                            option [ value t, selected <| t == val ] [ text t ]
-                        )
-                        values
-                )
-            , h5 [ classList [ ( "no-filter", mState == Nothing ) ] ]
-                [ text val ]
+                                model.tags
+                            )
+                        , bookList <| pluckIds model.books model.booksShown
+                        ]
+            , button [ class "scrollToTop", onClick ScrollToTop ] [ text "⇞" ]
+            , footer [] [ text "❦" ]
             ]
         ]
 
