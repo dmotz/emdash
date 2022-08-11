@@ -8,7 +8,7 @@ import Dict exposing (Dict, insert, update)
 import List exposing (all, foldr, head, map)
 import MD5 exposing (bytes)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Book, Entry, Id)
+import Model exposing (Book, BookMap, Entry, EntryMap, Id)
 import Regex exposing (Match, Regex, replace)
 import Router exposing (slugify)
 import String
@@ -26,7 +26,7 @@ import Time exposing (Month(..), posixToMillis)
 import Utils exposing (juxt, rx, rx_)
 
 
-process : String -> ( Dict Id Entry, Dict Id Book )
+process : String -> ( EntryMap, BookMap )
 process =
     lines
         >> foldr folder ( [], [] )
@@ -172,7 +172,7 @@ replaceApostrophes =
     replace apostropheRx apostropheReplacer
 
 
-makeDicts : List ( List String, String ) -> ( Dict Id Entry, Dict Id Book )
+makeDicts : List ( List String, String ) -> ( EntryMap, BookMap )
 makeDicts =
     foldr
         (\( raw, notes ) ( entries, books ) ->
