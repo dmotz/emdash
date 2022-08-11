@@ -356,7 +356,9 @@ update message model =
                     else
                         ( { model_
                             | entriesShown =
-                                findMatches query .text (values model.entries)
+                                model.entries
+                                    |> values
+                                    |> findMatches query .text
                                     |> take maxSearchResults
                                     |> map .id
                                     |> Just
