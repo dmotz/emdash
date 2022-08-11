@@ -50,6 +50,7 @@ import Set exposing (diff, toList, union)
 import String exposing (toLower, trim)
 import Task exposing (attempt, perform)
 import Tuple exposing (first)
+import Update.Extra as Update exposing (addCmd)
 import Url exposing (Url)
 import Url.Parser exposing (parse)
 import Utils
@@ -272,28 +273,36 @@ update message model =
             let
                 ( newEntries, newBooks ) =
                     Parser.process text
+
+                allBooks =
+                    Dict.union model.books newBooks
             in
             if Dict.isEmpty newEntries then
                 ( { model | parsingError = True }, none )
 
             else
-                store <|
-                    update
-                        (SortBooks model.bookSort)
-                        { model
-                            | parsingError = False
-                            , entries =
-                                Dict.filter
-                                    (\id _ ->
-                                        not <|
-                                            Set.member
-                                                id
-                                                model.hiddenEntries
-                                    )
-                                    (Dict.union model.entries newEntries)
-                            , books = newBooks
-                            , booksShown = keys newBooks
-                        }
+                ( { model
+                    | parsingError = False
+                    , entries =
+                        Dict.filter
+                            (\id _ ->
+                                not <|
+                                    Set.member
+                                        id
+                                        model.hiddenEntries
+                            )
+                            (Dict.union model.entries newEntries)
+                    , books = allBooks
+                    , booksShown = keys allBooks
+                    , titleRouteMap =
+                        Parser.getRouteMap <| values allBooks
+                    , embeddingsReady = False
+                  }
+                , none
+                )
+                    |> Update.andThen update (SortBooks model.bookSort)
+                    |> addCmd (model |> modelToStoredModel |> handleNewEntries)
+                    |> store
 
         ResetError ->
             ( { model | parsingError = False }, none )
