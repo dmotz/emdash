@@ -748,7 +748,11 @@ update message model =
                                                 perform
                                                     (always NoOp)
                                                     (setViewport 0 0)
-                                        , requestBookNeighbors bookId
+                                        , if model.embeddingsReady then
+                                            requestBookNeighbors bookId
+
+                                          else
+                                            none
                                         ]
 
                                     _ ->
@@ -778,7 +782,11 @@ update message model =
                             Just bookId ->
                                 case get bookId model.bookNeighborMap of
                                     Nothing ->
-                                        requestBookNeighbors bookId
+                                        if model.embeddingsReady then
+                                            requestBookNeighbors bookId
+
+                                        else
+                                            none
 
                                     _ ->
                                         none
