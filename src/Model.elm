@@ -1,13 +1,16 @@
 module Model exposing
     ( Author
     , Book
+    , BookMap
     , BookSort(..)
     , Entry
+    , EntryMap
     , EntryTab(..)
     , Filter(..)
     , Id
     , InputFocus(..)
     , Model
+    , NeighborMap
     , StoredModel
     , Tag
     , Title
@@ -84,13 +87,25 @@ type alias Entry =
     }
 
 
+type alias EntryMap =
+    Dict Id Entry
+
+
+type alias BookMap =
+    Dict Id Book
+
+
+type alias NeighborMap =
+    Dict Id (List ( Id, Float ))
+
+
 type alias Model =
-    { entries : Dict Id Entry
-    , books : Dict Id Book
+    { entries : EntryMap
+    , books : BookMap
     , booksShown : List Id
     , entriesShown : Maybe (List Id)
-    , neighborMap : Dict Id (List ( Id, Float ))
-    , bookNeighborMap : Dict Id (List ( Id, Float ))
+    , neighborMap : NeighborMap
+    , bookNeighborMap : NeighborMap
     , hiddenEntries : Set Id
     , completedEmbeddings : Set Id
     , embeddingsReady : Bool
