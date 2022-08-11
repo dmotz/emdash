@@ -5,6 +5,7 @@
   "dependencies": {
     "direct": {
       "PanagiotisGeorgiadis/elm-datetime": "1.3.0",
+      "ccapndave/elm-update-extra": "4.0.0",
       "danfishgold/base64-bytes": "1.1.0",
       "elm/browser": "1.0.2",
       "elm/bytes": "1.0.8",
