@@ -163,6 +163,9 @@ main =
                                 TitleFilter book ->
                                     book.title ++ " - "
 
+                                AuthorFilter author ->
+                                    author ++ " - "
+
                                 _ ->
                                     ""
 
