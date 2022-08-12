@@ -39,14 +39,7 @@ import Model
 import Msg exposing (Msg(..))
 import Parser exposing (normalizeTitle)
 import Platform.Cmd exposing (batch, none)
-import Router
-    exposing
-        ( Route(..)
-        , deslugify
-        , entryToRoute
-        , routeParser
-        , searchToRoute
-        )
+import Router exposing (Route(..), entryToRoute, routeParser, searchToRoute)
 import Set exposing (diff, toList, union)
 import String exposing (toLower, trim)
 import Task exposing (attempt, perform)
