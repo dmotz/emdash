@@ -33,6 +33,7 @@ import Model
         , InputFocus(..)
         , Model
         , StoredModel
+        , TagSort(..)
         , initialStoredModel
         )
 import Msg exposing (Msg(..))
@@ -218,6 +219,7 @@ init maybeModel url key =
             , embeddingsReady = False
             , tags = restored.books |> map .tags |> concat |> dedupe
             , tagCounts = getTagCounts books
+            , tagSort = TagAlphaSort
             , titleRouteMap = Parser.getRouteMap restored.books
             , filter = Nothing
             , pendingTag = Nothing
@@ -504,6 +506,9 @@ update message model =
 
                 _ ->
                     noOp
+
+        SetTagSort sort ->
+            ( { model | tagSort = sort }, none )
 
         ToggleFocusMode ->
             store ( { model | focusMode = not model.focusMode }, none )

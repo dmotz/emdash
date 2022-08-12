@@ -13,6 +13,7 @@ module Model exposing
     , NeighborMap
     , StoredModel
     , Tag
+    , TagSort(..)
     , Title
     , initialStoredModel
     , sortToString
@@ -43,6 +44,11 @@ type BookSort
     = RecencySort
     | TitleSort
     | NumSort
+
+
+type TagSort
+    = TagAlphaSort
+    | TagNumSort
 
 
 type EntryTab
@@ -112,6 +118,7 @@ type alias Model =
     , titleRouteMap : Dict String Id
     , tags : List Tag
     , tagCounts : Dict Tag Int
+    , tagSort : TagSort
     , filter : Maybe Filter
     , pendingTag : Maybe Tag
     , focusMode : Bool
