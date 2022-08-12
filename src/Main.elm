@@ -406,6 +406,7 @@ update message model =
                       }
                     , none
                     )
+                        |> Update.andThen update (SortBooks model.bookSort)
 
                 _ ->
                     reset ()
