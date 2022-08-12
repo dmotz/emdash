@@ -111,6 +111,7 @@ type alias Model =
     , embeddingsReady : Bool
     , titleRouteMap : Dict String Id
     , tags : List Tag
+    , tagCounts : Dict Tag Int
     , filter : Maybe Filter
     , pendingTag : Maybe Tag
     , focusMode : Bool
