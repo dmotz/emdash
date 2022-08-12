@@ -32,6 +32,7 @@ import Model
         )
 import Msg exposing (Msg(..))
 import String exposing (fromInt, isEmpty)
+import Utils exposing (getEntryDomId)
 import Views.Snippet exposing (snippetView)
 
 
@@ -45,7 +46,7 @@ entryView :
     -> Entry
     -> Html Msg
 entryView entries books neighborMap showDetails activeTab i entry =
-    li [ class "entry", id <| "entry" ++ entry.id ]
+    li [ class "entry", getEntryDomId entry.id |> id ]
         [ figure []
             [ figcaption [ class "meta" ]
                 [ div [] [ text <| fromInt (i + 1) ++ "." ]

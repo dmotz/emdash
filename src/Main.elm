@@ -60,6 +60,7 @@ import Utils
         , dedupe
         , embeddingBatchSize
         , findMatches
+        , getEntryDomId
         , getTagCounts
         , insertOnce
         , juxt
@@ -776,9 +777,9 @@ update message model =
                                             Just lastId ->
                                                 attempt
                                                     ScrollToElement
-                                                    (getElement <|
-                                                        "entry"
-                                                            ++ lastId
+                                                    (lastId
+                                                        |> getEntryDomId
+                                                        |> getElement
                                                     )
 
                                             _ ->
@@ -809,7 +810,7 @@ update message model =
                         , if model.lastTitleSlug /= slug then
                             attempt
                                 ScrollToElement
-                                (getElement <| "entry" ++ id)
+                                (id |> getEntryDomId |> getElement)
 
                           else
                             none

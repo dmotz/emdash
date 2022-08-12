@@ -7,6 +7,7 @@ module Utils exposing
     , find
     , findMatches
     , formatNumber
+    , getEntryDomId
     , getIndex
     , getNextIndex
     , getPrevIndex
@@ -267,3 +268,8 @@ getTagCounts bookMap =
         |> insert
             untaggedKey
             (filter (\{ tags } -> isEmpty tags) books |> length)
+
+
+getEntryDomId : Id -> String
+getEntryDomId =
+    (++) "entry"
