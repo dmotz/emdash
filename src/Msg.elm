@@ -4,7 +4,7 @@ import Browser exposing (UrlRequest)
 import Browser.Dom exposing (Element, Error)
 import Debounce
 import File exposing (File)
-import Model exposing (BookSort, EntryTab, Filter, Id, InputFocus, Tag)
+import Model exposing (BookSort, EntryTab, Filter, Id, InputFocus, Tag, TagSort)
 import Url exposing (Url)
 import Utils exposing (KeyEvent)
 
@@ -29,6 +29,7 @@ type Msg
     | UpdatePendingTag Tag
     | AddTag
     | RemoveTag Tag
+    | SetTagSort TagSort
     | Sort
     | ScrollToElement (Result Error Element)
     | ExportJson
