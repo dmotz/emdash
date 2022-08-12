@@ -59,11 +59,13 @@ import Utils
         , dedupe
         , embeddingBatchSize
         , findMatches
+        , getTagCounts
         , insertOnce
         , juxt
         , modelToStoredModel
         , pluckIds
         , removeItem
+        , untaggedKey
         )
 import Views.Base exposing (view)
 
@@ -198,9 +200,12 @@ init maybeModel url key =
         restored =
             withDefault initialStoredModel maybeModel
 
+        books =
+            Dict.fromList (map (juxt .id identity) restored.books)
+
         model_ =
             { entries = Dict.fromList (map (juxt .id identity) restored.entries)
-            , books = Dict.fromList (map (juxt .id identity) restored.books)
+            , books = books
             , booksShown = map .id restored.books
             , entriesShown = Nothing
             , neighborMap = Dict.empty
@@ -209,6 +214,7 @@ init maybeModel url key =
             , completedEmbeddings = Set.empty
             , embeddingsReady = False
             , tags = restored.books |> map .tags |> concat |> dedupe
+            , tagCounts = getTagCounts books
             , titleRouteMap = Parser.getRouteMap restored.books
             , filter = Nothing
             , pendingTag = Nothing
@@ -389,7 +395,12 @@ update message model =
                         | entriesShown = Nothing
                         , booksShown =
                             Dict.filter
-                                (\_ book -> member tag book.tags)
+                                (if tag == untaggedKey then
+                                    \_ book -> isEmpty book.tags
+
+                                 else
+                                    \_ book -> member tag book.tags
+                                )
                                 model.books
                                 |> keys
                       }
@@ -423,26 +434,30 @@ update message model =
                                 tagN =
                                     tag |> trim |> toLower
                             in
-                            if tagN == "" then
+                            if tagN == "" || tagN == untaggedKey then
                                 ( { model | pendingTag = Nothing }, none )
 
                             else
+                                let
+                                    books =
+                                        Dict.update bookId
+                                            (Maybe.map
+                                                (\book ->
+                                                    { book
+                                                        | tags =
+                                                            insertOnce
+                                                                book.tags
+                                                                tagN
+                                                    }
+                                                )
+                                            )
+                                            model.books
+                                in
                                 store
                                     ( { model
-                                        | tags = insertOnce model.tags tagN
-                                        , books =
-                                            Dict.update bookId
-                                                (Maybe.map
-                                                    (\book ->
-                                                        { book
-                                                            | tags =
-                                                                insertOnce
-                                                                    book.tags
-                                                                    tagN
-                                                        }
-                                                    )
-                                                )
-                                                model.books
+                                        | books = books
+                                        , tags = insertOnce model.tags tagN
+                                        , tagCounts = getTagCounts books
                                         , pendingTag = Nothing
                                       }
                                     , none
@@ -458,7 +473,7 @@ update message model =
             case model.currentBook of
                 Just bookId ->
                     let
-                        newBooks =
+                        books =
                             Dict.update
                                 bookId
                                 (Maybe.map
@@ -472,12 +487,13 @@ update message model =
                     in
                     store
                         ( { model
-                            | tags =
-                                newBooks
+                            | books = books
+                            , tags =
+                                books
                                     |> values
                                     |> concatMap .tags
                                     |> dedupe
-                            , books = newBooks
+                            , tagCounts = getTagCounts books
                           }
                         , none
                         )

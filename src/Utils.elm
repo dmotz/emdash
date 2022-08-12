@@ -10,6 +10,7 @@ module Utils exposing
     , getIndex
     , getNextIndex
     , getPrevIndex
+    , getTagCounts
     , insertOnce
     , juxt
     , modelToStoredModel
@@ -20,23 +21,18 @@ module Utils exposing
     , rx_
     , takeExcerpt
     , toDict
+    , untaggedKey
     , updateItem
     , updateItems
     )
 
-import Dict exposing (Dict, get, values)
-import List exposing (filter, filterMap, length, map, partition)
+import Dict exposing (Dict, empty, get, insert, update, values)
+import List exposing (concatMap, filter, filterMap, foldl, foldr, isEmpty, length, map, partition)
 import Maybe exposing (withDefault)
-import Model
-    exposing
-        ( Filter(..)
-        , Id
-        , Model
-        , StoredModel
-        )
-import Regex exposing (Regex)
+import Model exposing (BookMap, Filter(..), Id, Model, StoredModel, Tag)
+import Regex exposing (Regex, replace)
 import Set
-import String exposing (fromChar, join, split, toList, toLower)
+import String exposing (fromChar, fromInt, join, split, toList, toLower)
 
 
 type alias KeyEvent =
@@ -58,6 +54,11 @@ queryCharMin =
     4
 
 
+untaggedKey : String
+untaggedKey =
+    "untagged"
+
+
 rx : String -> Regex
 rx =
     Regex.fromString >> withDefault Regex.never
@@ -71,7 +72,7 @@ rx_ =
 
 formatNumber : Int -> String
 formatNumber =
-    String.fromInt >> Regex.replace (rx "\\B(?=(\\d{3})+(?!\\d))") (always ",")
+    fromInt >> replace (rx "\\B(?=(\\d{3})+(?!\\d))") (always ",")
 
 
 insertOnce : List comparable -> comparable -> List comparable
@@ -250,3 +251,19 @@ findMatches query accessor xs =
         ++ filter
             (\x -> Regex.contains wordsRx (toLower (accessor x)))
             rest
+
+
+getTagCounts : BookMap -> Dict Tag Int
+getTagCounts bookMap =
+    let
+        books =
+            values bookMap
+    in
+    books
+        |> concatMap .tags
+        |> foldl
+            (\tag acc -> update tag (withDefault 0 >> (+) 1 >> Just) acc)
+            empty
+        |> insert
+            untaggedKey
+            (filter (\{ tags } -> isEmpty tags) books |> length)
