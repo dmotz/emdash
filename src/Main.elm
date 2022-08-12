@@ -221,7 +221,8 @@ init maybeModel url key =
             , tags = restored.books |> map .tags |> concat |> dedupe
             , tagCounts = getTagCounts books
             , tagSort = TagAlphaSort
-            , titleRouteMap = Parser.getRouteMap restored.books
+            , titleRouteMap = Parser.getTitleRouteMap restored.books
+            , authorRouteMap = Parser.getAuthorRouteMap restored.books
             , filter = Nothing
             , pendingTag = Nothing
             , focusMode = restored.focusMode
@@ -288,6 +289,9 @@ update message model =
 
                 allBooks =
                     Dict.union model.books newBooks
+
+                bookVals =
+                    values allBooks
             in
             if Dict.isEmpty newEntries then
                 ( { model | parsingError = True }, none )
@@ -307,7 +311,9 @@ update message model =
                     , books = allBooks
                     , booksShown = keys allBooks
                     , titleRouteMap =
-                        Parser.getRouteMap <| values allBooks
+                        Parser.getTitleRouteMap bookVals
+                    , authorRouteMap =
+                        Parser.getAuthorRouteMap bookVals
                     , embeddingsReady = False
                   }
                 , none
@@ -834,17 +840,22 @@ update message model =
                         ]
                     )
 
-                Just (AuthorRoute author) ->
-                    ( update
-                        (FilterBy
-                            (Just (AuthorFilter (deslugify author)))
-                        )
-                        { model_ | searchQuery = "" }
-                        |> first
-                    , perform
-                        (always NoOp)
-                        (setViewport 0 0)
-                    )
+                Just (AuthorRoute slug) ->
+                    case get slug model.authorRouteMap of
+                        Just author ->
+                            ( update
+                                (FilterBy
+                                    (Just (AuthorFilter author))
+                                )
+                                { model_ | searchQuery = "" }
+                                |> first
+                            , perform
+                                (always NoOp)
+                                (setViewport 0 0)
+                            )
+
+                        _ ->
+                            ( { model_ | routeNotFound = True }, none )
 
                 Just (TagRoute tag) ->
                     update

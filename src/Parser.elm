@@ -1,4 +1,9 @@
-module Parser exposing (getRouteMap, normalizeTitle, process)
+module Parser exposing
+    ( getAuthorRouteMap
+    , getTitleRouteMap
+    , normalizeTitle
+    , process
+    )
 
 import Base64 exposing (fromBytes)
 import Bytes.Encode exposing (encode, sequence, unsignedInt8)
@@ -8,7 +13,7 @@ import Dict exposing (Dict, insert, update)
 import List exposing (all, foldr, head, map)
 import MD5 exposing (bytes)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Book, BookMap, Entry, EntryMap, Id)
+import Model exposing (Author, Book, BookMap, Entry, EntryMap, Id)
 import Regex exposing (Match, Regex, replace)
 import Router exposing (slugify)
 import String
@@ -350,6 +355,11 @@ normalizeTitle =
     toLower >> replace titlePrefixRx (always "")
 
 
-getRouteMap : List Book -> Dict String Id
-getRouteMap =
+getTitleRouteMap : List Book -> Dict String Id
+getTitleRouteMap =
     map (juxt (.title >> slugify) .id) >> Dict.fromList
+
+
+getAuthorRouteMap : List Book -> Dict String Author
+getAuthorRouteMap =
+    map (juxt (.author >> slugify) .author) >> Dict.fromList

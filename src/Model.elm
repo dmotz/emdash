@@ -116,6 +116,7 @@ type alias Model =
     , completedEmbeddings : Set Id
     , embeddingsReady : Bool
     , titleRouteMap : Dict String Id
+    , authorRouteMap : Dict String Author
     , tags : List Tag
     , tagCounts : Dict Tag Int
     , tagSort : TagSort
