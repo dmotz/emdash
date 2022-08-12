@@ -838,7 +838,7 @@ update message model =
 
                 Just (TagRoute tag) ->
                     update
-                        (FilterBy (Just (TagFilter (deslugify tag))))
+                        (FilterBy (Just (TagFilter tag)))
                         { model_ | searchQuery = "" }
 
                 Just (TextRoute query) ->
