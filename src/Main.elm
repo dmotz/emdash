@@ -223,6 +223,7 @@ init maybeModel url key =
             , tagSort = TagAlphaSort
             , titleRouteMap = Parser.getTitleRouteMap restored.books
             , authorRouteMap = Parser.getAuthorRouteMap restored.books
+            , routeNotFound = False
             , filter = Nothing
             , pendingTag = Nothing
             , focusMode = restored.focusMode
@@ -740,7 +741,7 @@ update message model =
         UrlChanged url ->
             let
                 model_ =
-                    { model | url = url }
+                    { model | url = url, routeNotFound = False }
 
                 noOp_ =
                     ( model_, none )
@@ -757,7 +758,7 @@ update message model =
                                     { model_ | lastTitleSlug = slug }
 
                             _ ->
-                                noOp_
+                                ( { model_ | routeNotFound = True }, none )
             in
             case
                 parse routeParser url
