@@ -11,6 +11,7 @@ import Html
         , div
         , footer
         , h2
+        , h3
         , li
         , main_
         , p
@@ -64,114 +65,133 @@ view model =
             model.reverseSort
             model.hideHeader
         , main_ []
-            [ case
-                model.entriesShown
-              of
-                Just entryIds ->
-                    case model.filter of
-                        Just (TextFilter query) ->
-                            div
-                                [ class "searchResults" ]
-                                [ if isEmpty model.booksShown then
-                                    text ""
+            [ case model.notFoundMsg of
+                Just msg ->
+                    div [ class "notFound" ]
+                        [ h2 [] [ text "Alas!" ]
+                        , h3 [] [ text msg ]
+                        , a [ href "/" ] [ text "Return to the index." ]
+                        ]
 
-                                  else
-                                    bookList <|
-                                        pluckIds model.books model.booksShown
-                                , if isEmpty entryIds then
-                                    text ""
+                _ ->
+                    case
+                        model.entriesShown
+                    of
+                        Just entryIds ->
+                            case model.filter of
+                                Just (TextFilter query) ->
+                                    div
+                                        [ class "searchResults" ]
+                                        [ if isEmpty model.booksShown then
+                                            text ""
 
-                                  else
-                                    ul
-                                        [ class "snippets" ]
-                                        (map
-                                            (lazy4
-                                                snippetView
-                                                model.books
-                                                Nothing
-                                                (Just query)
-                                            )
-                                            (pluckIds model.entries entryIds)
-                                        )
-                                , if
-                                    isEmpty model.booksShown
-                                        && isEmpty entryIds
-                                  then
-                                    p [ class "noResults" ]
-                                        [ text "No results found." ]
+                                          else
+                                            bookList <|
+                                                pluckIds
+                                                    model.books
+                                                    model.booksShown
+                                        , if isEmpty entryIds then
+                                            text ""
 
-                                  else
-                                    text ""
-                                ]
+                                          else
+                                            ul
+                                                [ class "snippets" ]
+                                                (map
+                                                    (lazy4
+                                                        snippetView
+                                                        model.books
+                                                        Nothing
+                                                        (Just query)
+                                                    )
+                                                    (pluckIds
+                                                        model.entries
+                                                        entryIds
+                                                    )
+                                                )
+                                        , if
+                                            isEmpty model.booksShown
+                                                && isEmpty entryIds
+                                          then
+                                            p [ class "noResults" ]
+                                                [ text "No results found." ]
+
+                                          else
+                                            text ""
+                                        ]
+
+                                _ ->
+                                    div []
+                                        [ case
+                                            model.currentBook
+                                                |> andThen
+                                                    (\id ->
+                                                        get
+                                                            id
+                                                            model.books
+                                                    )
+                                          of
+                                            Just book ->
+                                                bookInfo
+                                                    book
+                                                    model.books
+                                                    model.tags
+                                                    model.pendingTag
+                                                    model.bookNeighborMap
+
+                                            _ ->
+                                                text ""
+                                        , entryList
+                                            entryIds
+                                            model.entries
+                                            model.books
+                                            model.neighborMap
+                                            model.idToShowDetails
+                                            model.idToActiveTab
+                                        ]
 
                         _ ->
-                            div []
-                                [ case
-                                    model.currentBook
-                                        |> andThen (\id -> get id model.books)
-                                  of
-                                    Just book ->
-                                        bookInfo
-                                            book
-                                            model.books
-                                            model.tags
-                                            model.pendingTag
-                                            model.bookNeighborMap
+                            div
+                                []
+                                [ if
+                                    not model.embeddingsReady
+                                        && size model.entries
+                                        /= 0
+                                  then
+                                    let
+                                        done =
+                                            Set.size model.completedEmbeddings
+
+                                        needed =
+                                            size model.entries
+                                    in
+                                    div
+                                        []
+                                        [ progress
+                                            [ toFloat done
+                                                / toFloat needed
+                                                |> fromFloat
+                                                |> value
+                                            ]
+                                            []
+                                        , text <|
+                                            formatNumber done
+                                                ++ " / "
+                                                ++ formatNumber needed
+                                        ]
+
+                                  else
+                                    text ""
+                                , case model.filter of
+                                    Just (TagFilter _) ->
+                                        tagHeader model
+
+                                    Nothing ->
+                                        tagHeader model
 
                                     _ ->
                                         text ""
-                                , entryList
-                                    entryIds
-                                    model.entries
-                                    model.books
-                                    model.neighborMap
-                                    model.idToShowDetails
-                                    model.idToActiveTab
+                                , bookList <| pluckIds model.books model.booksShown
                                 ]
-
-                _ ->
-                    div
-                        []
-                        [ if
-                            not model.embeddingsReady
-                                && size model.entries
-                                /= 0
-                          then
-                            let
-                                done =
-                                    model.completedEmbeddings |> Set.size
-
-                                needed =
-                                    size model.entries
-                            in
-                            div
-                                []
-                                [ progress
-                                    [ toFloat done
-                                        / toFloat needed
-                                        |> fromFloat
-                                        |> value
-                                    ]
-                                    []
-                                , text <|
-                                    formatNumber done
-                                        ++ " / "
-                                        ++ formatNumber needed
-                                ]
-
-                          else
-                            text ""
-                        , case model.filter of
-                            Just (TagFilter _) ->
-                                tagHeader model
-
-                            Nothing ->
-                                tagHeader model
-
-                            _ ->
-                                text ""
-                        , bookList <| pluckIds model.books model.booksShown
-                        ]
             , button [ class "scrollToTop", onClick ScrollToTop ] [ text "⇞" ]
             , footer [] [ text "❦" ]
             ]
