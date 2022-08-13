@@ -14,9 +14,12 @@ import List
     exposing
         ( concat
         , concatMap
+        , drop
         , filter
         , filterMap
+        , head
         , isEmpty
+        , length
         , map
         , member
         , reverse
@@ -39,6 +42,7 @@ import Model
 import Msg exposing (Msg(..))
 import Parser exposing (normalizeTitle)
 import Platform.Cmd exposing (batch, none)
+import Random exposing (generate)
 import Router exposing (Route(..), entryToRoute, routeParser, searchToRoute)
 import Set exposing (diff, toList, union)
 import String exposing (toLower, trim)
@@ -320,7 +324,28 @@ update message model =
             ( { model | parsingError = False }, none )
 
         ShowRandom ->
-            noOp
+            ( model
+            , generate
+                GotRandomIndex
+                (Random.int 0 ((model.entries |> values |> length) - 1))
+            )
+
+        GotRandomIndex n ->
+            case model.entries |> values |> drop n |> head of
+                Just entry ->
+                    case get entry.bookId model.books of
+                        Just book ->
+                            ( model
+                            , Nav.pushUrl
+                                model.key
+                                (entryToRoute model.books entry)
+                            )
+
+                        _ ->
+                            noOp
+
+                _ ->
+                    noOp
 
         SetInputFocus focus ->
             ( { model | inputFocused = focus }, none )
