@@ -181,7 +181,7 @@ view model =
 tagHeader : Model -> Html Msg
 tagHeader model =
     details
-        [ attribute "open" "true" ]
+        [ class "tagHeader", attribute "open" "true" ]
         [ summary [] [ text "Tags" ]
         , ul
             [ class "tagSort" ]
@@ -243,15 +243,19 @@ tagHeader model =
                         , span
                             [ class "count" ]
                             [ text <|
-                                if tag == allBooksKey then
-                                    model.books
-                                        |> size
-                                        |> formatNumber
+                                if model.tagSort == TagNumSort then
+                                    if tag == allBooksKey then
+                                        model.books
+                                            |> size
+                                            |> formatNumber
+
+                                    else
+                                        get tag model.tagCounts
+                                            |> withDefault 0
+                                            |> formatNumber
 
                                 else
-                                    get tag model.tagCounts
-                                        |> withDefault 0
-                                        |> formatNumber
+                                    ""
                             ]
                         ]
                 )
