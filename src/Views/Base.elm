@@ -161,103 +161,116 @@ view model =
 
                           else
                             text ""
-                        , details
-                            [ attribute "open" "true" ]
-                            [ summary [] [ text "Tags" ]
-                            , ul
-                                [ class "tagSort" ]
-                                (map
-                                    (\sort ->
-                                        button
-                                            [ onClick <| SetTagSort sort
-                                            , classList
-                                                [ ( "active"
-                                                  , sort == model.tagSort
-                                                  )
-                                                ]
-                                            ]
-                                            (case sort of
-                                                TagAlphaSort ->
-                                                    [ text "▲"
-                                                    , span [] [ text "A-Z" ]
-                                                    ]
+                        , case model.filter of
+                            Just (TagFilter _) ->
+                                tagHeader model
 
-                                                _ ->
-                                                    [ text "▼"
-                                                    , span [] [ text "№" ]
-                                                    ]
-                                            )
-                                    )
-                                    [ TagAlphaSort, TagNumSort ]
-                                )
-                            , ul [ class "tags" ]
-                                (map
-                                    (\tag ->
-                                        li
-                                            [ class "tag"
-                                            , classList
-                                                [ ( "active"
-                                                  , case model.filter of
-                                                        Just (TagFilter t) ->
-                                                            tag == t
+                            Nothing ->
+                                tagHeader model
 
-                                                        _ ->
-                                                            tag == allBooksKey
-                                                  )
-                                                , ( "special"
-                                                  , tag
-                                                        == allBooksKey
-                                                        || tag
-                                                        == untaggedKey
-                                                  )
-                                                ]
-                                            ]
-                                            [ a
-                                                [ href <|
-                                                    if tag == allBooksKey then
-                                                        "/"
-
-                                                    else
-                                                        tagToRoute tag
-                                                ]
-                                                [ text tag ]
-                                            , span
-                                                [ class "count" ]
-                                                [ text <|
-                                                    if tag == allBooksKey then
-                                                        model.books
-                                                            |> size
-                                                            |> formatNumber
-
-                                                    else
-                                                        get tag model.tagCounts
-                                                            |> withDefault 0
-                                                            |> formatNumber
-                                                ]
-                                            ]
-                                    )
-                                    ([ allBooksKey, untaggedKey ]
-                                        ++ (if model.tagSort == TagNumSort then
-                                                model.tags
-                                                    |> sortBy
-                                                        (\tag ->
-                                                            get tag
-                                                                model.tagCounts
-                                                                |> withDefault 0
-                                                        )
-                                                    |> reverse
-
-                                            else
-                                                model.tags
-                                           )
-                                    )
-                                )
-                            ]
+                            _ ->
+                                text ""
                         , bookList <| pluckIds model.books model.booksShown
                         ]
             , button [ class "scrollToTop", onClick ScrollToTop ] [ text "⇞" ]
             , footer [] [ text "❦" ]
             ]
+        ]
+
+
+tagHeader : Model -> Html Msg
+tagHeader model =
+    details
+        [ attribute "open" "true" ]
+        [ summary [] [ text "Tags" ]
+        , ul
+            [ class "tagSort" ]
+            (map
+                (\sort ->
+                    button
+                        [ onClick <| SetTagSort sort
+                        , classList
+                            [ ( "active"
+                              , sort == model.tagSort
+                              )
+                            ]
+                        ]
+                        (case sort of
+                            TagAlphaSort ->
+                                [ text "▲"
+                                , span [] [ text "A-Z" ]
+                                ]
+
+                            _ ->
+                                [ text "▼"
+                                , span [] [ text "№" ]
+                                ]
+                        )
+                )
+                [ TagAlphaSort, TagNumSort ]
+            )
+        , ul [ class "tags" ]
+            (map
+                (\tag ->
+                    li
+                        [ class "tag"
+                        , classList
+                            [ ( "active"
+                              , case model.filter of
+                                    Just (TagFilter t) ->
+                                        tag == t
+
+                                    _ ->
+                                        tag == allBooksKey
+                              )
+                            , ( "special"
+                              , tag
+                                    == allBooksKey
+                                    || tag
+                                    == untaggedKey
+                              )
+                            ]
+                        ]
+                        [ a
+                            [ href <|
+                                if tag == allBooksKey then
+                                    "/"
+
+                                else
+                                    tagToRoute tag
+                            ]
+                            [ text tag ]
+                        , span
+                            [ class "count" ]
+                            [ text <|
+                                if tag == allBooksKey then
+                                    model.books
+                                        |> size
+                                        |> formatNumber
+
+                                else
+                                    get tag model.tagCounts
+                                        |> withDefault 0
+                                        |> formatNumber
+                            ]
+                        ]
+                )
+                ([ allBooksKey, untaggedKey ]
+                    ++ (if model.tagSort == TagNumSort then
+                            model.tags
+                                |> sortBy
+                                    (\tag ->
+                                        get tag
+                                            model.tagCounts
+                                            |> withDefault 0
+                                    )
+                                |> reverse
+
+                        else
+                            model.tags
+                       )
+                )
+            )
         ]
 
 
