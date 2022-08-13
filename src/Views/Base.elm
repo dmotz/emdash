@@ -1,27 +1,31 @@
 module Views.Base exposing (view)
 
-import Dict exposing (get)
+import Dict exposing (get, size)
 import File
 import Html
     exposing
         ( Html
         , a
         , button
+        , details
         , div
         , footer
+        , h2
         , li
         , main_
         , p
         , progress
+        , span
+        , summary
         , text
         , ul
         )
-import Html.Attributes exposing (class, href, id, value)
+import Html.Attributes exposing (attribute, class, classList, href, id, value)
 import Html.Events exposing (onClick)
 import Html.Lazy exposing (lazy4)
 import Json.Decode as Decode exposing (Decoder)
-import List exposing (isEmpty, map)
-import Maybe exposing (andThen)
+import List exposing (isEmpty, map, reverse, sortBy)
+import Maybe exposing (andThen, withDefault)
 import Model
     exposing
         ( BookSort(..)
@@ -29,12 +33,13 @@ import Model
         , Filter(..)
         , InputFocus(..)
         , Model
+        , TagSort(..)
         )
 import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
-import Set exposing (size)
+import Set
 import String exposing (fromFloat)
-import Utils exposing (formatNumber, pluckIds)
+import Utils exposing (formatNumber, pluckIds, untaggedKey)
 import Views.BookInfo exposing (bookInfo)
 import Views.BookList exposing (bookList)
 import Views.Common exposing (on)
@@ -129,15 +134,15 @@ view model =
                         []
                         [ if
                             not model.embeddingsReady
-                                && Dict.size model.entries
+                                && size model.entries
                                 /= 0
                           then
                             let
                                 done =
-                                    model.completedEmbeddings |> size
+                                    model.completedEmbeddings |> Set.size
 
                                 needed =
-                                    Dict.size model.entries
+                                    size model.entries
                             in
                             div
                                 []
@@ -156,24 +161,109 @@ view model =
 
                           else
                             text ""
-                        , ul []
-                            (map
-                                (\tag ->
-                                    li
-                                        [ class "tag" ]
-                                        [ a
-                                            [ href <| tagToRoute tag ]
-                                            [ text tag ]
-                                        ]
+                        , details
+                            [ attribute "open" "true" ]
+                            [ summary [] [ text "Tags" ]
+                            , ul
+                                [ class "tagSort" ]
+                                (map
+                                    (\sort ->
+                                        button
+                                            [ onClick <| SetTagSort sort
+                                            , classList
+                                                [ ( "active"
+                                                  , sort == model.tagSort
+                                                  )
+                                                ]
+                                            ]
+                                            (case sort of
+                                                TagAlphaSort ->
+                                                    [ text "▲"
+                                                    , span [] [ text "A-Z" ]
+                                                    ]
+
+                                                _ ->
+                                                    [ text "▼"
+                                                    , span [] [ text "№" ]
+                                                    ]
+                                            )
+                                    )
+                                    [ TagAlphaSort, TagNumSort ]
                                 )
-                                model.tags
-                            )
+                            , ul [ class "tags" ]
+                                (map
+                                    (\tag ->
+                                        li
+                                            [ class "tag"
+                                            , classList
+                                                [ ( "active"
+                                                  , case model.filter of
+                                                        Just (TagFilter t) ->
+                                                            tag == t
+
+                                                        _ ->
+                                                            tag == allBooksKey
+                                                  )
+                                                , ( "special"
+                                                  , tag
+                                                        == allBooksKey
+                                                        || tag
+                                                        == untaggedKey
+                                                  )
+                                                ]
+                                            ]
+                                            [ a
+                                                [ href <|
+                                                    if tag == allBooksKey then
+                                                        "/"
+
+                                                    else
+                                                        tagToRoute tag
+                                                ]
+                                                [ text tag ]
+                                            , span
+                                                [ class "count" ]
+                                                [ text <|
+                                                    if tag == allBooksKey then
+                                                        model.books
+                                                            |> size
+                                                            |> formatNumber
+
+                                                    else
+                                                        get tag model.tagCounts
+                                                            |> withDefault 0
+                                                            |> formatNumber
+                                                ]
+                                            ]
+                                    )
+                                    ([ allBooksKey, untaggedKey ]
+                                        ++ (if model.tagSort == TagNumSort then
+                                                model.tags
+                                                    |> sortBy
+                                                        (\tag ->
+                                                            get tag
+                                                                model.tagCounts
+                                                                |> withDefault 0
+                                                        )
+                                                    |> reverse
+
+                                            else
+                                                model.tags
+                                           )
+                                    )
+                                )
+                            ]
                         , bookList <| pluckIds model.books model.booksShown
                         ]
             , button [ class "scrollToTop", onClick ScrollToTop ] [ text "⇞" ]
             , footer [] [ text "❦" ]
             ]
         ]
+
+
+allBooksKey : String
+allBooksKey =
+    "all books"
 
 
 dropDecoder : Decoder Msg
