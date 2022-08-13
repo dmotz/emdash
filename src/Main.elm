@@ -825,39 +825,44 @@ update message model =
                     )
 
                 Just (EntryRoute slug id) ->
-                    let
-                        ( m, cmd ) =
-                            titleView slug
-                    in
-                    ( { m | searchQuery = "" }
-                    , batch
-                        [ cmd
-                        , if model.lastTitleSlug /= slug then
-                            attempt
-                                ScrollToElement
-                                (id |> getEntryDomId |> getElement)
+                    case get id model.entries of
+                        Nothing ->
+                            ( { model_ | routeNotFound = True }, none )
 
-                          else
-                            none
-                        , case
-                            m.currentBook
-                          of
-                            Just bookId ->
-                                case get bookId model.bookNeighborMap of
-                                    Nothing ->
-                                        if model.embeddingsReady then
-                                            requestBookNeighbors bookId
+                        _ ->
+                            let
+                                ( m, cmd ) =
+                                    titleView slug
+                            in
+                            ( { m | searchQuery = "" }
+                            , batch
+                                [ cmd
+                                , if model.lastTitleSlug /= slug then
+                                    attempt
+                                        ScrollToElement
+                                        (id |> getEntryDomId |> getElement)
 
-                                        else
-                                            none
+                                  else
+                                    none
+                                , case
+                                    m.currentBook
+                                  of
+                                    Just bookId ->
+                                        case get bookId model.bookNeighborMap of
+                                            Nothing ->
+                                                if model.embeddingsReady then
+                                                    requestBookNeighbors bookId
+
+                                                else
+                                                    none
+
+                                            _ ->
+                                                none
 
                                     _ ->
                                         none
-
-                            _ ->
-                                none
-                        ]
-                    )
+                                ]
+                            )
 
                 Just (AuthorRoute slug) ->
                     case get slug model.authorRouteMap of
@@ -891,7 +896,7 @@ update message model =
                                         text
                                         model.searchDebounce
                             in
-                            ( { model
+                            ( { model_
                                 | searchDebounce = debounce
                                 , searchQuery = text
                               }
@@ -902,7 +907,7 @@ update message model =
                             ( { model_ | searchQuery = "" }, none )
 
                 _ ->
-                    noOp_
+                    ( { model_ | routeNotFound = True }, none )
 
         SortBooks sort ->
             let
