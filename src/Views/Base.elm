@@ -41,7 +41,6 @@ import Views.Common exposing (on)
 import Views.EntryList exposing (entryList)
 import Views.Header exposing (headerView)
 import Views.Snippet exposing (snippetView)
-import Views.TagSection exposing (tagSection)
 
 
 view : Model -> Html Msg

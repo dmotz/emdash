@@ -28,7 +28,17 @@ module Utils exposing
     )
 
 import Dict exposing (Dict, empty, get, insert, update, values)
-import List exposing (concatMap, filter, filterMap, foldl, foldr, isEmpty, length, map, partition)
+import List
+    exposing
+        ( concatMap
+        , filter
+        , filterMap
+        , foldl
+        , isEmpty
+        , length
+        , map
+        , partition
+        )
 import Maybe exposing (withDefault)
 import Model exposing (BookMap, Filter(..), Id, Model, StoredModel, Tag)
 import Regex exposing (Regex, replace)
