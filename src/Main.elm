@@ -220,7 +220,7 @@ init maybeModel url key =
             , tagSort = TagAlphaSort
             , titleRouteMap = Parser.getTitleRouteMap restored.books
             , authorRouteMap = Parser.getAuthorRouteMap restored.books
-            , routeNotFound = False
+            , notFoundMsg = Nothing
             , filter = Nothing
             , pendingTag = Nothing
             , focusMode = restored.focusMode
@@ -759,7 +759,7 @@ update message model =
         UrlChanged url ->
             let
                 model_ =
-                    { model | url = url, routeNotFound = False }
+                    { model | url = url, notFoundMsg = Nothing }
 
                 noOp_ =
                     ( model_, none )
@@ -776,7 +776,11 @@ update message model =
                                     { model_ | lastTitleSlug = slug }
 
                             _ ->
-                                ( { model_ | routeNotFound = True }, none )
+                                ( { model_
+                                    | notFoundMsg = Just "Title not found."
+                                  }
+                                , none
+                                )
             in
             case
                 parse routeParser url
@@ -827,7 +831,7 @@ update message model =
                 Just (EntryRoute slug id) ->
                     case get id model.entries of
                         Nothing ->
-                            ( { model_ | routeNotFound = True }, none )
+                            ( { model_ | notFoundMsg = Just "Excerpt ID not found." }, none )
 
                         _ ->
                             let
@@ -879,7 +883,11 @@ update message model =
                             )
 
                         _ ->
-                            ( { model_ | routeNotFound = True }, none )
+                            ( { model_
+                                | notFoundMsg = Just "Author not found."
+                              }
+                            , none
+                            )
 
                 Just (TagRoute tag) ->
                     update
@@ -907,7 +915,7 @@ update message model =
                             ( { model_ | searchQuery = "" }, none )
 
                 _ ->
-                    ( { model_ | routeNotFound = True }, none )
+                    ( { model_ | notFoundMsg = Just "Route not found." }, none )
 
         SortBooks sort ->
             let
