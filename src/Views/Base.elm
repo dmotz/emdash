@@ -18,12 +18,13 @@ import Html
         , progress
         , span
         , summary
+        , sup
         , text
         , ul
         )
 import Html.Attributes exposing (attribute, class, classList, href, id, value)
 import Html.Events exposing (onClick)
-import Html.Lazy exposing (lazy4)
+import Html.Lazy exposing (lazy3, lazy4)
 import Json.Decode as Decode exposing (Decoder)
 import List exposing (isEmpty, map, reverse, sortBy)
 import Maybe exposing (andThen, withDefault)
@@ -39,7 +40,7 @@ import Model
 import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
 import Set
-import String exposing (fromFloat)
+import String exposing (fromFloat, join)
 import Utils exposing (formatNumber, pluckIds, untaggedKey)
 import Views.BookInfo exposing (bookInfo)
 import Views.BookList exposing (bookList)
@@ -58,12 +59,7 @@ view model =
         , on "dragleave" (Decode.succeed DragLeave)
         , on "drop" dropDecoder
         ]
-        [ lazy4
-            headerView
-            model.filter
-            model.searchQuery
-            model.reverseSort
-            model.hideHeader
+        [ lazy3 headerView model.filter model.searchQuery model.hideHeader
         , main_ []
             [ case model.notFoundMsg of
                 Just msg ->
@@ -190,7 +186,52 @@ view model =
 
                                     _ ->
                                         text ""
-                                , bookList <| pluckIds model.books model.booksShown
+                                , div
+                                    [ class "bookSort" ]
+                                    [ div [] [ text "sort by:" ]
+                                    , ul []
+                                        (map
+                                            (\sort ->
+                                                li
+                                                    [ classList
+                                                        [ ( "active"
+                                                          , sort == model.bookSort
+                                                          )
+                                                        ]
+                                                    ]
+                                                    [ button
+                                                        [ onClick <|
+                                                            SortBooks sort
+                                                        ]
+                                                        [ text <|
+                                                            sortToString sort
+                                                        ]
+                                                    ]
+                                            )
+                                            [ RecencySort, TitleSort, NumSort ]
+                                        )
+                                    , div [] [ text "|" ]
+                                    , button
+                                        [ onClick Sort ]
+                                        (let
+                                            ( arrow, f ) =
+                                                if model.reverseSort then
+                                                    ( "▲", identity )
+
+                                                else
+                                                    ( "▼", reverse )
+                                         in
+                                         [ span [] [ text arrow ]
+                                         , model.bookSort
+                                            |> sortToBounds
+                                            |> f
+                                            |> join "–"
+                                            |> text
+                                         ]
+                                        )
+                                    ]
+                                , bookList <|
+                                    pluckIds model.books model.booksShown
                                 ]
             , button [ class "scrollToTop", onClick ScrollToTop ] [ text "⇞" ]
             , footer [] [ text "❦" ]
