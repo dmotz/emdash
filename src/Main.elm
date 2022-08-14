@@ -165,18 +165,20 @@ main =
                 { title =
                     (case m.filter of
                         Just filter ->
-                            case filter of
+                            (case filter of
                                 TitleFilter book ->
-                                    book.title ++ " | "
+                                    book.title
 
                                 AuthorFilter author ->
-                                    author ++ " | "
+                                    author
 
                                 TagFilter tag ->
-                                    "#" ++ tag ++ " | "
+                                    "#" ++ tag
 
-                                _ ->
-                                    ""
+                                TextFilter text ->
+                                    "🔍 " ++ text
+                            )
+                                ++ " | "
 
                         _ ->
                             ""
