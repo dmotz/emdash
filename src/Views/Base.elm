@@ -24,6 +24,7 @@ import Html
         )
 import Html.Attributes exposing (attribute, class, classList, href, id, value)
 import Html.Events exposing (onClick)
+import Html.Keyed as Keyed
 import Html.Lazy exposing (lazy3, lazy4)
 import Json.Decode as Decode exposing (Decoder)
 import List exposing (isEmpty, map, reverse, sortBy)
@@ -273,10 +274,12 @@ tagHeader model =
                 )
                 [ TagAlphaSort, TagNumSort ]
             )
-        , ul [ class "tags" ]
+        , Keyed.ul
+            [ class "tags" ]
             (map
                 (\tag ->
-                    li
+                    ( tag
+                    , li
                         [ class "tag"
                         , classList
                             [ ( "active"
@@ -322,6 +325,7 @@ tagHeader model =
                                     ""
                             ]
                         ]
+                    )
                 )
                 ([ allBooksKey, untaggedKey ]
                     ++ (if model.tagSort == TagNumSort then
