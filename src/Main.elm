@@ -172,6 +172,9 @@ main =
                                 AuthorFilter author ->
                                     author ++ " - "
 
+                                TagFilter tag ->
+                                    "#" ++ tag ++ " - "
+
                                 _ ->
                                     ""
 
