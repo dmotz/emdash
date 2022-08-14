@@ -43,7 +43,14 @@ import Msg exposing (Msg(..))
 import Parser exposing (normalizeTitle)
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
-import Router exposing (Route(..), entryToRoute, routeParser, searchToRoute)
+import Router
+    exposing
+        ( Route(..)
+        , entryToRoute
+        , routeParser
+        , searchToRoute
+        , slugify
+        )
 import Set exposing (diff, toList, union)
 import String exposing (toLower, trim)
 import Task exposing (attempt, perform)
@@ -464,7 +471,7 @@ update message model =
                         Just tag ->
                             let
                                 tagN =
-                                    tag |> trim |> toLower
+                                    tag |> trim |> toLower |> slugify
                             in
                             if tagN == "" || tagN == untaggedKey then
                                 ( { model | pendingTag = Nothing }, none )
