@@ -831,7 +831,11 @@ update message model =
                 Just (EntryRoute slug id) ->
                     case get id model.entries of
                         Nothing ->
-                            ( { model_ | notFoundMsg = Just "Excerpt ID not found." }, none )
+                            ( { model_
+                                | notFoundMsg = Just "Excerpt ID not found."
+                              }
+                            , none
+                            )
 
                         _ ->
                             let
@@ -890,9 +894,15 @@ update message model =
                             )
 
                 Just (TagRoute tag) ->
-                    update
-                        (FilterBy (Just (TagFilter tag)))
-                        { model_ | searchQuery = "" }
+                    if member tag model.tags then
+                        update
+                            (FilterBy (Just (TagFilter tag)))
+                            { model_ | searchQuery = "" }
+
+                    else
+                        ( { model_ | notFoundMsg = Just "Tag not found." }
+                        , none
+                        )
 
                 Just (TextRoute query) ->
                     case query of
@@ -915,7 +925,12 @@ update message model =
                             ( { model_ | searchQuery = "" }, none )
 
                 _ ->
-                    ( { model_ | notFoundMsg = Just "Route not found." }, none )
+                    ( { model_
+                        | notFoundMsg = Just "Route not found."
+                        , filter = Nothing
+                      }
+                    , none
+                    )
 
         SortBooks sort ->
             let
