@@ -248,25 +248,28 @@ tagHeader model =
             [ class "tagSort" ]
             (map
                 (\sort ->
-                    button
-                        [ onClick <| SetTagSort sort
-                        , classList
-                            [ ( "active"
-                              , sort == model.tagSort
-                              )
+                    li
+                        []
+                        [ button
+                            [ onClick <| SetTagSort sort
+                            , classList
+                                [ ( "active"
+                                  , sort == model.tagSort
+                                  )
+                                ]
                             ]
-                        ]
-                        (case sort of
-                            TagAlphaSort ->
-                                [ text "▲"
-                                , span [] [ text "A-Z" ]
-                                ]
+                            (case sort of
+                                TagAlphaSort ->
+                                    [ text "▲"
+                                    , span [] [ text "A–Z" ]
+                                    ]
 
-                            _ ->
-                                [ text "▼"
-                                , span [] [ text "№" ]
-                                ]
-                        )
+                                _ ->
+                                    [ text "▼"
+                                    , span [] [ text "№" ]
+                                    ]
+                            )
+                        ]
                 )
                 [ TagAlphaSort, TagNumSort ]
             )
@@ -301,7 +304,7 @@ tagHeader model =
                                     tagToRoute tag
                             ]
                             [ text tag ]
-                        , span
+                        , sup
                             [ class "count" ]
                             [ text <|
                                 if model.tagSort == TagNumSort then
@@ -342,6 +345,31 @@ tagHeader model =
 allBooksKey : String
 allBooksKey =
     "all books"
+
+
+sortToString : BookSort -> String
+sortToString sort =
+    case sort of
+        RecencySort ->
+            "recent"
+
+        TitleSort ->
+            "title"
+
+        _ ->
+            "№ excerpts"
+
+
+sortToBounds sort =
+    case sort of
+        RecencySort ->
+            [ "older", "newer" ]
+
+        TitleSort ->
+            [ "A", "Z" ]
+
+        _ ->
+            [ "less", "more" ]
 
 
 dropDecoder : Decoder Msg
