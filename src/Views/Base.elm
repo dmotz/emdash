@@ -152,18 +152,18 @@ view model =
                         _ ->
                             div
                                 []
-                                [ if
-                                    not model.embeddingsReady
-                                        && size model.entries
-                                        /= 0
-                                  then
-                                    let
-                                        done =
-                                            Set.size model.completedEmbeddings
+                                [ let
+                                    done =
+                                        Set.size model.completedEmbeddings
 
-                                        needed =
-                                            size model.entries
-                                    in
+                                    needed =
+                                        size model.entries
+                                  in
+                                  if
+                                    not model.embeddingsReady
+                                        && (done /= 0)
+                                        && (done /= needed)
+                                  then
                                     div
                                         []
                                         [ progress
