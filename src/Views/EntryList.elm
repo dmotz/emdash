@@ -1,8 +1,9 @@
 module Views.EntryList exposing (entryList)
 
 import Dict exposing (Dict, get)
-import Html exposing (Html, ul)
+import Html exposing (Html)
 import Html.Attributes exposing (class)
+import Html.Keyed as Keyed
 import List exposing (indexedMap)
 import Maybe exposing (withDefault)
 import Model exposing (BookMap, EntryMap, EntryTab(..), Id, NeighborMap)
@@ -20,11 +21,12 @@ entryList :
     -> Dict Id EntryTab
     -> Html Msg
 entryList ids entries books neighbors idToShowDetails idToActiveTab =
-    ul
+    Keyed.ul
         [ class "entries" ]
         (indexedMap
             (\i entry ->
-                entryView
+                ( entry.id
+                , entryView
                     entries
                     books
                     neighbors
@@ -32,6 +34,7 @@ entryList ids entries books neighbors idToShowDetails idToActiveTab =
                     (withDefault Related (get entry.id idToActiveTab))
                     i
                     entry
+                )
             )
             (pluckIds entries ids)
         )
