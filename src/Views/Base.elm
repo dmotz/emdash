@@ -48,6 +48,7 @@ import Views.BookList exposing (bookList)
 import Views.Common exposing (on)
 import Views.EntryList exposing (entryList)
 import Views.Header exposing (headerView)
+import Views.Landing exposing (landingView)
 import Views.Snippet exposing (snippetView)
 
 
@@ -60,183 +61,185 @@ view model =
         , on "dragleave" (Decode.succeed DragLeave)
         , on "drop" dropDecoder
         ]
-        [ lazy3 headerView model.filter model.searchQuery model.hideHeader
-        , main_ []
-            [ case model.notFoundMsg of
-                Just msg ->
-                    div [ class "notFound" ]
-                        [ h2 [] [ text "Alas!" ]
-                        , h3 [] [ text msg ]
-                        , a [ href "/" ] [ text "Return to the index." ]
-                        ]
+        (if Dict.isEmpty model.books then
+            [ landingView ]
 
-                _ ->
-                    case
-                        model.entriesShown
-                    of
-                        Just entryIds ->
-                            case model.filter of
-                                Just (TextFilter query) ->
-                                    div
-                                        [ class "searchResults" ]
-                                        [ if isEmpty model.booksShown then
-                                            text ""
+         else
+            [ lazy3 headerView model.filter model.searchQuery model.hideHeader
+            , main_ []
+                [ case model.notFoundMsg of
+                    Just msg ->
+                        div [ class "notFound" ]
+                            [ h2 [] [ text "Alas!" ]
+                            , h3 [] [ text msg ]
+                            , a [ href "/" ] [ text "Return to the index." ]
+                            ]
 
-                                          else
-                                            bookList <|
-                                                pluckIds
-                                                    model.books
-                                                    model.booksShown
-                                        , if isEmpty entryIds then
-                                            text ""
-
-                                          else
-                                            ul
-                                                [ class "snippets" ]
-                                                (map
-                                                    (lazy4
-                                                        snippetView
-                                                        model.books
-                                                        Nothing
-                                                        (Just query)
-                                                    )
-                                                    (pluckIds
-                                                        model.entries
-                                                        entryIds
-                                                    )
-                                                )
-                                        , if
-                                            isEmpty model.booksShown
-                                                && isEmpty entryIds
-                                          then
-                                            p [ class "noResults" ]
-                                                [ text "No results found." ]
-
-                                          else
-                                            text ""
-                                        ]
-
-                                _ ->
-                                    div []
-                                        [ case
-                                            model.currentBook
-                                                |> andThen
-                                                    (\id ->
-                                                        get
-                                                            id
-                                                            model.books
-                                                    )
-                                          of
-                                            Just book ->
-                                                bookInfo
-                                                    book
-                                                    model.books
-                                                    model.tags
-                                                    model.pendingTag
-                                                    model.bookNeighborMap
-
-                                            _ ->
+                    _ ->
+                        case
+                            model.entriesShown
+                        of
+                            Just entryIds ->
+                                case model.filter of
+                                    Just (TextFilter query) ->
+                                        div
+                                            [ class "searchResults" ]
+                                            [ if isEmpty model.booksShown then
                                                 text ""
-                                        , entryList
-                                            entryIds
-                                            model.entries
-                                            model.books
-                                            model.neighborMap
-                                            model.idToShowDetails
-                                            model.idToActiveTab
-                                        ]
 
-                        _ ->
-                            div
-                                []
-                                [ let
-                                    done =
-                                        Set.size model.completedEmbeddings
+                                              else
+                                                bookList <|
+                                                    pluckIds
+                                                        model.books
+                                                        model.booksShown
+                                            , if isEmpty entryIds then
+                                                text ""
 
-                                    needed =
-                                        size model.entries
-                                  in
-                                  if
-                                    not model.embeddingsReady
-                                        && (done /= 0)
-                                        && (done /= needed)
-                                  then
-                                    div
-                                        []
-                                        [ progress
-                                            [ toFloat done
-                                                / toFloat needed
-                                                |> fromFloat
-                                                |> value
+                                              else
+                                                ul
+                                                    [ class "snippets" ]
+                                                    (map
+                                                        (lazy4
+                                                            snippetView
+                                                            model.books
+                                                            Nothing
+                                                            (Just query)
+                                                        )
+                                                        (pluckIds
+                                                            model.entries
+                                                            entryIds
+                                                        )
+                                                    )
+                                            , if
+                                                isEmpty model.booksShown
+                                                    && isEmpty entryIds
+                                              then
+                                                p [ class "noResults" ]
+                                                    [ text "No results found." ]
+
+                                              else
+                                                text ""
                                             ]
-                                            []
-                                        , text <|
-                                            formatNumber done
-                                                ++ " / "
-                                                ++ formatNumber needed
-                                        ]
-
-                                  else
-                                    text ""
-                                , case model.filter of
-                                    Just (TagFilter _) ->
-                                        tagHeader model
-
-                                    Nothing ->
-                                        tagHeader model
 
                                     _ ->
-                                        text ""
-                                , div
-                                    [ class "bookSort" ]
-                                    [ div [] [ text "sort by:" ]
-                                    , ul []
-                                        (map
-                                            (\sort ->
-                                                li
-                                                    [ classList
-                                                        [ ( "active"
-                                                          , sort == model.bookSort
-                                                          )
-                                                        ]
-                                                    ]
-                                                    [ button
-                                                        [ onClick <|
-                                                            SortBooks sort
-                                                        ]
-                                                        [ text <|
-                                                            sortToString sort
-                                                        ]
-                                                    ]
-                                            )
-                                            [ RecencySort, TitleSort, NumSort ]
-                                        )
-                                    , div [] [ text "|" ]
-                                    , button
-                                        [ onClick Sort ]
-                                        (let
-                                            ( arrow, f ) =
-                                                if model.reverseSort then
-                                                    ( "▲", identity )
+                                        div []
+                                            [ case
+                                                model.currentBook
+                                                    |> andThen
+                                                        (\id ->
+                                                            get
+                                                                id
+                                                                model.books
+                                                        )
+                                              of
+                                                Just book ->
+                                                    bookInfo
+                                                        book
+                                                        model.books
+                                                        model.tags
+                                                        model.pendingTag
+                                                        model.bookNeighborMap
 
-                                                else
-                                                    ( "▼", reverse )
-                                         in
-                                         [ span [] [ text arrow ]
-                                         , model.bookSort
-                                            |> sortToBounds
-                                            |> f
-                                            |> join "–"
-                                            |> text
-                                         ]
-                                        )
+                                                _ ->
+                                                    text ""
+                                            , entryList
+                                                entryIds
+                                                model.entries
+                                                model.books
+                                                model.neighborMap
+                                                model.idToShowDetails
+                                                model.idToActiveTab
+                                            ]
+
+                            _ ->
+                                div
+                                    []
+                                    [ let
+                                        done =
+                                            Set.size model.completedEmbeddings
+
+                                        needed =
+                                            size model.entries
+                                      in
+                                      if
+                                        not model.embeddingsReady
+                                            && (done /= 0)
+                                            && (done /= needed)
+                                      then
+                                        div
+                                            []
+                                            [ progress
+                                                [ toFloat done
+                                                    / toFloat needed
+                                                    |> fromFloat
+                                                    |> value
+                                                ]
+                                                []
+                                            , text <|
+                                                formatNumber done
+                                                    ++ " / "
+                                                    ++ formatNumber needed
+                                            ]
+
+                                      else
+                                        text ""
+                                    , case model.filter of
+                                        Just (TagFilter _) ->
+                                            tagHeader model
+
+                                        Nothing ->
+                                            tagHeader model
+
+                                        _ ->
+                                            text ""
+                                    , bookSorter
+                                        model.bookSort
+                                        model.reverseSort
+                                    , bookList <|
+                                        pluckIds model.books model.booksShown
                                     ]
-                                , bookList <|
-                                    pluckIds model.books model.booksShown
-                                ]
-            , button [ class "scrollToTop", onClick ScrollToTop ] [ text "⇞" ]
-            , footer [] [ text "❦" ]
+                , button
+                    [ class "scrollToTop", onClick ScrollToTop ]
+                    [ text "⇞" ]
+                , footer [] [ text "❦" ]
+                ]
             ]
+        )
+
+
+bookSorter : BookSort -> Bool -> Html Msg
+bookSorter activeSort reverseSort =
+    div
+        [ class "bookSort" ]
+        [ div [] [ text "sort by:" ]
+        , ul
+            []
+            (map
+                (\sort ->
+                    li
+                        [ classList [ ( "active", sort == activeSort ) ] ]
+                        [ button
+                            [ onClick <| SortBooks sort ]
+                            [ text <| sortToString sort ]
+                        ]
+                )
+                [ RecencySort, TitleSort, NumSort ]
+            )
+        , div [] [ text "|" ]
+        , button
+            [ onClick Sort ]
+            (let
+                ( arrow, f ) =
+                    if reverseSort then
+                        ( "▲", identity )
+
+                    else
+                        ( "▼", reverse )
+             in
+             [ span [] [ text arrow ]
+             , activeSort |> sortToBounds |> f |> join "–" |> text
+             ]
+            )
         ]
 
 
