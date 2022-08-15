@@ -766,9 +766,6 @@ update message model =
                 model_ =
                     { model | url = url, notFoundMsg = Nothing }
 
-                noOp_ =
-                    ( model_, none )
-
                 titleView =
                     \slug ->
                         case
