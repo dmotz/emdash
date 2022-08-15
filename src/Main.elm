@@ -896,7 +896,7 @@ update message model =
                             )
 
                 Just (TagRoute tag) ->
-                    if member tag model.tags then
+                    if tag == untaggedKey || member tag model.tags then
                         update
                             (FilterBy (Just (TagFilter tag)))
                             { model_ | searchQuery = "" }
