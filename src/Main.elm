@@ -345,16 +345,9 @@ update message model =
         GotRandomIndex n ->
             case model.entries |> values |> drop n |> head of
                 Just entry ->
-                    case get entry.bookId model.books of
-                        Just book ->
-                            ( model
-                            , Nav.pushUrl
-                                model.key
-                                (entryToRoute model.books entry)
-                            )
-
-                        _ ->
-                            noOp
+                    ( model
+                    , Nav.pushUrl model.key (entryToRoute model.books entry)
+                    )
 
                 _ ->
                     noOp
