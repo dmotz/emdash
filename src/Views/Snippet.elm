@@ -9,18 +9,19 @@ import Html
         , cite
         , div
         , li
+        , mark
         , meter
         , span
         , text
         )
 import Html.Attributes exposing (class, href, value)
-import Html.Parser
-import Html.Parser.Util
+import List exposing (indexedMap)
 import Model exposing (Book, BookMap, Entry, EntryTab(..), InputFocus(..))
 import Msg exposing (Msg(..))
 import Regex
 import Router exposing (entryToRoute)
-import String exposing (fromFloat, fromInt)
+import String exposing (fromFloat, fromInt, split)
+import Utils exposing (rx_)
 
 
 snippetView : BookMap -> Maybe Float -> Maybe String -> Entry -> Html Msg
@@ -87,19 +88,21 @@ innerSnippet entry book mScore query =
 
 addHighlighting : String -> String -> List (Html msg)
 addHighlighting str query =
-    let
-        rx =
-            Regex.fromStringWith
-                { caseInsensitive = True, multiline = False }
-                ("\\b" ++ query)
-                |> Maybe.withDefault Regex.never
+    str
+        |> Regex.replace
+            (rx_ ("\\b" ++ query))
+            (\{ match } -> sigil ++ match ++ sigil)
+        |> split sigil
+        |> indexedMap
+            (\i s ->
+                if modBy 2 i == 1 then
+                    mark [] [ text s ]
 
-        addTag m =
-            "<mark>" ++ .match m ++ "</mark>"
-    in
-    case Html.Parser.run <| Regex.replace rx addTag str of
-        Ok parsedNodes ->
-            Html.Parser.Util.toVirtualDom parsedNodes
+                else
+                    text s
+            )
 
-        _ ->
-            [ text str ]
+
+sigil : String
+sigil =
+    "__marginalia_splitter__"
