@@ -12,7 +12,7 @@ const stateKey = 'state'
 const embeddingsKey = 'embeddings'
 const stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
 const embeddingsStore = createStore(`${dbNs}:${embeddingsKey}`, embeddingsKey)
-const writeMs = 1000
+const writeMs = 999
 const batchIds = {}
 const observer = new IntersectionObserver(
   obs => {
@@ -67,6 +67,8 @@ const init = async () => {
     app = Elm.Main.init({flags: null})
     didFail = true
   }
+
+  app.ports.handleNewEntries.subscribe(handleNewEntries)
 
   app.ports.importJson.subscribe(text => {
     try {
