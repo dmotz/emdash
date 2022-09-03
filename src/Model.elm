@@ -123,7 +123,6 @@ type alias Model =
     , tagSort : TagSort
     , filter : Maybe Filter
     , pendingTag : Maybe Tag
-    , focusMode : Bool
     , aboutMode : Bool
     , isDragging : Bool
     , reverseSort : Bool
@@ -150,7 +149,6 @@ type alias StoredModel =
     { entries : List Entry
     , books : List Book
     , hiddenEntries : List Id
-    , focusMode : Bool
     , reverseSort : Bool
     , schemaVersion : Int
     , bookIdToLastRead : List ( Id, Id )
@@ -162,7 +160,6 @@ initialStoredModel =
     { entries = []
     , books = []
     , hiddenEntries = []
-    , focusMode = False
     , reverseSort = False
     , schemaVersion = 0
     , bookIdToLastRead = []

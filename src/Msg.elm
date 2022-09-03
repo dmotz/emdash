@@ -14,7 +14,6 @@ type Msg
     | ShowRandom
     | GotRandomIndex Int
     | FilterBy (Maybe Filter)
-    | ToggleFocusMode
     | ToggleAboutMode
     | DragEnter
     | DragLeave

@@ -235,7 +235,6 @@ init maybeModel url key =
             , notFoundMsg = Nothing
             , filter = Nothing
             , pendingTag = Nothing
-            , focusMode = restored.focusMode
             , aboutMode = False
             , isDragging = False
             , reverseSort = False
@@ -541,9 +540,6 @@ update message model =
         SetTagSort sort ->
             ( { model | tagSort = sort }, none )
 
-        ToggleFocusMode ->
-            store ( { model | focusMode = not model.focusMode }, none )
-
         ToggleAboutMode ->
             ( { model | aboutMode = not model.aboutMode }, none )
 
@@ -631,9 +627,6 @@ update message model =
                     (case key of
                         "r" ->
                             ShowRandom
-
-                        "f" ->
-                            ToggleFocusMode
 
                         "s" ->
                             Sort
