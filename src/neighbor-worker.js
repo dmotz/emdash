@@ -16,14 +16,9 @@ self.addEventListener('message', ({data}) => {
   self.postMessage({
     id: targetId,
     neighbors: Object.entries(embeddingMap)
-      .reduce((a, [k, v]) => {
-        if (k === targetId || !predicate(k)) {
-          return a
-        }
-
-        a.push([k, similarity(target, v)])
-        return a
-      }, [])
+      .flatMap(([k, v]) =>
+        k === targetId || !predicate(k) ? [] : [[k, similarity(target, v)]]
+      )
       .sort(([, a], [, b]) => b - a)
       .slice(0, neighborsK)
   })
