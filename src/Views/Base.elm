@@ -387,6 +387,7 @@ sortToString sort =
             "№ excerpts"
 
 
+sortToBounds : BookSort -> List String
 sortToBounds sort =
     case sort of
         RecencySort ->
