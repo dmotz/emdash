@@ -1,0 +1,50 @@
+.expBookInfo
+  max-width: 80rem
+  margin: 0 auto
+
+  h1,h2
+    user-select: text
+
+  h1
+    font-style: italic
+
+  h2
+    margin-bottom: 0
+    font-size: 2.4rem
+
+.bookMeta
+  max-width: $maxWidth
+  margin: 3rem auto
+  display: flex
+
+  > div
+    padding: 1rem 0
+    flex: 1
+    padding-right: 2rem
+
+    &:last-child
+      border-left: 1px solid $black
+      padding-right: 0
+      padding-left: 2rem
+
+  h5
+    margin-bottom: 1rem
+    font-weight: 500
+
+  .tags
+    padding: 0
+    text-align: left
+
+.related
+  li
+    font-size: 2rem
+    line-height: 1.3
+
+    + li
+      margin-top: 1rem
+
+.tags
+  padding: 0 4rem
+  text-align: center
+  max-width: 150rem
+  margin: 0 auto
