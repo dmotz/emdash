@@ -12,6 +12,7 @@ import Html
         , footer
         , h2
         , h3
+        , img
         , li
         , main_
         , p
@@ -22,7 +23,7 @@ import Html
         , text
         , ul
         )
-import Html.Attributes exposing (attribute, class, classList, href, id, value)
+import Html.Attributes exposing (attribute, class, classList, draggable, href, id, src, value)
 import Html.Events exposing (onClick)
 import Html.Keyed as Keyed
 import Html.Lazy exposing (lazy3, lazy4)
@@ -49,6 +50,7 @@ import Views.Common exposing (on)
 import Views.EntryList exposing (entryList)
 import Views.Header exposing (headerView)
 import Views.Landing exposing (landingView)
+import Views.SearchInput exposing (searchInput)
 import Views.Snippet exposing (snippetView)
 
 
@@ -65,9 +67,27 @@ view model =
             [ landingView ]
 
          else
-            [ lazy3 headerView model.filter model.searchQuery model.hideHeader
+            [ a
+                [ class "logo", href "/" ]
+                [ img
+                    [ src "/logo.svg"
+                    , draggable "false"
+                    , onClick ToggleAboutMode
+                    ]
+                    []
+                ]
+            , div
+                [ class "actions" ]
+                [ a
+                    [ href "/settings" ]
+                    [ img [ src "/focus.svg" ] [] ]
+                , button
+                    [ onClick ShowRandom ]
+                    [ img [ src "/random.svg" ] [] ]
+                ]
             , main_ []
-                [ case model.notFoundMsg of
+                [ searchInput model.searchQuery
+                , case model.notFoundMsg of
                     Just msg ->
                         div [ class "notFound" ]
                             [ h2 [] [ text "Alas!" ]
