@@ -1,0 +1,92 @@
+.bookSort
+  display: flex
+  justify-content: center
+  align-items: center
+  position: relative
+  margin-bottom: 2rem
+
+  ul
+    color: $lighter
+    display: flex
+
+  li
+    & + li
+      margin-left: 0.8rem
+
+    &.active button
+      color: $black
+      font-weight: 500
+
+  div
+    margin: 0 1rem
+    color: $gray
+
+  button
+    color: inherit
+    font-size: inherit
+
+    span
+      font-size: 1rem
+      margin-right: 0.5rem
+
+.bookList
+  width: 100%
+  max-width: 150rem
+  margin: 0 auto
+  display: grid
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr))
+  gap: 4rem
+  justify-items: center
+  padding: 2rem
+
+  li
+    transform: scale(0.95)
+    transition: transform .2s
+
+    &:hover
+      transform: scale(0.99)
+
+      a
+        text-decoration: none
+
+        &:after
+          transform: translateX(0) translateY(0)
+
+    a
+      transition: all .2s
+      text-decoration: none
+      display: flex
+      flex-direction: column
+      width: 20rem
+      height: 30rem
+      border: 1px solid #000
+      padding: 2rem
+      align-items: center
+      justify-content: center
+      text-align: center
+      position: relative
+
+      &:after
+        transition: transform .2s
+        content: ''
+        border: 1px solid #ccc
+        width: 100%
+        height: 100%
+        position: absolute
+        z-index: -1
+        pointer-events: none
+        transform: translateX(.8rem) translateY(.8rem)
+
+    .title
+      margin-bottom: 2rem
+      font-size: 2rem
+
+    .count
+      position: absolute
+      bottom: 1rem
+      right: 1rem
+
+.authorInfo
+  max-width: $maxWidth
+  margin: 0 auto
+  margin-bottom: 2rem
