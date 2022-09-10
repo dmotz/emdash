@@ -218,9 +218,6 @@ view model =
                                     , bookList <|
                                         pluckIds model.books model.booksShown
                                     ]
-                , button
-                    [ class "scrollToTop", onClick ScrollToTop ]
-                    [ text "⇞" ]
                 , footer [] [ text "❦" ]
                 ]
             ]
