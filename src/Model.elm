@@ -16,8 +16,6 @@ module Model exposing
     , TagSort(..)
     , Title
     , initialStoredModel
-    , sortToString
-    , stringToSort
     )
 
 import Browser.Navigation as Nav
@@ -161,33 +159,8 @@ initialStoredModel =
     { entries = []
     , books = []
     , hiddenEntries = []
-    , reverseSort = False
+
+    -- , reverseSort = False
     , schemaVersion = 0
     , bookIdToLastRead = []
     }
-
-
-stringToSort : String -> BookSort
-stringToSort s =
-    case s of
-        "recent" ->
-            RecencySort
-
-        "title" ->
-            TitleSort
-
-        _ ->
-            NumSort
-
-
-sortToString : BookSort -> String
-sortToString t =
-    case t of
-        RecencySort ->
-            "recent"
-
-        TitleSort ->
-            "title"
-
-        _ ->
-            "№ of entries"
