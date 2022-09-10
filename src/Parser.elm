@@ -317,8 +317,7 @@ makeDicts =
                                         case mBook of
                                             Just book ->
                                                 { book
-                                                    | count = book.count + 1
-                                                    , sortIndex =
+                                                    | sortIndex =
                                                         max
                                                             book.sortIndex
                                                             date
@@ -329,7 +328,7 @@ makeDicts =
                                                     bookId
                                                     title
                                                     author
-                                                    1
+                                                    0
                                                     date
                                                     []
                                 )
