@@ -1,0 +1,51 @@
+.search
+  max-width: $maxWidth
+  position: relative
+  display: flex
+  align-items: center
+  padding-top: 1.6rem
+  width: 100%
+  margin: 0 auto
+  margin-bottom: 6rem
+
+  input
+    font-size: 2.1rem
+    width: 100%
+    border-color: $lighter
+    text-align: center
+    border
+
+    &:focus
+      border-color: $highlight
+
+  button
+    position: absolute
+    right: 0
+    visibility: hidden
+
+    &.active
+      visibility: visible
+
+  @media (max-width: 1000px)
+    max-width: calc(100vw - 200px)
+
+.searchResults
+  display: flex
+  justify-content: center
+
+  > ul
+    flex: 2
+    padding: 6rem
+
+  .bookList
+    max-width: 60rem
+    margin: 0
+    align-items: flex-start
+    justify-content: center
+    display: flex
+    flex-wrap: wrap
+    align-content: flex-start
+
+  .snippets
+    flex: 3
+    max-width: $maxWidth
