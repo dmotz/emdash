@@ -1,0 +1,194 @@
+.entries
+  width: 100%
+  margin: 0 auto
+  margin-bottom: 8rem
+  max-width: $maxWidth
+  display: flex
+  flex-direction: column
+  align-items: center
+
+.entry
+  width: 100%
+  padding-top: 4rem
+  position: relative
+
+  details
+    margin-top: 3rem
+
+  summary
+    cursor: pointer
+    font-size: 3rem
+    margin-bottom: 2rem
+
+    &::marker
+      font-size: 2rem
+
+  &:hover
+    .meta, .detailsBar
+      opacity: 1
+
+  .wait
+    margin: 3rem 0
+    font-style: italic
+
+blockquote
+  font-size: 2.4rem
+  line-height: 1.8
+  user-select: text
+  hyphens: auto
+
+.meta
+  position: absolute
+  transform: translateX(-100%)
+  padding-right: 2rem
+  height: 100%
+  font-size: 1.4rem
+  margin-top: 1rem
+  transition: opacity 0.2s
+  text-align: right
+  opacity: 0
+
+  a
+    font-size: 2rem
+    color: #aaa
+
+  &:hover
+    opacity: 1
+
+.detailsBar
+  display: flex
+  margin-top: 2rem
+  opacity: 0
+  transition: opacity 0.2s
+
+  &.active
+    border-bottom: 1px solid $black
+
+  &:not(.active) .detailsToggle
+    flex: 1
+
+.detailsToggle
+  position: relative
+  margin-right: 1rem
+  text-align: left
+  padding: 8.5px 0
+
+  > span
+    display: inline-block
+
+    &:first-of-type
+      width: 12px
+
+    &:last-of-type
+      font-size: 2.2rem
+      margin-left: 1rem
+
+  .hint
+    left: 3rem
+    top: 53%
+
+  &:hover
+    .hint
+      opacity: 1
+
+.details
+  section:not(.related)
+    padding-top: 3rem
+
+.tabs
+  flex: 1
+
+  button
+    font-size: 1.8rem
+    border: 1px solid transparent
+    padding: 1rem 1.5rem
+    position: relative
+    top: 2px
+
+    &.active
+      background: $white
+      border-color: $black
+      border-bottom: none
+      box-shadow: 0 3px 0 0 $white
+
+    &:last-child
+      font-style: italic
+
+.neighbors
+  margin-top: 4rem
+
+.snippet
+  $size: 1.8rem
+  position: relative
+  margin-bottom: 4rem
+
+  a
+    text-decoration: none
+
+  &:hover
+    .clone
+      display: block
+      z-index: 1
+      outline: 1px solid #ddd
+      box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1)
+
+  blockquote
+    font-size: $size
+    overflow: hidden
+    display: -webkit-box
+    -webkit-box-orient: vertical
+    -webkit-line-clamp: 3
+
+  mark
+    background: none
+    box-shadow: inset 0 -8.5px 0 yellow
+
+  cite
+    font-size: $size
+    margin-top: 1.5rem
+
+  .clone
+    $pad: 3rem
+    position: absolute
+    width: calc(100% + #{$pad} * 2)
+    top: -$pad
+    left: -$pad
+    background: $white
+    display: none
+    padding: $pad
+    pointer-events: none
+
+    blockquote
+      overflow: visible
+      -webkit-line-clamp: unset
+
+cite
+  display: flex
+  font-style: normal
+
+  .divider
+    margin: 0 .4em
+
+  .score
+    margin-left: auto
+    display: flex
+    align-items: center
+
+    span
+      font-size: 1.2rem
+
+    meter
+      margin-left: 1rem
+      height: 4px
+
+      &::-webkit-meter-bar
+        border-radius: 0
+        background: $lightGray
+        padding: 0
+        border: none
+        border-radius: 2px
+
+      &::-webkit-meter-optimum-value
+        border-radius: 0
+        background: $black
+        border-radius: 2px
