@@ -7,7 +7,6 @@ import Html
         ( Html
         , a
         , button
-        , details
         , div
         , footer
         , h2
@@ -18,7 +17,6 @@ import Html
         , p
         , progress
         , span
-        , summary
         , sup
         , text
         , ul
