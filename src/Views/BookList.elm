@@ -13,7 +13,7 @@ import String exposing (fromInt)
 bookList : List Book -> Html Msg
 bookList books =
     Keyed.ul
-        [ class "books" ]
+        [ class "bookList" ]
         (map
             (\{ id, title, author, count } ->
                 ( id
