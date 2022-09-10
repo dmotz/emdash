@@ -31,6 +31,7 @@ type Msg
     | RemoveTag Tag
     | SetTagSort TagSort
     | Sort
+    | ToggleTagHeader
     | ScrollToElement (Result Error Element)
     | ExportJson
     | ImportJson

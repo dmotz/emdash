@@ -121,6 +121,7 @@ type alias Model =
     , tags : List Tag
     , tagCounts : Dict Tag Int
     , tagSort : TagSort
+    , showTagHeader : Bool
     , filter : Maybe Filter
     , pendingTag : Maybe Tag
     , aboutMode : Bool

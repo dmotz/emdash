@@ -230,6 +230,7 @@ init maybeModel url key =
             , tags = restored.books |> map .tags |> concat |> dedupe
             , tagCounts = getTagCounts books
             , tagSort = TagAlphaSort
+            , showTagHeader = True
             , titleRouteMap = Parser.getTitleRouteMap restored.books
             , authorRouteMap = Parser.getAuthorRouteMap restored.books
             , notFoundMsg = Nothing
@@ -604,6 +605,9 @@ update message model =
                   }
                 , none
                 )
+
+        ToggleTagHeader ->
+            ( { model | showTagHeader = not model.showTagHeader }, none )
 
         ScrollToElement result ->
             case result of
