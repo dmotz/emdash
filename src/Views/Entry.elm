@@ -46,7 +46,8 @@ entryView :
     -> Entry
     -> Html Msg
 entryView entries books neighborMap showDetails activeTab i entry =
-    li [ class "entry", getEntryDomId entry.id |> id ]
+    li
+        [ class "entry", getEntryDomId entry.id |> id ]
         [ figure []
             [ figcaption [ class "meta" ]
                 [ div [] [ text <| fromInt (i + 1) ++ "." ]
@@ -77,6 +78,15 @@ entryView entries books neighborMap showDetails activeTab i entry =
                             )
                         ]
                     , span [] [ text "‡" ]
+                    , if showDetails then
+                        text ""
+
+                      else
+                        div
+                            [ class "hint" ]
+                            [ span [] [ text "☜" ]
+                            , text "show related excerpts, notes, &c"
+                            ]
                     ]
                 , if showDetails then
                     div [ class "tabs" ]
