@@ -1,9 +1,9 @@
 import {get, getMany, set, setMany, del, keys, createStore} from 'idb-keyval'
 import JsZip from 'jszip'
 import {Elm} from './Main.elm'
-import EmbedWorker from './embed-worker?worker'
-import BookEmbedWorker from './book-embed-worker?worker'
-import NeighborWorker from './neighbor-worker?worker'
+import EmbedWorker from './workers/embed-worker?worker'
+import BookEmbedWorker from './workers/book-embed-worker?worker'
+import NeighborWorker from './workers/neighbor-worker?worker'
 import {version} from '../package.json'
 import './styles.sass'
 
