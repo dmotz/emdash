@@ -406,16 +406,16 @@ update message model =
                     )
 
                 Just (AuthorFilter author) ->
-                    ( { model_
-                        | entriesShown = Nothing
-                        , booksShown =
-                            model.books
-                                |> Dict.filter
-                                    (\_ book -> book.author == author)
-                                |> keys
-                      }
-                    , none
-                    )
+                    update
+                        (SortBooks model.bookSort)
+                        { model_
+                            | entriesShown = Nothing
+                            , booksShown =
+                                model.books
+                                    |> Dict.filter
+                                        (\_ book -> book.author == author)
+                                    |> keys
+                        }
 
                 Just (TextFilter val) ->
                     let
