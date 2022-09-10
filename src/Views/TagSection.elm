@@ -35,10 +35,6 @@ import Router exposing (tagToRoute)
 
 tagSection : List Tag -> List Tag -> Maybe Tag -> Html Msg
 tagSection tags globalTags pendingTag =
-    let
-        pendTag =
-            Maybe.withDefault "" pendingTag
-    in
     div []
         [ h5 [] [ text "Tags" ]
         , if length tags > 0 then
@@ -51,9 +47,7 @@ tagSection tags globalTags pendingTag =
                             li
                                 [ class "tag" ]
                                 [ a
-                                    [ href <| tagToRoute tag
-                                    , class "tagTitle"
-                                    ]
+                                    [ href <| tagToRoute tag ]
                                     [ text tag ]
                                 , button
                                     [ onClick <| RemoveTag tag
@@ -71,6 +65,9 @@ tagSection tags globalTags pendingTag =
         , let
             datalistId =
                 "tagDatalist"
+
+            pendTag =
+                Maybe.withDefault "" pendingTag
           in
           div [ class "tagInput" ]
             [ datalist [ id datalistId ]
