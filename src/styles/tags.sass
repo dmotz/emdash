@@ -1,0 +1,103 @@
+.tag
+  margin-right: 1rem
+  margin-bottom: 1rem
+  display: inline-flex
+  align-items: center
+  position: relative
+
+  &:hover
+    a
+      color: $black
+
+    .tagDelete
+      display: block
+
+  &:after
+    content: '•'
+    margin-left: 1rem
+    color: #ccc
+
+  &:last-child::after
+    content: ''
+
+  a
+    font-size: 2rem
+    font-style: italic
+
+  .count
+    margin-left: 0.4rem
+    margin-top: -0.8rem
+
+  &.active
+    a
+      color: $black
+      text-decoration-color: $highlight
+
+  &.special
+    a
+      font-style: normal
+
+.tagDelete
+  font-size: 2rem
+  align-self: flex-end
+  line-height: 0
+  display: none
+  position: absolute
+  top: 0
+  right: -2px
+  opacity: .3
+
+  &:hover
+    opacity: 1
+
+.tagHeader
+  display: flex
+  flex-direction: column
+
+  > button
+    margin-bottom: 1rem
+
+    span
+      font-size: 1rem
+      margin-right: 0.6rem
+
+  .tags
+    margin-bottom: 3rem
+
+.tagSort
+  display: flex
+  justify-content: center
+  margin-bottom: 2rem
+
+  button
+    padding: 0 .6rem
+    font-size: 0.8rem
+    color: $lighter
+    transition: color .2s
+
+    &:hover
+      color: $black
+
+    &.active
+      color: $black
+      border-bottom: 2px solid $black
+
+    span
+      font-size: 1.4rem
+      margin-left: 0.2rem
+
+.tagInput
+  margin-top: 0rem
+  display: inline-block
+
+  button
+    margin-left: 1rem
+    visibility: hidden
+
+  input
+    border-color: $lightGray
+    &:focus + button
+      visibility: visible
+
+      &:disabled
+        visibility: hidden
