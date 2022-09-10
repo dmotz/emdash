@@ -296,8 +296,32 @@ update message model =
                 ( newEntries, newBooks ) =
                     Parser.process text
 
+                hiddenPred =
+                    \id _ -> not <| Set.member id model.hiddenEntries
+
+                unseenEntries =
+                    Dict.diff newEntries model.entries |> Dict.filter hiddenPred
+
                 allBooks =
-                    Dict.union model.books newBooks
+                    unseenEntries
+                        |> Dict.foldl
+                            (\_ entry acc ->
+                                Dict.update
+                                    entry.bookId
+                                    (Maybe.map
+                                        (\book ->
+                                            { book
+                                                | count = book.count + 1
+                                                , sortIndex =
+                                                    max
+                                                        book.sortIndex
+                                                        entry.date
+                                            }
+                                        )
+                                    )
+                                    acc
+                            )
+                            (Dict.union model.books newBooks)
 
                 bookVals =
                     values allBooks
@@ -309,14 +333,8 @@ update message model =
                 ( { model
                     | parsingError = False
                     , entries =
-                        Dict.filter
-                            (\id _ ->
-                                not <|
-                                    Set.member
-                                        id
-                                        model.hiddenEntries
-                            )
-                            (Dict.union model.entries newEntries)
+                        Dict.union model.entries newEntries
+                            |> Dict.filter hiddenPred
                     , books = allBooks
                     , booksShown = keys allBooks
                     , titleRouteMap =
