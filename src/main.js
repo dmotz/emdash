@@ -5,7 +5,7 @@ import EmbedWorker from './workers/embed-worker?worker'
 import BookEmbedWorker from './workers/book-embed-worker?worker'
 import NeighborWorker from './workers/neighbor-worker?worker'
 import {version} from '../package.json'
-import './styles.sass'
+import './styles/main.sass'
 
 const dbNs = 'marginalia'
 const stateKey = 'state'
