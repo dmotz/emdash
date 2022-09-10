@@ -1,0 +1,43 @@
+$inset: 1.6rem
+
+.logo, .actions
+  z-index: 99
+
+.logo
+  position: fixed
+  top: $inset
+  left: $inset
+  width: 6rem
+
+  img
+    width: 100%
+
+  &:after
+    content: ''
+    display: block
+    width: 84%
+    margin-left: auto
+    border-bottom: 3px solid transparent
+    transition: border-color .2s
+
+  &:hover
+    &:after
+      border-color: $highlight
+
+.actions
+  position: fixed
+  top: $inset
+  right: $inset
+  display: flex
+  flex-direction: column
+  align-items: center
+  margin-left: auto
+  padding-top: 1rem
+
+  a, button
+    display: flex
+    align-items: center
+    margin-bottom: 2rem
+
+  img
+    width: 2rem
