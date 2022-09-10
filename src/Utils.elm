@@ -1,6 +1,5 @@
 module Utils exposing
-    ( ClickWithKeys
-    , KeyEvent
+    ( KeyEvent
     , charLimit
     , dedupe
     , embeddingBatchSize
@@ -50,13 +49,6 @@ type alias KeyEvent =
     { key : String
     , control : Bool
     , meta : Bool
-    }
-
-
-type alias ClickWithKeys =
-    { control : Bool
-    , meta : Bool
-    , shift : Bool
     }
 
 
