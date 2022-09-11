@@ -3,6 +3,7 @@ module Utils exposing
     , charLimit
     , dedupe
     , embeddingBatchSize
+    , excerptCountLabel
     , find
     , findMatches
     , formatNumber
@@ -275,3 +276,15 @@ getTagCounts bookMap =
 getEntryDomId : Id -> String
 getEntryDomId =
     (++) "entry"
+
+
+excerptCountLabel : Int -> String
+excerptCountLabel n =
+    formatNumber n
+        ++ " excerpt"
+        ++ (if n == 1 then
+                ""
+
+            else
+                "s"
+           )
