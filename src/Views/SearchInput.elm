@@ -1,4 +1,4 @@
-module Views.SearchInput exposing (..)
+module Views.SearchInput exposing (searchInput)
 
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (class, placeholder, spellcheck, value)
