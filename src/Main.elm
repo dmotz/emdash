@@ -143,11 +143,6 @@ maxSearchResults =
     20
 
 
-headerHeight : Float
-headerHeight =
-    75
-
-
 debounceConfig : Debounce.Config Msg
 debounceConfig =
     { strategy = Debounce.soon 999
@@ -613,10 +608,7 @@ update message model =
             case result of
                 Ok element ->
                     ( model
-                    , perform (always NoOp)
-                        (setViewport 0
-                            (element.element.y - headerHeight)
-                        )
+                    , perform (always NoOp) (setViewport 0 element.element.y)
                     )
 
                 Err _ ->
