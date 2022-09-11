@@ -48,7 +48,7 @@ import Views.Common exposing (on)
 import Views.EntryList exposing (entryList)
 import Views.Landing exposing (landingView)
 import Views.SearchInput exposing (searchInput)
-import Views.Snippet exposing (snippetView)
+import Views.SearchResults exposing (searchResults)
 
 
 view : Model -> Html Msg
@@ -99,44 +99,13 @@ view model =
                             Just entryIds ->
                                 case model.filter of
                                     Just (TextFilter query) ->
-                                        div
-                                            [ class "searchResults" ]
-                                            [ if isEmpty model.booksShown then
-                                                text ""
-
-                                              else
-                                                bookList <|
-                                                    pluckIds
-                                                        model.books
-                                                        model.booksShown
-                                            , if isEmpty entryIds then
-                                                text ""
-
-                                              else
-                                                ul
-                                                    [ class "snippets" ]
-                                                    (map
-                                                        (lazy4
-                                                            snippetView
-                                                            model.books
-                                                            Nothing
-                                                            (Just query)
-                                                        )
-                                                        (pluckIds
-                                                            model.entries
-                                                            entryIds
-                                                        )
-                                                    )
-                                            , if
-                                                isEmpty model.booksShown
-                                                    && isEmpty entryIds
-                                              then
-                                                p [ class "noResults" ]
-                                                    [ text "No results found." ]
-
-                                              else
-                                                text ""
-                                            ]
+                                        searchResults
+                                            model.books
+                                            model.booksShown
+                                            model.entries
+                                            entryIds
+                                            model.semanticMatches
+                                            query
 
                                     _ ->
                                         div []
