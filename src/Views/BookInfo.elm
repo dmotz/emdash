@@ -20,6 +20,7 @@ import List exposing (map, repeat)
 import Model exposing (Book, BookMap, NeighborMap, Tag)
 import Msg exposing (Msg)
 import Router exposing (authorToRoute, titleToRoute)
+import Utils exposing (excerptCountLabel)
 import Views.TagSection exposing (tagSection)
 
 
@@ -29,12 +30,17 @@ bookInfo :
     -> List Tag
     -> Maybe Tag
     -> NeighborMap
+    -> Int
     -> Html Msg
-bookInfo book books tags pendingTag bookNeighborMap =
+bookInfo book books tags pendingTag bookNeighborMap entryCount =
     div
         [ class "expBookInfo" ]
         [ h1 [] [ text book.title ]
-        , h2 [] [ a [ href <| authorToRoute book.author ] [ text book.author ] ]
+        , h2
+            []
+            [ a [ href <| authorToRoute book.author ] [ text book.author ]
+            , text <| " — " ++ excerptCountLabel entryCount
+            ]
         , section
             [ class "bookMeta" ]
             [ div

@@ -125,6 +125,7 @@ view model =
                                                         model.tags
                                                         model.pendingTag
                                                         model.bookNeighborMap
+                                                        (length entryIds)
 
                                                 _ ->
                                                     text ""
