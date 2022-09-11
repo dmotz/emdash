@@ -9,24 +9,32 @@ import Html
         , button
         , div
         , footer
+        , h1
         , h2
         , h3
         , img
         , li
         , main_
-        , p
         , progress
         , span
         , sup
         , text
         , ul
         )
-import Html.Attributes exposing (attribute, class, classList, draggable, href, id, src, value)
+import Html.Attributes
+    exposing
+        ( class
+        , classList
+        , draggable
+        , href
+        , id
+        , src
+        , value
+        )
 import Html.Events exposing (onClick)
 import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy3, lazy4)
 import Json.Decode as Decode exposing (Decoder)
-import List exposing (isEmpty, map, reverse, sortBy)
+import List exposing (foldl, length, map, reverse, sortBy)
 import Maybe exposing (andThen, withDefault)
 import Model
     exposing
@@ -41,7 +49,7 @@ import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
 import Set
 import String exposing (fromFloat, join)
-import Utils exposing (formatNumber, pluckIds, untaggedKey)
+import Utils exposing (excerptCountLabel, formatNumber, pluckIds, untaggedKey)
 import Views.BookInfo exposing (bookInfo)
 import Views.BookList exposing (bookList)
 import Views.Common exposing (on)
@@ -139,8 +147,12 @@ view model =
                                             ]
 
                             _ ->
+                                let
+                                    books =
+                                        pluckIds model.books model.booksShown
+                                in
                                 div
-                                    []
+                                    [ class "books" ]
                                     [ let
                                         done =
                                             Set.size model.completedEmbeddings
@@ -171,6 +183,23 @@ view model =
                                       else
                                         text ""
                                     , case model.filter of
+                                        Just (AuthorFilter author) ->
+                                            div
+                                                [ class "authorInfo" ]
+                                                [ h1 [] [ text author ]
+                                                , h2
+                                                    []
+                                                    [ books
+                                                        |> foldl
+                                                            (\{ count } acc ->
+                                                                acc + count
+                                                            )
+                                                            0
+                                                        |> excerptCountLabel
+                                                        |> text
+                                                    ]
+                                                ]
+
                                         Just (TagFilter _) ->
                                             tagHeader model
 
@@ -182,8 +211,7 @@ view model =
                                     , bookSorter
                                         model.bookSort
                                         model.reverseSort
-                                    , bookList <|
-                                        pluckIds model.books model.booksShown
+                                    , bookList books
                                     ]
                 , footer [] [ text "❦" ]
                 ]
