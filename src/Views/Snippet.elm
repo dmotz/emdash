@@ -19,7 +19,7 @@ import List exposing (indexedMap)
 import Model exposing (Book, BookMap, Entry, EntryTab(..), InputFocus(..))
 import Msg exposing (Msg(..))
 import Regex
-import Router exposing (entryToRoute)
+import Router exposing (authorToRoute, entryToRoute, titleToRoute)
 import String exposing (fromFloat, fromInt, split)
 import Utils exposing (rx_)
 
@@ -55,9 +55,9 @@ innerSnippet entry book mScore query =
                 [ text entry.text ]
         )
     , cite []
-        ([ span [ class "title" ] [ text book.title ]
+        ([ a [ class "title", href <| titleToRoute book.title ] [ text book.title ]
          , span [ class "divider" ] [ text " - " ]
-         , span [] [ text book.author ]
+         , a [ href <| authorToRoute book.author ] [ text book.author ]
          ]
             ++ (if entry.page /= -1 then
                     [ span [ class "divider" ]
