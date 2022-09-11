@@ -15,6 +15,8 @@ import Html
         , text
         )
 import Html.Attributes exposing (class, href, value)
+import Html.Events exposing (stopPropagationOn)
+import Json.Decode exposing (succeed)
 import List exposing (indexedMap)
 import Model exposing (Book, BookMap, Entry, EntryTab(..), InputFocus(..))
 import Msg exposing (Msg(..))
@@ -55,9 +57,13 @@ innerSnippet entry book mScore query =
                 [ text entry.text ]
         )
     , cite []
-        ([ a [ class "title", href <| titleToRoute book.title ] [ text book.title ]
+        ([ a
+            [ class "title", href <| titleToRoute book.title, stopLinkProp ]
+            [ text book.title ]
          , span [ class "divider" ] [ text " - " ]
-         , a [ href <| authorToRoute book.author ] [ text book.author ]
+         , a
+            [ href <| authorToRoute book.author, stopLinkProp ]
+            [ text book.author ]
          ]
             ++ (if entry.page /= -1 then
                     [ span [ class "divider" ]
@@ -106,3 +112,8 @@ addHighlighting str query =
 sigil : String
 sigil =
     "__marginalia_splitter__"
+
+
+stopLinkProp : Html.Attribute Msg
+stopLinkProp =
+    stopPropagationOn "click" (succeed ( NoOp, True ))
