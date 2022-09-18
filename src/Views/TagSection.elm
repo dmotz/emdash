@@ -46,14 +46,14 @@ tagSection tags globalTags pendingTag =
                         (\tag ->
                             li
                                 [ class "tag" ]
-                                [ a
-                                    [ href <| tagToRoute tag ]
-                                    [ text tag ]
-                                , button
+                                [ button
                                     [ onClick <| RemoveTag tag
                                     , class "tagDelete"
                                     ]
                                     [ text "×" ]
+                                , a
+                                    [ href <| tagToRoute tag ]
+                                    [ text tag ]
                                 ]
                         )
                         tags
