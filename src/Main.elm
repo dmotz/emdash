@@ -338,6 +338,7 @@ update message model =
                     , authorRouteMap =
                         Parser.getAuthorRouteMap bookVals
                     , embeddingsReady = False
+                    , neighborMap = Dict.empty
                   }
                 , none
                 )
