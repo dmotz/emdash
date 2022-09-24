@@ -189,13 +189,17 @@ view model =
                                                 [ h1 [] [ text author ]
                                                 , h2
                                                     []
-                                                    [ books
-                                                        |> foldl
-                                                            (\{ count } acc ->
-                                                                acc + count
-                                                            )
-                                                            0
-                                                        |> excerptCountLabel
+                                                    [ titleCountLabel
+                                                        (length books)
+                                                        ++ ", "
+                                                        ++ (books
+                                                                |> foldl
+                                                                    (\{ count } acc ->
+                                                                        acc + count
+                                                                    )
+                                                                    0
+                                                                |> excerptCountLabel
+                                                           )
                                                         |> text
                                                     ]
                                                 ]
