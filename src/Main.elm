@@ -239,7 +239,6 @@ init maybeModel url key =
             , showTagHeader = True
             , titleRouteMap = Parser.getTitleRouteMap restored.books
             , authorRouteMap = Parser.getAuthorRouteMap restored.books
-            , notFoundMsg = Nothing
             , filter = Nothing
             , pendingTag = Nothing
             , aboutMode = False
@@ -794,7 +793,7 @@ update message model =
         UrlChanged url ->
             let
                 model_ =
-                    { model | url = url, notFoundMsg = Nothing }
+                    { model | url = url }
             in
             case
                 parse routeParser url
@@ -874,7 +873,7 @@ update message model =
                                     AuthorPage author
                                         (model.books
                                             |> Dict.filter
-                                                (\_ book -> book.author == author)
+                                                (\_ b -> b.author == author)
                                             |> values
                                         )
                               }
