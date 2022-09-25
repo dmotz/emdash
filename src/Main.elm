@@ -1002,12 +1002,43 @@ update message model =
         ScrollToTop ->
             ( model, scrollToTop () )
 
-        OnSearch query ->
+        OnSearchStart query ->
             if String.isEmpty query then
                 ( { model | searchQuery = "" }, Nav.replaceUrl model.key "/" )
 
             else
                 ( model, Nav.replaceUrl model.key (searchToRoute query) )
+
+        OnSearchEnd val ->
+            let
+                query =
+                    val |> toLower |> trim
+            in
+            if String.isEmpty query then
+                noOp
+
+            else
+                ( { model
+                    | page =
+                        SearchPage
+                            query
+                            (findMatches
+                                query
+                                (\b -> b.title ++ " " ++ b.author)
+                                (values model.books)
+                            )
+                            (model.entries
+                                |> values
+                                |> findMatches query .text
+                                |> take maxSearchResults
+                            )
+                  }
+                , if String.length query >= 5 then
+                    requestSemanticSearch query
+
+                  else
+                    none
+                )
 
         OnScroll delta ->
             ( { model
@@ -1022,11 +1053,7 @@ update message model =
                     Debounce.update
                         debounceConfig
                         (Debounce.takeLast
-                            (\text ->
-                                Task.perform
-                                    (\t -> FilterBy (Just (TextFilter t)))
-                                    (Task.succeed text)
-                            )
+                            (\t -> Task.perform OnSearchEnd (Task.succeed t))
                         )
                         msg
                         model.searchDebounce

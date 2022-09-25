@@ -51,6 +51,7 @@ type Msg
     | SetEntryTab Id EntryTab
     | ScrollToTop
     | OnScroll Float
-    | OnSearch String
+    | OnSearchStart String
+    | OnSearchEnd String
     | ReceiveUnicodeNormalized String
     | DebounceMsg Debounce.Msg
