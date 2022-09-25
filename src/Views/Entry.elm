@@ -153,7 +153,7 @@ entryView entries books neighborMap showDetails activeTab i entry =
                                     _ ->
                                         p
                                             [ class "wait" ]
-                                            [ text "Calculating related entries…" ]
+                                            [ text "Finding related entries…" ]
                                 ]
 
                         Notes ->
