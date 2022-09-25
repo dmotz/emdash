@@ -286,10 +286,10 @@ bookSorter activeSort reverseSort =
                 (let
                     ( arrow, f ) =
                         if reverseSort then
-                            ( "▲", identity )
+                            ( "▼", reverse )
 
                         else
-                            ( "▼", reverse )
+                            ( "▲", identity )
                  in
                  [ span [] [ text arrow ]
                  , activeSort |> sortToBounds |> f |> join "–" |> text
