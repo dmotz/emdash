@@ -60,17 +60,14 @@ innerSnippet entry book mScore query =
         ([ a
             [ class "title", href <| titleToRoute book.title, stopLinkProp ]
             [ text book.title ]
-         , span [ class "divider" ] [ text " - " ]
+         , span [ class "divider" ] [ text " • " ]
          , a
             [ href <| authorToRoute book.author, stopLinkProp ]
             [ text book.author ]
          ]
             ++ (if entry.page /= -1 then
-                    [ span [ class "divider" ]
-                        [ text " - " ]
-                    , span
-                        []
-                        [ text <| "p. " ++ fromInt entry.page ]
+                    [ span [ class "divider" ] [ text " • " ]
+                    , span [] [ text <| "p. " ++ fromInt entry.page ]
                     ]
 
                 else
