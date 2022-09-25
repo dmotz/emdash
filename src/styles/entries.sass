@@ -2,7 +2,6 @@
   width: 100%
   margin: 0 auto
   margin-bottom: 8rem
-  max-width: $maxWidth
   display: flex
   flex-direction: column
   align-items: center
@@ -31,6 +30,12 @@
     margin: 3rem 0
     font-style: italic
 
+  &.permalink
+    figure > cite
+      font-size: 2.4rem
+      margin: 4rem 0
+      margin-bottom: 8rem
+
 blockquote
   font-size: 2.4rem
   line-height: 1.8
@@ -41,16 +46,10 @@ blockquote
   position: absolute
   transform: translateX(-100%)
   padding-right: 2rem
-  height: 100%
   font-size: 1.4rem
   margin-top: 1rem
   transition: opacity 0.2s
   text-align: right
-  opacity: 0
-
-  a
-    font-size: 2rem
-    color: #aaa
 
   &:hover
     opacity: 1
@@ -62,7 +61,7 @@ blockquote
   transition: opacity 0.2s
 
   &.active
-    border-bottom: 1px solid $black
+    border-bottom: 1px solid $gray
     opacity: 1
 
   &:not(.active) .detailsToggle
@@ -108,7 +107,7 @@ blockquote
 
     &.active
       background: $white
-      border-color: $black
+      border-color: $gray
       border-bottom: none
       box-shadow: 0 3px 0 0 $white
 
@@ -168,6 +167,7 @@ cite
 
   .divider
     margin: 0 .4em
+    color: $lightGray
 
   .score
     margin-left: auto
