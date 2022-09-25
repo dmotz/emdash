@@ -718,9 +718,12 @@ update message model =
 
         ReceiveBookEmbeddings _ ->
             ( { model | embeddingsReady = True }
-            , case model.currentBook of
-                Just bookId ->
-                    requestBookNeighbors bookId
+            , case model.page of
+                TitlePage book _ ->
+                    requestBookNeighbors book.id
+
+                EntryPage entry _ ->
+                    requestNeighbors ( entry.id, True )
 
                 _ ->
                     none
