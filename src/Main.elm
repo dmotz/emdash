@@ -795,144 +795,123 @@ update message model =
             let
                 model_ =
                     { model | url = url, notFoundMsg = Nothing }
-
-                titleView =
-                    \slug ->
-                        case
-                            get slug model.titleRouteMap
-                                |> andThen (\id -> get id model.books)
-                        of
-                            Just book ->
-                                update
-                                    (FilterBy (Just (TitleFilter book)))
-                                    { model_ | lastTitleSlug = slug }
-
-                            _ ->
-                                ( { model_
-                                    | notFoundMsg = Just "Title not found."
-                                  }
-                                , none
-                                )
             in
             case
                 parse routeParser url
             of
                 Just RootRoute ->
-                    update (FilterBy Nothing) { model_ | searchQuery = "" }
-
-                Just (TitleRoute slug) ->
-                    let
-                        ( m, cmd ) =
-                            titleView slug
-                    in
-                    ( { m | searchQuery = "" }
-                    , batch
-                        (cmd
-                            :: (case get slug model.titleRouteMap of
-                                    Just bookId ->
-                                        [ case
-                                            get
-                                                bookId
-                                                model.bookIdToLastRead
-                                          of
-                                            Just lastId ->
-                                                attempt
-                                                    ScrollToElement
-                                                    (lastId
-                                                        |> getEntryDomId
-                                                        |> getElement
-                                                    )
-
-                                            _ ->
-                                                perform
-                                                    (always NoOp)
-                                                    (setViewport 0 0)
-                                        , if model.embeddingsReady then
-                                            requestBookNeighbors bookId
-
-                                          else
-                                            none
-                                        ]
-
-                                    _ ->
-                                        []
-                               )
-                        )
+                    ( { model_
+                        | page = MainPage (values model.books) Nothing
+                        , searchQuery = ""
+                      }
+                    , none
                     )
 
-                Just (EntryRoute slug id) ->
-                    case get id model.entries of
-                        Nothing ->
+                Just (TitleRoute slug) ->
+                    case
+                        get slug model.titleRouteMap
+                            |> andThen (\id -> get id model.books)
+                    of
+                        Just book ->
                             ( { model_
-                                | notFoundMsg = Just "Excerpt ID not found."
+                                | page =
+                                    TitlePage
+                                        book
+                                        (model.entries
+                                            |> Dict.filter
+                                                (\_ { bookId } ->
+                                                    bookId == book.id
+                                                )
+                                            |> values
+                                            |> sortBy .page
+                                        )
+                              }
+                            , if model.embeddingsReady then
+                                requestBookNeighbors book.id
+
+                              else
+                                none
+                            )
+
+                        _ ->
+                            ( { model_
+                                | page = NotFoundPage "Title not found."
                               }
                             , none
                             )
 
+                Just (EntryRoute titleSlug entrySlug) ->
+                    let
+                        mEntry =
+                            get entrySlug model.entries
+
+                        mBook =
+                            get titleSlug model.titleRouteMap
+                                |> andThen (\id -> get id model.books)
+                    in
+                    case ( mEntry, mBook ) of
+                        ( Just entry, Just book ) ->
+                            ( { model_ | page = EntryPage entry book }
+                            , if model.embeddingsReady then
+                                requestNeighbors ( entry.id, True )
+
+                              else
+                                none
+                            )
+
                         _ ->
-                            let
-                                ( m, cmd ) =
-                                    titleView slug
-                            in
-                            ( { m | searchQuery = "" }
-                            , batch
-                                [ cmd
-                                , if model.lastTitleSlug /= slug then
-                                    attempt
-                                        ScrollToElement
-                                        (id |> getEntryDomId |> getElement)
-
-                                  else
-                                    none
-                                , case
-                                    m.currentBook
-                                  of
-                                    Just bookId ->
-                                        case get bookId model.bookNeighborMap of
-                                            Nothing ->
-                                                if model.embeddingsReady then
-                                                    requestBookNeighbors bookId
-
-                                                else
-                                                    none
-
-                                            _ ->
-                                                none
-
-                                    _ ->
-                                        none
-                                ]
+                            ( { model_
+                                | page = NotFoundPage "Excerpt not found."
+                              }
+                            , none
                             )
 
                 Just (AuthorRoute slug) ->
                     case get slug model.authorRouteMap of
                         Just author ->
-                            ( update
-                                (FilterBy
-                                    (Just (AuthorFilter author))
-                                )
-                                { model_ | searchQuery = "" }
-                                |> first
-                            , perform
-                                (always NoOp)
-                                (setViewport 0 0)
+                            ( { model_
+                                | page =
+                                    AuthorPage author
+                                        (model.books
+                                            |> Dict.filter
+                                                (\_ book -> book.author == author)
+                                            |> values
+                                        )
+                              }
+                            , none
                             )
 
                         _ ->
                             ( { model_
-                                | notFoundMsg = Just "Author not found."
+                                | page = NotFoundPage "Author not found."
                               }
                             , none
                             )
 
                 Just (TagRoute tag) ->
                     if tag == untaggedKey || member tag model.tags then
-                        update
-                            (FilterBy (Just (TagFilter tag)))
-                            { model_ | searchQuery = "" }
+                        ( { model_
+                            | page =
+                                MainPage
+                                    (Dict.filter
+                                        (if tag == untaggedKey then
+                                            \_ book -> isEmpty book.tags
+
+                                         else
+                                            \_ book -> member tag book.tags
+                                        )
+                                        model.books
+                                        |> values
+                                    )
+                                    (Just tag)
+                          }
+                        , none
+                        )
 
                     else
-                        ( { model_ | notFoundMsg = Just "Tag not found." }
+                        ( { model_
+                            | page = NotFoundPage "Tag not found."
+                          }
                         , none
                         )
 
@@ -957,12 +936,6 @@ update message model =
                             ( { model_ | searchQuery = "" }, none )
 
                 _ ->
-                    -- ( { model_
-                    --     | notFoundMsg = Just "Route not found."
-                    --     , filter = Nothing
-                    --   }
-                    -- , none
-                    -- )
                     ( { model_ | page = NotFoundPage "Route not found." }
                     , none
                     )
