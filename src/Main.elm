@@ -24,7 +24,6 @@ import List
         , member
         , reverse
         , sortBy
-        , sortWith
         , take
         )
 import Maybe exposing (andThen, withDefault)
@@ -35,12 +34,13 @@ import Model
         , Id
         , InputFocus(..)
         , Model
+        , Page(..)
         , StoredModel
         , TagSort(..)
         , initialStoredModel
         )
 import Msg exposing (Msg(..))
-import Parser exposing (normalizeTitle)
+import Parser
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Router
@@ -52,7 +52,7 @@ import Router
         , slugify
         )
 import Set exposing (diff, toList, union)
-import String exposing (toLower, trim)
+import String exposing (fromInt, toLower, trim)
 import Task exposing (attempt, perform)
 import Tuple exposing (first)
 import Update.Extra as Update exposing (addCmd)
@@ -69,7 +69,6 @@ import Utils
         , insertOnce
         , juxt
         , modelToStoredModel
-        , pluckIds
         , removeItem
         , untaggedKey
         )
@@ -158,27 +157,38 @@ main =
         , view =
             \m ->
                 { title =
-                    (case m.filter of
-                        Just filter ->
-                            (case filter of
-                                TitleFilter book ->
-                                    book.title
-
-                                AuthorFilter author ->
-                                    author
-
-                                TagFilter tag ->
-                                    "#" ++ tag
-
-                                TextFilter text ->
-                                    "🔍 " ++ text
-                            )
-                                ++ " | "
+                    case m.page of
+                        MainPage _ Nothing ->
+                            appName
 
                         _ ->
-                            ""
-                    )
-                        ++ appName
+                            (case m.page of
+                                MainPage _ (Just tag) ->
+                                    "#" ++ tag
+
+                                SearchPage query _ _ ->
+                                    "🔍 " ++ query
+
+                                TitlePage book _ ->
+                                    book.title
+
+                                AuthorPage author _ ->
+                                    author
+
+                                EntryPage entry book ->
+                                    book.title
+                                        ++ " "
+                                        ++ "p. "
+                                        ++ fromInt entry.page
+
+                                NotFoundPage _ ->
+                                    "404"
+
+                                _ ->
+                                    ""
+                            )
+                                ++ " | "
+                                ++ appName
                 , body = [ view m ]
                 }
         , subscriptions =
