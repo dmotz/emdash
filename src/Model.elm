@@ -11,6 +11,7 @@ module Model exposing
     , InputFocus(..)
     , Model
     , NeighborMap
+    , Page(..)
     , StoredModel
     , Tag
     , TagSort(..)
@@ -23,6 +24,16 @@ import Debounce exposing (Debounce)
 import Dict exposing (Dict)
 import Set exposing (Set)
 import Url exposing (Url)
+
+
+type Page
+    = MainPage (List Book) (Maybe Tag)
+    | SearchPage String (List Book) (List Entry)
+    | TitlePage Book (List Entry)
+    | AuthorPage Author (List Book)
+    | EntryPage Entry Book
+    | NotFoundPage String
+    | LandingPage
 
 
 type Filter
@@ -104,7 +115,8 @@ type alias NeighborMap =
 
 
 type alias Model =
-    { entries : EntryMap
+    { page : Page
+    , entries : EntryMap
     , books : BookMap
     , booksShown : List Id
     , entriesShown : Maybe (List Id)
