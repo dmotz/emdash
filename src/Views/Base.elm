@@ -1,6 +1,6 @@
 module Views.Base exposing (view)
 
-import Dict exposing (get, size)
+import Dict exposing (Dict, get, size)
 import File
 import Html
     exposing
@@ -8,53 +8,42 @@ import Html
         , a
         , button
         , div
-        , footer
         , h1
         , h2
         , h3
-        , hr
         , img
         , li
         , main_
-        , progress
         , span
         , sup
         , text
         , ul
         )
-import Html.Attributes
-    exposing
-        ( class
-        , classList
-        , draggable
-        , href
-        , id
-        , src
-        , value
-        )
+import Html.Attributes exposing (class, classList, draggable, href, id, src)
 import Html.Events exposing (onClick)
 import Html.Keyed as Keyed
 import Json.Decode as Decode exposing (Decoder)
-import List exposing (foldl, head, length, map, reverse, sortBy)
-import Maybe exposing (andThen, withDefault)
+import List exposing (foldl, length, map, reverse, sortBy)
+import Maybe exposing (withDefault)
 import Model
     exposing
-        ( BookSort(..)
+        ( BookMap
+        , BookSort(..)
         , EntryTab(..)
         , Filter(..)
         , InputFocus(..)
         , Model
+        , Page(..)
+        , Tag
         , TagSort(..)
         )
 import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
-import Set
 import String exposing (fromFloat, join)
 import Utils
     exposing
         ( excerptCountLabel
         , formatNumber
-        , pluckIds
         , titleCountLabel
         , untaggedKey
         )
@@ -299,8 +288,15 @@ bookSorter activeSort reverseSort =
         ]
 
 
-tagHeader : Model -> Html Msg
-tagHeader model =
+tagHeader :
+    Bool
+    -> BookMap
+    -> TagSort
+    -> List Tag
+    -> Dict Tag Int
+    -> Maybe Tag
+    -> Html Msg
+tagHeader show allBooks tagSort tags tagCounts mActiveTag =
     div
         [ class "tagHeader" ]
         [ div
@@ -309,21 +305,21 @@ tagHeader model =
               ul
                 []
                 [ li
-                    [ classList [ ( "active", model.showTagHeader ) ] ]
+                    [ classList [ ( "active", show ) ] ]
                     [ button [ onClick ToggleTagHeader ] [ text "Show tags" ] ]
                 , li
-                    [ classList [ ( "active", not model.showTagHeader ) ] ]
+                    [ classList [ ( "active", not show ) ] ]
                     [ button [ onClick ToggleTagHeader ] [ text "Hide tags" ] ]
                 ]
 
             -- , div [ class "divider" ] [ text "|" ]
-            , if model.showTagHeader then
+            , if show then
                 ul
                     [ class "last" ]
                     (map
                         (\sort ->
                             li
-                                [ classList [ ( "active", sort == model.tagSort ) ] ]
+                                [ classList [ ( "active", sort == tagSort ) ] ]
                                 [ button
                                     [ onClick <| SetTagSort sort ]
                                     [ text <|
@@ -342,7 +338,7 @@ tagHeader model =
               else
                 text ""
             ]
-        , if model.showTagHeader then
+        , if show then
             Keyed.ul
                 [ class "tags" ]
                 (map
@@ -352,8 +348,8 @@ tagHeader model =
                             [ class "tag"
                             , classList
                                 [ ( "active"
-                                  , case model.filter of
-                                        Just (TagFilter t) ->
+                                  , case mActiveTag of
+                                        Just t ->
                                             tag == t
 
                                         _ ->
@@ -376,17 +372,15 @@ tagHeader model =
                                         tagToRoute tag
                                 ]
                                 [ text tag ]
-                            , if model.tagSort == TagNumSort then
+                            , if tagSort == TagNumSort then
                                 sup
                                     [ class "count" ]
                                     [ text <|
                                         if tag == allBooksKey then
-                                            model.books
-                                                |> size
-                                                |> formatNumber
+                                            allBooks |> size |> formatNumber
 
                                         else
-                                            get tag model.tagCounts
+                                            get tag tagCounts
                                                 |> withDefault 0
                                                 |> formatNumber
                                     ]
@@ -397,18 +391,16 @@ tagHeader model =
                         )
                     )
                     ([ allBooksKey, untaggedKey ]
-                        ++ (if model.tagSort == TagNumSort then
-                                model.tags
+                        ++ (if tagSort == TagNumSort then
+                                tags
                                     |> sortBy
                                         (\tag ->
-                                            get tag
-                                                model.tagCounts
-                                                |> withDefault 0
+                                            get tag tagCounts |> withDefault 0
                                         )
                                     |> reverse
 
                             else
-                                model.tags
+                                tags
                            )
                     )
                 )
