@@ -1,29 +1,16 @@
 module Views.Snippet exposing (snippetView)
 
 import Dict exposing (get)
-import Html
-    exposing
-        ( Html
-        , a
-        , blockquote
-        , cite
-        , div
-        , li
-        , mark
-        , meter
-        , span
-        , text
-        )
-import Html.Attributes exposing (class, href, value)
-import Html.Events exposing (stopPropagationOn)
-import Json.Decode exposing (succeed)
+import Html exposing (Html, a, blockquote, div, li, mark, text)
+import Html.Attributes exposing (class, href)
 import List exposing (indexedMap)
 import Model exposing (Book, BookMap, Entry, EntryTab(..), InputFocus(..))
 import Msg exposing (Msg(..))
 import Regex
-import Router exposing (authorToRoute, entryToRoute, titleToRoute)
-import String exposing (fromFloat, fromInt, split)
+import Router exposing (entryToRoute)
+import String exposing (split)
 import Utils exposing (rx_)
+import Views.Citation exposing (citation)
 
 
 snippetView : BookMap -> Maybe Float -> Maybe String -> Entry -> Html Msg
@@ -53,39 +40,10 @@ innerSnippet entry book mScore query =
             Just q ->
                 addHighlighting entry.text q
 
-            Nothing ->
+            _ ->
                 [ text entry.text ]
         )
-    , cite []
-        ([ a
-            [ class "title", href <| titleToRoute book.title, stopLinkProp ]
-            [ text book.title ]
-         , span [ class "divider" ] [ text " • " ]
-         , a
-            [ href <| authorToRoute book.author, stopLinkProp ]
-            [ text book.author ]
-         ]
-            ++ (if entry.page /= -1 then
-                    [ span [ class "divider" ] [ text " • " ]
-                    , span [] [ text <| "p. " ++ fromInt entry.page ]
-                    ]
-
-                else
-                    []
-               )
-            ++ (case mScore of
-                    Just score ->
-                        [ div
-                            [ class "score" ]
-                            [ span [] [ text (score * 100 |> round |> fromInt) ]
-                            , meter [ score |> fromFloat |> value ] []
-                            ]
-                        ]
-
-                    _ ->
-                        []
-               )
-        )
+    , citation entry book mScore
     ]
 
 
@@ -109,8 +67,3 @@ addHighlighting str query =
 sigil : String
 sigil =
     "__marginalia_splitter__"
-
-
-stopLinkProp : Html.Attribute Msg
-stopLinkProp =
-    stopPropagationOn "click" (succeed ( NoOp, True ))
