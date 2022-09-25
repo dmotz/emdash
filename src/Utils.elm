@@ -15,6 +15,7 @@ module Utils exposing
     , insertOnce
     , juxt
     , modelToStoredModel
+    , normalizeTitle
     , pluckIds
     , queryCharMin
     , removeItem
@@ -39,9 +40,22 @@ import List
         , length
         , map
         , partition
+        , reverse
+        , sortBy
+        , sortWith
         )
 import Maybe exposing (withDefault)
-import Model exposing (BookMap, Filter(..), Id, Model, StoredModel, Tag)
+import Model
+    exposing
+        ( Book
+        , BookMap
+        , BookSort(..)
+        , Filter(..)
+        , Id
+        , Model
+        , StoredModel
+        , Tag
+        )
 import Regex exposing (Regex, replace)
 import Set
 import String exposing (fromChar, fromInt, join, split, toList, toLower)
@@ -300,3 +314,8 @@ excerptCountLabel =
 titleCountLabel : Int -> String
 titleCountLabel =
     countLabel "title"
+
+
+normalizeTitle : String -> String
+normalizeTitle =
+    toLower >> replace (rx "^(the )") (always "")

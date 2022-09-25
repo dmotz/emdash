@@ -1,9 +1,4 @@
-module Parser exposing
-    ( getAuthorRouteMap
-    , getTitleRouteMap
-    , normalizeTitle
-    , process
-    )
+module Parser exposing (getAuthorRouteMap, getTitleRouteMap, process)
 
 import Base64 exposing (fromBytes)
 import Bytes.Encode exposing (encode, sequence, unsignedInt8)
@@ -16,17 +11,7 @@ import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Book, BookMap, Entry, EntryMap, Id)
 import Regex exposing (Match, Regex, replace)
 import Router exposing (slugify)
-import String
-    exposing
-        ( lines
-        , repeat
-        , right
-        , split
-        , startsWith
-        , toInt
-        , toLower
-        , trim
-        )
+import String exposing (lines, repeat, right, split, startsWith, toInt, trim)
 import Time exposing (Month(..), posixToMillis)
 import Utils exposing (juxt, rx, rx_)
 
@@ -342,16 +327,6 @@ makeDicts =
                     noOp
         )
         ( Dict.empty, Dict.empty )
-
-
-titlePrefixRx : Regex
-titlePrefixRx =
-    rx "^(the )"
-
-
-normalizeTitle : String -> String
-normalizeTitle =
-    toLower >> replace titlePrefixRx (always "")
 
 
 getTitleRouteMap : List Book -> Dict String Id
