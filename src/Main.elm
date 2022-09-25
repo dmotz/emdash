@@ -223,7 +223,8 @@ init maybeModel url key =
             Dict.fromList (map (juxt .id identity) restored.books)
 
         model_ =
-            { entries = Dict.fromList (map (juxt .id identity) restored.entries)
+            { page = MainPage (values books) Nothing
+            , entries = Dict.fromList (map (juxt .id identity) restored.entries)
             , books = books
             , booksShown = map .id restored.books
             , entriesShown = Nothing
@@ -600,7 +601,15 @@ update message model =
                                     )
                             )
                   }
-                , deleteEmbedding id
+                , batch
+                    [ deleteEmbedding id
+                    , case model.page of
+                        EntryPage _ _ ->
+                            Nav.pushUrl model.key "/"
+
+                        _ ->
+                            none
+                    ]
                 )
 
         Sort ->
