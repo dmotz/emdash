@@ -21,6 +21,7 @@ module Utils exposing
     , rx
     , rx_
     , takeExcerpt
+    , titleCountLabel
     , toDict
     , untaggedKey
     , updateItem
@@ -278,13 +279,24 @@ getEntryDomId =
     (++) "entry"
 
 
-excerptCountLabel : Int -> String
-excerptCountLabel n =
+countLabel : String -> Int -> String
+countLabel label n =
     formatNumber n
-        ++ " excerpt"
+        ++ " "
+        ++ label
         ++ (if n == 1 then
                 ""
 
             else
                 "s"
            )
+
+
+excerptCountLabel : Int -> String
+excerptCountLabel =
+    countLabel "excerpt"
+
+
+titleCountLabel : Int -> String
+titleCountLabel =
+    countLabel "title"
