@@ -233,7 +233,7 @@ init maybeModel url key =
             , pendingTag = Nothing
             , aboutMode = False
             , isDragging = False
-            , reverseSort = False
+            , reverseSort = True
             , hidePromptActive = False
             , inputFocused = Nothing
             , parsingError = False
@@ -935,54 +935,23 @@ update message model =
                             ( { model_ | searchQuery = "" }, none )
 
                 _ ->
-                    ( { model_
-                        | notFoundMsg = Just "Route not found."
-                        , filter = Nothing
-                      }
+                    -- ( { model_
+                    --     | notFoundMsg = Just "Route not found."
+                    --     , filter = Nothing
+                    --   }
+                    -- , none
+                    -- )
+                    ( { model_ | page = NotFoundPage "Route not found." }
                     , none
                     )
 
         SortBooks sort ->
-            let
-                model_ =
-                    { model | bookSort = sort }
-            in
             ( case sort of
-                RecencySort ->
-                    { model_
-                        | booksShown =
-                            sortBy
-                                .sortIndex
-                                (pluckIds model.books model.booksShown)
-                                |> map .id
-                                |> reverse
-                        , reverseSort = False
-                    }
-
                 TitleSort ->
-                    { model_
-                        | booksShown =
-                            sortWith
-                                (\a b ->
-                                    compare
-                                        (a |> .title |> normalizeTitle)
-                                        (b |> .title |> normalizeTitle)
-                                )
-                                (pluckIds model.books model.booksShown)
-                                |> map .id
-                        , reverseSort = True
-                    }
+                    { model | bookSort = sort, reverseSort = False }
 
-                NumSort ->
-                    { model_
-                        | booksShown =
-                            sortBy
-                                .count
-                                (pluckIds model.books model.booksShown)
-                                |> map .id
-                                |> reverse
-                        , reverseSort = False
-                    }
+                _ ->
+                    { model | bookSort = sort, reverseSort = True }
             , none
             )
 
