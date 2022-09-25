@@ -16,6 +16,7 @@ module Utils exposing
     , juxt
     , modelToStoredModel
     , normalizeTitle
+    , null
     , pluckIds
     , queryCharMin
     , removeItem
@@ -31,6 +32,7 @@ module Utils exposing
     )
 
 import Dict exposing (Dict, empty, get, insert, update, values)
+import Html exposing (Html, text)
 import List
     exposing
         ( concatMap
@@ -345,3 +347,8 @@ sortBooks sort reverseSort =
             else
                 identity
            )
+
+
+null : Html msg
+null =
+    text ""

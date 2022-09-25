@@ -31,6 +31,7 @@ import List exposing (filter, length, map, member)
 import Model exposing (Filter(..), InputFocus(..), Tag)
 import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
+import Utils exposing (null)
 
 
 tagSection : List Tag -> List Tag -> Maybe Tag -> Html Msg
@@ -61,7 +62,7 @@ tagSection tags globalTags pendingTag =
                 ]
 
           else
-            text ""
+            null
         , let
             datalistId =
                 "tagDatalist"

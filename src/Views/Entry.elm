@@ -34,7 +34,7 @@ import Model
 import Msg exposing (Msg(..))
 import Router exposing (entryToRoute)
 import String exposing (fromInt, isEmpty)
-import Utils exposing (getEntryDomId)
+import Utils exposing (getEntryDomId, null)
 import Views.Citation exposing (citation)
 import Views.Snippet exposing (snippetView)
 
@@ -64,12 +64,12 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
                             [ text <| "p. " ++ fromInt entry.page ]
 
                       else
-                        text ""
+                        null
                     , a [ href <| entryToRoute books entry ] [ text "#" ]
                     ]
 
               else
-                text ""
+                null
             , blockquote [] [ text entry.text ]
             , if perma then
                 case get entry.bookId books of
@@ -77,10 +77,10 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
                         citation entry book Nothing
 
                     _ ->
-                        text ""
+                        null
 
               else
-                text ""
+                null
             , div
                 [ classList
                     [ ( "detailsBar", True )
@@ -88,7 +88,7 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
                     ]
                 ]
                 [ if perma then
-                    text ""
+                    null
 
                   else
                     button
@@ -106,7 +106,7 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
                             ]
                         , span [] [ text "‡" ]
                         , if showDetails then
-                            text ""
+                            null
 
                           else
                             div
@@ -150,7 +150,7 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
                         )
 
                   else
-                    text ""
+                    null
                 ]
             , if showDetails then
                 div [ class "details" ]
@@ -172,7 +172,7 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
                                                                 neighbor
 
                                                         _ ->
-                                                            text ""
+                                                            null
                                                 )
                                                 neighbors
                                             )
@@ -205,6 +205,6 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
                     ]
 
               else
-                text ""
+                null
             ]
         ]

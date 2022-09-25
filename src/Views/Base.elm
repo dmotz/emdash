@@ -44,6 +44,7 @@ import Utils
     exposing
         ( excerptCountLabel
         , formatNumber
+        , null
         , titleCountLabel
         , untaggedKey
         )
@@ -202,7 +203,7 @@ view model =
                                 ]
 
                         _ ->
-                            text ""
+                            null
                     ]
                 ]
         )
@@ -294,7 +295,7 @@ tagHeader show allBooks tagSort tags tagCounts mActiveTag =
                     )
 
               else
-                text ""
+                null
             ]
         , if show then
             Keyed.ul
@@ -344,7 +345,7 @@ tagHeader show allBooks tagSort tags tagCounts mActiveTag =
                                     ]
 
                               else
-                                text ""
+                                null
                             ]
                         )
                     )
@@ -364,7 +365,7 @@ tagHeader show allBooks tagSort tags tagCounts mActiveTag =
                 )
 
           else
-            text ""
+            null
         ]
 
 

@@ -8,6 +8,7 @@ import List exposing (filterMap, isEmpty, map)
 import Maybe exposing (andThen)
 import Model exposing (Book, BookMap, BookSort(..), Entry, EntryMap, Id)
 import Msg exposing (Msg)
+import Utils exposing (null)
 import Views.BookList exposing (bookList)
 import Views.Snippet exposing (snippetView)
 
@@ -29,12 +30,12 @@ searchResults bookMap entryMap books entries semanticMatches query =
                 [ text "No results found." ]
 
           else if isEmpty books then
-            text ""
+            null
 
           else
             bookList books TitleSort False
         , if isEmpty entries then
-            text ""
+            null
 
           else
             ul

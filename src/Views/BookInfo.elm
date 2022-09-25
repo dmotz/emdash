@@ -20,7 +20,7 @@ import List exposing (map, repeat)
 import Model exposing (Book, BookMap, NeighborMap, Tag)
 import Msg exposing (Msg)
 import Router exposing (authorToRoute, titleToRoute)
-import Utils exposing (excerptCountLabel)
+import Utils exposing (excerptCountLabel, null)
 import Views.TagSection exposing (tagSection)
 
 
@@ -66,7 +66,7 @@ bookInfo book books tags pendingTag bookNeighborMap entryCount =
                                                 ]
 
                                         _ ->
-                                            text ""
+                                            null
                                 )
                                 ids
 

@@ -9,7 +9,7 @@ import Msg exposing (Msg(..))
 import Regex
 import Router exposing (entryToRoute)
 import String exposing (split)
-import Utils exposing (rx_)
+import Utils exposing (null, rx_)
 import Views.Citation exposing (citation)
 
 
@@ -30,7 +30,7 @@ snippetView books mScore query entry =
                 ]
 
         _ ->
-            text ""
+            null
 
 
 innerSnippet : Entry -> Book -> Maybe Float -> Maybe String -> List (Html Msg)
