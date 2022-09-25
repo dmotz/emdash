@@ -21,6 +21,7 @@ module Utils exposing
     , removeItem
     , rx
     , rx_
+    , sortBooks
     , takeExcerpt
     , titleCountLabel
     , toDict
@@ -319,3 +320,28 @@ titleCountLabel =
 normalizeTitle : String -> String
 normalizeTitle =
     toLower >> replace (rx "^(the )") (always "")
+
+
+sortBooks : BookSort -> Bool -> List Book -> List Book
+sortBooks sort reverseSort =
+    (case sort of
+        RecencySort ->
+            sortBy .sortIndex
+
+        TitleSort ->
+            sortWith
+                (\a b ->
+                    compare
+                        (a |> .title |> normalizeTitle)
+                        (b |> .title |> normalizeTitle)
+                )
+
+        NumSort ->
+            sortBy .count
+    )
+        >> (if reverseSort then
+                reverse
+
+            else
+                identity
+           )
