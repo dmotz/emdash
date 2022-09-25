@@ -4,6 +4,7 @@ import Dict exposing (get)
 import Html
     exposing
         ( Html
+        , a
         , blockquote
         , button
         , div
@@ -17,7 +18,7 @@ import Html
         , textarea
         , ul
         )
-import Html.Attributes exposing (class, classList, id, placeholder, value)
+import Html.Attributes exposing (class, classList, href, id, placeholder, value)
 import Html.Events exposing (onClick, onFocus, onInput)
 import Html.Lazy exposing (lazy4)
 import List exposing (map)
@@ -31,8 +32,10 @@ import Model
         , NeighborMap
         )
 import Msg exposing (Msg(..))
+import Router exposing (entryToRoute)
 import String exposing (fromInt, isEmpty)
 import Utils exposing (getEntryDomId)
+import Views.Citation exposing (citation)
 import Views.Snippet exposing (snippetView)
 
 
@@ -43,51 +46,75 @@ entryView :
     -> Bool
     -> EntryTab
     -> Int
+    -> Bool
     -> Entry
     -> Html Msg
-entryView entries books neighborMap showDetails activeTab i entry =
+entryView entries books neighborMap showDetails activeTab i perma entry =
     li
-        [ class "entry", getEntryDomId entry.id |> id ]
+        [ classList [ ( "entry", True ), ( "permalink", perma ) ]
+        , id <| getEntryDomId entry.id
+        ]
         [ figure []
-            [ figcaption [ class "meta" ]
-                [ div [] [ text <| fromInt (i + 1) ++ "." ]
-                , if entry.page /= -1 then
-                    div [ class "page" ] [ text <| "p. " ++ fromInt entry.page ]
+            [ if not perma then
+                figcaption [ class "meta" ]
+                    [ div [] [ text <| fromInt (i + 1) ++ "." ]
+                    , if entry.page /= -1 then
+                        div
+                            [ class "page" ]
+                            [ text <| "p. " ++ fromInt entry.page ]
 
-                  else
-                    text ""
-                ]
+                      else
+                        text ""
+                    , a [ href <| entryToRoute books entry ] [ text "#" ]
+                    ]
+
+              else
+                text ""
             , blockquote [] [ text entry.text ]
+            , if perma then
+                case get entry.bookId books of
+                    Just book ->
+                        citation entry book Nothing
+
+                    _ ->
+                        text ""
+
+              else
+                text ""
             , div
                 [ classList
                     [ ( "detailsBar", True )
                     , ( "active", showDetails )
                     ]
                 ]
-                [ button
-                    [ class "detailsToggle"
-                    , onClick (ToggleDetails entry.id)
-                    ]
-                    [ span []
-                        [ text
-                            (if showDetails then
-                                "▼"
+                [ if perma then
+                    text ""
 
-                             else
-                                "▶"
-                            )
+                  else
+                    button
+                        [ class "detailsToggle"
+                        , onClick (ToggleDetails entry.id)
                         ]
-                    , span [] [ text "‡" ]
-                    , if showDetails then
-                        text ""
+                        [ span []
+                            [ text
+                                (if showDetails then
+                                    "▼"
 
-                      else
-                        div
-                            [ class "hint" ]
-                            [ span [] [ text "☜" ]
-                            , text "show related excerpts, notes, &c"
+                                 else
+                                    "▶"
+                                )
                             ]
-                    ]
+                        , span [] [ text "‡" ]
+                        , if showDetails then
+                            text ""
+
+                          else
+                            div
+                                [ class "hint" ]
+                                [ span [] [ text "☜" ]
+                                , text "show related excerpts, notes, &c"
+                                ]
+                        ]
                 , if showDetails then
                     div [ class "tabs" ]
                         (map
