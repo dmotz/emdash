@@ -12,7 +12,7 @@ searchInput searchQuery =
     div
         [ class "search" ]
         [ input
-            [ onInput OnSearch
+            [ onInput OnSearchStart
             , onFocus <| SetInputFocus (Just SearchFocus)
             , onBlur <| SetInputFocus Nothing
             , spellcheck False
@@ -21,7 +21,7 @@ searchInput searchQuery =
             ]
             []
         , button
-            [ onClick <| OnSearch ""
+            [ onClick <| OnSearchStart ""
             , class
                 (if String.isEmpty searchQuery then
                     ""
