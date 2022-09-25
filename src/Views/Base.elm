@@ -39,7 +39,7 @@ import Model
         )
 import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
-import String exposing (fromFloat, join)
+import String exposing (join)
 import Utils
     exposing
         ( excerptCountLabel
@@ -66,187 +66,145 @@ view model =
         , on "dragleave" (Decode.succeed DragLeave)
         , on "drop" dropDecoder
         ]
-        -- ((if model.isDragging then
-        --     div [] [ text "dragging" ]
-        --   else
-        --     text ""
-        --  )
-        --     ::
-        (if Dict.isEmpty model.books then
-            [ landingView ]
+        (case model.page of
+            LandingPage ->
+                [ landingView ]
 
-         else
-            [ a
-                [ class "logo", href "/" ]
-                [ img
-                    [ src "/logo.svg"
-                    , draggable "false"
-                    , onClick ToggleAboutMode
-                    ]
-                    []
-                ]
-            , div
-                [ class "actions" ]
+            _ ->
                 [ a
-                    [ href "/settings" ]
-                    [ img [ src "/focus.svg" ] [] ]
-                , button
-                    [ onClick ShowRandom ]
-                    [ img [ src "/random.svg" ] [] ]
-                ]
-            , main_ []
-                [ searchInput model.searchQuery
-                , case model.notFoundMsg of
-                    Just msg ->
-                        div [ class "notFound" ]
-                            [ h2 [] [ text "Alas!" ]
-                            , h3 [] [ text msg ]
-                            , a [ href "/" ] [ text "Return to the index." ]
-                            ]
+                    [ class "logo", href "/" ]
+                    [ img
+                        [ src "/logo.svg"
+                        , draggable "false"
+                        , onClick ToggleAboutMode
+                        ]
+                        []
+                    ]
+                , div
+                    [ class "actions" ]
+                    [ a
+                        [ href "/settings" ]
+                        [ img [ src "/focus.svg" ] [] ]
+                    , button
+                        [ onClick ShowRandom ]
+                        [ img [ src "/random.svg" ] [] ]
+                    ]
+                , main_
+                    []
+                    [ case model.page of
+                        MainPage books mTag ->
+                            div
+                                [ class "fullWidth" ]
+                                [ searchInput model.searchQuery
+                                , tagHeader
+                                    model.showTagHeader
+                                    model.books
+                                    model.tagSort
+                                    model.tags
+                                    model.tagCounts
+                                    mTag
+                                , bookSorter
+                                    model.bookSort
+                                    model.reverseSort
+                                , bookList
+                                    books
+                                    model.bookSort
+                                    model.reverseSort
+                                ]
 
-                    _ ->
-                        case
-                            model.entriesShown
-                        of
-                            Just entryIds ->
-                                case model.filter of
-                                    Just (TextFilter query) ->
-                                        searchResults
-                                            model.books
-                                            model.booksShown
-                                            model.entries
-                                            entryIds
-                                            model.semanticMatches
-                                            query
+                        SearchPage query books entries ->
+                            div
+                                [ class "searchPage" ]
+                                [ searchInput model.searchQuery
+                                , searchResults
+                                    model.books
+                                    model.entries
+                                    books
+                                    entries
+                                    model.semanticMatches
+                                    query
+                                ]
 
-                                    _ ->
-                                        div []
-                                            (case
-                                                model.currentBook
-                                                    |> andThen
-                                                        (\id ->
-                                                            get
-                                                                id
-                                                                model.books
+                        TitlePage book entries ->
+                            div
+                                []
+                                [ bookInfo
+                                    book
+                                    model.books
+                                    model.tags
+                                    model.pendingTag
+                                    model.bookNeighborMap
+                                    (length entries)
+                                , entryList
+                                    entries
+                                    model.entries
+                                    model.books
+                                    model.neighborMap
+                                    model.idToShowDetails
+                                    model.idToActiveTab
+                                ]
+
+                        AuthorPage author books ->
+                            div []
+                                [ div
+                                    [ class "authorInfo" ]
+                                    [ h1 [] [ text author ]
+                                    , h2
+                                        []
+                                        [ titleCountLabel
+                                            (length books)
+                                            ++ ", "
+                                            ++ (books
+                                                    |> foldl
+                                                        (\{ count } acc ->
+                                                            acc + count
                                                         )
-                                             of
-                                                Just book ->
-                                                    [ bookInfo
-                                                        book
-                                                        model.books
-                                                        model.tags
-                                                        model.pendingTag
-                                                        model.bookNeighborMap
-                                                        (length entryIds)
-                                                    , entryList
-                                                        entryIds
-                                                        model.entries
-                                                        model.books
-                                                        model.neighborMap
-                                                        model.idToShowDetails
-                                                        model.idToActiveTab
-                                                    ]
-
-                                                _ ->
-                                                    [ case
-                                                        head entryIds
-                                                            |> andThen
-                                                                (\id ->
-                                                                    get
-                                                                        id
-                                                                        model.entries
-                                                                )
-                                                      of
-                                                        Just entry ->
-                                                            entryView
-                                                                model.entries
-                                                                model.books
-                                                                model.neighborMap
-                                                                True
-                                                                Related
-                                                                1
-                                                                entry
-
-                                                        Nothing ->
-                                                            text ""
-                                                    ]
-                                            )
-
-                            _ ->
-                                let
-                                    books =
-                                        pluckIds model.books model.booksShown
-                                in
-                                div
-                                    [ class "books" ]
-                                    [ let
-                                        done =
-                                            Set.size model.completedEmbeddings
-
-                                        needed =
-                                            size model.entries
-                                      in
-                                      if
-                                        not model.embeddingsReady
-                                            && (done /= 0)
-                                            && (done /= needed)
-                                      then
-                                        div
-                                            []
-                                            [ progress
-                                                [ toFloat done
-                                                    / toFloat needed
-                                                    |> fromFloat
-                                                    |> value
-                                                ]
-                                                []
-                                            , text <|
-                                                formatNumber done
-                                                    ++ " / "
-                                                    ++ formatNumber needed
-                                            ]
-
-                                      else
-                                        text ""
-                                    , case model.filter of
-                                        Just (AuthorFilter author) ->
-                                            div
-                                                [ class "authorInfo" ]
-                                                [ h1 [] [ text author ]
-                                                , h2
-                                                    []
-                                                    [ titleCountLabel
-                                                        (length books)
-                                                        ++ ", "
-                                                        ++ (books
-                                                                |> foldl
-                                                                    (\{ count } acc ->
-                                                                        acc + count
-                                                                    )
-                                                                    0
-                                                                |> excerptCountLabel
-                                                           )
-                                                        |> text
-                                                    ]
-                                                ]
-
-                                        Just (TagFilter _) ->
-                                            tagHeader model
-
-                                        Nothing ->
-                                            tagHeader model
-
-                                        _ ->
-                                            text ""
-                                    , hr [] []
-                                    , bookSorter
-                                        model.bookSort
-                                        model.reverseSort
-                                    , bookList books
+                                                        0
+                                                    |> excerptCountLabel
+                                               )
+                                            |> text
+                                        ]
                                     ]
-                , footer [] [ text "❦" ]
+                                , bookSorter
+                                    model.bookSort
+                                    model.reverseSort
+                                , bookList
+                                    books
+                                    model.bookSort
+                                    model.reverseSort
+                                ]
+
+                        EntryPage entry _ ->
+                            div
+                                []
+                                [ ul
+                                    [ class "entries" ]
+                                    [ entryView
+                                        model.entries
+                                        model.books
+                                        model.neighborMap
+                                        True
+                                        (withDefault
+                                            Related
+                                            (get entry.id model.idToActiveTab)
+                                        )
+                                        -1
+                                        True
+                                        entry
+                                    ]
+                                ]
+
+                        NotFoundPage msg ->
+                            div [ class "notFound" ]
+                                [ h2 [] [ text "Alas!" ]
+                                , h3 [] [ text msg ]
+                                , a [ href "/" ] [ text "Return to the index." ]
+                                ]
+
+                        _ ->
+                            text ""
+                    ]
                 ]
-            ]
         )
 
 
