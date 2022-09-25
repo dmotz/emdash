@@ -4,14 +4,15 @@ import Html exposing (Html, a, div, li, text)
 import Html.Attributes exposing (class, href)
 import Html.Keyed as Keyed
 import List exposing (map)
-import Model exposing (Book)
+import Model exposing (Book, BookSort)
 import Msg exposing (Msg)
 import Router exposing (titleToRoute)
 import String exposing (fromInt)
+import Utils exposing (sortBooks)
 
 
-bookList : List Book -> Html Msg
-bookList books =
+bookList : List Book -> BookSort -> Bool -> Html Msg
+bookList books sort reverseSort =
     Keyed.ul
         [ class "bookList" ]
         (map
@@ -27,5 +28,5 @@ bookList books =
                     ]
                 )
             )
-            books
+            (sortBooks sort reverseSort books)
         )
