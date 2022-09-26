@@ -460,19 +460,16 @@ update message model =
                     noOp
 
         RemoveTag tag ->
-            case model.currentBook of
-                Just bookId ->
+            case model.page of
+                TitlePage book entries ->
                     let
+                        newTagSet =
+                            removeItem book.tags tag
+
                         books =
                             Dict.update
-                                bookId
-                                (Maybe.map
-                                    (\book ->
-                                        { book
-                                            | tags = removeItem book.tags tag
-                                        }
-                                    )
-                                )
+                                book.id
+                                (Maybe.map (\b -> { b | tags = newTagSet }))
                                 model.books
                     in
                     store
@@ -484,6 +481,10 @@ update message model =
                                     |> concatMap .tags
                                     |> dedupe
                             , tagCounts = getTagCounts books
+                            , page =
+                                TitlePage
+                                    { book | tags = newTagSet }
+                                    entries
                           }
                         , none
                         )
