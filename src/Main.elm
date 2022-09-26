@@ -226,7 +226,6 @@ init maybeModel url key =
             { page = MainPage (values books) Nothing
             , entries = Dict.fromList (map (juxt .id identity) restored.entries)
             , books = books
-            , entriesShown = Nothing
             , neighborMap = Dict.empty
             , bookNeighborMap = Dict.empty
             , hiddenEntries = Set.fromList restored.hiddenEntries
@@ -973,12 +972,8 @@ update message model =
                     none
                 )
 
-        OnScroll delta ->
-            ( { model
-                | hideHeader = model.entriesShown /= Nothing && delta > 0
-              }
-            , none
-            )
+        OnScroll _ ->
+            noOp
 
         DebounceMsg msg ->
             let

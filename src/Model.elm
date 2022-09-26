@@ -118,7 +118,6 @@ type alias Model =
     { page : Page
     , entries : EntryMap
     , books : BookMap
-    , entriesShown : Maybe (List Id)
     , neighborMap : NeighborMap
     , bookNeighborMap : NeighborMap
     , hiddenEntries : Set Id
