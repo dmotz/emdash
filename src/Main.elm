@@ -899,11 +899,8 @@ update message model =
             case get id model.entries of
                 Just entry ->
                     store
-                        ( case
-                            model.currentBook
-                                |> andThen (\bookId -> get bookId model.books)
-                          of
-                            Just book ->
+                        ( case model.page of
+                            TitlePage book _ ->
                                 { model
                                     | bookIdToLastRead =
                                         insert
