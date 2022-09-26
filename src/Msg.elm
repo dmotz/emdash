@@ -13,7 +13,6 @@ type Msg
     = NoOp
     | ShowRandom
     | GotRandomIndex Int
-    | FilterBy (Maybe Filter)
     | ToggleAboutMode
     | DragEnter
     | DragLeave
