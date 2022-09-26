@@ -387,6 +387,27 @@ update message model =
                             id
                             (Maybe.map (\entry -> { entry | notes = text }))
                             model.entries
+                    , page =
+                        case model.page of
+                            EntryPage entry book ->
+                                EntryPage { entry | notes = text } book
+
+                            TitlePage book entries ->
+                                TitlePage
+                                    book
+                                    (map
+                                        (\entry ->
+                                            if entry.id == id then
+                                                { entry | notes = text }
+
+                                            else
+                                                entry
+                                        )
+                                        entries
+                                    )
+
+                            _ ->
+                                model.page
                   }
                 , none
                 )
