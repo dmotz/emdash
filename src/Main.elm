@@ -504,30 +504,46 @@ update message model =
             ( { model | hidePromptActive = False }, none )
 
         HideEntry id ->
+            let
+                entries =
+                    remove id model.entries
+
+                books =
+                    withDefault
+                        model.books
+                        (get id model.entries
+                            |> Maybe.map
+                                (\{ bookId } ->
+                                    Dict.update
+                                        bookId
+                                        (Maybe.map
+                                            (\book ->
+                                                { book
+                                                    | count = book.count - 1
+                                                }
+                                            )
+                                        )
+                                        model.books
+                                )
+                        )
+            in
             store
                 ( { model
                     | hiddenEntries = Set.insert id model.hiddenEntries
-                    , entries = remove id model.entries
-                    , entriesShown =
-                        Maybe.map (filter ((/=) id)) model.entriesShown
-                    , books =
-                        withDefault
-                            model.books
-                            (get id model.entries
-                                |> Maybe.map
-                                    (\{ bookId } ->
-                                        Dict.update
-                                            bookId
-                                            (Maybe.map
-                                                (\book ->
-                                                    { book
-                                                        | count = book.count - 1
-                                                    }
-                                                )
-                                            )
-                                            model.books
+                    , entries = entries
+                    , books = books
+                    , page =
+                        case model.page of
+                            TitlePage oldBook oldEntries ->
+                                TitlePage
+                                    (withDefault oldBook (get oldBook.id books))
+                                    (filter
+                                        (\entry -> entry.id /= id)
+                                        oldEntries
                                     )
-                            )
+
+                            _ ->
+                                model.page
                   }
                 , batch
                     [ deleteEmbedding id
