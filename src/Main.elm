@@ -254,7 +254,6 @@ init maybeModel url key =
             , bookSortOrder = True
             , lastTitleSlug = ""
             , bookIdToLastRead = restored.bookIdToLastRead |> Dict.fromList
-            , currentBook = Nothing
             , idToShowDetails = Dict.empty
             , idToActiveTab = Dict.empty
             , searchQuery = ""
