@@ -226,7 +226,6 @@ init maybeModel url key =
             { page = MainPage (values books) Nothing
             , entries = Dict.fromList (map (juxt .id identity) restored.entries)
             , books = books
-            , booksShown = map .id restored.books
             , entriesShown = Nothing
             , neighborMap = Dict.empty
             , bookNeighborMap = Dict.empty
@@ -341,7 +340,6 @@ update message model =
                         Dict.union model.entries newEntries
                             |> Dict.filter hiddenPred
                     , books = allBooks
-                    , booksShown = keys allBooks
                     , titleRouteMap =
                         Parser.getTitleRouteMap bookVals
                     , authorRouteMap =
@@ -557,13 +555,7 @@ update message model =
                 )
 
         Sort ->
-            store
-                ( { model
-                    | reverseSort = not model.reverseSort
-                    , booksShown = reverse model.booksShown
-                  }
-                , none
-                )
+            store ( { model | reverseSort = not model.reverseSort }, none )
 
         ToggleTagHeader ->
             ( { model | showTagHeader = not model.showTagHeader }, none )
