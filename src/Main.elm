@@ -416,13 +416,16 @@ update message model =
             ( { model | pendingTag = Just text }, none )
 
         AddTag ->
-            case model.currentBook of
-                Just bookId ->
+            case model.page of
+                TitlePage book entries ->
                     case model.pendingTag of
                         Just tag ->
                             let
                                 tagN =
                                     tag |> trim |> toLower |> slugify
+
+                                newTagSet =
+                                    insertOnce book.tags tagN
                             in
                             if tagN == "" || tagN == untaggedKey then
                                 ( { model | pendingTag = Nothing }, none )
@@ -430,16 +433,9 @@ update message model =
                             else
                                 let
                                     books =
-                                        Dict.update bookId
+                                        Dict.update book.id
                                             (Maybe.map
-                                                (\book ->
-                                                    { book
-                                                        | tags =
-                                                            insertOnce
-                                                                book.tags
-                                                                tagN
-                                                    }
-                                                )
+                                                (\b -> { b | tags = newTagSet })
                                             )
                                             model.books
                                 in
@@ -449,6 +445,10 @@ update message model =
                                         , tags = insertOnce model.tags tagN
                                         , tagCounts = getTagCounts books
                                         , pendingTag = Nothing
+                                        , page =
+                                            TitlePage
+                                                { book | tags = newTagSet }
+                                                entries
                                       }
                                     , none
                                     )
