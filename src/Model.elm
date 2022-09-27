@@ -6,7 +6,6 @@ module Model exposing
     , Entry
     , EntryMap
     , EntryTab(..)
-    , Filter(..)
     , Id
     , InputFocus(..)
     , Model
@@ -34,13 +33,6 @@ type Page
     | EntryPage Entry Book
     | NotFoundPage String
     | LandingPage
-
-
-type Filter
-    = TitleFilter Book
-    | AuthorFilter Author
-    | TagFilter Tag
-    | TextFilter String
 
 
 type InputFocus
