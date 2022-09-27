@@ -717,6 +717,9 @@ update message model =
             let
                 model_ =
                     { model | url = url }
+
+                scrollTop =
+                    perform (always NoOp) (setViewport 0 0)
             in
             case
                 parse routeParser url
@@ -753,11 +756,14 @@ update message model =
                                             |> sortBy .page
                                         )
                               }
-                            , if model.embeddingsReady then
-                                requestBookNeighbors book.id
+                            , batch
+                                [ scrollTop
+                                , if model.embeddingsReady then
+                                    requestBookNeighbors book.id
 
-                              else
-                                none
+                                  else
+                                    none
+                                ]
                             )
 
                         _ ->
@@ -779,11 +785,14 @@ update message model =
                     case ( mEntry, mBook ) of
                         ( Just entry, Just book ) ->
                             ( { model_ | page = EntryPage entry book }
-                            , if model.embeddingsReady then
-                                requestNeighbors ( entry.id, True )
+                            , batch
+                                [ scrollTop
+                                , if model.embeddingsReady then
+                                    requestNeighbors ( entry.id, True )
 
-                              else
-                                none
+                                  else
+                                    none
+                                ]
                             )
 
                         _ ->
@@ -805,7 +814,7 @@ update message model =
                                             |> values
                                         )
                               }
-                            , none
+                            , scrollTop
                             )
 
                         _ ->
