@@ -236,28 +236,22 @@ init maybeModel url key =
             , tags = restored.books |> map .tags |> concat |> dedupe
             , tagCounts = getTagCounts books
             , tagSort = TagAlphaSort
-            , showTagHeader = True
+            , showTagHeader = False
             , titleRouteMap = Parser.getTitleRouteMap restored.books
             , authorRouteMap = Parser.getAuthorRouteMap restored.books
-            , filter = Nothing
             , pendingTag = Nothing
-            , aboutMode = False
             , isDragging = False
             , reverseSort = True
-            , hidePromptActive = False
             , inputFocused = Nothing
             , parsingError = False
             , schemaVersion = 0
             , url = url
             , key = key
             , bookSort = RecencySort
-            , bookSortOrder = True
-            , lastTitleSlug = ""
             , bookIdToLastRead = restored.bookIdToLastRead |> Dict.fromList
             , idToShowDetails = Dict.empty
             , idToActiveTab = Dict.empty
             , searchQuery = ""
-            , hideHeader = False
             , searchDebounce = Debounce.init
             }
     in
@@ -492,15 +486,6 @@ update message model =
 
         SetTagSort sort ->
             ( { model | tagSort = sort }, none )
-
-        ToggleAboutMode ->
-            ( { model | aboutMode = not model.aboutMode }, none )
-
-        PromptHide ->
-            ( { model | hidePromptActive = True }, none )
-
-        CancelHide ->
-            ( { model | hidePromptActive = False }, none )
 
         HideEntry id ->
             let

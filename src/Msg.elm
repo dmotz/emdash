@@ -4,7 +4,7 @@ import Browser exposing (UrlRequest)
 import Browser.Dom exposing (Element, Error)
 import Debounce
 import File exposing (File)
-import Model exposing (BookSort, EntryTab, Filter, Id, InputFocus, Tag, TagSort)
+import Model exposing (BookSort, EntryTab, Id, InputFocus, Tag, TagSort)
 import Url exposing (Url)
 import Utils exposing (KeyEvent)
 
@@ -13,7 +13,6 @@ type Msg
     = NoOp
     | ShowRandom
     | GotRandomIndex Int
-    | ToggleAboutMode
     | DragEnter
     | DragLeave
     | GotFiles (String -> Msg) File (List File)
@@ -22,8 +21,6 @@ type Msg
     | KeyDown KeyEvent
     | SetInputFocus (Maybe InputFocus)
     | HideEntry Id
-    | PromptHide
-    | CancelHide
     | UpdateNotes Id String
     | UpdatePendingTag Tag
     | AddTag
