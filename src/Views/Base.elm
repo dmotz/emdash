@@ -4,13 +4,16 @@ import Dict exposing (Dict, get, size)
 import File
 import Html
     exposing
-        ( Html
+        ( Attribute
+        , Html
         , a
         , button
         , div
+        , footer
         , h1
         , h2
         , h3
+        , hr
         , img
         , li
         , main_
@@ -20,7 +23,7 @@ import Html
         , ul
         )
 import Html.Attributes exposing (class, classList, draggable, href, id, src)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, preventDefaultOn)
 import Html.Keyed as Keyed
 import Json.Decode as Decode exposing (Decoder)
 import List exposing (foldl, length, map, reverse, sortBy)
@@ -49,7 +52,6 @@ import Utils
         )
 import Views.BookInfo exposing (bookInfo)
 import Views.BookList exposing (bookList)
-import Views.Common exposing (on)
 import Views.Entry exposing (entryView)
 import Views.EntryList exposing (entryList)
 import Views.Landing exposing (landingView)
@@ -403,3 +405,8 @@ dropDecoder =
     Decode.at
         [ "dataTransfer", "files" ]
         (Decode.oneOrMore (GotFiles FileLoad) File.decoder)
+
+
+on : String -> Decoder msg -> Attribute msg
+on event decoder =
+    preventDefaultOn event (Decode.map (\m -> ( m, True )) decoder)
