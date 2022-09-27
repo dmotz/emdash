@@ -161,6 +161,9 @@ main =
                         MainPage _ Nothing ->
                             appName
 
+                        LandingPage ->
+                            appName
+
                         _ ->
                             (case m.page of
                                 MainPage _ (Just tag) ->
