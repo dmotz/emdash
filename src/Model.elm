@@ -121,25 +121,19 @@ type alias Model =
     , tagCounts : Dict Tag Int
     , tagSort : TagSort
     , showTagHeader : Bool
-    , filter : Maybe Filter
     , pendingTag : Maybe Tag
-    , aboutMode : Bool
     , isDragging : Bool
     , reverseSort : Bool
-    , hidePromptActive : Bool
     , inputFocused : Maybe InputFocus
     , parsingError : Bool
     , schemaVersion : Int
     , url : Url
     , key : Nav.Key
     , bookSort : BookSort
-    , bookSortOrder : Bool
-    , lastTitleSlug : String
     , bookIdToLastRead : Dict Id Id
     , idToShowDetails : Dict Id Bool
     , idToActiveTab : Dict Id EntryTab
     , searchQuery : String
-    , hideHeader : Bool
     , searchDebounce : Debounce String
     }
 
