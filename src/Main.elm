@@ -723,7 +723,12 @@ update message model =
             of
                 Just RootRoute ->
                     ( { model_
-                        | page = MainPage (values model.books) Nothing
+                        | page =
+                            if Dict.isEmpty model.books then
+                                LandingPage
+
+                            else
+                                MainPage (values model.books) Nothing
                         , searchQuery = ""
                       }
                     , none
