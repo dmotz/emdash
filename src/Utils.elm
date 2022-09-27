@@ -53,7 +53,6 @@ import Model
         ( Book
         , BookMap
         , BookSort(..)
-        , Filter(..)
         , Id
         , Model
         , StoredModel
