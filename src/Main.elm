@@ -30,7 +30,6 @@ import Maybe exposing (andThen, withDefault)
 import Model
     exposing
         ( BookSort(..)
-        , Filter(..)
         , Id
         , InputFocus(..)
         , Model

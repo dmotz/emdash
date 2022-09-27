@@ -30,7 +30,6 @@ import Model
         ( BookMap
         , BookSort(..)
         , EntryTab(..)
-        , Filter(..)
         , InputFocus(..)
         , Model
         , Page(..)
@@ -213,8 +212,7 @@ bookSorter : BookSort -> Bool -> Html Msg
 bookSorter activeSort reverseSort =
     div
         [ class "modeHeading" ]
-        [ --div [] [ text "Sorting:" ]
-          ul
+        [ ul
             []
             (map
                 (\sort ->
