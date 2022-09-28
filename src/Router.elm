@@ -25,7 +25,7 @@ type Route
     | EntryRoute Title Id
     | AuthorRoute Author
     | TagRoute Tag
-    | TextRoute (Maybe String)
+    | SearchRoute (Maybe String)
     | SettingsRoute
 
 
@@ -37,7 +37,7 @@ routeParser =
         , map EntryRoute (s "title" </> string </> string)
         , map AuthorRoute (s "author" </> string)
         , map TagRoute (s "tag" </> string)
-        , map TextRoute (s "search" <?> Query.string "q")
+        , map SearchRoute (s "search" <?> Query.string "q")
         , map SettingsRoute (s "settings")
         ]
 

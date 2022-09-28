@@ -854,7 +854,7 @@ update message model =
                         , none
                         )
 
-                Just (TextRoute query) ->
+                Just (SearchRoute query) ->
                     case query of
                         Just text ->
                             let
