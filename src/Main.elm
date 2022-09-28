@@ -224,6 +224,9 @@ init maybeModel url key =
         books =
             Dict.fromList (map (juxt .id identity) restored.books)
 
+        tags =
+            restored.books |> map .tags |> concat |> dedupe
+
         model_ =
             { page = MainPage (values books) Nothing
             , entries = Dict.fromList (map (juxt .id identity) restored.entries)
@@ -236,7 +239,7 @@ init maybeModel url key =
             , tags = restored.books |> map .tags |> concat |> dedupe
             , tagCounts = getTagCounts books
             , tagSort = TagAlphaSort
-            , showTagHeader = False
+            , showTagHeader = length tags > 0
             , titleRouteMap = Parser.getTitleRouteMap restored.books
             , authorRouteMap = Parser.getAuthorRouteMap restored.books
             , pendingTag = Nothing
