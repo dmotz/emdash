@@ -200,7 +200,11 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
                                     [ class "button"
                                     , onClick (HideEntry entry.id)
                                     ]
-                                    [ text "× Delete" ]
+                                    [ text "× Delete"
+                                    , div
+                                        [ class "hint" ]
+                                        [ text "Remove this excerpt from your collection" ]
+                                    ]
                                 ]
                     ]
 
