@@ -183,6 +183,9 @@ main =
                                         ++ "p. "
                                         ++ fromInt entry.page
 
+                                SettingsPage ->
+                                    "Settings"
+
                                 NotFoundPage _ ->
                                     "404"
 
