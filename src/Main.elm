@@ -877,6 +877,9 @@ update message model =
                         _ ->
                             ( { model_ | searchQuery = "" }, none )
 
+                Just SettingsRoute ->
+                    ( { model_ | page = SettingsPage }, scrollTop )
+
                 _ ->
                     ( { model_ | page = NotFoundPage "Route not found." }
                     , none
