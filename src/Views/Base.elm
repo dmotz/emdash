@@ -57,6 +57,7 @@ import Views.EntryList exposing (entryList)
 import Views.Landing exposing (landingView)
 import Views.SearchInput exposing (searchInput)
 import Views.SearchResults exposing (searchResults)
+import Views.Settings exposing (settingsView)
 
 
 view : Model -> Html Msg
@@ -215,6 +216,13 @@ view model =
                                             [ href "/" ]
                                             [ text "Return to the index." ]
                                         ]
+
+                                SettingsPage ->
+                                    settingsView
+                                        (size model.entries)
+                                        (size model.books)
+                                        (size model.authorRouteMap)
+                                        (length model.tags)
 
                                 _ ->
                                     null
