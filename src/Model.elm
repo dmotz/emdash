@@ -32,6 +32,7 @@ type Page
     | AuthorPage Author (List Book)
     | EntryPage Entry Book
     | NotFoundPage String
+    | SettingsPage
     | LandingPage
 
 
