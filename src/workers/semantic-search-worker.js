@@ -21,5 +21,3 @@ self.addEventListener('message', async ({data}) => {
   })
   tensor.dispose()
 })
-
-export default () => {}

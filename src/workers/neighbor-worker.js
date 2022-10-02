@@ -20,5 +20,3 @@ self.addEventListener('message', ({data}) => {
       .slice(0, neighborsK)
   })
 })
-
-export default () => {}
