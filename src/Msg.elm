@@ -39,6 +39,7 @@ type Msg
     | ReceiveBookEmbeddings ()
     | ReceiveNeighbors ( Id, List ( Id, Float ) )
     | ReceiveBookNeighbors ( Id, List ( Id, Float ) )
+    | ReceiveSemanticSearch ( String, List ( Id, Float ) )
     | LinkClicked UrlRequest
     | UrlChanged Url
     | SortBooks BookSort

@@ -17,12 +17,12 @@ import List
         , drop
         , filter
         , filterMap
+        , foldl
         , head
         , isEmpty
         , length
         , map
         , member
-        , reverse
         , sortBy
         , take
         )
@@ -131,6 +131,12 @@ port requestUnicodeNormalized : String -> Cmd msg
 port receiveUnicodeNormalized : (String -> msg) -> Sub msg
 
 
+port requestSemanticSearch : String -> Cmd msg
+
+
+port receiveSemanticSearch : (( String, List ( Id, Float ) ) -> msg) -> Sub msg
+
+
 appName : String
 appName =
     "Marginalia"
@@ -234,6 +240,7 @@ init maybeModel url key =
             { page = MainPage (values books) Nothing
             , entries = Dict.fromList (map (juxt .id identity) restored.entries)
             , books = books
+            , semanticMatches = []
             , neighborMap = Dict.empty
             , bookNeighborMap = Dict.empty
             , hiddenEntries = Set.fromList restored.hiddenEntries
@@ -706,6 +713,27 @@ update message model =
 
             else
                 noOp
+
+        ReceiveSemanticSearch ( _, idScores ) ->
+            case model.page of
+                SearchPage _ _ entries ->
+                    ( { model
+                        | semanticMatches =
+                            filter
+                                (\( id, _ ) ->
+                                    not <|
+                                        foldl
+                                            (\ent acc -> acc || ent.id == id)
+                                            False
+                                            entries
+                                )
+                                idScores
+                      }
+                    , none
+                    )
+
+                _ ->
+                    ( { model | semanticMatches = [] }, none )
 
         LinkClicked urlRequest ->
             case urlRequest of

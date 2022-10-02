@@ -110,6 +110,7 @@ type alias Model =
     { page : Page
     , entries : EntryMap
     , books : BookMap
+    , semanticMatches : List ( Id, Float )
     , neighborMap : NeighborMap
     , bookNeighborMap : NeighborMap
     , hiddenEntries : Set Id
