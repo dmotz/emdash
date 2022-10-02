@@ -1,7 +1,7 @@
 module Views.SearchResults exposing (searchResults)
 
 import Dict exposing (get)
-import Html exposing (Html, div, p, text, ul)
+import Html exposing (Html, div, h2, p, text, ul)
 import Html.Attributes exposing (class)
 import Html.Lazy exposing (lazy4)
 import List exposing (filterMap, isEmpty, map)
@@ -24,7 +24,7 @@ searchResults :
 searchResults bookMap entryMap books entries semanticMatches query =
     div
         [ class "searchResults" ]
-        [ if isEmpty books && isEmpty entries then
+        [ if isEmpty books && isEmpty entries && isEmpty semanticMatches then
             p
                 [ class "noResults" ]
                 [ text "No results found." ]
@@ -34,25 +34,49 @@ searchResults bookMap entryMap books entries semanticMatches query =
 
           else
             bookList books TitleSort False
-        , if isEmpty entries then
-            null
+        , div
+            [ class "snippets" ]
+            ((if not (isEmpty entries) then
+                [ h2 [] [ text "Text matches" ]
+                , ul
+                    []
+                    (map
+                        (lazy4 snippetView bookMap Nothing (Just query))
+                        entries
+                    )
+                ]
 
-          else
-            ul
-                [ class "snippets" ]
-                (map
-                    (lazy4 snippetView bookMap Nothing (Just query))
-                    entries
-                    ++ map
-                        (\( entry, score ) ->
-                            snippetView bookMap (Just score) (Just query) entry
-                        )
-                        (filterMap
-                            (\( id, score ) ->
-                                get id entryMap
-                                    |> andThen (\entry -> Just ( entry, score ))
+              else
+                []
+             )
+                ++ (if not (isEmpty semanticMatches) then
+                        [ h2 [] [ text "Semantic matches" ]
+                        , ul
+                            []
+                            (map
+                                (\( entry, score ) ->
+                                    snippetView
+                                        bookMap
+                                        (Just score)
+                                        (Just query)
+                                        entry
+                                )
+                                (filterMap
+                                    (\( id, score ) ->
+                                        get id entryMap
+                                            |> andThen
+                                                (\entry ->
+                                                    Just
+                                                        ( entry, score )
+                                                )
+                                    )
+                                    semanticMatches
+                                )
                             )
-                            semanticMatches
-                        )
-                )
+                        ]
+
+                    else
+                        []
+                   )
+            )
         ]
