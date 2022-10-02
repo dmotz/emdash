@@ -1,14 +1,10 @@
 import '@tensorflow/tfjs'
 import {load} from '@tensorflow-models/universal-sentence-encoder'
+import {similarity} from './utils'
 
-const {sqrt} = Math
 const neighborsK = 20
 const threshold = 0.3
 const model = load()
-
-const dot = (a, b) => a.reduce((a, c, i) => a + c * b[i], 0)
-
-const similarity = (a, b) => dot(a, b) / (sqrt(dot(a, a)) * sqrt(dot(b, b)))
 
 self.addEventListener('message', async ({data}) => {
   const {query, embeddingMap} = data

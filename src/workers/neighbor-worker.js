@@ -1,9 +1,6 @@
-const {sqrt} = Math
+import {similarity} from './utils'
+
 const neighborsK = 5
-
-const dot = (a, b) => a.reduce((a, c, i) => a + c * b[i], 0)
-
-const similarity = (a, b) => dot(a, b) / (sqrt(dot(a, a)) * sqrt(dot(b, b)))
 
 self.addEventListener('message', ({data}) => {
   const {embeddingMap, targetId, titleMap, ignoreSameTitle} = data
