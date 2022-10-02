@@ -660,6 +660,9 @@ update message model =
                 EntryPage entry _ ->
                     requestNeighbors ( entry.id, True )
 
+                SearchPage query _ _ ->
+                    requestSemanticSearch query
+
                 _ ->
                     none
             )
