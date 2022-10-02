@@ -217,7 +217,7 @@ main =
                     , receiveBookEmbeddings ReceiveBookEmbeddings
                     , receiveUnicodeNormalized ReceiveUnicodeNormalized
                     , onIntersect OnIntersect
-                    , onScroll OnScroll
+                    , receiveSemanticSearch ReceiveSemanticSearch
                     ]
         , onUrlChange = UrlChanged
         , onUrlRequest = LinkClicked
