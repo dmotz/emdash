@@ -32,9 +32,9 @@
   display: flex
   justify-content: center
 
-  > ul
+  > *
     flex: 2
-    padding: 6rem
+    padding: 2rem 6rem
 
   .bookList
     max-width: 60rem
@@ -48,3 +48,9 @@
   .snippets
     flex: 3
     max-width: $maxWidth
+
+  h2
+    margin-bottom: 3rem
+
+  ul + h2
+    margin-top: 8rem
