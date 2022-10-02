@@ -228,5 +228,6 @@ let embedWorker
 let bookEmbedWorker
 let neighborWorker
 let bookNeighborWorker
+let semanticSearchWorker
 
 init()
