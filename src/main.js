@@ -4,6 +4,7 @@ import {Elm} from './Main.elm'
 import EmbedWorker from './workers/embed-worker?worker'
 import BookEmbedWorker from './workers/book-embed-worker?worker'
 import NeighborWorker from './workers/neighbor-worker?worker'
+import SemanticSearchWorker from './workers/semantic-search-worker?worker'
 import {version} from '../package.json'
 import './styles/main.sass'
 
@@ -171,6 +172,21 @@ const init = async () => {
     }
 
     bookNeighborWorker.postMessage({targetId, embeddingMap: bookEmbeddings})
+  })
+
+  app.ports.requestSemanticSearch.subscribe(query => {
+    console.log('semantic search', query)
+
+    if (!semanticSearchWorker) {
+      semanticSearchWorker = new SemanticSearchWorker()
+      semanticSearchWorker.onmessage = ({data}) =>
+        app.ports.receiveSemanticSearch.send([data.query, data.matches])
+    }
+
+    semanticSearchWorker.postMessage({
+      query,
+      embeddingMap: embeddings
+    })
   })
 
   app.ports.setObservers.subscribe(ids =>
