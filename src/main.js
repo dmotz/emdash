@@ -175,8 +175,6 @@ const init = async () => {
   })
 
   app.ports.requestSemanticSearch.subscribe(query => {
-    console.log('semantic search', query)
-
     if (!semanticSearchWorker) {
       semanticSearchWorker = new SemanticSearchWorker()
       semanticSearchWorker.onmessage = ({data}) =>
