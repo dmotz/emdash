@@ -143,7 +143,6 @@ type alias StoredModel =
     { entries : List Entry
     , books : List Book
     , hiddenEntries : List Id
-    , reverseSort : Bool
     , schemaVersion : Int
     , bookIdToLastRead : List ( Id, Id )
     }
@@ -154,8 +153,6 @@ initialStoredModel =
     { entries = []
     , books = []
     , hiddenEntries = []
-
-    -- , reverseSort = False
     , schemaVersion = 0
     , bookIdToLastRead = []
     }

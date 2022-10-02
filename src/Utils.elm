@@ -185,8 +185,6 @@ modelToStoredModel model =
     { entries = values model.entries
     , books = values model.books
     , hiddenEntries = Set.toList model.hiddenEntries
-    , focusMode = model.focusMode
-    , reverseSort = model.reverseSort
     , schemaVersion = model.schemaVersion
     , bookIdToLastRead = Dict.toList model.bookIdToLastRead
     }
