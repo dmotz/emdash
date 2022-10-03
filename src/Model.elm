@@ -27,7 +27,7 @@ import Url exposing (Url)
 
 type Page
     = MainPage (List Book) (Maybe Tag)
-    | SearchPage String (List Book) (List Entry)
+    | SearchPage String (List Book) (List Entry) (List ( Id, Float ))
     | TitlePage Book (List Entry)
     | AuthorPage Author (List Book)
     | EntryPage Entry Book
@@ -111,7 +111,6 @@ type alias Model =
     { page : Page
     , entries : EntryMap
     , books : BookMap
-    , semanticMatches : List ( Id, Float )
     , semanticThreshold : Float
     , neighborMap : NeighborMap
     , bookNeighborMap : NeighborMap

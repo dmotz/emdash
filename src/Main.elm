@@ -174,7 +174,7 @@ main =
                                 MainPage _ (Just tag) ->
                                     "#" ++ tag
 
-                                SearchPage query _ _ ->
+                                SearchPage query _ _ _ ->
                                     "🔍 " ++ query
 
                                 TitlePage book _ ->
@@ -240,7 +240,6 @@ init maybeModel url key =
             { page = MainPage (values books) Nothing
             , entries = Dict.fromList (map (juxt .id identity) restored.entries)
             , books = books
-            , semanticMatches = []
             , semanticThreshold = 0.1
             , neighborMap = Dict.empty
             , bookNeighborMap = Dict.empty
@@ -661,7 +660,7 @@ update message model =
                 EntryPage entry _ ->
                     requestNeighbors ( entry.id, True )
 
-                SearchPage query _ _ ->
+                SearchPage query _ _ _ ->
                     requestSemanticSearch ( query, model.semanticThreshold )
 
                 _ ->
@@ -720,24 +719,33 @@ update message model =
 
         ReceiveSemanticSearch ( _, idScores ) ->
             case model.page of
-                SearchPage _ _ entries ->
+                SearchPage query books entries _ ->
                     ( { model
-                        | semanticMatches =
-                            filter
-                                (\( id, _ ) ->
-                                    not <|
-                                        foldl
-                                            (\ent acc -> acc || ent.id == id)
-                                            False
-                                            entries
+                        | page =
+                            SearchPage
+                                query
+                                books
+                                entries
+                                (filter
+                                    (\( id, _ ) ->
+                                        not <|
+                                            foldl
+                                                (\ent acc ->
+                                                    acc
+                                                        || ent.id
+                                                        == id
+                                                )
+                                                False
+                                                entries
+                                    )
+                                    idScores
                                 )
-                                idScores
                       }
                     , none
                     )
 
                 _ ->
-                    ( { model | semanticMatches = [] }, none )
+                    noOp
 
         LinkClicked urlRequest ->
             case urlRequest of
@@ -1006,6 +1014,7 @@ update message model =
                                 |> findMatches query .text
                                 |> take maxSearchResults
                             )
+                            []
                   }
                 , if String.length query >= 5 then
                     requestSemanticSearch ( query, model.semanticThreshold )
