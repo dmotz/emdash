@@ -131,7 +131,7 @@ port requestUnicodeNormalized : String -> Cmd msg
 port receiveUnicodeNormalized : (String -> msg) -> Sub msg
 
 
-port requestSemanticSearch : String -> Cmd msg
+port requestSemanticSearch : ( String, Float ) -> Cmd msg
 
 
 port receiveSemanticSearch : (( String, List ( Id, Float ) ) -> msg) -> Sub msg
@@ -241,6 +241,7 @@ init maybeModel url key =
             , entries = Dict.fromList (map (juxt .id identity) restored.entries)
             , books = books
             , semanticMatches = []
+            , semanticThreshold = 0.1
             , neighborMap = Dict.empty
             , bookNeighborMap = Dict.empty
             , hiddenEntries = Set.fromList restored.hiddenEntries
@@ -661,7 +662,7 @@ update message model =
                     requestNeighbors ( entry.id, True )
 
                 SearchPage query _ _ ->
-                    requestSemanticSearch query
+                    requestSemanticSearch ( query, model.semanticThreshold )
 
                 _ ->
                     none
@@ -1007,7 +1008,7 @@ update message model =
                             )
                   }
                 , if String.length query >= 5 then
-                    requestSemanticSearch query
+                    requestSemanticSearch ( query, model.semanticThreshold )
 
                   else
                     none

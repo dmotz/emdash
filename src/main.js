@@ -174,7 +174,7 @@ const init = async () => {
     bookNeighborWorker.postMessage({targetId, embeddingMap: bookEmbeddings})
   })
 
-  app.ports.requestSemanticSearch.subscribe(query => {
+  app.ports.requestSemanticSearch.subscribe(([query, threshold]) => {
     if (!semanticSearchWorker) {
       semanticSearchWorker = new SemanticSearchWorker()
       semanticSearchWorker.onmessage = ({data}) =>
@@ -183,6 +183,7 @@ const init = async () => {
 
     semanticSearchWorker.postMessage({
       query,
+      threshold,
       embeddingMap: embeddings
     })
   })

@@ -112,6 +112,7 @@ type alias Model =
     , entries : EntryMap
     , books : BookMap
     , semanticMatches : List ( Id, Float )
+    , semanticThreshold : Float
     , neighborMap : NeighborMap
     , bookNeighborMap : NeighborMap
     , hiddenEntries : Set Id

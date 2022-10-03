@@ -3,11 +3,10 @@ import {load} from '@tensorflow-models/universal-sentence-encoder'
 import {similarity} from './utils'
 
 const neighborsK = 20
-const threshold = 0.3
 const model = load()
 
 self.addEventListener('message', async ({data}) => {
-  const {query, embeddingMap} = data
+  const {query, embeddingMap, threshold} = data
   const tensor = await (await model).embed(query)
   const embedding = await tensor.data()
 
