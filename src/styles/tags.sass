@@ -58,27 +58,61 @@
 .tagHeader
   display: flex
   flex-direction: column
+  align-items: center
+  margin-bottom: 4rem
 
-  > button
-    margin-bottom: 1rem
+  .toggle
+    display: flex
+    flex-direction: column
+    align-items: center
+    width: 100%
 
-    span
-      font-size: 1rem
-      margin-right: 0.6rem
+    button
+      font-size: 1.8rem
+      border: 1px solid $lightGray
+      border-bottom: none
+      position: relative
+      z-index: 1
+      padding: 0.5rem
+      width: 10rem
+      margin-bottom: -1px
+      background: $white
+      text-transform: uppercase
+      font-style: italic
+      font-size: 1.4rem
+
+      &:hover
+        color: $lighter
+
+      span
+        display: none
+        position: absolute
+        margin-left: -1rem
+
+      &.active
+        color: $black
+
+  hr
+    width: 60rem
+    max-width: 100%
+    margin-bottom: 4px
+    border: none
+    border-bottom: 1px solid $lightGray
+
+  .modeHeading
+    margin-top: 1.5rem
+    margin-bottom: 1.5rem
 
   .tags
-    margin-bottom: 3rem
+    margin-bottom: 2rem
 
 .tagSort
   display: flex
   justify-content: center
-  margin-bottom: 2rem
+  margin: 1rem
 
   button
-    padding: 0 .6rem
-    font-size: 0.8rem
-    color: $lighter
-    transition: color .2s
+    margin: 0 1rem
 
     &:hover
       color: $black
@@ -86,10 +120,6 @@
     &.active
       color: $black
       border-bottom: 2px solid $black
-
-    span
-      font-size: 1.4rem
-      margin-left: 0.2rem
 
 .tagInput
   margin-top: 0rem
