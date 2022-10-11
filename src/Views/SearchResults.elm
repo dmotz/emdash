@@ -19,64 +19,66 @@ searchResults :
     -> List Book
     -> List Entry
     -> List ( Id, Float )
+    -> Bool
     -> String
     -> Html Msg
-searchResults bookMap entryMap books entries semanticMatches query =
-    div
-        [ class "searchResults" ]
-        [ if isEmpty books && isEmpty entries && isEmpty semanticMatches then
-            p
-                [ class "noResults" ]
-                [ text "No results found." ]
+searchResults bookMap entryMap books entries semanticMatches semanticReady query =
+    if isEmpty books && isEmpty entries && isEmpty semanticMatches && semanticReady then
+        p
+            [ class "noResults" ]
+            [ text "No results found." ]
 
-          else if isEmpty books then
-            null
-
-          else
-            bookList books TitleSort False
-        , div
-            [ class "snippets" ]
-            ((if not (isEmpty entries) then
-                [ h2 [] [ text "Text matches" ]
-                , ul
-                    []
-                    (map
-                        (lazy4 snippetView bookMap Nothing (Just query))
-                        entries
-                    )
-                ]
+    else
+        div
+            [ class "searchResults" ]
+            [ if isEmpty books then
+                null
 
               else
-                []
-             )
-                ++ (if not (isEmpty semanticMatches) then
-                        [ h2 [] [ text "Semantic matches" ]
-                        , ul
-                            []
-                            (map
-                                (\( entry, score ) ->
-                                    snippetView
-                                        bookMap
-                                        (Just score)
-                                        (Just query)
-                                        entry
-                                )
-                                (filterMap
-                                    (\( id, score ) ->
-                                        get id entryMap
-                                            |> andThen
-                                                (\entry ->
-                                                    Just
-                                                        ( entry, score )
-                                                )
-                                    )
-                                    semanticMatches
-                                )
-                            )
-                        ]
-
-                    else
+                bookList books TitleSort False
+            , div
+                [ class "snippets" ]
+                ((if not (isEmpty entries) then
+                    [ h2 [] [ text "Text matches" ]
+                    , ul
                         []
-                   )
-            )
-        ]
+                        (map
+                            (lazy4 snippetView bookMap Nothing (Just query))
+                            entries
+                        )
+                    ]
+
+                  else
+                    []
+                 )
+                    ++ (if not (isEmpty semanticMatches) then
+                            [ h2 [] [ text "Semantic matches" ]
+                            , ul
+                                []
+                                (map
+                                    (\( entry, score ) ->
+                                        snippetView
+                                            bookMap
+                                            (Just score)
+                                            (Just query)
+                                            entry
+                                    )
+                                    (filterMap
+                                        (\( id, score ) ->
+                                            get id entryMap
+                                                |> andThen
+                                                    (\entry ->
+                                                        Just
+                                                            ( entry, score )
+                                                    )
+                                        )
+                                        semanticMatches
+                                    )
+                                )
+                            ]
+
+                        else
+                            []
+                       )
+                )
+            ]

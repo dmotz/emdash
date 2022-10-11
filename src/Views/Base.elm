@@ -123,7 +123,7 @@ view model =
                                             model.reverseSort
                                         ]
 
-                                SearchPage query books entries ->
+                                SearchPage query semanticReady books entries semanticMatches ->
                                     div
                                         [ class "searchPage fullWidth" ]
                                         [ searchInput model.searchQuery
@@ -132,7 +132,8 @@ view model =
                                             model.entries
                                             books
                                             entries
-                                            model.semanticMatches
+                                            semanticMatches
+                                            semanticReady
                                             query
                                         ]
 

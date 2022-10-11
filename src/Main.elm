@@ -174,7 +174,7 @@ main =
                                 MainPage _ (Just tag) ->
                                     "#" ++ tag
 
-                                SearchPage query _ _ _ ->
+                                SearchPage query _ _ _ _ ->
                                     "🔍 " ++ query
 
                                 TitlePage book _ ->
@@ -660,7 +660,7 @@ update message model =
                 EntryPage entry _ ->
                     requestNeighbors ( entry.id, True )
 
-                SearchPage query _ _ _ ->
+                SearchPage query _ _ _ _ ->
                     requestSemanticSearch ( query, model.semanticThreshold )
 
                 _ ->
@@ -719,11 +719,12 @@ update message model =
 
         ReceiveSemanticSearch ( _, idScores ) ->
             case model.page of
-                SearchPage query books entries _ ->
+                SearchPage query _ books entries _ ->
                     ( { model
                         | page =
                             SearchPage
                                 query
+                                True
                                 books
                                 entries
                                 (filter
@@ -1004,6 +1005,7 @@ update message model =
                     | page =
                         SearchPage
                             query
+                            False
                             (findMatches
                                 query
                                 (\b -> b.title ++ " " ++ b.author)
