@@ -61,43 +61,19 @@
   align-items: center
   margin-bottom: 4rem
 
-  .toggle
-    display: flex
-    flex-direction: column
-    align-items: center
-    width: 100%
+  .tabs
+    width: 60rem
+    max-width: 100%
+    text-align: center
 
-    button
-      font-size: 1.8rem
-      border: 1px solid $lightGray
-      border-bottom: none
-      position: relative
-      z-index: 1
-      padding: 0.5rem
-      width: 10rem
-      margin-bottom: -1px
-      background: $white
-      text-transform: uppercase
-      font-style: italic
-      font-size: 1.4rem
-
-      &:hover
-        color: $lighter
-
-      span
-        display: none
-        position: absolute
-        margin-left: -1rem
-
-      &.active
-        color: $black
+    + hr
+      margin-top: 4px
 
   hr
     width: 60rem
     max-width: 100%
-    margin-bottom: 4px
     border: none
-    border-bottom: 1px solid $lightGray
+    border-bottom: 1px solid $gray
 
   .modeHeading
     margin-top: 1.5rem

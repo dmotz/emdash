@@ -282,21 +282,10 @@ tagHeader show allBooks tagSort tags tagCounts mActiveTag =
     div
         [ class "tagHeader" ]
         [ div
-            [ class "toggle" ]
+            [ class "tabs" ]
             [ button
-                [ onClick ToggleTagHeader, classList [ ( "active", show ) ] ]
-                [ span []
-                    [ text
-                        (if show then
-                            "▾"
-
-                         else
-                            "▸"
-                        )
-                    ]
-                , text "Tags"
-                ]
-            , hr [] []
+                [ onClick ToggleTagHeader, class "active" ]
+                [ text "Tags" ]
             ]
         , if show then
             div
