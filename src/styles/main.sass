@@ -174,22 +174,119 @@ input[type='range']::-webkit-slider-runnable-track
   font-style: italic
 
 .hint
+  @include fade
   position: absolute
   display: flex
   align-items: center
   pointer-events: none
+  width: max-content
   font-style: italic
-  transition: opacity 0.2s
+  background: $black
+  color: $white
   font-size: 1.5rem
-  transform: translateY(-50%)
+  right: -2rem
+  transform: translateX(100%)
+  padding: 0.2rem 0.6rem
+  opacity: 0
+  line-height: 1.4
+  padding-left: 0
+
+  &:before
+    content: ''
+    position: absolute
+    top: 0
+    left: 0
+    z-index: -1
+    transform-origin: 0 0
+    height: 70.71067812%
+    aspect-ratio: 1
+    transform: rotate(45deg)
+    background: inherit
+
+  &.left
+    right: unset
+    padding-left: 0.6rem
+    padding-right: 0
+    left: -2rem
+    transform: translateX(-100%)
+
+    &:before
+      left: unset
+      right: 0
+      transform: translateX(100%) rotate(45deg)
+
+*:has(> .hint)
+  display: flex
+  align-items: center
+
+  &:hover .hint
+    opacity: 1
+
+.smallCaps
+  font-variant: small-caps
+
+.modeHeading
+  margin: 0 auto
+  margin-bottom: 1rem
+  color: $lighter
+  display: flex
+  justify-content: center
+  position: relative
+  width: fit-content
+
+  > div
+    margin-bottom: 0.6rem
+    color: $black
+    font-weight: 500
+    margin-right: 0.5rem
+    left: 0
+    color: $lighter
+
+    &:last-child
+      display: none
+
+  ul
+    display: flex
+    margin-bottom: 0.6rem
+
+    &.last
+      margin-left: 1rem
+
+      &::before
+        content: "|"
+        margin-right: 1rem
+
+  li
+    &:after
+      content: '•'
+      margin-left: 1rem
+      color: $lightGray
+
+    + li
+      margin-left: 1rem
+
+    &:last-child:after
+      content: ''
+      margin: 0
+
+    &.active button
+      color: $black
+      text-decoration-color: $black
+
+  button
+    text-decoration: underline 2px transparent
+    color: $lighter
+    font-size: 1.8rem
+
+    &:hover
+      color: $black
 
   span
+    font-size: 1rem
     margin-right: 0.5rem
-    margin-left: 1.2rem
-    font-style: normal
-    font-size: 2.2rem
-    line-height: 0
-    margin-top: 0.5rem
+
+  .divider
+    margin: 0 1rem
 
 footer
   display: flex
