@@ -9,6 +9,7 @@
 .entry
   width: 100%
   padding-top: 4rem
+  margin-bottom: 2rem
   position: relative
 
   details
@@ -22,9 +23,28 @@
     &::marker
       font-size: 2rem
 
-  &:hover
-    .meta, .detailsBar
+  .tabs
+    margin-top: 1.2rem
+    opacity: 0
+    @include fade
+
+    &.active
       opacity: 1
+
+    button:last-child
+      text-transform: unset
+
+  hr
+    opacity: 0
+    @include fade
+
+  &:hover
+    .tabs, hr
+      opacity: 1
+
+    .meta
+      .page, a
+        opacity: 1
 
   .wait
     margin: 3rem 0
@@ -34,7 +54,7 @@
     figure > cite
       font-size: 2.4rem
       margin: 4rem 0
-      margin-bottom: 8rem
+      margin-bottom: 6rem
 
 blockquote
   font-size: 2.4rem
@@ -45,47 +65,34 @@ blockquote
 .meta
   position: absolute
   transform: translateX(-100%)
+  display: flex
+  flex-direction: column
   padding-right: 2rem
   font-size: 1.4rem
   margin-top: 1rem
-  transition: opacity 0.2s
   text-align: right
+  line-height: 2
 
-  &:hover
-    opacity: 1
-
-.detailsBar
-  display: flex
-  margin-top: 2rem
-  opacity: 0
-  transition: opacity 0.2s
-
-  &.active
-    border-bottom: 1px solid $gray
-    opacity: 1
-
-  &:not(.active) .detailsToggle
-    flex: 1
+  .page, a
+    opacity: 0
+    @include fade
 
 .detailsToggle
-  position: relative
-  margin-right: 1rem
-  text-align: left
-  padding: 8.5px 0
+  position: absolute
+  transform: translateX(-100%)
+  color: $lightGray
+  padding: 2rem 2rem 0 0
+  opacity: 0
+
+  &.active
+    > span
+      color: $black
+      transform: rotate(90deg)
 
   > span
+    transition: all 0.2s
     display: inline-block
-
-    &:first-of-type
-      width: 12px
-
-    &:last-of-type
-      font-size: 2.2rem
-      margin-left: 1rem
-
-  .hint
-    left: 3rem
-    top: 53%
+    font-size: 1.2rem
 
   &:hover
     .hint
@@ -93,10 +100,13 @@ blockquote
 
 .details
   section:not(.related)
-    padding-top: 3rem
+    padding: 3rem 0
+
+  + hr
+    opacity: 1
 
 .neighbors
-  margin-top: 4rem
+  margin: 4rem 0
 
 .snippet
   $size: 1.8rem
