@@ -10,10 +10,10 @@ import Html
         , div
         , figcaption
         , figure
+        , hr
         , li
         , p
         , section
-        , span
         , text
         , textarea
         , ul
@@ -65,7 +65,7 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
 
                       else
                         null
-                    , a [ href <| entryToRoute books entry ] [ text "#" ]
+                    , a [ href <| entryToRoute books entry ] [ text "¶" ]
                     ]
 
               else
@@ -81,77 +81,43 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
 
               else
                 null
-            , div
-                [ classList
-                    [ ( "detailsBar", True )
-                    , ( "active", showDetails )
-                    ]
-                ]
-                [ if perma then
-                    null
-
-                  else
-                    button
-                        [ class "detailsToggle"
-                        , onClick (ToggleDetails entry.id)
-                        ]
-                        [ span []
-                            [ text
-                                (if showDetails then
-                                    "▼"
-
-                                 else
-                                    "▶"
-                                )
-                            ]
-                        , span [] [ text "‡" ]
-                        , if showDetails then
-                            null
-
-                          else
-                            div
-                                [ class "hint" ]
-                                [ span [] [ text "☜" ]
-                                , text "show related excerpts, notes, &c"
+            , div [ classList [ ( "tabs", True ), ( "active", showDetails ) ] ]
+                (map
+                    (\tab ->
+                        button
+                            [ onClick <|
+                                SetEntryTab
+                                    entry.id
+                                    tab
+                                    (not perma
+                                        && (not showDetails || tab == activeTab)
+                                    )
+                            , classList
+                                [ ( "active"
+                                  , showDetails && tab == activeTab
+                                  )
                                 ]
-                        ]
-                , if showDetails then
-                    div [ class "tabs" ]
-                        (map
-                            (\tab ->
-                                button
-                                    [ onClick <| SetEntryTab entry.id tab
-                                    , classList
-                                        [ ( "active", tab == activeTab )
-                                        ]
-                                    ]
-                                    [ text <|
-                                        case tab of
-                                            Related ->
-                                                "Related"
+                            ]
+                            [ text <|
+                                case tab of
+                                    Related ->
+                                        "Related"
 
-                                            Notes ->
-                                                "Notes"
-                                                    ++ (if
-                                                            isEmpty
-                                                                entry.notes
-                                                        then
-                                                            ""
+                                    Notes ->
+                                        "Notes"
+                                            ++ (if isEmpty entry.notes then
+                                                    ""
 
-                                                        else
-                                                            " °"
-                                                       )
+                                                else
+                                                    " °"
+                                               )
 
-                                            Etc ->
-                                                "&c."
-                                    ]
-                            )
-                            [ Related, Notes, Etc ]
-                        )
-
-                  else
-                    null
-                ]
+                                    Etc ->
+                                        "&c."
+                            ]
+                    )
+                    [ Related, Notes, Etc ]
+                )
             , if showDetails then
                 div [ class "details" ]
                     [ case activeTab of
@@ -189,7 +155,7 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
                                     [ onFocus <| SetInputFocus (Just NoteFocus)
                                     , onInput (UpdateNotes entry.id)
                                     , value entry.notes
-                                    , placeholder "add notes here"
+                                    , placeholder "Add notes here"
                                     ]
                                     [ text entry.notes ]
                                 ]
@@ -210,5 +176,6 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
 
               else
                 null
+            , hr [] []
             ]
         ]
