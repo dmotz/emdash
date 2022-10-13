@@ -975,12 +975,18 @@ update message model =
                 none
             )
 
-        SetEntryTab id tab ->
-            ( { model
-                | idToActiveTab = insert id tab model.idToActiveTab
-              }
-            , none
-            )
+        SetEntryTab id tab toggle ->
+            let
+                m =
+                    { model
+                        | idToActiveTab = insert id tab model.idToActiveTab
+                    }
+            in
+            if toggle then
+                update (ToggleDetails id) m
+
+            else
+                ( m, none )
 
         ScrollToTop ->
             ( model, scrollToTop () )

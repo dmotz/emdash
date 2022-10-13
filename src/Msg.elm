@@ -45,7 +45,7 @@ type Msg
     | SortBooks BookSort
     | OnIntersect Id
     | ToggleDetails Id
-    | SetEntryTab Id EntryTab
+    | SetEntryTab Id EntryTab Bool
     | ScrollToTop
     | OnScroll Float
     | OnSearchStart String
