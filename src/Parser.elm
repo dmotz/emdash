@@ -286,7 +286,8 @@ makeDicts =
                                 date =
                                     withDefault 0 dateRaw
                             in
-                            ( insert id
+                            ( insert
+                                id
                                 (Entry
                                     id
                                     (replace footnoteRx footnoteReplacer text)
@@ -313,6 +314,7 @@ makeDicts =
                                                     bookId
                                                     title
                                                     author
+                                                    0
                                                     0
                                                     date
                                                     []
