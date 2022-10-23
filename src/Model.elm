@@ -46,6 +46,7 @@ type BookSort
     = RecencySort
     | TitleSort
     | NumSort
+    | RatingSort
 
 
 type TagSort
