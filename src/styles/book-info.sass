@@ -1,4 +1,4 @@
-.expBookInfo
+.bookInfo
   margin: 0 auto
 
   h1, h2
@@ -11,6 +11,33 @@
     margin-bottom: 0
     font-size: 2.4rem
 
+  .col:last-child
+    > div:first-child
+      margin-bottom: 3rem
+
+.rating
+  display: flex
+
+  p
+    font-size: 3.6rem
+    font-size: 2.4rem
+    width: 5rem
+    line-height: 0
+    height: 3.2rem
+    display: flex
+    align-items: center
+    position: relative
+    letter-spacing: 0.2ch
+
+    &.unrated
+      color: $gray
+      top: -0.3rem
+
+  input[type="range"]
+    max-width: 9.9rem
+    margin: 0
+    padding: 0
+
 .bookMeta
   margin: 3rem auto
   display: flex
@@ -21,6 +48,9 @@
     padding-right: 2rem
 
     &:last-child
+      display: flex
+      flex-direction: column
+      justify-content: space-between
       border-left: 1px solid $black
       padding-right: 0
       padding-left: 2rem
