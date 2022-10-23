@@ -146,7 +146,6 @@ view model =
                                             model.tags
                                             model.pendingTag
                                             model.bookNeighborMap
-                                            (length entries)
                                         , entryList
                                             entries
                                             model.entries
