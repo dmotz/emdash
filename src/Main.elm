@@ -497,6 +497,25 @@ update message model =
                 _ ->
                     noOp
 
+        SetRating book n ->
+            let
+                newBook =
+                    { book | rating = n }
+            in
+            store
+                ( { model
+                    | books = insert book.id newBook model.books
+                    , page =
+                        case model.page of
+                            TitlePage _ entries ->
+                                TitlePage newBook entries
+
+                            _ ->
+                                model.page
+                  }
+                , none
+                )
+
         SetTagSort sort ->
             ( { model | tagSort = sort }, none )
 
