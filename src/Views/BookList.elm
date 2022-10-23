@@ -1,4 +1,4 @@
-module Views.BookList exposing (book, bookList)
+module Views.BookList exposing (bookList, bookView)
 
 import Html exposing (Html, a, div, li, text)
 import Html.Attributes exposing (class, href)
@@ -16,14 +16,21 @@ bookList books sort reverseSort =
     Keyed.ul
         [ class "bookList" ]
         (map
-            (\{ id, title, author, count } -> ( id, book title author count ))
+            (\{ id, title, author, count } ->
+                ( id, bookView li title author count )
+            )
             (sortBooks sort reverseSort books)
         )
 
 
-book : Title -> Author -> Int -> Html Msg
-book title author count =
-    li
+bookView :
+    (List (Html.Attribute msg) -> List (Html Msg) -> Html Msg)
+    -> Title
+    -> Author
+    -> Int
+    -> Html Msg
+bookView tag title author count =
+    tag
         [ class "book" ]
         [ a
             [ href <| titleToRoute title ]
