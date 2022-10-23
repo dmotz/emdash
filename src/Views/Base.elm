@@ -248,7 +248,7 @@ bookSorter activeSort reverseSort =
                             [ text <| sortToString sort ]
                         ]
                 )
-                [ RecencySort, TitleSort, NumSort ]
+                [ RecencySort, TitleSort, NumSort, RatingSort ]
             )
         , div [ class "divider" ] [ text "|" ]
         , div []
@@ -398,6 +398,9 @@ sortToString sort =
         TitleSort ->
             "Title"
 
+        RatingSort ->
+            "Rating"
+
         _ ->
             "№ excerpts"
 
@@ -410,6 +413,9 @@ sortToBounds sort =
 
         TitleSort ->
             [ "A", "Z" ]
+
+        RatingSort ->
+            [ "worse", "better" ]
 
         _ ->
             [ "less", "more" ]
