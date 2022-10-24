@@ -57,7 +57,7 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
         [ figure []
             [ if not perma then
                 figcaption [ class "meta" ]
-                    [ div [] [ text <| fromInt (i + 1) ++ "." ]
+                    [ div [] [ text <| fromInt (i + 1) ]
                     , if entry.page /= -1 then
                         div
                             [ class "page" ]
