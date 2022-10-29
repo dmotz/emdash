@@ -23,17 +23,18 @@ import Html.Attributes as H
         , classList
         , href
         , step
+        , target
         , type_
         , value
         )
 import Html.Events exposing (onInput)
 import List exposing (map, repeat)
 import Maybe exposing (withDefault)
-import Model exposing (Book, BookMap, NeighborMap, Tag)
+import Model exposing (Book, BookMap, Id, NeighborMap, Tag)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleToRoute)
 import String exposing (fromInt, toInt)
-import Utils exposing (excerptCountLabel, null)
+import Utils exposing (excerptCountLabel, getEntryDomId, null)
 import Views.TagSection exposing (tagSection)
 
 
@@ -43,8 +44,9 @@ bookInfo :
     -> List Tag
     -> Maybe Tag
     -> NeighborMap
+    -> Maybe Id
     -> Html Msg
-bookInfo book books tags pendingTag bookNeighborMap =
+bookInfo book books tags pendingTag bookNeighborMap mLastRead =
     div
         [ class "bookInfo" ]
         [ h1 [] [ text book.title ]
@@ -131,4 +133,12 @@ bookInfo book books tags pendingTag bookNeighborMap =
                     ]
                 ]
             ]
+        , case mLastRead of
+            Just id ->
+                a
+                    [ href <| "#" ++ getEntryDomId id, target "_self" ]
+                    [ text "↧ Jump to last read excerpt" ]
+
+            _ ->
+                null
         ]
