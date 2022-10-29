@@ -72,9 +72,6 @@ import Utils
 import Views.Base exposing (view)
 
 
-port setObservers : List Id -> Cmd msg
-
-
 port setStorage : StoredModel -> Cmd msg
 
 
