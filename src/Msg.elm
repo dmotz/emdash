@@ -42,10 +42,10 @@ type Msg
     | ReceiveNeighbors ( Id, List ( Id, Float ) )
     | ReceiveBookNeighbors ( Id, List ( Id, Float ) )
     | ReceiveSemanticSearch ( String, List ( Id, Float ) )
+    | SetSemanticThreshold String
     | LinkClicked UrlRequest
     | UrlChanged Url
     | SortBooks BookSort
-    | OnIntersect Id
     | ToggleDetails Id
     | SetEntryTab Id EntryTab Bool
     | ScrollToTop

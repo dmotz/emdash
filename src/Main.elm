@@ -1,7 +1,7 @@
 port module Main exposing (main)
 
 import Browser exposing (application)
-import Browser.Dom exposing (getElement, setViewport)
+import Browser.Dom exposing (setViewport)
 import Browser.Events exposing (onKeyDown)
 import Browser.Navigation as Nav
 import Debounce
@@ -70,9 +70,6 @@ import Utils
         , untaggedKey
         )
 import Views.Base exposing (view)
-
-
-port onIntersect : (Id -> msg) -> Sub msg
 
 
 port onScroll : (Float -> msg) -> Sub msg
@@ -214,7 +211,6 @@ main =
                     , receiveEmbeddings ReceiveEmbeddings
                     , receiveBookEmbeddings ReceiveBookEmbeddings
                     , receiveUnicodeNormalized ReceiveUnicodeNormalized
-                    , onIntersect OnIntersect
                     , receiveSemanticSearch ReceiveSemanticSearch
                     ]
         , onUrlChange = UrlChanged
@@ -961,30 +957,6 @@ update message model =
                   }
                 , none
                 )
-
-        OnIntersect id ->
-            case get id model.entries of
-                Just entry ->
-                    store
-                        ( case model.page of
-                            TitlePage book _ ->
-                                { model
-                                    | bookIdToLastRead =
-                                        insert
-                                            book.id
-                                            id
-                                            model.bookIdToLastRead
-                                }
-
-                            _ ->
-                                model
-                        , Nav.replaceUrl
-                            model.key
-                            (entryToRoute model.books entry)
-                        )
-
-                _ ->
-                    noOp
 
         ToggleDetails id ->
             let
