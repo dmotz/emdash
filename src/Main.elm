@@ -63,7 +63,6 @@ import Utils
         , dedupe
         , embeddingBatchSize
         , findMatches
-        , getEntryDomId
         , getTagCounts
         , insertOnce
         , juxt
@@ -954,6 +953,15 @@ update message model =
                     { model | bookSort = sort, reverseSort = True }
             , none
             )
+
+        SetLastRead bookId entryId ->
+            store
+                ( { model
+                    | bookIdToLastRead =
+                        insert bookId entryId model.bookIdToLastRead
+                  }
+                , none
+                )
 
         OnIntersect id ->
             case get id model.entries of

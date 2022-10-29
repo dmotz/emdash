@@ -22,6 +22,7 @@ type Msg
     | SetInputFocus (Maybe InputFocus)
     | HideEntry Id
     | UpdateNotes Id String
+    | SetLastRead Id Id
     | UpdatePendingTag Tag
     | AddTag
     | RemoveTag Tag
