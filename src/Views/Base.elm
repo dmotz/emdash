@@ -146,6 +146,7 @@ view model =
                                             model.tags
                                             model.pendingTag
                                             model.bookNeighborMap
+                                            (get book.id model.bookIdToLastRead)
                                         , entryList
                                             entries
                                             model.entries
@@ -153,6 +154,9 @@ view model =
                                             model.neighborMap
                                             model.idToShowDetails
                                             model.idToActiveTab
+                                            (get book.id model.bookIdToLastRead
+                                                |> withDefault ""
+                                            )
                                         ]
 
                                 AuthorPage author books ->
@@ -204,6 +208,7 @@ view model =
                                                 )
                                                 -1
                                                 True
+                                                False
                                                 entry
                                             ]
                                         ]
