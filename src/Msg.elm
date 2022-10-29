@@ -46,7 +46,6 @@ type Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
     | SortBooks BookSort
-    | ToggleDetails Id
     | SetEntryTab Id EntryTab Bool
     | ScrollToTop
     | OnScroll Float
