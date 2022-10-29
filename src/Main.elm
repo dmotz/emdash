@@ -967,21 +967,6 @@ update message model =
                 , none
                 )
 
-        ToggleDetails id ->
-            let
-                newState =
-                    get id model.idToShowDetails |> withDefault False |> not
-            in
-            ( { model
-                | idToShowDetails = insert id newState model.idToShowDetails
-              }
-            , if newState && get id model.neighborMap == Nothing then
-                requestNeighbors ( id, True )
-
-              else
-                none
-            )
-
         SetEntryTab id tab toggle ->
             let
                 m =
@@ -990,7 +975,19 @@ update message model =
                     }
             in
             if toggle then
-                update (ToggleDetails id) m
+                let
+                    newState =
+                        get id model.idToShowDetails |> withDefault False |> not
+                in
+                ( { m
+                    | idToShowDetails = insert id newState model.idToShowDetails
+                  }
+                , if newState && get id model.neighborMap == Nothing then
+                    requestNeighbors ( id, True )
+
+                  else
+                    none
+                )
 
             else
                 ( m, none )
