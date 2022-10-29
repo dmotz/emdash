@@ -15,16 +15,6 @@ const stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
 const embeddingsStore = createStore(`${dbNs}:${embeddingsKey}`, embeddingsKey)
 const writeMs = 999
 const batchIds = {}
-const observer = new IntersectionObserver(
-  obs => {
-    const visible = obs.find(ob => ob.intersectionRatio > 0)
-
-    if (visible) {
-      app.ports.onIntersect.send(visible.target.id.replace(/^entry/, ''))
-    }
-  },
-  {rootMargin: '-20% 0% -60% 0%'}
-)
 
 const downloadFile = (name, data) => {
   const a = document.createElement('a')
@@ -187,12 +177,6 @@ const init = async () => {
       embeddingMap: embeddings
     })
   })
-
-  app.ports.setObservers.subscribe(ids =>
-    requestAnimationFrame(() =>
-      ids.forEach(id => observer.observe(document.getElementById('entry' + id)))
-    )
-  )
 
   app.ports.scrollToTop.subscribe(() =>
     window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
