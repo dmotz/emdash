@@ -103,7 +103,11 @@ entryView entries books neighborMap showDetails activeTab i perma isMarked entry
 
                       else
                         null
-                    , a [ href <| entryToRoute books entry ] [ text "¶" ]
+                    , a
+                        [ href <| entryToRoute books entry ]
+                        [ text "¶"
+                        , div [ class "hint left" ] [ text "Permalink" ]
+                        ]
                     ]
 
               else
