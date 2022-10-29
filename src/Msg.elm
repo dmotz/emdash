@@ -48,7 +48,6 @@ type Msg
     | SortBooks BookSort
     | SetEntryTab Id EntryTab Bool
     | ScrollToTop
-    | OnScroll Float
     | OnSearchStart String
     | OnSearchEnd String
     | ReceiveUnicodeNormalized String
