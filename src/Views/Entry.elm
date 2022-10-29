@@ -11,6 +11,7 @@ import Html
         , figcaption
         , figure
         , hr
+        , img
         , li
         , p
         , section
@@ -18,7 +19,16 @@ import Html
         , textarea
         , ul
         )
-import Html.Attributes exposing (class, classList, href, id, placeholder, value)
+import Html.Attributes
+    exposing
+        ( class
+        , classList
+        , href
+        , id
+        , placeholder
+        , src
+        , value
+        )
 import Html.Events exposing (onClick, onFocus, onInput)
 import Html.Lazy exposing (lazy4)
 import List exposing (map)
@@ -47,9 +57,10 @@ entryView :
     -> EntryTab
     -> Int
     -> Bool
+    -> Bool
     -> Entry
     -> Html Msg
-entryView entries books neighborMap showDetails activeTab i perma entry =
+entryView entries books neighborMap showDetails activeTab i perma isMarked entry =
     li
         [ classList [ ( "entry", True ), ( "permalink", perma ) ]
         , id <| getEntryDomId entry.id
@@ -58,6 +69,33 @@ entryView entries books neighborMap showDetails activeTab i perma entry =
             [ if not perma then
                 figcaption [ class "meta" ]
                     [ div [] [ text <| fromInt (i + 1) ]
+                    , if perma then
+                        text ""
+
+                      else
+                        button
+                            [ classList
+                                [ ( "bookmark", True )
+                                , ( "bookmarked", isMarked )
+                                ]
+                            , onClick (SetLastRead entry.bookId entry.id)
+                            ]
+                            [ img
+                                [ src <|
+                                    "/bookmark"
+                                        ++ (if isMarked then
+                                                "-filled"
+
+                                            else
+                                                ""
+                                           )
+                                        ++ ".svg"
+                                ]
+                                []
+                            , div
+                                [ class "hint left" ]
+                                [ text "Mark as last read in this book" ]
+                            ]
                     , if entry.page /= -1 then
                         div
                             [ class "page" ]
