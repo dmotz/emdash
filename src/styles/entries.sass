@@ -38,12 +38,25 @@
     opacity: 0
     @include fade
 
+  .bookmark
+    position: relative
+    width: 0.8rem
+    margin: 1rem 0
+    opacity: 0
+    @include fade
+
+    &.bookmarked
+      opacity: 1
+
+    img
+      width: 100%
+
   &:hover
     .tabs, hr
       opacity: 1
 
     .meta
-      .page, a
+      .page, a, .bookmark
         opacity: 1
 
   .wait
@@ -67,6 +80,7 @@ blockquote
   transform: translateX(-100%)
   display: flex
   flex-direction: column
+  align-items: flex-end
   padding-right: 2rem
   font-size: 1.4rem
   margin-top: 0.4rem
@@ -75,6 +89,7 @@ blockquote
 
   .page, a
     opacity: 0
+    position: relative
     @include fade
 
 .detailsToggle
