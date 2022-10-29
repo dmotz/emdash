@@ -817,7 +817,16 @@ update message model =
                                         )
                               }
                             , batch
-                                [ scrollTop
+                                [ case parse routeParser model.url of
+                                    Just (TitleRoute lastSlug) ->
+                                        if lastSlug == slug then
+                                            none
+
+                                        else
+                                            scrollTop
+
+                                    _ ->
+                                        scrollTop
                                 , if model.embeddingsReady then
                                     requestBookNeighbors book.id
 
