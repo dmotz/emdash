@@ -82,19 +82,23 @@ view model =
                     _ ->
                         [ a
                             [ class "logo", href "/" ]
-                            [ img [ src "/logo.svg", draggable "false" ] []
+                            [ img
+                                [ src "/images/logo.svg", draggable "false" ]
+                                []
                             , div [ class "hint" ] [ text "Back to the index" ]
                             ]
                         , div
                             [ class "actions" ]
                             [ a
                                 [ href "/settings" ]
-                                [ img [ src "/focus.svg" ] []
+                                [ img [ src "/images/focus.svg" ] []
                                 , div [ class "hint left" ] [ text "Settings" ]
                                 ]
                             , button
-                                [ onClick ShowRandom ]
-                                [ img [ src "/random.svg" ] []
+                                [ class "random"
+                                , onClick ShowRandom
+                                ]
+                                [ img [ src "/images/random.svg" ] []
                                 , div
                                     [ class "hint left" ]
                                     [ text "Discover a random excerpt" ]

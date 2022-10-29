@@ -82,7 +82,7 @@ entryView entries books neighborMap showDetails activeTab i perma isMarked entry
                             ]
                             [ img
                                 [ src <|
-                                    "/bookmark"
+                                    "/images/bookmark"
                                         ++ (if isMarked then
                                                 "-filled"
 
