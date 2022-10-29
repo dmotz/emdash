@@ -189,22 +189,12 @@ const init = async () => {
   if (restored && !didFail) {
     handleNewEntries(restored)
   }
-
-  window.addEventListener(
-    'scroll',
-    () => {
-      app.ports.onScroll.send(window.scrollY - lastScrollY)
-      lastScrollY = window.scrollY
-    },
-    {passive: true}
-  )
 }
 
 let embeddings = {}
 let bookEmbeddings = {}
 let titleMap = {}
 let workerBatch = 0
-let lastScrollY = window.scrollY
 let app
 let writeTimer
 let embedWorker

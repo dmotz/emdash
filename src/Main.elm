@@ -72,9 +72,6 @@ import Utils
 import Views.Base exposing (view)
 
 
-port onScroll : (Float -> msg) -> Sub msg
-
-
 port setObservers : List Id -> Cmd msg
 
 
@@ -1034,9 +1031,6 @@ update message model =
                   else
                     none
                 )
-
-        OnScroll _ ->
-            noOp
 
         DebounceMsg msg ->
             let
