@@ -235,7 +235,13 @@ view model =
                                             [ entryView
                                                 model.entries
                                                 model.books
-                                                model.neighborMap
+                                                (withDefault
+                                                    []
+                                                    (get
+                                                        entry.id
+                                                        model.neighborMap
+                                                    )
+                                                )
                                                 True
                                                 (withDefault
                                                     Related

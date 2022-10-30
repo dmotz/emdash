@@ -35,6 +35,7 @@ import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleToRoute)
 import String exposing (fromInt, toInt)
 import Utils exposing (excerptCountLabel, getEntryDomId, null)
+import Views.EmbeddingProgress exposing (embeddingProgress)
 import Views.TagSection exposing (tagSection)
 
 
@@ -45,8 +46,9 @@ bookInfo :
     -> Maybe Tag
     -> NeighborMap
     -> Maybe Id
+    -> Maybe (Html Msg)
     -> Html Msg
-bookInfo book books tags pendingTag bookNeighborMap mLastRead =
+bookInfo book books tags pendingTag bookNeighborMap mLastRead progressView =
     div
         [ class "bookInfo" ]
         [ h1 [] [ text book.title ]
@@ -60,37 +62,42 @@ bookInfo book books tags pendingTag bookNeighborMap mLastRead =
             [ div
                 [ class "col" ]
                 [ h5 [] [ text "Related" ]
-                , ul
-                    [ class "related" ]
-                    (case get book.id bookNeighborMap of
-                        Just ids ->
-                            map
-                                (\( id, _ ) ->
-                                    case
-                                        get id books
-                                    of
-                                        Just neighbor ->
-                                            li []
-                                                [ a
-                                                    [ class "title"
-                                                    , href <|
-                                                        titleToRoute
-                                                            neighbor.title
-                                                    ]
-                                                    [ text neighbor.title ]
-                                                ]
+                , case progressView of
+                    Just view ->
+                        view
 
-                                        _ ->
-                                            null
-                                )
-                                ids
+                    _ ->
+                        ul
+                            [ class "related" ]
+                            (case get book.id bookNeighborMap of
+                                Just ids ->
+                                    map
+                                        (\( id, _ ) ->
+                                            case
+                                                get id books
+                                            of
+                                                Just neighbor ->
+                                                    li []
+                                                        [ a
+                                                            [ class "title"
+                                                            , href <|
+                                                                titleToRoute
+                                                                    neighbor.title
+                                                            ]
+                                                            [ text neighbor.title ]
+                                                        ]
 
-                        _ ->
-                            li
-                                [ class "wait" ]
-                                [ text "…" ]
-                                :: repeat 4 (li [] [ br [] [] ])
-                    )
+                                                _ ->
+                                                    null
+                                        )
+                                        ids
+
+                                _ ->
+                                    li
+                                        [ class "wait" ]
+                                        [ text "…" ]
+                                        :: repeat 4 (li [] [ br [] [] ])
+                            )
                 ]
             , div
                 [ class "col" ]

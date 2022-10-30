@@ -19,8 +19,9 @@ entryList :
     -> Dict Id Bool
     -> Dict Id EntryTab
     -> Id
+    -> Maybe (Html Msg)
     -> Html Msg
-entryList entries entryMap books neighbors idToShowDetails idToActiveTab lastReadId =
+entryList entries entryMap books neighbors idToShowDetails idToActiveTab lastReadId mProgress =
     Keyed.ul
         [ class "entries" ]
         (indexedMap
@@ -29,12 +30,13 @@ entryList entries entryMap books neighbors idToShowDetails idToActiveTab lastRea
                 , entryView
                     entryMap
                     books
-                    neighbors
+                    (withDefault [] (get entry.id neighbors))
                     (withDefault False (get entry.id idToShowDetails))
                     (withDefault Related (get entry.id idToActiveTab))
                     i
                     False
                     (lastReadId == entry.id)
+                    mProgress
                     entry
                 )
             )

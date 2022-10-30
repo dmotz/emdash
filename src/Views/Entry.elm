@@ -31,19 +31,19 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onFocus, onInput)
 import Html.Lazy exposing (lazy4)
-import List exposing (map)
+import List exposing (isEmpty, map)
 import Model
     exposing
         ( BookMap
         , Entry
         , EntryMap
         , EntryTab(..)
+        , Id
         , InputFocus(..)
-        , NeighborMap
         )
 import Msg exposing (Msg(..))
 import Router exposing (entryToRoute)
-import String exposing (fromInt, isEmpty)
+import String exposing (fromInt)
 import Utils exposing (getEntryDomId, null)
 import Views.Citation exposing (citation)
 import Views.Snippet exposing (snippetView)
@@ -52,22 +52,24 @@ import Views.Snippet exposing (snippetView)
 entryView :
     EntryMap
     -> BookMap
-    -> NeighborMap
+    -> List ( Id, Float )
     -> Bool
     -> EntryTab
     -> Int
     -> Bool
     -> Bool
+    -> Maybe (Html Msg)
     -> Entry
     -> Html Msg
-entryView entries books neighborMap showDetails activeTab i perma isMarked entry =
+entryView entries books neighbors showDetails activeTab i perma isMarked mProgress entry =
     li
         [ classList [ ( "entry", True ), ( "permalink", perma ) ]
         , id <| getEntryDomId entry.id
         ]
         [ figure []
             [ if not perma then
-                figcaption [ class "meta" ]
+                figcaption
+                    [ class "meta" ]
                     [ div [] [ text <| fromInt (i + 1) ]
                     , if perma then
                         text ""
@@ -123,7 +125,8 @@ entryView entries books neighborMap showDetails activeTab i perma isMarked entry
 
               else
                 null
-            , div [ classList [ ( "tabs", True ), ( "active", showDetails ) ] ]
+            , div
+                [ classList [ ( "tabs", True ), ( "active", showDetails ) ] ]
                 (map
                     (\tab ->
                         button
@@ -147,7 +150,7 @@ entryView entries books neighborMap showDetails activeTab i perma isMarked entry
 
                                     Notes ->
                                         "Notes"
-                                            ++ (if isEmpty entry.notes then
+                                            ++ (if String.isEmpty entry.notes then
                                                     ""
 
                                                 else
@@ -161,38 +164,45 @@ entryView entries books neighborMap showDetails activeTab i perma isMarked entry
                     [ Related, Notes, Etc ]
                 )
             , if showDetails then
-                div [ class "details" ]
+                div
+                    [ class "details" ]
                     [ case activeTab of
                         Related ->
-                            section [ class "related" ]
-                                [ case get entry.id neighborMap of
-                                    Just neighbors ->
-                                        ul [ class "neighbors" ]
-                                            (map
-                                                (\( id, score ) ->
-                                                    case get id entries of
-                                                        Just neighbor ->
-                                                            lazy4
-                                                                snippetView
-                                                                books
-                                                                (Just score)
-                                                                Nothing
-                                                                neighbor
-
-                                                        _ ->
-                                                            null
-                                                )
-                                                neighbors
-                                            )
+                            section
+                                [ class "related" ]
+                                [ case mProgress of
+                                    Just progressView ->
+                                        progressView
 
                                     _ ->
-                                        p
-                                            [ class "wait" ]
-                                            [ text "Finding related entries…" ]
+                                        if isEmpty neighbors then
+                                            p
+                                                [ class "wait" ]
+                                                [ text "Finding related entries…" ]
+
+                                        else
+                                            ul [ class "neighbors" ]
+                                                (map
+                                                    (\( id, score ) ->
+                                                        case get id entries of
+                                                            Just neighbor ->
+                                                                lazy4
+                                                                    snippetView
+                                                                    books
+                                                                    (Just score)
+                                                                    Nothing
+                                                                    neighbor
+
+                                                            _ ->
+                                                                null
+                                                    )
+                                                    neighbors
+                                                )
                                 ]
 
                         Notes ->
-                            section [ class "notes" ]
+                            section
+                                [ class "notes" ]
                                 [ textarea
                                     [ onFocus <| SetInputFocus (Just NoteFocus)
                                     , onInput (UpdateNotes entry.id)
@@ -203,7 +213,8 @@ entryView entries books neighborMap showDetails activeTab i perma isMarked entry
                                 ]
 
                         Etc ->
-                            section []
+                            section
+                                []
                                 [ button
                                     [ class "button"
                                     , onClick (HideEntry entry.id)
