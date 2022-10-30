@@ -34,7 +34,7 @@ import Model exposing (Book, BookMap, Id, NeighborMap, Tag)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleToRoute)
 import String exposing (fromInt, toInt)
-import Utils exposing (excerptCountLabel, getEntryDomId, null)
+import Utils exposing (excerptCountLabel, getEntryDomId, null, ratingStr)
 import Views.TagSection exposing (tagSection)
 
 
@@ -111,18 +111,7 @@ bookInfo book books tags pendingTag bookNeighborMap mLastRead progressView =
                         [ class "rating" ]
                         [ p
                             [ classList [ ( "unrated", book.rating == 0 ) ] ]
-                            [ text <|
-                                if book.rating == 0 then
-                                    "—"
-
-                                else
-                                    (book.rating
-                                        |> toFloat
-                                        |> (\n -> n / 2)
-                                        |> String.fromFloat
-                                    )
-                                        ++ "/5"
-                            ]
+                            [ text <| ratingStr book ]
                         , input
                             [ type_ "range"
                             , H.min "0"
