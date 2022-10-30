@@ -19,6 +19,7 @@ module Utils exposing
     , null
     , pluckIds
     , queryCharMin
+    , ratingStr
     , removeItem
     , rx
     , rx_
@@ -347,6 +348,15 @@ sortBooks sort reverseSort =
             else
                 identity
            )
+
+
+ratingStr : Book -> String
+ratingStr book =
+    if book.rating == 0 then
+        "—"
+
+    else
+        (book.rating |> toFloat |> (\n -> n / 2) |> String.fromFloat) ++ "/5"
 
 
 null : Html msg
