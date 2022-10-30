@@ -290,7 +290,7 @@ getTagCounts bookMap =
 
 getEntryDomId : Id -> String
 getEntryDomId =
-    (++) "entry"
+    (++) "entry-"
 
 
 countLabel : String -> Int -> String
