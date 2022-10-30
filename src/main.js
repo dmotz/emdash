@@ -63,170 +63,172 @@ let neighborWorker
 let bookNeighborWorker
 let semanticSearchWorker
 
-console.log(`Marginalia v${version}`)
+;(async () => {
+  console.log(`Marginalia v${version}`)
 
-await new Promise(res => {
-  const testNs = `${dbNs}:test`
-  const dbReq = indexedDB.open(testNs)
-  dbReq.onerror = () => {
-    dbFailure = true
-    console.warn('cannot open DB for writing')
-    res()
+  await new Promise(res => {
+    const testNs = `${dbNs}:test`
+    const dbReq = indexedDB.open(testNs)
+    dbReq.onerror = () => {
+      dbFailure = true
+      console.warn('cannot open DB for writing')
+      res()
+    }
+    dbReq.onsuccess = () => {
+      res()
+      indexedDB.deleteDatabase(testNs)
+    }
+  })
+
+  if (!dbFailure) {
+    stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
+    embeddingsStore = createStore(`${dbNs}:${embeddingsKey}`, embeddingsKey)
+    restored = await get(stateKey, stateStore)
   }
-  dbReq.onsuccess = () => {
-    res()
-    indexedDB.deleteDatabase(testNs)
-  }
-})
 
-if (!dbFailure) {
-  stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
-  embeddingsStore = createStore(`${dbNs}:${embeddingsKey}`, embeddingsKey)
-  restored = await get(stateKey, stateStore)
-}
-
-try {
-  app = Elm.Main.init({flags: restored || null})
-} catch (e) {
-  console.warn('malformed restored state', restored)
-  app = Elm.Main.init({flags: null})
-  restoreFailure = true
-}
-
-app.ports.handleNewEntries.subscribe(handleNewEntries)
-
-app.ports.importJson.subscribe(text => {
   try {
-    app = Elm.Main.init({flags: JSON.parse(text)})
+    app = Elm.Main.init({flags: restored || null})
   } catch (e) {
-    alert('failed to parse restored JSON:', e)
+    console.warn('malformed restored state', restored)
+    app = Elm.Main.init({flags: null})
+    restoreFailure = true
   }
-})
 
-app.ports.exportJson.subscribe(state =>
-  downloadFile(
-    `marginalia_backup_${new Date().toLocaleDateString()}.json`,
-    new Blob([JSON.stringify(state)], {type: 'text/plain'})
+  app.ports.handleNewEntries.subscribe(handleNewEntries)
+
+  app.ports.importJson.subscribe(text => {
+    try {
+      app = Elm.Main.init({flags: JSON.parse(text)})
+    } catch (e) {
+      alert('failed to parse restored JSON:', e)
+    }
+  })
+
+  app.ports.exportJson.subscribe(state =>
+    downloadFile(
+      `marginalia_backup_${new Date().toLocaleDateString()}.json`,
+      new Blob([JSON.stringify(state)], {type: 'text/plain'})
+    )
   )
-)
 
-app.ports.setStorage.subscribe(state => {
-  clearTimeout(writeTimer)
-  if (stateStore) {
-    writeTimer = setTimeout(() => set(stateKey, state, stateStore), writeMs)
-  }
-})
+  app.ports.setStorage.subscribe(state => {
+    clearTimeout(writeTimer)
+    if (stateStore) {
+      writeTimer = setTimeout(() => set(stateKey, state, stateStore), writeMs)
+    }
+  })
 
-app.ports.createEpub.subscribe(async pairs => {
-  const zip = new JsZip()
+  app.ports.createEpub.subscribe(async pairs => {
+    const zip = new JsZip()
 
-  zip.folder('META-INF')
-  zip.folder('OEBPS')
-  pairs.forEach(([path, text]) => zip.file(path, text.trim()))
-  downloadFile(
-    `marginalia_excerpts_${new Date().toLocaleDateString()}.epub`,
-    await zip.generateAsync({type: 'blob'})
-  )
-})
+    zip.folder('META-INF')
+    zip.folder('OEBPS')
+    pairs.forEach(([path, text]) => zip.file(path, text.trim()))
+    downloadFile(
+      `marginalia_excerpts_${new Date().toLocaleDateString()}.epub`,
+      await zip.generateAsync({type: 'blob'})
+    )
+  })
 
-app.ports.requestEmbeddings.subscribe(pairs => {
-  if (!embedWorker) {
-    embedWorker = new EmbedWorker()
-    embedWorker.onmessage = ({data}) => {
-      app.ports.receiveEmbeddings.send(batchIds[data.batchId])
-      data.targets.forEach(([k, v]) => (embeddings[k] = v))
-      delete batchIds[data.batchId]
+  app.ports.requestEmbeddings.subscribe(pairs => {
+    if (!embedWorker) {
+      embedWorker = new EmbedWorker()
+      embedWorker.onmessage = ({data}) => {
+        app.ports.receiveEmbeddings.send(batchIds[data.batchId])
+        data.targets.forEach(([k, v]) => (embeddings[k] = v))
+        delete batchIds[data.batchId]
 
-      if (embeddingsStore) {
-        setMany(data.targets, embeddingsStore)
+        if (embeddingsStore) {
+          setMany(data.targets, embeddingsStore)
+        }
       }
     }
-  }
 
-  const batchId = workerBatch++
-  const targets = pairs.filter(([id]) => !embeddings[id])
-  const ids = pairs.map(([id]) => id)
+    const batchId = workerBatch++
+    const targets = pairs.filter(([id]) => !embeddings[id])
+    const ids = pairs.map(([id]) => id)
 
-  if (!targets.length) {
-    app.ports.receiveEmbeddings.send(ids)
-    return
-  }
-
-  batchIds[batchId] = ids
-  embedWorker.postMessage({targets, batchId})
-})
-
-app.ports.requestBookEmbeddings.subscribe(sets => {
-  if (!bookEmbedWorker) {
-    bookEmbedWorker = new BookEmbedWorker()
-    bookEmbedWorker.onmessage = ({data}) => {
-      bookEmbeddings = Object.fromEntries(data.embeddingPairs)
-      app.ports.receiveBookEmbeddings.send(null)
+    if (!targets.length) {
+      app.ports.receiveEmbeddings.send(ids)
+      return
     }
-  }
 
-  bookEmbedWorker.postMessage({sets, embeddings})
-})
-
-app.ports.deleteEmbedding.subscribe(id => {
-  delete embeddings[id]
-  if (embeddingsStore) {
-    del(id, embeddingsStore)
-  }
-})
-
-app.ports.requestNeighbors.subscribe(([targetId, ignoreSameTitle]) => {
-  if (!embeddings[targetId]) {
-    console.warn(`no embeddings yet for ${targetId}`)
-    return
-  }
-
-  if (!neighborWorker) {
-    neighborWorker = new NeighborWorker()
-    neighborWorker.onmessage = ({data}) =>
-      app.ports.receiveNeighbors.send([data.id, data.neighbors])
-  }
-
-  neighborWorker.postMessage({
-    targetId,
-    titleMap,
-    ignoreSameTitle,
-    embeddingMap: embeddings
+    batchIds[batchId] = ids
+    embedWorker.postMessage({targets, batchId})
   })
-})
 
-app.ports.requestBookNeighbors.subscribe(targetId => {
-  if (!bookNeighborWorker) {
-    bookNeighborWorker = new NeighborWorker()
-    bookNeighborWorker.onmessage = ({data}) =>
-      app.ports.receiveBookNeighbors.send([data.id, data.neighbors])
-  }
+  app.ports.requestBookEmbeddings.subscribe(sets => {
+    if (!bookEmbedWorker) {
+      bookEmbedWorker = new BookEmbedWorker()
+      bookEmbedWorker.onmessage = ({data}) => {
+        bookEmbeddings = Object.fromEntries(data.embeddingPairs)
+        app.ports.receiveBookEmbeddings.send(null)
+      }
+    }
 
-  bookNeighborWorker.postMessage({targetId, embeddingMap: bookEmbeddings})
-})
-
-app.ports.requestSemanticSearch.subscribe(([query, threshold]) => {
-  if (!semanticSearchWorker) {
-    semanticSearchWorker = new SemanticSearchWorker()
-    semanticSearchWorker.onmessage = ({data}) =>
-      app.ports.receiveSemanticSearch.send([data.query, data.matches])
-  }
-
-  semanticSearchWorker.postMessage({
-    query,
-    threshold,
-    embeddingMap: embeddings
+    bookEmbedWorker.postMessage({sets, embeddings})
   })
-})
 
-app.ports.scrollToTop.subscribe(() =>
-  window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
-)
+  app.ports.deleteEmbedding.subscribe(id => {
+    delete embeddings[id]
+    if (embeddingsStore) {
+      del(id, embeddingsStore)
+    }
+  })
 
-app.ports.requestUnicodeNormalized.subscribe(str =>
-  app.ports.receiveUnicodeNormalized.send(str.normalize('NFKD'))
-)
+  app.ports.requestNeighbors.subscribe(([targetId, ignoreSameTitle]) => {
+    if (!embeddings[targetId]) {
+      console.warn(`no embeddings yet for ${targetId}`)
+      return
+    }
 
-if (restored && !restoreFailure) {
-  handleNewEntries(restored)
-}
+    if (!neighborWorker) {
+      neighborWorker = new NeighborWorker()
+      neighborWorker.onmessage = ({data}) =>
+        app.ports.receiveNeighbors.send([data.id, data.neighbors])
+    }
+
+    neighborWorker.postMessage({
+      targetId,
+      titleMap,
+      ignoreSameTitle,
+      embeddingMap: embeddings
+    })
+  })
+
+  app.ports.requestBookNeighbors.subscribe(targetId => {
+    if (!bookNeighborWorker) {
+      bookNeighborWorker = new NeighborWorker()
+      bookNeighborWorker.onmessage = ({data}) =>
+        app.ports.receiveBookNeighbors.send([data.id, data.neighbors])
+    }
+
+    bookNeighborWorker.postMessage({targetId, embeddingMap: bookEmbeddings})
+  })
+
+  app.ports.requestSemanticSearch.subscribe(([query, threshold]) => {
+    if (!semanticSearchWorker) {
+      semanticSearchWorker = new SemanticSearchWorker()
+      semanticSearchWorker.onmessage = ({data}) =>
+        app.ports.receiveSemanticSearch.send([data.query, data.matches])
+    }
+
+    semanticSearchWorker.postMessage({
+      query,
+      threshold,
+      embeddingMap: embeddings
+    })
+  })
+
+  app.ports.scrollToTop.subscribe(() =>
+    window.scrollTo({top: 0, left: 0, behavior: 'smooth'})
+  )
+
+  app.ports.requestUnicodeNormalized.subscribe(str =>
+    app.ports.receiveUnicodeNormalized.send(str.normalize('NFKD'))
+  )
+
+  if (restored && !restoreFailure) {
+    handleNewEntries(restored)
+  }
+})()
