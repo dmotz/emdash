@@ -107,7 +107,7 @@ view model =
                                 ]
                             , button
                                 [ onClick ScrollToTop ]
-                                [ text "↟"
+                                [ span [] [ text "↟" ]
                                 , div
                                     [ class "hint left" ]
                                     [ text "Scroll to top" ]
