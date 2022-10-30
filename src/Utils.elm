@@ -337,6 +337,9 @@ sortBooks sort reverseSort =
 
         NumSort ->
             sortBy .count
+
+        RatingSort ->
+            sortBy .rating
     )
         >> (if reverseSort then
                 reverse
