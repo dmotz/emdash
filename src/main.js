@@ -63,7 +63,7 @@ let neighborWorker
 let bookNeighborWorker
 let semanticSearchWorker
 
-;(async () => {
+!(async () => {
   console.log(`Marginalia v${version}`)
 
   await new Promise(res => {

@@ -12,3 +12,5 @@ self.addEventListener('message', ({data}) =>
     ])
   })
 )
+
+export default {}
