@@ -35,7 +35,6 @@ import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleToRoute)
 import String exposing (fromInt, toInt)
 import Utils exposing (excerptCountLabel, getEntryDomId, null)
-import Views.EmbeddingProgress exposing (embeddingProgress)
 import Views.TagSection exposing (tagSection)
 
 
