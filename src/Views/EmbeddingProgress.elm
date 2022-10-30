@@ -1,4 +1,4 @@
-module Views.EmbeddingProgress exposing (..)
+module Views.EmbeddingProgress exposing (embeddingProgress)
 
 import Html exposing (Html, div, p, progress, text)
 import Html.Attributes exposing (class, value)

@@ -41,6 +41,7 @@ import Model
         )
 import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
+import Set
 import String exposing (join)
 import Utils
     exposing
@@ -52,6 +53,7 @@ import Utils
         )
 import Views.BookInfo exposing (bookInfo)
 import Views.BookList exposing (bookList)
+import Views.EmbeddingProgress exposing (embeddingProgress)
 import Views.Entry exposing (entryView)
 import Views.EntryList exposing (entryList)
 import Views.Landing exposing (landingView)
@@ -103,10 +105,40 @@ view model =
                                     [ class "hint left" ]
                                     [ text "Discover a random excerpt" ]
                                 ]
+                            , button
+                                [ onClick ScrollToTop ]
+                                [ text "↟"
+                                , div
+                                    [ class "hint left" ]
+                                    [ text "Scroll to top" ]
+                                ]
                             ]
                         , main_
                             []
-                            [ case model.page of
+                            [ let
+                                completedCount =
+                                    Set.size model.completedEmbeddings
+
+                                totalCount =
+                                    size model.entries
+
+                                progressView =
+                                    if
+                                        model.embeddingsReady
+                                            || completedCount
+                                            == 0
+                                            || completedCount
+                                            == totalCount
+                                    then
+                                        Nothing
+
+                                    else
+                                        Just <|
+                                            embeddingProgress
+                                                completedCount
+                                                totalCount
+                              in
+                              case model.page of
                                 MainPage books mTag ->
                                     div
                                         [ class "fullWidth" ]
@@ -151,6 +183,7 @@ view model =
                                             model.pendingTag
                                             model.bookNeighborMap
                                             (get book.id model.bookIdToLastRead)
+                                            progressView
                                         , entryList
                                             entries
                                             model.entries
@@ -161,6 +194,7 @@ view model =
                                             (get book.id model.bookIdToLastRead
                                                 |> withDefault ""
                                             )
+                                            progressView
                                         ]
 
                                 AuthorPage author books ->
@@ -213,6 +247,7 @@ view model =
                                                 -1
                                                 True
                                                 False
+                                                progressView
                                                 entry
                                             ]
                                         ]
