@@ -152,23 +152,23 @@ input[type='range']
   border: none
   margin-right: 1rem
 
-input[type='range']:focus
-  outline: none
-  border: 0
+  &:focus
+    outline: none
+    border: 0
 
-input[type='range']::-webkit-slider-thumb
-  appearance: none
-  width: 1.4rem
-  aspect-ratio: 1
-  border-radius: 100%
-  background: $black
-  border: 1px solid $white
-  transform: translateY(-50%)
+  &::-webkit-slider-thumb
+    appearance: none
+    width: 1.4rem
+    aspect-ratio: 1
+    border-radius: 100%
+    background: $black
+    border: 1px solid $white
+    transform: translateY(-50%)
 
-input[type='range']::-webkit-slider-runnable-track
-  width: 100%
-  height: 1px
-  background: $lightGray
+  &::-webkit-slider-runnable-track
+    width: 100%
+    height: 1px
+    background: $lightGray
 
 .title
   font-style: italic
