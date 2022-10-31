@@ -1,7 +1,7 @@
 port module Main exposing (main)
 
 import Browser exposing (application)
-import Browser.Dom exposing (setViewport)
+import Browser.Dom exposing (getElement, setViewport)
 import Browser.Events exposing (onKeyDown)
 import Browser.Navigation as Nav
 import Debounce
@@ -52,7 +52,7 @@ import Router
         )
 import Set exposing (diff, toList, union)
 import String exposing (fromInt, toLower, trim)
-import Task exposing (perform)
+import Task exposing (attempt, perform)
 import Update.Extra as Update exposing (addCmd)
 import Url exposing (Url)
 import Url.Parser exposing (parse)
@@ -791,7 +791,7 @@ update message model =
                     , none
                     )
 
-                Just (TitleRoute slug) ->
+                Just (TitleRoute slug mFragment) ->
                     case
                         get slug model.titleRouteMap
                             |> andThen (\id -> get id model.books)
@@ -811,16 +811,23 @@ update message model =
                                         )
                               }
                             , batch
-                                [ case parse routeParser model.url of
-                                    Just (TitleRoute lastSlug) ->
-                                        if lastSlug == slug then
-                                            none
-
-                                        else
-                                            scrollTop
+                                [ case mFragment of
+                                    Just entryId ->
+                                        attempt
+                                            ScrollToElement
+                                            (getElement entryId)
 
                                     _ ->
-                                        scrollTop
+                                        case parse routeParser model.url of
+                                            Just (TitleRoute lastSlug _) ->
+                                                if lastSlug == slug then
+                                                    none
+
+                                                else
+                                                    scrollTop
+
+                                            _ ->
+                                                scrollTop
                                 , if model.embeddingsReady then
                                     requestBookNeighbors book.id
 
