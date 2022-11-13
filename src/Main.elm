@@ -133,7 +133,7 @@ appName =
 
 maxSearchResults : Int
 maxSearchResults =
-    20
+    100
 
 
 debounceConfig : Debounce.Config Msg
