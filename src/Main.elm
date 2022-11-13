@@ -788,7 +788,7 @@ update message model =
                                 MainPage (values model.books) Nothing
                         , searchQuery = ""
                       }
-                    , none
+                    , scrollTop
                     )
 
                 Just (TitleRoute slug mFragment) ->
