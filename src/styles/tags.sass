@@ -7,7 +7,7 @@
 
   &:hover
     a
-      color: $black
+      color: $fg
 
     .tagDelete
       display: block
@@ -15,7 +15,7 @@
   &:after
     content: '•'
     margin-left: 1rem
-    color: #ccc
+    color: $mid2
 
   &:last-child::after
     content: ''
@@ -30,8 +30,8 @@
 
   &.active
     a
-      color: $black
-      text-decoration-color: $highlight
+      color: $fg
+      text-decoration-color: $accent
 
   &.special
     a
@@ -45,15 +45,15 @@
   position: absolute
   top: 0
   right: -2px
-  color: $lightGray
+  color: $mid2
   transition: color .2s
 
   &:hover
-    color: $black
+    color: $fg
 
     + a
-      color: $lightGray
-      text-decoration: line-through 2px $black
+      color: $mid2
+      text-decoration: line-through 2px $fg
 
 .tagHeader
   display: flex
@@ -70,7 +70,7 @@
     width: 60rem
     max-width: 100%
     border: none
-    border-bottom: 1px solid $gray
+    border-bottom: 1px solid $mid3
 
   .modeHeading
     margin-top: 1.5rem
@@ -88,11 +88,11 @@
     margin: 0 1rem
 
     &:hover
-      color: $black
+      color: $fg
 
     &.active
-      color: $black
-      border-bottom: 2px solid $black
+      color: $fg
+      border-bottom: 2px solid $fg
 
 .tagInput
   margin-top: 0rem
@@ -103,7 +103,7 @@
     visibility: hidden
 
   input
-    border-color: $lightGray
+    border-color: $mid2
     &:focus + button
       visibility: visible
 

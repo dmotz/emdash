@@ -96,13 +96,13 @@ blockquote
 .detailsToggle
   position: absolute
   transform: translateX(-100%)
-  color: $lightGray
+  color: $mid2
   padding: 2rem 2rem 0 0
   opacity: 0
 
   &.active
     > span
-      color: $black
+      color: $fg
       transform: rotate(90deg)
 
   > span
@@ -136,7 +136,7 @@ blockquote
     .clone
       display: block
       z-index: 1
-      outline: 1px solid #ddd
+      outline: 1px solid $mid1
       box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1)
 
   blockquote
@@ -160,7 +160,7 @@ blockquote
     width: calc(100% + #{$pad} * 2)
     top: -$pad
     left: -$pad
-    background: $white
+    background: $bg
     display: none
     padding: $pad
 
@@ -174,7 +174,7 @@ cite
 
   .divider
     margin: 0 .4em
-    color: $lightGray
+    color: $mid2
 
   .score
     margin-left: auto
@@ -199,12 +199,12 @@ cite
 
       &::-webkit-meter-optimum-value
         border-radius: 0
-        background: $black
+        background: $fg
         border-radius: 2px
 
 .notes
   textarea
-    border-color: $lightGray
+    border-color: $mid2
 
     &:focus
-      border-color: $black
+      border-color: $fg
