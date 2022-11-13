@@ -218,8 +218,11 @@ init maybeModel url key =
         restored =
             withDefault initialStoredModel maybeModel
 
+        ( titleRouteMap, booksWithSlugs ) =
+            Parser.getTitleRouteMap restored.books
+
         books =
-            Dict.fromList (map (juxt .id identity) restored.books)
+            Dict.fromList (map (juxt .id identity) booksWithSlugs)
 
         tags =
             restored.books |> map .tags |> concat |> dedupe
@@ -238,7 +241,7 @@ init maybeModel url key =
             , tagCounts = getTagCounts books
             , tagSort = TagAlphaSort
             , showTagHeader = length tags > 0
-            , titleRouteMap = Parser.getTitleRouteMap restored.books
+            , titleRouteMap = titleRouteMap
             , authorRouteMap = Parser.getAuthorRouteMap restored.books
             , pendingTag = Nothing
             , isDragging = False
@@ -302,7 +305,7 @@ update message model =
                 unseenEntries =
                     Dict.diff newEntries model.entries |> Dict.filter hiddenPred
 
-                allBooks =
+                bookVals =
                     unseenEntries
                         |> Dict.foldl
                             (\_ entry acc ->
@@ -322,9 +325,10 @@ update message model =
                                     acc
                             )
                             (Dict.union model.books newBooks)
+                        |> values
 
-                bookVals =
-                    values allBooks
+                ( titleRouteMap, booksWithSlugs ) =
+                    Parser.getTitleRouteMap bookVals
             in
             if Dict.isEmpty newEntries then
                 ( { model | parsingError = True }, none )
@@ -335,9 +339,10 @@ update message model =
                     , entries =
                         Dict.union model.entries newEntries
                             |> Dict.filter hiddenPred
-                    , books = allBooks
-                    , titleRouteMap =
-                        Parser.getTitleRouteMap bookVals
+                    , books =
+                        Dict.fromList
+                            (map (juxt .id identity) booksWithSlugs)
+                    , titleRouteMap = titleRouteMap
                     , authorRouteMap =
                         Parser.getAuthorRouteMap bookVals
                     , embeddingsReady = False

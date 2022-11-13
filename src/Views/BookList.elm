@@ -6,7 +6,7 @@ import Html.Keyed as Keyed
 import List exposing (map)
 import Model exposing (Book, BookSort(..))
 import Msg exposing (Msg)
-import Router exposing (titleToRoute)
+import Router exposing (titleSlugToRoute)
 import String exposing (fromInt)
 import Utils exposing (null, ratingStr, sortBooks)
 
@@ -34,7 +34,7 @@ bookView tag book showRating =
     tag
         [ class "book" ]
         [ a
-            [ href <| titleToRoute book.title ]
+            [ href <| titleSlugToRoute book.slug ]
             [ div [ class "title" ] [ text book.title ]
             , div [ class "author" ] [ text book.author ]
             , div [ class "count" ] [ text <| fromInt book.count ]

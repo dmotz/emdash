@@ -7,7 +7,7 @@ module Router exposing
     , searchToRoute
     , slugify
     , tagToRoute
-    , titleToRoute
+    , titleSlugToRoute
     )
 
 import Dict exposing (get)
@@ -63,8 +63,8 @@ entryToRoute books entry =
             ""
 
 
-titleToRoute : Title -> String
-titleToRoute title =
+titleSlugToRoute : Title -> String
+titleSlugToRoute title =
     absolute [ "title", slugify title ] []
 
 

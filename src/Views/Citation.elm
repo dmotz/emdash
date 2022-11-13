@@ -6,7 +6,7 @@ import Html.Events exposing (stopPropagationOn)
 import Json.Decode exposing (succeed)
 import Model exposing (Book, Entry)
 import Msg exposing (Msg(..))
-import Router exposing (authorToRoute, titleToRoute)
+import Router exposing (authorToRoute, titleSlugToRoute)
 import String exposing (fromFloat, fromInt)
 import Utils exposing (getEntryDomId)
 
@@ -15,7 +15,7 @@ citation : Entry -> Book -> Maybe Float -> Html Msg
 citation entry book mScore =
     cite []
         ([ a
-            [ class "title", href <| titleToRoute book.title, stopLinkProp ]
+            [ class "title", href <| titleSlugToRoute book.slug, stopLinkProp ]
             [ text book.title ]
          , span [ class "divider" ] [ text " • " ]
          , a
@@ -26,7 +26,7 @@ citation entry book mScore =
                     [ span [ class "divider" ] [ text " • " ]
                     , a
                         [ href <|
-                            titleToRoute book.title
+                            titleSlugToRoute book.slug
                                 ++ "#"
                                 ++ getEntryDomId entry.id
                         , stopLinkProp

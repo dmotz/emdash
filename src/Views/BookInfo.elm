@@ -32,7 +32,7 @@ import List exposing (map, repeat)
 import Maybe exposing (withDefault)
 import Model exposing (Book, BookMap, Id, NeighborMap, Tag)
 import Msg exposing (Msg(..))
-import Router exposing (authorToRoute, titleToRoute)
+import Router exposing (authorToRoute, titleSlugToRoute)
 import String exposing (fromInt, toInt)
 import Utils exposing (excerptCountLabel, getEntryDomId, null, ratingStr)
 import Views.TagSection exposing (tagSection)
@@ -80,8 +80,8 @@ bookInfo book books tags pendingTag bookNeighborMap mLastRead progressView =
                                                         [ a
                                                             [ class "title"
                                                             , href <|
-                                                                titleToRoute
-                                                                    neighbor.title
+                                                                titleSlugToRoute
+                                                                    neighbor.slug
                                                             ]
                                                             [ text neighbor.title ]
                                                         ]

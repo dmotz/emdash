@@ -4,8 +4,8 @@ import Base64 exposing (fromBytes)
 import Bytes.Encode exposing (encode, sequence, unsignedInt8)
 import Char exposing (isDigit)
 import DateTime exposing (fromRawParts, toPosix)
-import Dict exposing (Dict, insert, update)
-import List exposing (all, foldr, head, map)
+import Dict exposing (Dict, get, insert, update)
+import List exposing (all, foldr, head, map, reverse, sortBy)
 import MD5 exposing (bytes)
 import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Book, BookMap, Entry, EntryMap, Id)
@@ -318,6 +318,7 @@ makeDicts =
                                                     0
                                                     date
                                                     []
+                                                    ""
                                 )
                                 books
                             )
@@ -331,9 +332,26 @@ makeDicts =
         ( Dict.empty, Dict.empty )
 
 
-getTitleRouteMap : List Book -> Dict String Id
+getTitleRouteMap : List Book -> ( Dict String Id, List Book )
 getTitleRouteMap =
-    map (juxt (.title >> slugify) .id) >> Dict.fromList
+    sortBy .sortIndex
+        >> reverse
+        >> foldr
+            (\book ( slugToId, newBooks ) ->
+                let
+                    slug =
+                        case get (slugify book.title) slugToId of
+                            Just _ ->
+                                slugify (book.title ++ " by " ++ book.author)
+
+                            _ ->
+                                slugify book.title
+                in
+                ( insert slug book.id slugToId
+                , { book | slug = slug } :: newBooks
+                )
+            )
+            ( Dict.empty, [] )
 
 
 getAuthorRouteMap : List Book -> Dict String Author
