@@ -4,7 +4,7 @@ import Dict exposing (get)
 import Html exposing (Html, div, h2, p, text, ul)
 import Html.Attributes exposing (class)
 import Html.Lazy exposing (lazy4)
-import List exposing (filterMap, isEmpty, map)
+import List exposing (filterMap, isEmpty, length, map)
 import Maybe exposing (andThen)
 import Model exposing (Book, BookMap, BookSort(..), Entry, EntryMap, Id)
 import Msg exposing (Msg)
@@ -39,7 +39,14 @@ searchResults bookMap entryMap books entries semanticMatches semanticReady query
             , div
                 [ class "snippets" ]
                 ((if not (isEmpty entries) then
-                    [ h2 [] [ text "Text matches" ]
+                    [ h2
+                        []
+                        [ text <|
+                            "Text matches "
+                                ++ "("
+                                ++ (entries |> length |> String.fromInt)
+                                ++ ")"
+                        ]
                     , ul
                         []
                         (map
