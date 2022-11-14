@@ -351,6 +351,7 @@ update message model =
                 , none
                 )
                     |> Update.andThen update (SortBooks model.bookSort)
+                    |> Update.andThen update (UrlChanged model.url)
                     |> addCmd (model |> modelToStoredModel |> handleNewEntries)
                     |> store
 
