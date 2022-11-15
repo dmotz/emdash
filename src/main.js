@@ -87,20 +87,21 @@ let semanticSearchWorker
   }
 
   try {
-    app = Elm.Main.init({flags: restored || null})
+    app = Elm.Main.init({flags: [restored || null, false]})
   } catch (e) {
     console.warn('malformed restored state', restored)
-    app = Elm.Main.init({flags: null})
+    app = Elm.Main.init({flags: [null, false]})
     restoreFailure = true
   }
 
   app.ports.handleNewEntries.subscribe(handleNewEntries)
 
-  app.ports.importJson.subscribe(text => {
+  app.ports.importJson.subscribe(([text, demoMode]) => {
     try {
-      app = Elm.Main.init({flags: JSON.parse(text)})
+      app = Elm.Main.init({flags: [JSON.parse(text), demoMode]})
     } catch (e) {
-      alert('failed to parse restored JSON:', e)
+      console.error(e, text)
+      alert('failed to parse restored JSON:')
     }
   })
 
