@@ -1,4 +1,4 @@
-module Decoder exposing (..)
+module Decoder exposing (decodeStoredModel)
 
 import Json.Decode
     exposing
