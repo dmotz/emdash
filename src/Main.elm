@@ -181,6 +181,9 @@ main =
                                 SettingsPage ->
                                     "Settings"
 
+                                ImportPage ->
+                                    "Import"
+
                                 NotFoundPage _ ->
                                     "404"
 
@@ -949,6 +952,9 @@ update message model =
 
                 Just SettingsRoute ->
                     ( { model_ | page = SettingsPage }, scrollTop )
+
+                Just ImportRoute ->
+                    ( { model_ | page = ImportPage }, scrollTop )
 
                 _ ->
                     ( { model_ | page = NotFoundPage "Route not found." }
