@@ -40,20 +40,57 @@ const handleNewEntries = async state => {
   app.ports.receiveEmbeddings.send(ids)
 }
 
-const initPorts = () => {
-  app.ports.handleNewEntries.subscribe(handleNewEntries)
+const dbNs = 'marginalia'
+const stateKey = 'state'
+const embeddingsKey = 'embeddings'
+const writeMs = 999
+const batchIds = {}
 
-  app.ports.importJson.subscribe(([text, demoMode]) => {
-    try {
-      const restored = JSON.parse(text)
-      app = Elm.Main.init({flags: [restored, demoMode]})
-      initPorts()
-      handleNewEntries(restored)
-    } catch (e) {
-      console.error(e, text)
-      alert('failed to parse restored JSON:')
-    }
-  })
+let embeddings = {}
+let bookEmbeddings = {}
+let titleMap = {}
+let workerBatch = 0
+let app
+let restored
+let stateStore
+let embeddingsStore
+let writeTimer
+let embedWorker
+let bookEmbedWorker
+let neighborWorker
+let bookNeighborWorker
+let semanticSearchWorker
+
+!(async () => {
+  console.log(`Marginalia v${version}`)
+
+  try {
+    await new Promise((res, rej) => {
+      const testNs = `${dbNs}:test`
+      const dbReq = indexedDB.open(testNs)
+      dbReq.onerror = rej
+
+      dbReq.onsuccess = () => {
+        res()
+        indexedDB.deleteDatabase(testNs)
+      }
+    })
+
+    stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
+    embeddingsStore = createStore(`${dbNs}:${embeddingsKey}`, embeddingsKey)
+    restored = await get(stateKey, stateStore)
+  } catch (e) {
+    console.warn('cannot open DB for writing')
+  }
+
+  try {
+    app = Elm.Main.init({flags: [restored, false]})
+  } catch (e) {
+    console.warn('malformed restored state:', restored)
+    app = Elm.Main.init({flags: [null, false]})
+  }
+
+  app.ports.handleNewEntries.subscribe(handleNewEntries)
 
   app.ports.exportJson.subscribe(state =>
     downloadFile(
@@ -178,65 +215,4 @@ const initPorts = () => {
   app.ports.requestUnicodeNormalized.subscribe(str =>
     app.ports.receiveUnicodeNormalized.send(str.normalize('NFKD'))
   )
-}
-
-const dbNs = 'marginalia'
-const stateKey = 'state'
-const embeddingsKey = 'embeddings'
-const writeMs = 999
-const batchIds = {}
-
-let embeddings = {}
-let bookEmbeddings = {}
-let titleMap = {}
-let workerBatch = 0
-let dbFailure = false
-let restoreFailure = false
-let restored
-let stateStore
-let embeddingsStore
-let app
-let writeTimer
-let embedWorker
-let bookEmbedWorker
-let neighborWorker
-let bookNeighborWorker
-let semanticSearchWorker
-
-!(async () => {
-  console.log(`Marginalia v${version}`)
-
-  await new Promise(res => {
-    const testNs = `${dbNs}:test`
-    const dbReq = indexedDB.open(testNs)
-    dbReq.onerror = () => {
-      dbFailure = true
-      console.warn('cannot open DB for writing')
-      res()
-    }
-    dbReq.onsuccess = () => {
-      res()
-      indexedDB.deleteDatabase(testNs)
-    }
-  })
-
-  if (!dbFailure) {
-    stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
-    embeddingsStore = createStore(`${dbNs}:${embeddingsKey}`, embeddingsKey)
-    restored = await get(stateKey, stateStore)
-  }
-
-  try {
-    app = Elm.Main.init({flags: [restored || null, false]})
-  } catch (e) {
-    console.warn('malformed restored state', restored)
-    app = Elm.Main.init({flags: [null, false]})
-    restoreFailure = true
-  }
-
-  initPorts()
-
-  if (restored && !restoreFailure) {
-    handleNewEntries(restored)
-  }
 })()
