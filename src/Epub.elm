@@ -129,7 +129,7 @@ generateTocNcx titles =
         <navMap>
           <navPoint id="toc" playOrder="0" class="chapter">
             <navLabel>
-              <text>Table Of Contents</text>
+              <text>Table of Contents</text>
             </navLabel>
             <content src="toc.xhtml"/>
           </navPoint>
