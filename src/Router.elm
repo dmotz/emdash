@@ -38,6 +38,7 @@ type Route
     | TagRoute Tag
     | SearchRoute (Maybe String)
     | SettingsRoute
+    | ImportRoute
 
 
 routeParser : Parser (Route -> a) a
@@ -50,6 +51,7 @@ routeParser =
         , map TagRoute (s "tag" </> string)
         , map SearchRoute (s "search" <?> Query.string "q")
         , map SettingsRoute (s "settings")
+        , map ImportRoute (s "import")
         ]
 
 
