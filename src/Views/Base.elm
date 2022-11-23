@@ -87,7 +87,14 @@ view model =
                             [ img
                                 [ src "/images/logo.svg", draggable "false" ]
                                 []
-                            , div [ class "hint" ] [ text "Back to the index" ]
+                            , case model.page of
+                                MainPage _ _ ->
+                                    null
+
+                                _ ->
+                                    div
+                                        [ class "hint" ]
+                                        [ text "Back to the index" ]
                             ]
                         , div
                             [ class "actions" ]
