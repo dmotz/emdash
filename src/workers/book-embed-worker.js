@@ -4,8 +4,7 @@ self.addEventListener('message', ({data}) =>
       bookId,
       ids.length
         ? ids
-            .map(id => data.embeddings[id])
-            .filter(x => x)
+            .flatMap(id => data.embeddings[id] || [])
             .reduce((a, c) => a.map((n, i) => n + c[i]))
             .map(n => n / data.sets[0][1][0].length)
         : []
