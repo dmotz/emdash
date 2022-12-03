@@ -75,7 +75,7 @@ const methods = {
       )
     }
 
-    cb({embeddedIds: Object.keys(excerptEmbMap)})
+    cb(Object.keys(excerptEmbMap))
   },
 
   computeExcerptEmbeddings: ({targets}, cb) => {
@@ -88,13 +88,13 @@ const methods = {
     )
 
     if (!needed.filter(([id]) => !embsInProgress[id]).length) {
-      return cb({embeddedIds: has})
+      return cb(has)
     }
 
     needed.forEach(([id]) => (embsInProgress[id] = true))
 
     computeEmbeddings(needed).then(embeddings => {
-      cb({embeddedIds: embeddings.map(([id]) => id).concat(has)})
+      cb(embeddings.map(([id]) => id).concat(has))
       embeddings.forEach(([id, v]) => {
         excerptEmbMap[id] = v
         delete embsInProgress[id]
@@ -117,24 +117,18 @@ const methods = {
         : []
     ])
 
-    cb({})
+    cb(null)
     embeddings.forEach(([k, v]) => (bookEmbMap[k] = v))
   },
 
   requestExcerptNeighbors: ({target}, cb) =>
-    cb({
-      target,
-      neighborIds: findNeighbors(target, excerptEmbMap, true)
-    }),
+    cb([target, findNeighbors(target, excerptEmbMap, true)]),
 
   requestBookNeighbors: ({target}, cb) =>
-    cb({
-      target,
-      neighborIds: findNeighbors(target, bookEmbMap)
-    }),
+    cb([target, findNeighbors(target, bookEmbMap)]),
 
   semanticSearch: ({query, threshold}, cb) =>
-    semanticSearch(query, threshold).then(matches => cb({query, matches})),
+    semanticSearch(query, threshold).then(matches => cb([query, matches])),
 
   deleteEmbedding: ({target}) => {
     delete excerptEmbMap[target]
@@ -149,7 +143,7 @@ self.onconnect = e => {
   const [port] = e.ports
 
   port.onmessage = ({data: {method, ...payload}}) =>
-    methods[method](payload, data => port.postMessage({method, ...data}))
+    methods[method](payload, data => port.postMessage({method, data}))
 }
 
 export default {}

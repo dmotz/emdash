@@ -12,6 +12,14 @@ const stateKey = 'state'
 const writeMs = 999
 const worker = new MarginaliaWorker()
 const stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
+const messageToPort = {
+  processNewExcerpts: 'receiveExcerptEmbeddings',
+  computeExcerptEmbeddings: 'receiveExcerptEmbeddings',
+  computeBookEmbeddings: 'receiveBookEmbeddings',
+  requestExcerptNeighbors: 'receiveExcerptNeighbors',
+  requestBookNeighbors: 'receiveBookNeighbors',
+  semanticSearch: 'receiveSemanticSearch'
+}
 
 const downloadFile = (name, data) => {
   const a = document.createElement('a')
@@ -102,23 +110,6 @@ let writeTimer
   )
 
   worker.port.start()
-  worker.port.onmessage = ({data: {method, ...payload}}) =>
-    ({
-      processNewExcerpts: ({embeddedIds}) =>
-        app.ports.receiveExcerptEmbeddings.send(embeddedIds),
-
-      computeExcerptEmbeddings: ({embeddedIds}) =>
-        app.ports.receiveExcerptEmbeddings.send(embeddedIds),
-
-      computeBookEmbeddings: () => app.ports.receiveBookEmbeddings.send(null),
-
-      requestExcerptNeighbors: ({target, neighborIds}) =>
-        app.ports.receiveExcerptNeighbors.send([target, neighborIds]),
-
-      requestBookNeighbors: ({target, neighborIds}) =>
-        app.ports.receiveBookNeighbors.send([target, neighborIds]),
-
-      semanticSearch: ({query, matches}) =>
-        app.ports.receiveSemanticSearch.send([query, matches])
-    }[method](payload))
+  worker.port.onmessage = ({data: {method, data}}) =>
+    app.ports[messageToPort[method]].send(data)
 })()
