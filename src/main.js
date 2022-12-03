@@ -1,7 +1,7 @@
 import {get, set, createStore} from 'idb-keyval'
-import JsZip from 'jszip'
 import {Elm} from './Main.elm'
 import MarginaliaWorker from './worker?sharedworker'
+import ZipWorker from './zip-worker?worker'
 import {version} from '../package.json'
 import './styles/main.sass'
 
@@ -33,6 +33,7 @@ const downloadFile = (name, data) => {
 
 let app
 let writeTimer
+let zipWorker
 
 !(async () => {
   const restored = await get(stateKey, stateStore)
@@ -66,15 +67,13 @@ let writeTimer
     }
   })
 
-  app.ports.createEpub.subscribe(async pairs => {
-    const zip = new JsZip()
-    zip.folder('META-INF')
-    zip.folder('OEBPS')
-    pairs.forEach(([path, text]) => zip.file(path, text.trim()))
-    downloadFile(
-      `marginalia_excerpts_${new Date().toLocaleDateString()}.epub`,
-      await zip.generateAsync({type: 'blob'})
-    )
+  app.ports.createEpub.subscribe(pairs => {
+    if (!zipWorker) {
+      zipWorker = new ZipWorker()
+      zipWorker.onmessage = ({data}) => downloadFile(...data)
+    }
+
+    zipWorker.postMessage(pairs)
   })
 
   app.ports.requestExcerptEmbeddings.subscribe(targets =>
