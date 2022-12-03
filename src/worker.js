@@ -1,8 +1,7 @@
 import '@tensorflow/tfjs'
 import {load} from '@tensorflow-models/universal-sentence-encoder'
-import {getMany, setMany, del, keys, createStore} from 'idb-keyval'
+import {createStore, del, entries, setMany} from 'idb-keyval'
 
-const {entries, fromEntries} = Object
 const dbNs = 'marginalia'
 const embKey = 'embeddings'
 const model = load()
@@ -38,7 +37,7 @@ const semanticSearch = async (query, threshold) => {
 
   setTimeout(() => tensor.dispose())
 
-  return entries(excerptEmbMap)
+  return Object.entries(excerptEmbMap)
     .map(([k, v]) => [k, similarity(embedding, v)])
     .filter(([, v]) => v >= threshold)
     .sort(([, a], [, b]) => b - a)
@@ -51,7 +50,7 @@ const findNeighbors = (targetId, embMap, ignoreSameTitle) => {
     ? k => titleMap[k] !== titleMap[targetId]
     : x => x
 
-  return entries(embMap)
+  return Object.entries(embMap)
     .flatMap(([k, v]) =>
       k === targetId || !predicate(k) ? [] : [[k, similarity(target, v)]]
     )
@@ -61,25 +60,22 @@ const findNeighbors = (targetId, embMap, ignoreSameTitle) => {
 
 const methods = {
   processNewExcerpts: async ({books, excerpts}, cb) => {
-    const bookIdToTitle = fromEntries(books.map(({id, title}) => [id, title]))
+    const bookIdToTitle = Object.fromEntries(
+      books.map(({id, title}) => [id, title])
+    )
 
-    let ids = []
-
-    if (embStore) {
-      ids = await keys(embStore)
-
-      const vals = await getMany(ids, embStore)
-      excerptEmbMap = fromEntries(ids.map((id, i) => [id, vals[i]]))
+    if (embStore && !Object.keys(excerptEmbMap).length) {
+      excerptEmbMap = Object.fromEntries(await entries(embStore))
     }
 
     titleMap = {
       ...titleMap,
-      ...fromEntries(
+      ...Object.fromEntries(
         excerpts.map(({id, bookId}) => [id, bookIdToTitle[bookId]])
       )
     }
 
-    cb({embeddedIds: ids})
+    cb({embeddedIds: Object.keys(excerptEmbMap)})
   },
 
   computeExcerptEmbeddings: ({targets}, cb) => {
@@ -149,11 +145,11 @@ const methods = {
   }
 }
 
-self.addEventListener('connect', e => {
+self.onconnect = e => {
   const [port] = e.ports
 
   port.onmessage = ({data: {method, ...payload}}) =>
     methods[method](payload, data => port.postMessage({method, ...data}))
-})
+}
 
 export default {}
