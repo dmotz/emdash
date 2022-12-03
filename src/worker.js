@@ -14,7 +14,7 @@ const embStore = createStore(`${dbNs}:${embKey}`, embKey)
 let excerptEmbMap = {}
 let titleMap = {}
 
-const dot = (a, b) => a.reduce((a, c, i) => a + c * b[i], 0)
+const dot = (a, b) => a.reduce((acc, c, i) => acc + c * b[i], 0)
 
 const similarity = (a, b) =>
   dot(a, b) / (Math.sqrt(dot(a, a)) * Math.sqrt(dot(b, b)))
