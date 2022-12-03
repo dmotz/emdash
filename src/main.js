@@ -5,13 +5,10 @@ import ZipWorker from './zip-worker?worker'
 import {version} from '../package.json'
 import './styles/main.sass'
 
-console.log(`Marginalia v${version} ⁓ habent sua fata libelli`)
-
 const dbNs = 'marginalia'
 const stateKey = 'state'
 const writeMs = 999
 const worker = new MarginaliaWorker()
-const stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
 const messageToPort = {
   processNewExcerpts: 'receiveExcerptEmbeddings',
   computeExcerptEmbeddings: 'receiveExcerptEmbeddings',
@@ -36,7 +33,28 @@ let writeTimer
 let zipWorker
 
 !(async () => {
-  const restored = await get(stateKey, stateStore)
+  console.log(`Marginalia v${version} ⁓ habent sua fata libelli`)
+
+  let restored = null
+  let stateStore
+
+  try {
+    await new Promise((res, rej) => {
+      const testNs = `${dbNs}:test`
+      const dbReq = indexedDB.open(testNs)
+      dbReq.onerror = rej
+
+      dbReq.onsuccess = () => {
+        res()
+        indexedDB.deleteDatabase(testNs)
+      }
+    })
+
+    stateStore = createStore(`${dbNs}:${stateKey}`, stateKey)
+    restored = await get(stateKey, stateStore)
+  } catch (e) {
+    console.warn('cannot open DB for writing')
+  }
 
   try {
     app = Elm.Main.init({flags: [restored, false]})
