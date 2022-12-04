@@ -135,5 +135,5 @@ bookInfo book books tags pendingTag bookNeighborMap mLastRead progressView =
                     [ text "↧ Jump to last read excerpt" ]
 
             _ ->
-                null
+                a [ href "#", class "hidden" ] [ text "↧" ]
         ]
