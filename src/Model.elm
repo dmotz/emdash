@@ -133,7 +133,6 @@ type alias Model =
     , reverseSort : Bool
     , inputFocused : Maybe InputFocus
     , parsingError : Bool
-    , schemaVersion : Int
     , url : Url
     , key : Nav.Key
     , bookSort : BookSort
@@ -149,7 +148,6 @@ type alias StoredModel =
     { entries : List Entry
     , books : List Book
     , hiddenEntries : List Id
-    , schemaVersion : Int
     , bookIdToLastRead : List ( Id, Id )
     }
 
@@ -159,6 +157,5 @@ initialStoredModel =
     { entries = []
     , books = []
     , hiddenEntries = []
-    , schemaVersion = 0
     , bookIdToLastRead = []
     }
