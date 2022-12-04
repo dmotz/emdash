@@ -8,7 +8,7 @@ import Dict exposing (Dict, get, insert, update)
 import List exposing (all, foldr, head, map, reverse, sortBy)
 import MD5 exposing (bytes)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Author, Book, BookMap, Entry, EntryMap, Id)
+import Model exposing (Author, Book, BookMap, EntryMap, Id)
 import Regex exposing (Match, Regex, replace)
 import Router exposing (slugify)
 import String exposing (lines, repeat, right, split, startsWith, toInt, trim)
@@ -288,14 +288,13 @@ makeDicts =
                             in
                             ( insert
                                 id
-                                (Entry
-                                    id
-                                    (replace footnoteRx footnoteReplacer text)
-                                    bookId
-                                    date
-                                    (withDefault -1 page)
-                                    notes
-                                )
+                                { id = id
+                                , text = replace footnoteRx footnoteReplacer text
+                                , bookId = bookId
+                                , date = date
+                                , page = withDefault -1 page
+                                , notes = notes
+                                }
                                 entries
                             , update bookId
                                 (\mBook ->
@@ -310,15 +309,15 @@ makeDicts =
                                                 }
 
                                             _ ->
-                                                Book
-                                                    bookId
-                                                    title
-                                                    author
-                                                    0
-                                                    0
-                                                    date
-                                                    []
-                                                    ""
+                                                { id = bookId
+                                                , title = title
+                                                , author = author
+                                                , count = 0
+                                                , rating = 0
+                                                , sortIndex = date
+                                                , tags = []
+                                                , slug = ""
+                                                }
                                 )
                                 books
                             )
