@@ -72,240 +72,240 @@ view model =
         , on "dragleave" (Decode.succeed DragLeave)
         , on "drop" dropDecoder
         ]
-        ((if model.isDragging then
-            div [ class "dragNotice" ] [ text "Drop your file here." ]
+        ((case model.page of
+            LandingPage ->
+                [ landingView ]
 
-          else
-            text ""
-         )
-            :: (case model.page of
-                    LandingPage ->
-                        [ landingView ]
-
-                    _ ->
-                        [ a
-                            [ class "logo", href "/" ]
-                            [ img
-                                [ src "/images/logo.svg", draggable "false" ]
-                                []
-                            , case model.page of
-                                MainPage _ _ ->
-                                    null
-
-                                _ ->
-                                    div
-                                        [ class "hint" ]
-                                        [ text "Back to the index" ]
-                            ]
-                        , div
-                            [ class "actions" ]
-                            [ a
-                                [ href "/settings" ]
-                                [ img [ src "/images/focus.svg" ] []
-                                , div [ class "hint left" ] [ text "Settings" ]
-                                ]
-                            , button
-                                [ class "random"
-                                , onClick ShowRandom
-                                ]
-                                [ img [ src "/images/random.svg" ] []
-                                , div
-                                    [ class "hint left" ]
-                                    [ text "Discover a random excerpt" ]
-                                ]
-                            , button
-                                [ onClick ScrollToTop ]
-                                [ span [] [ text "↟" ]
-                                , div
-                                    [ class "hint left" ]
-                                    [ text "Scroll to top" ]
-                                ]
-                            ]
-                        , if model.demoMode && model.page /= ImportPage then
-                            div
-                                [ class "demoNotice" ]
-                                [ span [] [ text "❧" ]
-                                , a
-                                    [ href "/import" ]
-                                    [ text "Ready to try Marginalia with your own collection?" ]
-                                ]
-
-                          else
+            _ ->
+                [ a
+                    [ class "logo", href "/" ]
+                    [ img
+                        [ src "/images/logo.svg", draggable "false" ]
+                        []
+                    , case model.page of
+                        MainPage _ _ ->
                             null
-                        , main_
-                            []
-                            [ let
-                                completedCount =
-                                    Set.size model.completedEmbeddings
 
-                                totalCount =
-                                    size model.entries
-
-                                progressView =
-                                    if
-                                        model.embeddingsReady
-                                            || completedCount
-                                            == 0
-                                            || completedCount
-                                            >= totalCount
-                                    then
-                                        Nothing
-
-                                    else
-                                        Just <|
-                                            embeddingProgress
-                                                completedCount
-                                                totalCount
-                              in
-                              case model.page of
-                                MainPage books mTag ->
-                                    div
-                                        [ class "fullWidth" ]
-                                        [ searchInput model.searchQuery
-                                        , tagHeader
-                                            (mTag /= Nothing || model.showTagHeader)
-                                            model.books
-                                            model.tagSort
-                                            model.tags
-                                            model.tagCounts
-                                            mTag
-                                        , bookSorter
-                                            model.bookSort
-                                            model.reverseSort
-                                        , bookList
-                                            books
-                                            model.bookSort
-                                            model.reverseSort
-                                        ]
-
-                                SearchPage query semanticReady books entries semanticMatches ->
-                                    div
-                                        [ class "searchPage fullWidth" ]
-                                        [ searchInput model.searchQuery
-                                        , searchResults
-                                            model.books
-                                            model.entries
-                                            books
-                                            entries
-                                            semanticMatches
-                                            semanticReady
-                                            query
-                                        ]
-
-                                TitlePage book entries ->
-                                    div
-                                        []
-                                        [ bookInfo
-                                            book
-                                            model.books
-                                            model.tags
-                                            model.pendingTag
-                                            model.bookNeighborMap
-                                            (get book.id model.bookIdToLastRead)
-                                            progressView
-                                        , entryList
-                                            entries
-                                            model.entries
-                                            model.books
-                                            model.neighborMap
-                                            model.idToShowDetails
-                                            model.idToActiveTab
-                                            (get book.id model.bookIdToLastRead
-                                                |> withDefault ""
-                                            )
-                                            progressView
-                                        ]
-
-                                AuthorPage author books ->
-                                    div []
-                                        [ div
-                                            [ class "authorInfo" ]
-                                            [ h1 [] [ text author ]
-                                            , h2
-                                                []
-                                                [ titleCountLabel
-                                                    (length books)
-                                                    ++ ", "
-                                                    ++ (books
-                                                            |> foldl
-                                                                (\{ count } acc ->
-                                                                    acc + count
-                                                                )
-                                                                0
-                                                            |> excerptCountLabel
-                                                       )
-                                                    |> text
-                                                ]
-                                            ]
-                                        , bookSorter
-                                            model.bookSort
-                                            model.reverseSort
-                                        , bookList
-                                            books
-                                            model.bookSort
-                                            model.reverseSort
-                                        ]
-
-                                EntryPage entry _ ->
-                                    div
-                                        []
-                                        [ ul
-                                            [ class "entries" ]
-                                            [ entryView
-                                                model.entries
-                                                model.books
-                                                (withDefault
-                                                    []
-                                                    (get
-                                                        entry.id
-                                                        model.neighborMap
-                                                    )
-                                                )
-                                                True
-                                                (withDefault
-                                                    Related
-                                                    (get
-                                                        entry.id
-                                                        model.idToActiveTab
-                                                    )
-                                                )
-                                                -1
-                                                True
-                                                False
-                                                progressView
-                                                entry
-                                            ]
-                                        ]
-
-                                NotFoundPage msg ->
-                                    div [ class "notFound" ]
-                                        [ h2 [] [ text "Alas!" ]
-                                        , h3 [] [ text msg ]
-                                        , a
-                                            [ href "/" ]
-                                            [ text "Return to the index." ]
-                                        ]
-
-                                SettingsPage ->
-                                    settingsView
-                                        (size model.entries)
-                                        (size model.books)
-                                        (size model.authorRouteMap)
-                                        (length model.tags)
-                                        model.semanticThreshold
-
-                                ImportPage ->
-                                    importView
-                                        (model.demoMode
-                                            || Dict.isEmpty model.entries
-                                        )
-
-                                _ ->
-                                    null
-                            , footer [] [ text "❦" ]
-                            ]
+                        _ ->
+                            div
+                                [ class "hint" ]
+                                [ text "Back to the index" ]
+                    ]
+                , div
+                    [ class "actions" ]
+                    [ a
+                        [ href "/settings" ]
+                        [ img [ src "/images/focus.svg" ] []
+                        , div [ class "hint left" ] [ text "Settings" ]
                         ]
-               )
+                    , button
+                        [ class "random"
+                        , onClick ShowRandom
+                        ]
+                        [ img [ src "/images/random.svg" ] []
+                        , div
+                            [ class "hint left" ]
+                            [ text "Discover a random excerpt" ]
+                        ]
+                    , button
+                        [ onClick ScrollToTop ]
+                        [ span [] [ text "↟" ]
+                        , div
+                            [ class "hint left" ]
+                            [ text "Scroll to top" ]
+                        ]
+                    ]
+                , if model.demoMode && model.page /= ImportPage then
+                    div
+                        [ class "demoNotice" ]
+                        [ span [] [ text "❧" ]
+                        , a
+                            [ href "/import" ]
+                            [ text "Ready to try Marginalia with your own collection?" ]
+                        ]
+
+                  else
+                    null
+                , main_
+                    []
+                    [ let
+                        completedCount =
+                            Set.size model.completedEmbeddings
+
+                        totalCount =
+                            size model.entries
+
+                        progressView =
+                            if
+                                model.embeddingsReady
+                                    || completedCount
+                                    == 0
+                                    || completedCount
+                                    >= totalCount
+                            then
+                                Nothing
+
+                            else
+                                Just <|
+                                    embeddingProgress
+                                        completedCount
+                                        totalCount
+                      in
+                      case model.page of
+                        MainPage books mTag ->
+                            div
+                                [ class "fullWidth" ]
+                                [ searchInput model.searchQuery
+                                , tagHeader
+                                    (mTag /= Nothing || model.showTagHeader)
+                                    model.books
+                                    model.tagSort
+                                    model.tags
+                                    model.tagCounts
+                                    mTag
+                                , bookSorter
+                                    model.bookSort
+                                    model.reverseSort
+                                , bookList
+                                    books
+                                    model.bookSort
+                                    model.reverseSort
+                                ]
+
+                        SearchPage query semanticReady books entries semanticMatches ->
+                            div
+                                [ class "searchPage fullWidth" ]
+                                [ searchInput model.searchQuery
+                                , searchResults
+                                    model.books
+                                    model.entries
+                                    books
+                                    entries
+                                    semanticMatches
+                                    semanticReady
+                                    query
+                                ]
+
+                        TitlePage book entries ->
+                            div
+                                []
+                                [ bookInfo
+                                    book
+                                    model.books
+                                    model.tags
+                                    model.pendingTag
+                                    model.bookNeighborMap
+                                    (get book.id model.bookIdToLastRead)
+                                    progressView
+                                , entryList
+                                    entries
+                                    model.entries
+                                    model.books
+                                    model.neighborMap
+                                    model.idToShowDetails
+                                    model.idToActiveTab
+                                    (get book.id model.bookIdToLastRead
+                                        |> withDefault ""
+                                    )
+                                    progressView
+                                ]
+
+                        AuthorPage author books ->
+                            div []
+                                [ div
+                                    [ class "authorInfo" ]
+                                    [ h1 [] [ text author ]
+                                    , h2
+                                        []
+                                        [ titleCountLabel
+                                            (length books)
+                                            ++ ", "
+                                            ++ (books
+                                                    |> foldl
+                                                        (\{ count } acc ->
+                                                            acc + count
+                                                        )
+                                                        0
+                                                    |> excerptCountLabel
+                                               )
+                                            |> text
+                                        ]
+                                    ]
+                                , bookSorter
+                                    model.bookSort
+                                    model.reverseSort
+                                , bookList
+                                    books
+                                    model.bookSort
+                                    model.reverseSort
+                                ]
+
+                        EntryPage entry _ ->
+                            div
+                                []
+                                [ ul
+                                    [ class "entries" ]
+                                    [ entryView
+                                        model.entries
+                                        model.books
+                                        (withDefault
+                                            []
+                                            (get
+                                                entry.id
+                                                model.neighborMap
+                                            )
+                                        )
+                                        True
+                                        (withDefault
+                                            Related
+                                            (get
+                                                entry.id
+                                                model.idToActiveTab
+                                            )
+                                        )
+                                        -1
+                                        True
+                                        False
+                                        progressView
+                                        entry
+                                    ]
+                                ]
+
+                        NotFoundPage msg ->
+                            div [ class "notFound" ]
+                                [ h2 [] [ text "Alas!" ]
+                                , h3 [] [ text msg ]
+                                , a
+                                    [ href "/" ]
+                                    [ text "Return to the index." ]
+                                ]
+
+                        SettingsPage ->
+                            settingsView
+                                (size model.entries)
+                                (size model.books)
+                                (size model.authorRouteMap)
+                                (length model.tags)
+                                model.semanticThreshold
+
+                        ImportPage ->
+                            importView
+                                (model.demoMode
+                                    || Dict.isEmpty model.entries
+                                )
+
+                        _ ->
+                            null
+                    , footer [] [ text "❦" ]
+                    ]
+                ]
+         )
+            ++ [ if model.isDragging then
+                    div [ class "dragNotice" ] [ text "Drop your file here." ]
+
+                 else
+                    text ""
+               ]
         )
 
 
