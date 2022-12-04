@@ -213,8 +213,8 @@ main =
         }
 
 
-init : Maybe StoredModel -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init maybeModel url key =
+init : ( Maybe StoredModel, Bool ) -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init ( maybeModel, demoMode ) url key =
     let
         restored =
             withDefault initialStoredModel maybeModel
@@ -230,6 +230,7 @@ init maybeModel url key =
 
         model_ =
             { page = MainPage (values books) Nothing
+            , demoMode = demoMode
             , entries = Dict.fromList (map (juxt .id identity) restored.entries)
             , books = books
             , semanticThreshold = 0.1
@@ -261,11 +262,16 @@ init maybeModel url key =
             }
     in
     update (UrlChanged url) model_
+        |> addCmd (model_ |> modelToStoredModel |> handleNewEntries)
 
 
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 store ( model, cmd ) =
-    ( model, batch [ cmd, model |> modelToStoredModel |> setStorage ] )
+    if model.demoMode then
+        ( model, cmd )
+
+    else
+        ( model, batch [ cmd, model |> modelToStoredModel |> setStorage ] )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

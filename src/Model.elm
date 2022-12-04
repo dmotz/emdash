@@ -112,6 +112,7 @@ type alias NeighborMap =
 
 type alias Model =
     { page : Page
+    , demoMode : Bool
     , entries : EntryMap
     , books : BookMap
     , semanticThreshold : Float
