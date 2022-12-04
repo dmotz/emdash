@@ -2,60 +2,55 @@ module Decoder exposing (decodeStoredModel)
 
 import Json.Decode
     exposing
-        ( Error
+        ( Decoder
+        , Error
+        , bool
         , decodeString
-        , field
         , index
         , int
         , list
         , map2
-        , map5
-        , map6
-        , map8
         , string
+        , succeed
         )
+import Json.Decode.Pipeline exposing (optional, required)
 import Model exposing (Book, Entry, StoredModel)
 import Tuple exposing (pair)
 
 
 decodeStoredModel : String -> Result Error StoredModel
 decodeStoredModel =
-    map5
-        StoredModel
-        (field
-            "entries"
-            (list
-                (map6
-                    Entry
-                    (field "id" string)
-                    (field "text" string)
-                    (field "bookId" string)
-                    (field "date" int)
-                    (field "page" int)
-                    (field "notes" string)
-                )
-            )
-        )
-        (field
-            "books"
-            (list
-                (map8
-                    Book
-                    (field "id" string)
-                    (field "title" string)
-                    (field "author" string)
-                    (field "count" int)
-                    (field "rating" int)
-                    (field "sortIndex" int)
-                    (field "tags" (list string))
-                    (field "slug" string)
-                )
-            )
-        )
-        (field "hiddenEntries" (list string))
-        (field "schemaVersion" int)
-        (field
+    succeed StoredModel
+        |> required "entries" (list entryDecoder)
+        |> required "books" (list bookDecoder)
+        |> optional "hiddenEntries" (list string) []
+        |> optional
             "bookIdToLastRead"
             (list (map2 pair (index 0 string) (index 1 string)))
-        )
+            []
         |> decodeString
+
+
+entryDecoder : Decoder Entry
+entryDecoder =
+    succeed Entry
+        |> required "id" string
+        |> required "text" string
+        |> required "bookId" string
+        |> optional "date" int 0
+        |> optional "page" int -1
+        |> optional "notes" string ""
+        |> optional "isFavorite" bool False
+
+
+bookDecoder : Decoder Book
+bookDecoder =
+    succeed Book
+        |> required "id" string
+        |> required "title" string
+        |> required "author" string
+        |> required "count" int
+        |> optional "rating" int 0
+        |> optional "sortIndex" int 0
+        |> optional "tags" (list string) []
+        |> required "slug" string
