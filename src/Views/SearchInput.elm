@@ -16,7 +16,7 @@ searchInput searchQuery =
             , onFocus <| SetInputFocus (Just SearchFocus)
             , onBlur <| SetInputFocus Nothing
             , spellcheck False
-            , placeholder "𐫱 search"
+            , placeholder "Search"
             , value searchQuery
             ]
             []
