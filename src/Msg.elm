@@ -33,7 +33,6 @@ type Msg
     | ScrollToElement (Result Error Element)
     | ExportJson
     | ImportJson
-    | JsonFileLoad String
     | ResetError
     | ExportEpub
     | RequestEmbeddings
