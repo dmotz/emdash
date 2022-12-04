@@ -120,6 +120,17 @@ view model =
                                     [ text "Scroll to top" ]
                                 ]
                             ]
+                        , if model.demoMode && model.page /= ImportPage then
+                            div
+                                [ class "demoNotice" ]
+                                [ span [] [ text "❧" ]
+                                , a
+                                    [ href "/import" ]
+                                    [ text "Ready to try Marginalia with your own collection?" ]
+                                ]
+
+                          else
+                            null
                         , main_
                             []
                             [ let
