@@ -135,7 +135,7 @@ view model =
                                             || completedCount
                                             == 0
                                             || completedCount
-                                            == totalCount
+                                            >= totalCount
                                     then
                                         Nothing
 
