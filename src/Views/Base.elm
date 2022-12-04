@@ -56,6 +56,7 @@ import Views.BookList exposing (bookList)
 import Views.EmbeddingProgress exposing (embeddingProgress)
 import Views.Entry exposing (entryView)
 import Views.EntryList exposing (entryList)
+import Views.Import exposing (importView)
 import Views.Landing exposing (landingView)
 import Views.SearchInput exposing (searchInput)
 import Views.SearchResults exposing (searchResults)
@@ -291,6 +292,13 @@ view model =
                                         (size model.books)
                                         (size model.authorRouteMap)
                                         (length model.tags)
+                                        model.semanticThreshold
+
+                                ImportPage ->
+                                    importView
+                                        (model.demoMode
+                                            || Dict.isEmpty model.entries
+                                        )
 
                                 _ ->
                                     null

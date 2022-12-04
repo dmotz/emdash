@@ -34,6 +34,7 @@ type Page
     | NotFoundPage String
     | SettingsPage
     | LandingPage
+    | ImportPage
 
 
 type InputFocus
