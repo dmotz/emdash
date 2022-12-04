@@ -1,14 +1,15 @@
 import {get, set, createStore} from 'idb-keyval'
 import {Elm} from './Main.elm'
-import MarginaliaWorker from './worker?sharedworker'
-import ZipWorker from './zip-worker?worker'
 import {version} from '../package.json'
 import './styles/main.sass'
 
 const dbNs = 'marginalia'
 const stateKey = 'state'
 const writeMs = 999
-const worker = new MarginaliaWorker()
+const worker = new SharedWorker(new URL('./worker.js', import.meta.url), {
+  name: 'marginalia',
+  type: 'module'
+})
 const messageToPort = {
   processNewExcerpts: 'receiveExcerptEmbeddings',
   computeExcerptEmbeddings: 'receiveExcerptEmbeddings',
@@ -87,7 +88,9 @@ let zipWorker
 
   app.ports.createEpub.subscribe(pairs => {
     if (!zipWorker) {
-      zipWorker = new ZipWorker()
+      zipWorker = new Worker(new URL('./zip-worker.js', import.meta.url), {
+        type: 'module'
+      })
       zipWorker.onmessage = ({data}) => downloadFile(...data)
     }
 
