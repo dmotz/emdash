@@ -96,7 +96,15 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                                 []
                             , div
                                 [ class "hint left" ]
-                                [ text "Mark as last read in this book" ]
+                                [ text <|
+                                    (if isMarked then
+                                        "Unmark"
+
+                                     else
+                                        "Mark"
+                                    )
+                                        ++ " as last read in this book"
+                                ]
                             ]
                     , if entry.page /= -1 then
                         div
