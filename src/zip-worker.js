@@ -15,5 +15,3 @@ self.onmessage = ({data}) => {
       ])
     )
 }
-
-export default {}

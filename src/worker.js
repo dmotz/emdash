@@ -145,5 +145,3 @@ self.onconnect = e => {
   port.onmessage = ({data: {method, ...payload}}) =>
     methods[method](payload, data => port.postMessage({method, data}))
 }
-
-export default {}
