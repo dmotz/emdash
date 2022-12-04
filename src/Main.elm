@@ -981,7 +981,16 @@ update message model =
             store
                 ( { model
                     | bookIdToLastRead =
-                        insert bookId entryId model.bookIdToLastRead
+                        case get bookId model.bookIdToLastRead of
+                            Just prevEntryId ->
+                                if prevEntryId == entryId then
+                                    remove bookId model.bookIdToLastRead
+
+                                else
+                                    insert bookId entryId model.bookIdToLastRead
+
+                            _ ->
+                                insert bookId entryId model.bookIdToLastRead
                   }
                 , none
                 )
