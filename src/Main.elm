@@ -776,6 +776,14 @@ update message model =
                 _ ->
                     noOp
 
+        SetSemanticThreshold s ->
+            case String.toFloat s of
+                Just n ->
+                    ( { model | semanticThreshold = n }, none )
+
+                _ ->
+                    noOp
+
         LinkClicked urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
