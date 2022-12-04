@@ -5,6 +5,7 @@ import Browser.Dom exposing (getElement, setViewport)
 import Browser.Events exposing (onKeyDown)
 import Browser.Navigation as Nav
 import Debounce
+import Decoder exposing (decodeStoredModel)
 import Dict exposing (get, insert, keys, remove, values)
 import Epub
 import File
@@ -81,9 +82,6 @@ port scrollToTop : () -> Cmd msg
 port exportJson : StoredModel -> Cmd msg
 
 
-port importJson : String -> Cmd msg
-
-
 port handleNewEntries : StoredModel -> Cmd msg
 
 
@@ -143,7 +141,7 @@ debounceConfig =
     }
 
 
-main : Program (Maybe StoredModel) Model Msg
+main : Program ( Maybe StoredModel, Bool ) Model Msg
 main =
     application
         { init = init
@@ -279,6 +277,17 @@ update message model =
     case message of
         NoOp ->
             noOp
+
+        ParseJsonText text ->
+            case decodeStoredModel text of
+                Ok storedModel ->
+                    init
+                        ( Just storedModel, model.demoMode )
+                        model.url
+                        model.key
+
+                _ ->
+                    noOp
 
         DragEnter ->
             ( { model | isDragging = True }, none )
@@ -590,11 +599,8 @@ update message model =
 
         ImportJson ->
             ( model
-            , Select.files [ "application/json" ] (GotFiles JsonFileLoad)
+            , Select.files [ "application/json" ] (GotFiles ParseJsonText)
             )
-
-        JsonFileLoad jsonText ->
-            ( model, importJson jsonText )
 
         KeyDown { key, control, meta } ->
             if control || meta then
