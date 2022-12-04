@@ -87,10 +87,10 @@ port importJson : String -> Cmd msg
 port handleNewEntries : StoredModel -> Cmd msg
 
 
-port requestEmbeddings : List ( Id, String ) -> Cmd msg
+port requestExcerptEmbeddings : List ( Id, String ) -> Cmd msg
 
 
-port receiveEmbeddings : (List Id -> msg) -> Sub msg
+port receiveExcerptEmbeddings : (List Id -> msg) -> Sub msg
 
 
 port requestBookEmbeddings : List ( Id, List Id ) -> Cmd msg
@@ -102,13 +102,13 @@ port receiveBookEmbeddings : (() -> msg) -> Sub msg
 port deleteEmbedding : Id -> Cmd msg
 
 
-port requestNeighbors : ( Id, Bool ) -> Cmd msg
+port requestExcerptNeighbors : ( Id, Bool ) -> Cmd msg
 
 
 port requestBookNeighbors : Id -> Cmd msg
 
 
-port receiveNeighbors : (( Id, List ( Id, Float ) ) -> msg) -> Sub msg
+port receiveExcerptNeighbors : (( Id, List ( Id, Float ) ) -> msg) -> Sub msg
 
 
 port receiveBookNeighbors : (( Id, List ( Id, Float ) ) -> msg) -> Sub msg
@@ -203,9 +203,9 @@ main =
                         (Decode.field "metaKey" Decode.bool)
                         |> Decode.map KeyDown
                         |> onKeyDown
-                    , receiveNeighbors ReceiveNeighbors
+                    , receiveExcerptNeighbors ReceiveNeighbors
                     , receiveBookNeighbors ReceiveBookNeighbors
-                    , receiveEmbeddings ReceiveEmbeddings
+                    , receiveExcerptEmbeddings ReceiveEmbeddings
                     , receiveBookEmbeddings ReceiveBookEmbeddings
                     , receiveUnicodeNormalized ReceiveUnicodeNormalized
                     , receiveSemanticSearch ReceiveSemanticSearch
@@ -656,7 +656,7 @@ update message model =
 
             else
                 ( { model | embeddingsReady = False }
-                , requestEmbeddings nextBatch
+                , requestExcerptEmbeddings nextBatch
                 )
 
         ReceiveEmbeddings ids ->
@@ -674,7 +674,7 @@ update message model =
                     requestBookNeighbors book.id
 
                 EntryPage entry _ ->
-                    requestNeighbors ( entry.id, True )
+                    requestExcerptNeighbors ( entry.id, True )
 
                 SearchPage query _ _ _ _ ->
                     requestSemanticSearch ( query, model.semanticThreshold )
@@ -867,7 +867,7 @@ update message model =
                             , batch
                                 [ scrollTop
                                 , if model.embeddingsReady then
-                                    requestNeighbors ( entry.id, True )
+                                    requestExcerptNeighbors ( entry.id, True )
 
                                   else
                                     none
@@ -996,7 +996,7 @@ update message model =
                     | idToShowDetails = insert id newState model.idToShowDetails
                   }
                 , if newState && get id model.neighborMap == Nothing then
-                    requestNeighbors ( id, True )
+                    requestExcerptNeighbors ( id, True )
 
                   else
                     none
