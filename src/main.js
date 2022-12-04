@@ -82,7 +82,10 @@ let zipWorker
   app.ports.setStorage.subscribe(state => {
     clearTimeout(writeTimer)
     if (stateStore) {
-      writeTimer = setTimeout(() => set(stateKey, state, stateStore), writeMs)
+      writeTimer = setTimeout(
+        () => set(stateKey, JSON.stringify(state), stateStore),
+        writeMs
+      )
     }
   })
 
