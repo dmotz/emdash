@@ -982,12 +982,7 @@ update message model =
                     )
 
         SortBooks sort ->
-            ( case sort of
-                TitleSort ->
-                    { model | bookSort = sort, reverseSort = False }
-
-                _ ->
-                    { model | bookSort = sort, reverseSort = True }
+            ( { model | bookSort = sort, reverseSort = sort /= TitleSort }
             , none
             )
 
