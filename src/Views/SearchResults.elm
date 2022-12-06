@@ -59,7 +59,14 @@ searchResults bookMap entryMap books entries semanticMatches semanticReady query
                     []
                  )
                     ++ (if not (isEmpty semanticMatches) then
-                            [ h2 [] [ text "Semantic matches" ]
+                            [ h2
+                                []
+                                [ text <|
+                                    "Semantic matches "
+                                        ++ "("
+                                        ++ (semanticMatches |> length |> String.fromInt)
+                                        ++ ")"
+                                ]
                             , ul
                                 []
                                 (map

@@ -269,7 +269,7 @@ init mStateString url key =
                     Ok storedModel ->
                         Just storedModel
 
-                    Err _ ->
+                    _ ->
                         Nothing
                 )
                 False
