@@ -141,7 +141,54 @@ debounceConfig =
     }
 
 
-main : Program ( Maybe StoredModel, Bool ) Model Msg
+createModel : Maybe StoredModel -> Bool -> Url -> Nav.Key -> Model
+createModel maybeStoredModel demoMode url key =
+    let
+        restored =
+            withDefault initialStoredModel maybeStoredModel
+
+        ( titleRouteMap, booksWithSlugs ) =
+            Parser.getTitleRouteMap restored.books
+
+        books =
+            Dict.fromList (map (juxt .id identity) booksWithSlugs)
+
+        tags =
+            restored.books |> map .tags |> concat |> dedupe
+    in
+    { page = MainPage (values books) Nothing
+    , demoMode = demoMode
+    , entries = Dict.fromList (map (juxt .id identity) restored.entries)
+    , books = books
+    , semanticThreshold = 0.1
+    , neighborMap = Dict.empty
+    , bookNeighborMap = Dict.empty
+    , hiddenEntries = Set.fromList restored.hiddenEntries
+    , completedEmbeddings = Set.empty
+    , embeddingsReady = False
+    , tags = restored.books |> map .tags |> concat |> dedupe
+    , tagCounts = getTagCounts books
+    , tagSort = TagAlphaSort
+    , showTagHeader = length tags > 0
+    , titleRouteMap = titleRouteMap
+    , authorRouteMap = Parser.getAuthorRouteMap restored.books
+    , pendingTag = Nothing
+    , isDragging = False
+    , reverseSort = True
+    , inputFocused = Nothing
+    , parsingError = False
+    , url = url
+    , key = key
+    , bookSort = RecencySort
+    , bookIdToLastRead = restored.bookIdToLastRead |> Dict.fromList
+    , idToShowDetails = Dict.empty
+    , idToActiveTab = Dict.empty
+    , searchQuery = ""
+    , searchDebounce = Debounce.init
+    }
+
+
+main : Program (Maybe String) Model Msg
 main =
     application
         { init = init
@@ -213,56 +260,24 @@ main =
         }
 
 
-init : ( Maybe StoredModel, Bool ) -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init ( maybeModel, demoMode ) url key =
+init : Maybe String -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init mStateString url key =
     let
-        restored =
-            withDefault initialStoredModel maybeModel
+        model =
+            createModel
+                (case decodeStoredModel (withDefault "" mStateString) of
+                    Ok storedModel ->
+                        Just storedModel
 
-        ( titleRouteMap, booksWithSlugs ) =
-            Parser.getTitleRouteMap restored.books
-
-        books =
-            Dict.fromList (map (juxt .id identity) booksWithSlugs)
-
-        tags =
-            restored.books |> map .tags |> concat |> dedupe
-
-        model_ =
-            { page = MainPage (values books) Nothing
-            , demoMode = demoMode
-            , entries = Dict.fromList (map (juxt .id identity) restored.entries)
-            , books = books
-            , semanticThreshold = 0.1
-            , neighborMap = Dict.empty
-            , bookNeighborMap = Dict.empty
-            , hiddenEntries = Set.fromList restored.hiddenEntries
-            , completedEmbeddings = Set.empty
-            , embeddingsReady = False
-            , tags = restored.books |> map .tags |> concat |> dedupe
-            , tagCounts = getTagCounts books
-            , tagSort = TagAlphaSort
-            , showTagHeader = length tags > 0
-            , titleRouteMap = titleRouteMap
-            , authorRouteMap = Parser.getAuthorRouteMap restored.books
-            , pendingTag = Nothing
-            , isDragging = False
-            , reverseSort = True
-            , inputFocused = Nothing
-            , parsingError = False
-            , schemaVersion = 0
-            , url = url
-            , key = key
-            , bookSort = RecencySort
-            , bookIdToLastRead = restored.bookIdToLastRead |> Dict.fromList
-            , idToShowDetails = Dict.empty
-            , idToActiveTab = Dict.empty
-            , searchQuery = ""
-            , searchDebounce = Debounce.init
-            }
+                    Err _ ->
+                        Nothing
+                )
+                False
+                url
+                key
     in
-    update (UrlChanged url) model_
-        |> addCmd (model_ |> modelToStoredModel |> handleNewEntries)
+    update (UrlChanged url) model
+        |> addCmd (model |> modelToStoredModel |> handleNewEntries)
 
 
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
@@ -284,13 +299,20 @@ update message model =
         NoOp ->
             noOp
 
+        RestoreState maybeModel demoMode ->
+            let
+                model_ =
+                    createModel maybeModel demoMode model.url model.key
+            in
+            update (UrlChanged model.url) model_
+                |> addCmd (model_ |> modelToStoredModel |> handleNewEntries)
+
         ParseJsonText text ->
             case decodeStoredModel text of
                 Ok storedModel ->
-                    init
-                        ( Just storedModel, model.demoMode )
-                        model.url
-                        model.key
+                    update
+                        (RestoreState (Just storedModel) model.demoMode)
+                        model
 
                 _ ->
                     noOp
