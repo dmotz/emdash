@@ -19,7 +19,7 @@ module Utils exposing
     , null
     , pluckIds
     , queryCharMin
-    , ratingStr
+    , ratingEl
     , removeItem
     , rx
     , rx_
@@ -30,10 +30,12 @@ module Utils exposing
     , untaggedKey
     , updateItem
     , updateItems
+    , version
     )
 
 import Dict exposing (Dict, empty, get, insert, update, values)
-import Html exposing (Html, text)
+import Html exposing (Html, div, span, text)
+import Html.Attributes exposing (class, classList)
 import List
     exposing
         ( concatMap
@@ -349,13 +351,29 @@ sortBooks sort reverseSort =
            )
 
 
-ratingStr : Book -> String
-ratingStr book =
-    if book.rating == 0 then
-        "—"
+ratingEl : Book -> Html msg
+ratingEl book =
+    let
+        baseInt =
+            truncate book.rating
+    in
+    div
+        [ classList [ ( "ratingNum", True ), ( "unrated", book.rating == 0 ) ] ]
+        (if book.rating == 0 then
+            [ text "—" ]
 
-    else
-        (book.rating |> toFloat |> (\n -> n / 2) |> String.fromFloat) ++ "/5"
+         else if ceiling book.rating > baseInt then
+            [ if baseInt == 0 then
+                null
+
+              else
+                book.rating |> truncate |> fromInt |> text
+            , span [ class "half" ] [ text "1/2" ]
+            ]
+
+         else
+            [ text (String.fromFloat book.rating) ]
+        )
 
 
 null : Html msg

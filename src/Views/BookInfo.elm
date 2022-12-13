@@ -33,8 +33,8 @@ import Maybe exposing (withDefault)
 import Model exposing (Book, BookMap, Id, NeighborMap, Tag)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
-import String exposing (fromInt, toInt)
-import Utils exposing (excerptCountLabel, getEntryDomId, null, ratingStr)
+import String exposing (fromInt)
+import Utils exposing (excerptCountLabel, getEntryDomId, null, ratingEl)
 import Views.TagSection exposing (tagSection)
 
 
@@ -109,17 +109,15 @@ bookInfo book books tags pendingTag bookNeighborMap mLastRead progressView =
                     [ h5 [] [ text "Rating" ]
                     , div
                         [ class "rating" ]
-                        [ p
-                            [ classList [ ( "unrated", book.rating == 0 ) ] ]
-                            [ text <| ratingStr book ]
+                        [ ratingEl book
                         , input
                             [ type_ "range"
                             , H.min "0"
-                            , H.max "10"
-                            , step "2"
-                            , value <| fromInt book.rating
+                            , H.max "5"
+                            , step "0.5"
+                            , value <| String.fromFloat book.rating
                             , onInput <|
-                                toInt
+                                String.toFloat
                                     >> withDefault 0
                                     >> SetRating book
                             ]

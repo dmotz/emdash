@@ -8,7 +8,7 @@ import Model exposing (Book, BookSort(..))
 import Msg exposing (Msg)
 import Router exposing (titleSlugToRoute)
 import String exposing (fromInt)
-import Utils exposing (null, ratingStr, sortBooks)
+import Utils exposing (null, ratingEl, sortBooks)
 
 
 bookList : List Book -> BookSort -> Bool -> Html Msg
@@ -39,7 +39,7 @@ bookView tag book showRating =
             , div [ class "author" ] [ text book.author ]
             , div [ class "count" ] [ text <| fromInt book.count ]
             , if showRating then
-                div [ class "rating" ] [ text <| ratingStr book ]
+                ratingEl book
 
               else
                 null
