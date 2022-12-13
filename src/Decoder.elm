@@ -6,6 +6,7 @@ import Json.Decode
         , Error
         , bool
         , decodeString
+        , float
         , index
         , int
         , list
@@ -50,7 +51,7 @@ bookDecoder =
         |> required "title" string
         |> required "author" string
         |> required "count" int
-        |> optional "rating" int 0
+        |> optional "rating" float 0
         |> optional "sortIndex" int 0
         |> optional "tags" (list string) []
         |> required "slug" string

@@ -23,10 +23,11 @@ type Msg
     | HideEntry Id
     | UpdateNotes Id String
     | SetLastRead Id Id
+    | ToggleFavorite Id
     | UpdatePendingTag Tag
     | AddTag
     | RemoveTag Tag
-    | SetRating Book Int
+    | SetRating Book Float
     | SetTagSort TagSort
     | Sort
     | ToggleTagHeader
