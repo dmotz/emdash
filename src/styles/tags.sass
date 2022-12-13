@@ -100,12 +100,9 @@
 
   button
     margin-left: 1rem
-    visibility: hidden
 
   input
     border-color: $mid2
-    &:focus + button
-      visibility: visible
 
-      &:disabled
-        visibility: hidden
+    &:placeholder-shown + button
+      visibility: hidden
