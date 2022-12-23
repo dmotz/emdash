@@ -21,7 +21,7 @@ entryList :
     -> Id
     -> Maybe (Html Msg)
     -> Html Msg
-entryList entries entryMap books neighbors idToShowDetails idToActiveTab lastReadId mProgress =
+entryList entries entryMap books neighbors idToShowDetails idToActiveTab bookmark mProgress =
     Keyed.ul
         [ class "entries" ]
         (indexedMap
@@ -35,7 +35,7 @@ entryList entries entryMap books neighbors idToShowDetails idToActiveTab lastRea
                     (withDefault Related (get entry.id idToActiveTab))
                     i
                     False
-                    (lastReadId == entry.id)
+                    (bookmark == entry.id)
                     mProgress
                     entry
                 )

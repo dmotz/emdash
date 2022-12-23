@@ -180,7 +180,7 @@ createModel maybeStoredModel demoMode url key =
     , url = url
     , key = key
     , bookSort = RecencySort
-    , bookIdToLastRead = restored.bookIdToLastRead |> Dict.fromList
+    , bookmarks = restored.bookmarks |> Dict.fromList
     , idToShowDetails = Dict.empty
     , idToActiveTab = Dict.empty
     , searchQuery = ""
@@ -1008,20 +1008,20 @@ update message model =
             , none
             )
 
-        SetLastRead bookId entryId ->
+        SetBookmark bookId entryId ->
             store
                 ( { model
-                    | bookIdToLastRead =
-                        case get bookId model.bookIdToLastRead of
+                    | bookmarks =
+                        case get bookId model.bookmarks of
                             Just prevEntryId ->
                                 if prevEntryId == entryId then
-                                    remove bookId model.bookIdToLastRead
+                                    remove bookId model.bookmarks
 
                                 else
-                                    insert bookId entryId model.bookIdToLastRead
+                                    insert bookId entryId model.bookmarks
 
                             _ ->
-                                insert bookId entryId model.bookIdToLastRead
+                                insert bookId entryId model.bookmarks
                   }
                 , none
                 )

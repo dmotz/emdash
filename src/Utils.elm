@@ -188,7 +188,7 @@ modelToStoredModel model =
     { entries = values model.entries
     , books = values model.books
     , hiddenEntries = Set.toList model.hiddenEntries
-    , bookIdToLastRead = Dict.toList model.bookIdToLastRead
+    , bookmarks = Dict.toList model.bookmarks
     }
 
 

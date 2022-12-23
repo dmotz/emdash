@@ -195,7 +195,7 @@ view model =
                                     model.tags
                                     model.pendingTag
                                     model.bookNeighborMap
-                                    (get book.id model.bookIdToLastRead)
+                                    (get book.id model.bookmarks)
                                     progressView
                                 , entryList
                                     entries
@@ -204,7 +204,7 @@ view model =
                                     model.neighborMap
                                     model.idToShowDetails
                                     model.idToActiveTab
-                                    (get book.id model.bookIdToLastRead
+                                    (get book.id model.bookmarks
                                         |> withDefault ""
                                     )
                                     progressView

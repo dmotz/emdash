@@ -137,7 +137,7 @@ type alias Model =
     , url : Url
     , key : Nav.Key
     , bookSort : BookSort
-    , bookIdToLastRead : Dict Id Id
+    , bookmarks : Dict Id Id
     , idToShowDetails : Dict Id Bool
     , idToActiveTab : Dict Id EntryTab
     , searchQuery : String
@@ -149,7 +149,7 @@ type alias StoredModel =
     { entries : List Entry
     , books : List Book
     , hiddenEntries : List Id
-    , bookIdToLastRead : List ( Id, Id )
+    , bookmarks : List ( Id, Id )
     }
 
 
@@ -158,5 +158,5 @@ initialStoredModel =
     { entries = []
     , books = []
     , hiddenEntries = []
-    , bookIdToLastRead = []
+    , bookmarks = []
     }

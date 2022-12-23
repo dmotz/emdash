@@ -26,7 +26,7 @@ decodeStoredModel =
         |> required "books" (list bookDecoder)
         |> optional "hiddenEntries" (list string) []
         |> optional
-            "bookIdToLastRead"
+            "bookmarks"
             (list (map2 pair (index 0 string) (index 1 string)))
             []
         |> decodeString

@@ -47,7 +47,7 @@ bookInfo :
     -> Maybe Id
     -> Maybe (Html Msg)
     -> Html Msg
-bookInfo book books tags pendingTag bookNeighborMap mLastRead progressView =
+bookInfo book books tags pendingTag bookNeighborMap mBookmark progressView =
     div
         [ class "bookInfo" ]
         [ h1 [] [ text book.title ]
@@ -126,7 +126,7 @@ bookInfo book books tags pendingTag bookNeighborMap mLastRead progressView =
                     ]
                 ]
             ]
-        , case mLastRead of
+        , case mBookmark of
             Just id ->
                 a
                     [ href <| "#" ++ getEntryDomId id, target "_self" ]
