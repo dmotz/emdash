@@ -80,7 +80,7 @@ type alias Tag =
 type alias Book =
     { id : Id
     , title : Title
-    , author : Author
+    , authors : List Author
     , count : Int
     , rating : Float
     , sortIndex : Int

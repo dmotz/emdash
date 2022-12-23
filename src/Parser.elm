@@ -5,13 +5,13 @@ import Bytes.Encode exposing (encode, sequence, unsignedInt8)
 import Char exposing (isDigit)
 import DateTime exposing (fromRawParts, toPosix)
 import Dict exposing (Dict, get, insert, update)
-import List exposing (all, foldr, head, map, reverse, sortBy)
+import List exposing (all, concatMap, foldr, head, map, reverse, sortBy)
 import MD5 exposing (bytes)
 import Maybe exposing (andThen, withDefault)
 import Model exposing (Author, Book, BookMap, EntryMap, Id)
 import Regex exposing (Match, Regex, replace)
 import Router exposing (slugify)
-import String exposing (lines, repeat, right, split, startsWith, toInt, trim)
+import String exposing (join, lines, repeat, right, split, startsWith, toInt, trim)
 import Time exposing (Month(..), posixToMillis)
 import Utils exposing (juxt, rx, rx_)
 
@@ -162,6 +162,11 @@ replaceApostrophes =
     replace apostropheRx apostropheReplacer
 
 
+authorSplitRx : Regex
+authorSplitRx =
+    rx "[;&]|\\sand\\s"
+
+
 makeDicts : List ( List String, String ) -> ( EntryMap, BookMap )
 makeDicts =
     foldr
@@ -277,11 +282,14 @@ makeDicts =
                                 title =
                                     replaceApostrophes titleRaw
 
-                                author =
-                                    replaceApostrophes authorRaw
+                                authors =
+                                    authorRaw
+                                        |> replaceApostrophes
+                                        |> Regex.split authorSplitRx
+                                        |> map trim
 
                                 bookId =
-                                    hashId <| title ++ " " ++ author
+                                    hashId <| title ++ " " ++ authorRaw
 
                                 date =
                                     withDefault 0 dateRaw
@@ -312,7 +320,7 @@ makeDicts =
                                             _ ->
                                                 { id = bookId
                                                 , title = title
-                                                , author = author
+                                                , authors = authors
                                                 , count = 0
                                                 , rating = 0
                                                 , sortIndex = date
@@ -342,7 +350,11 @@ getTitleRouteMap =
                     slug =
                         case get (slugify book.title) slugToId of
                             Just _ ->
-                                slugify (book.title ++ " by " ++ book.author)
+                                slugify
+                                    (book.title
+                                        ++ " by "
+                                        ++ join " & " book.authors
+                                    )
 
                             _ ->
                                 slugify book.title
@@ -356,4 +368,4 @@ getTitleRouteMap =
 
 getAuthorRouteMap : List Book -> Dict String Author
 getAuthorRouteMap =
-    map (juxt (.author >> slugify) .author) >> Dict.fromList
+    concatMap (.authors >> map (juxt slugify identity)) >> Dict.fromList

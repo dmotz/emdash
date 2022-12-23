@@ -52,7 +52,7 @@ import Router
         , slugify
         )
 import Set exposing (diff, toList, union)
-import String exposing (fromInt, toLower, trim)
+import String exposing (fromInt, join, toLower, trim)
 import Task exposing (attempt, perform)
 import Update.Extra as Update exposing (addCmd)
 import Url exposing (Url)
@@ -931,7 +931,7 @@ update message model =
                                     AuthorPage author
                                         (model.books
                                             |> Dict.filter
-                                                (\_ b -> b.author == author)
+                                                (\_ b -> member author b.authors)
                                             |> values
                                         )
                               }
@@ -1077,7 +1077,7 @@ update message model =
                             False
                             (findMatches
                                 query
-                                (\b -> b.title ++ " " ++ b.author)
+                                (\b -> b.title ++ " " ++ join " " b.authors)
                                 (values model.books)
                             )
                             (model.entries

@@ -49,7 +49,7 @@ bookDecoder =
     succeed Book
         |> required "id" string
         |> required "title" string
-        |> required "author" string
+        |> required "authors" (list string)
         |> required "count" int
         |> optional "rating" float 0
         |> optional "sortIndex" int 0

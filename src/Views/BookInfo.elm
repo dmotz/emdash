@@ -28,7 +28,7 @@ import Html.Attributes as H
         , value
         )
 import Html.Events exposing (onInput)
-import List exposing (map, repeat)
+import List exposing (intersperse, map, repeat)
 import Maybe exposing (withDefault)
 import Model exposing (Book, BookMap, Id, NeighborMap, Tag)
 import Msg exposing (Msg(..))
@@ -53,9 +53,13 @@ bookInfo book books tags pendingTag bookNeighborMap mBookmark progressView =
         [ h1 [] [ text book.title ]
         , h2
             []
-            [ a [ href <| authorToRoute book.author ] [ text book.author ]
-            , text <| " — " ++ excerptCountLabel book.count
-            ]
+            ((map
+                (\author -> a [ href <| authorToRoute author ] [ text author ])
+                book.authors
+                |> intersperse (text " / ")
+             )
+                ++ [ text <| " — " ++ excerptCountLabel book.count ]
+            )
         , section
             [ class "bookMeta" ]
             [ div

@@ -4,7 +4,7 @@ import List exposing (concat, filter, indexedMap, map, reverse)
 import MD5 exposing (hex)
 import Model exposing (Author, Book, Entry, Title)
 import Regex exposing (Regex)
-import String exposing (fromInt, replace, toLower)
+import String exposing (fromInt, join, replace, toLower)
 import Utils exposing (rx)
 
 
@@ -274,8 +274,8 @@ generateContent titles =
     )
 
 
-generateChapter : Int -> Title -> Author -> List Entry -> ( String, String )
-generateChapter i title author entries =
+generateChapter : Int -> Title -> List Author -> List Entry -> ( String, String )
+generateChapter i title authors entries =
     ( "OEBPS/" ++ normalizeTitle i title
     , """
     <?xml version="1.0" encoding="UTF-8"?>
@@ -293,11 +293,8 @@ generateChapter i title author entries =
       <body>
         <h1>"""
         ++ title
-        ++ """</h1>
-        <h2>"""
-        ++ author
-        ++ """</h2>
-        """
+        ++ "</h1>"
+        ++ join " " (map (\author -> "<h2>" ++ author ++ "</h2>") authors)
         ++ (String.concat <|
                 map
                     (\{ text, page } ->
@@ -333,11 +330,11 @@ export books entries =
       , generateContent titles
       ]
     , indexedMap
-        (\i { id, title, author } ->
+        (\i { id, title, authors } ->
             generateChapter
                 i
                 title
-                author
+                authors
                 (filter (.bookId >> (==) id) entries)
         )
         books

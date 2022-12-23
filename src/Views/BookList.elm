@@ -7,7 +7,7 @@ import List exposing (map)
 import Model exposing (Book, BookSort(..))
 import Msg exposing (Msg)
 import Router exposing (titleSlugToRoute)
-import String exposing (fromInt)
+import String exposing (fromInt, join)
 import Utils exposing (null, ratingEl, sortBooks)
 
 
@@ -36,7 +36,7 @@ bookView tag book showRating =
         [ a
             [ href <| titleSlugToRoute book.slug ]
             [ div [ class "title" ] [ text book.title ]
-            , div [ class "author" ] [ text book.author ]
+            , div [ class "author" ] [ text <| join " / " book.authors ]
             , div [ class "count" ] [ text <| fromInt book.count ]
             , if showRating then
                 ratingEl book
