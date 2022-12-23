@@ -4,7 +4,7 @@ import Html exposing (Html, a, cite, div, meter, span, text)
 import Html.Attributes exposing (class, href, value)
 import Html.Events exposing (stopPropagationOn)
 import Json.Decode exposing (succeed)
-import List exposing (map)
+import List exposing (intersperse, map)
 import Model exposing (Book, Entry)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
@@ -19,14 +19,18 @@ citation entry book mScore =
             [ class "title", href <| titleSlugToRoute book.slug, stopLinkProp ]
             [ text book.title ]
          , span [ class "divider" ] [ text " • " ]
-         ]
-            ++ map
+         , div
+            []
+            (map
                 (\author ->
                     a
                         [ href <| authorToRoute author, stopLinkProp ]
                         [ text author ]
                 )
                 book.authors
+                |> intersperse (text " / ")
+            )
+         ]
             ++ (if entry.page /= -1 then
                     [ span [ class "divider" ] [ text " • " ]
                     , a
