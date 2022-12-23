@@ -96,6 +96,7 @@ type alias Entry =
     , date : Int
     , page : Int
     , notes : String
+    , isFavorite : Bool
     }
 
 
