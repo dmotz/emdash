@@ -294,6 +294,7 @@ makeDicts =
                                 , date = date
                                 , page = withDefault -1 page
                                 , notes = notes
+                                , isFavorite = False
                                 }
                                 entries
                             , update bookId
