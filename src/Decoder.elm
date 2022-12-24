@@ -55,3 +55,4 @@ bookDecoder =
         |> optional "sortIndex" int 0
         |> optional "tags" (list string) []
         |> required "slug" string
+        |> optional "favCount" int 0
