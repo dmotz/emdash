@@ -14,14 +14,17 @@ import Utils exposing (getEntryDomId)
 
 citation : Entry -> Book -> Maybe Float -> Html Msg
 citation entry book mScore =
-    cite []
-        ([ a
-            [ class "title", href <| titleSlugToRoute book.slug, stopLinkProp ]
-            [ text book.title ]
-         , span [ class "divider" ] [ text " • " ]
+    cite
+        []
+        ([ div []
+            [ a
+                [ class "title", href <| titleSlugToRoute book.slug, stopLinkProp ]
+                [ text book.title ]
+            , span [ class "divider" ] [ text "•" ]
+            ]
          , div
             []
-            (map
+            ((map
                 (\author ->
                     a
                         [ href <| authorToRoute author, stopLinkProp ]
@@ -29,11 +32,17 @@ citation entry book mScore =
                 )
                 book.authors
                 |> intersperse (text " / ")
+             )
+                ++ (if entry.page /= -1 then
+                        [ span [ class "divider" ] [ text "•" ] ]
+
+                    else
+                        []
+                   )
             )
          ]
             ++ (if entry.page /= -1 then
-                    [ span [ class "divider" ] [ text " • " ]
-                    , a
+                    [ a
                         [ href <|
                             titleSlugToRoute book.slug
                                 ++ "#"

@@ -170,7 +170,12 @@ blockquote
 
 cite
   display: flex
+  flex-wrap: wrap
   font-style: normal
+  line-height: 1.5
+
+  > *
+    flex-shrink: 0
 
   .divider
     margin: 0 .4em
