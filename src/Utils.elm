@@ -348,6 +348,9 @@ sortBooks sort reverseSort =
 
         RatingSort ->
             sortBy .rating
+
+        FavSort ->
+            sortBy .favCount
     )
         >> (if reverseSort then
                 reverse

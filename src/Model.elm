@@ -48,6 +48,7 @@ type BookSort
     | TitleSort
     | NumSort
     | RatingSort
+    | FavSort
 
 
 type TagSort
