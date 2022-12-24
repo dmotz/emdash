@@ -1026,6 +1026,43 @@ update message model =
                 , none
                 )
 
+        ToggleFavorite id ->
+            let
+                toggle =
+                    \entry -> { entry | isFavorite = not entry.isFavorite }
+            in
+            store
+                ( { model
+                    | entries =
+                        Dict.update
+                            id
+                            (Maybe.map toggle)
+                            model.entries
+                    , page =
+                        case model.page of
+                            EntryPage entry book ->
+                                EntryPage (toggle entry) book
+
+                            TitlePage book entries ->
+                                TitlePage
+                                    book
+                                    (map
+                                        (\entry ->
+                                            if entry.id == id then
+                                                toggle entry
+
+                                            else
+                                                entry
+                                        )
+                                        entries
+                                    )
+
+                            _ ->
+                                model.page
+                  }
+                , none
+                )
+
         SetEntryTab id tab toggle ->
             let
                 m =
