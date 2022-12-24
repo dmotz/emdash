@@ -1030,22 +1030,49 @@ update message model =
             let
                 toggle =
                     \entry -> { entry | isFavorite = not entry.isFavorite }
+
+                newEntries =
+                    Dict.update
+                        id
+                        (Maybe.map toggle)
+                        model.entries
+
+                countDelta =
+                    if
+                        newEntries
+                            |> get id
+                            |> Maybe.map .isFavorite
+                            |> withDefault False
+                    then
+                        1
+
+                    else
+                        -1
+
+                updateCount =
+                    \book -> { book | favCount = book.favCount + countDelta }
             in
             store
                 ( { model
-                    | entries =
-                        Dict.update
-                            id
-                            (Maybe.map toggle)
-                            model.entries
+                    | entries = newEntries
+                    , books =
+                        case get id newEntries of
+                            Just entry ->
+                                Dict.update
+                                    entry.bookId
+                                    (Maybe.map updateCount)
+                                    model.books
+
+                            _ ->
+                                model.books
                     , page =
                         case model.page of
                             EntryPage entry book ->
-                                EntryPage (toggle entry) book
+                                EntryPage (toggle entry) (updateCount book)
 
                             TitlePage book entries ->
                                 TitlePage
-                                    book
+                                    (updateCount book)
                                     (map
                                         (\entry ->
                                             if entry.id == id then
