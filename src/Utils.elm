@@ -4,6 +4,7 @@ module Utils exposing
     , dedupe
     , embeddingBatchSize
     , excerptCountLabel
+    , favoriteCountLabel
     , find
     , findMatches
     , formatNumber
@@ -316,6 +317,11 @@ excerptCountLabel =
 titleCountLabel : Int -> String
 titleCountLabel =
     countLabel "title"
+
+
+favoriteCountLabel : Int -> String
+favoriteCountLabel =
+    countLabel "favorite"
 
 
 normalizeTitle : String -> String
