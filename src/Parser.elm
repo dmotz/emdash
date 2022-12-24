@@ -326,6 +326,7 @@ makeDicts =
                                                 , sortIndex = date
                                                 , tags = []
                                                 , slug = ""
+                                                , favCount = 0
                                                 }
                                 )
                                 books
