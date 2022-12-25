@@ -35,6 +35,7 @@ import Model
         , InputFocus(..)
         , Model
         , Page(..)
+        , ScorePairs
         , StoredModel
         , TagSort(..)
         , initialStoredModel
@@ -106,10 +107,10 @@ port requestExcerptNeighbors : ( Id, Bool ) -> Cmd msg
 port requestBookNeighbors : Id -> Cmd msg
 
 
-port receiveExcerptNeighbors : (( Id, List ( Id, Float ) ) -> msg) -> Sub msg
+port receiveExcerptNeighbors : (( Id, ScorePairs ) -> msg) -> Sub msg
 
 
-port receiveBookNeighbors : (( Id, List ( Id, Float ) ) -> msg) -> Sub msg
+port receiveBookNeighbors : (( Id, ScorePairs ) -> msg) -> Sub msg
 
 
 port requestUnicodeNormalized : String -> Cmd msg
@@ -121,7 +122,7 @@ port receiveUnicodeNormalized : (String -> msg) -> Sub msg
 port requestSemanticSearch : ( String, Float ) -> Cmd msg
 
 
-port receiveSemanticSearch : (( String, List ( Id, Float ) ) -> msg) -> Sub msg
+port receiveSemanticSearch : (( String, ScorePairs ) -> msg) -> Sub msg
 
 
 appName : String

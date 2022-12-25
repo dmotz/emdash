@@ -6,7 +6,7 @@ import Html.Attributes exposing (class)
 import Html.Lazy exposing (lazy4)
 import List exposing (filterMap, isEmpty, length, map)
 import Maybe exposing (andThen)
-import Model exposing (Book, BookMap, BookSort(..), Entry, EntryMap, Id)
+import Model exposing (Book, BookMap, BookSort(..), Entry, EntryMap, ScorePairs)
 import Msg exposing (Msg)
 import Utils exposing (null)
 import Views.BookList exposing (bookList)
@@ -18,7 +18,7 @@ searchResults :
     -> EntryMap
     -> List Book
     -> List Entry
-    -> List ( Id, Float )
+    -> ScorePairs
     -> Bool
     -> String
     -> Html Msg

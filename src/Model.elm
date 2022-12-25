@@ -11,6 +11,7 @@ module Model exposing
     , Model
     , NeighborMap
     , Page(..)
+    , ScorePairs
     , StoredModel
     , Tag
     , TagSort(..)
@@ -27,7 +28,7 @@ import Url exposing (Url)
 
 type Page
     = MainPage (List Book) (Maybe Tag)
-    | SearchPage String Bool (List Book) (List Entry) (List ( Id, Float ))
+    | SearchPage String Bool (List Book) (List Entry) ScorePairs
     | TitlePage Book (List Entry)
     | AuthorPage Author (List Book)
     | EntryPage Entry Book
@@ -78,6 +79,10 @@ type alias Tag =
     String
 
 
+type alias ScorePairs =
+    List ( Id, Float )
+
+
 type alias Book =
     { id : Id
     , title : Title
@@ -111,7 +116,7 @@ type alias BookMap =
 
 
 type alias NeighborMap =
-    Dict Id (List ( Id, Float ))
+    Dict Id ScorePairs
 
 
 type alias Model =

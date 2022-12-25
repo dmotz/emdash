@@ -38,8 +38,8 @@ import Model
         , Entry
         , EntryMap
         , EntryTab(..)
-        , Id
         , InputFocus(..)
+        , ScorePairs
         )
 import Msg exposing (Msg(..))
 import Router exposing (entryToRoute)
@@ -52,7 +52,7 @@ import Views.Snippet exposing (snippetView)
 entryView :
     EntryMap
     -> BookMap
-    -> List ( Id, Float )
+    -> ScorePairs
     -> Bool
     -> EntryTab
     -> Int

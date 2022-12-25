@@ -39,9 +39,10 @@ type Msg
     | RequestEmbeddings
     | ReceiveEmbeddings (List Id)
     | ReceiveBookEmbeddings ()
-    | ReceiveNeighbors ( Id, List ( Id, Float ) )
-    | ReceiveBookNeighbors ( Id, List ( Id, Float ) )
-    | ReceiveSemanticSearch ( String, List ( Id, Float ) )
+    | ReceiveNeighbors ( Id, ScorePairs )
+    | ReceiveBookNeighbors ( Id, ScorePairs )
+    | ReceiveSemanticSearch ( String, ScorePairs )
+    | ReceiveSemanticRank ( Id, ScorePairs )
     | SetSemanticThreshold String
     | LinkClicked UrlRequest
     | UrlChanged Url
