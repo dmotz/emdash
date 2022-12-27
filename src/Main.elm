@@ -10,6 +10,7 @@ import Dict exposing (get, insert, keys, remove, values)
 import Epub
 import File
 import File.Select as Select
+import Http
 import Json.Decode as Decode
 import List
     exposing
@@ -1262,4 +1263,12 @@ update message model =
             in
             ( { model | searchDebounce = debounce }
             , cmd
+            )
+
+        StartDemo ->
+            ( { model | demoMode = True }
+            , Http.get
+                { url = "/demo/demo.json"
+                , expect = Http.expectString GotDemoData
+                }
             )

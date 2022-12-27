@@ -69,3 +69,4 @@ type Msg
     | OnSearchEnd String
     | ReceiveUnicodeNormalized String
     | DebounceMsg Debounce.Msg
+    | StartDemo
