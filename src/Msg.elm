@@ -4,7 +4,20 @@ import Browser exposing (UrlRequest)
 import Browser.Dom exposing (Element, Error)
 import Debounce
 import File exposing (File)
-import Model exposing (Book, BookSort, EntryTab, Id, InputFocus, Tag, TagSort)
+import Http
+import Model
+    exposing
+        ( Book
+        , BookSort
+        , EntrySort
+        , EntryTab
+        , Id
+        , InputFocus
+        , ScorePairs
+        , StoredModel
+        , Tag
+        , TagSort
+        )
 import Url exposing (Url)
 import Utils exposing (KeyEvent)
 
@@ -47,6 +60,7 @@ type Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
     | SortBooks BookSort
+    | SortEntries EntrySort
     | SetEntryTab Id EntryTab Bool
     | ScrollToTop
     | OnSearchStart String
