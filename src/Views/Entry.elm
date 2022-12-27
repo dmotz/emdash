@@ -71,6 +71,38 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                 figcaption
                     [ class "meta" ]
                     [ div [] [ text <| fromInt (i + 1) ]
+                    , button
+                        [ onClick (ToggleFavorite entry.id)
+                        , classList
+                            [ ( "favorite", True )
+                            , ( "active", entry.isFavorite )
+                            ]
+                        ]
+                        [ img
+                            [ class "favoriteIcon"
+                            , src <|
+                                "/images/favorite"
+                                    ++ (if entry.isFavorite then
+                                            "-filled"
+
+                                        else
+                                            ""
+                                       )
+                                    ++ ".svg"
+                            ]
+                            []
+                        , div
+                            [ class "hint left" ]
+                            [ text <|
+                                (if entry.isFavorite then
+                                    "Unmark"
+
+                                 else
+                                    "Mark"
+                                )
+                                    ++ " as favorite"
+                            ]
+                        ]
                     , if perma then
                         text ""
 
