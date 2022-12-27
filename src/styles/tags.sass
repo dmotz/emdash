@@ -18,7 +18,7 @@
     color: $mid2
 
   &:last-child::after
-    content: ''
+    visibility: hidden
 
   a
     font-size: 2rem
@@ -43,8 +43,8 @@
   line-height: 0
   display: none
   position: absolute
-  top: 0
-  right: -2px
+  top: -0.25rem
+  right: 1.2rem
   color: $mid2
   transition: color .2s
 
@@ -78,6 +78,9 @@
 
   .tags
     margin-bottom: 2rem
+
+  .tag:last-child::after
+    content: ''
 
 .tagSort
   display: flex
