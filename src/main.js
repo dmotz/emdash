@@ -16,6 +16,7 @@ const messageToPort = {
   computeBookEmbeddings: 'receiveBookEmbeddings',
   requestExcerptNeighbors: 'receiveExcerptNeighbors',
   requestBookNeighbors: 'receiveBookNeighbors',
+  requestSemanticRank: 'receiveSemanticRank',
   semanticSearch: 'receiveSemanticSearch'
 }
 
@@ -122,6 +123,10 @@ let zipWorker
 
   app.ports.requestSemanticSearch.subscribe(([query, threshold]) =>
     worker.port.postMessage({method: 'semanticSearch', query, threshold})
+  )
+
+  app.ports.requestSemanticRank.subscribe(([bookId, entryIds]) =>
+    worker.port.postMessage({method: 'requestSemanticRank', bookId, entryIds})
   )
 
   app.ports.scrollToTop.subscribe(() =>
