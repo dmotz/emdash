@@ -716,7 +716,19 @@ update message model =
             ( { model | embeddingsReady = True }
             , case model.page of
                 TitlePage book _ ->
-                    requestBookNeighbors book.id
+                    batch
+                        [ requestBookNeighbors book.id
+                        , requestSemanticRank
+                            ( book.id
+                            , model.entries
+                                |> Dict.filter
+                                    (\_ { bookId } ->
+                                        bookId == book.id
+                                    )
+                                |> values
+                                |> map .id
+                            )
+                        ]
 
                 EntryPage entry _ ->
                     requestExcerptNeighbors ( entry.id, True )
