@@ -31,6 +31,7 @@ import Maybe exposing (andThen, withDefault)
 import Model
     exposing
         ( BookSort(..)
+        , EntrySort(..)
         , Id
         , InputFocus(..)
         , Model
@@ -181,6 +182,7 @@ createModel maybeStoredModel demoMode url key =
     , url = url
     , key = key
     , bookSort = RecencySort
+    , entrySort = EntryPageSort
     , bookmarks = restored.bookmarks |> Dict.fromList
     , idToShowDetails = Dict.empty
     , idToActiveTab = Dict.empty
@@ -861,6 +863,7 @@ update message model =
                                             |> values
                                             |> sortBy .page
                                         )
+                                , entrySort = EntryPageSort
                               }
                             , batch
                                 [ case mFragment of
@@ -1006,6 +1009,37 @@ update message model =
 
         SortBooks sort ->
             ( { model | bookSort = sort, reverseSort = sort /= TitleSort }
+            , none
+            )
+
+        SortEntries sort ->
+            ( { model
+                | entrySort = sort
+                , page =
+                    case model.page of
+                        TitlePage book entries ->
+                            TitlePage
+                                book
+                                (case sort of
+                                    EntrySemanticSort ->
+                                        case get book.id model.semanticRankMap of
+                                            Just ids ->
+                                                filterMap
+                                                    (\( id, _ ) ->
+                                                        get id model.entries
+                                                    )
+                                                    ids
+
+                                            _ ->
+                                                sortBy .page entries
+
+                                    _ ->
+                                        sortBy .page entries
+                                )
+
+                        _ ->
+                            model.page
+              }
             , none
             )
 

@@ -151,6 +151,7 @@ type alias Model =
     , url : Url
     , key : Nav.Key
     , bookSort : BookSort
+    , entrySort : EntrySort
     , bookmarks : Dict Id Id
     , idToShowDetails : Dict Id Bool
     , idToActiveTab : Dict Id EntryTab
