@@ -171,6 +171,7 @@ createModel maybeStoredModel demoMode url key =
     , semanticThreshold = 0.1
     , neighborMap = Dict.empty
     , bookNeighborMap = Dict.empty
+    , semanticRankMap = Dict.empty
     , hiddenEntries = Set.fromList restored.hiddenEntries
     , completedEmbeddings = Set.empty
     , embeddingsReady = False

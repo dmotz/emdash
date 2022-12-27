@@ -134,6 +134,7 @@ type alias Model =
     , semanticThreshold : Float
     , neighborMap : NeighborMap
     , bookNeighborMap : NeighborMap
+    , semanticRankMap : NeighborMap
     , hiddenEntries : Set Id
     , completedEmbeddings : Set Id
     , embeddingsReady : Bool
