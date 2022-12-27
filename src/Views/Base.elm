@@ -22,7 +22,7 @@ import Html
         , text
         , ul
         )
-import Html.Attributes exposing (class, classList, draggable, href, id, src)
+import Html.Attributes exposing (class, classList, draggable, href, id, src, target)
 import Html.Events exposing (onClick, preventDefaultOn)
 import Html.Keyed as Keyed
 import Json.Decode as Decode exposing (Decoder)
@@ -93,7 +93,7 @@ view model =
                                 [ text "Back to the index" ]
                     ]
                 , div
-                    [ class "actions" ]
+                    [ class "toolbar" ]
                     [ a
                         [ href "/settings" ]
                         [ img [ src "/images/focus.svg" ] []
@@ -313,11 +313,29 @@ view model =
 
                         _ ->
                             null
-                    , footer [] [ text "❦" ]
                     ]
                 ]
          )
-            ++ [ if model.isDragging then
+            ++ [ footer
+                    []
+                    [ div
+                        [ class "links" ]
+                        [ a [ href "" ] [ text "Send feedback" ]
+                        , a [ href "/import" ] [ text "Import excerpts" ]
+                        , if Dict.isEmpty model.entries then
+                            null
+
+                          else
+                            a [ href "/settings" ] [ text "Settings" ]
+                        , a
+                            [ href "https://github.com/dmotz/marginalia"
+                            , target "_blank"
+                            ]
+                            [ text "Source code" ]
+                        ]
+                    , div [ class "fleuron" ] [ text "❦" ]
+                    ]
+               , if model.isDragging then
                     div [ class "dragNotice" ] [ text "Drop your file here." ]
 
                  else
