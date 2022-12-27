@@ -158,6 +158,7 @@ type alias Model =
     , idToActiveTab : Dict Id EntryTab
     , searchQuery : String
     , searchDebounce : Debounce String
+    , version : String
     }
 
 
