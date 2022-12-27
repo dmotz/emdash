@@ -32,7 +32,6 @@ module Utils exposing
     , untaggedKey
     , updateItem
     , updateItems
-    , version
     )
 
 import Dict exposing (Dict, empty, get, insert, update, values)
