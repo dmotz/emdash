@@ -6,13 +6,13 @@ import Html
         ( Html
         , a
         , br
+        , button
         , div
         , h1
         , h2
         , h5
         , input
         , li
-        , p
         , section
         , span
         , text
@@ -28,10 +28,10 @@ import Html.Attributes as H
         , type_
         , value
         )
-import Html.Events exposing (onInput)
+import Html.Events exposing (onClick, onInput)
 import List exposing (intersperse, map, repeat)
 import Maybe exposing (withDefault)
-import Model exposing (Book, BookMap, Id, NeighborMap, Tag)
+import Model exposing (Book, BookMap, EntrySort(..), Id, NeighborMap, Tag)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
 import Utils exposing (excerptCountLabel, formatScore, getEntryDomId, null, ratingEl)
@@ -134,12 +134,57 @@ bookInfo book books tags pendingTag bookNeighborMap mBookmark entrySort progress
                     ]
                 ]
             ]
-        , case mBookmark of
-            Just id ->
-                a
-                    [ href <| "#" ++ getEntryDomId id, target "_self" ]
-                    [ text "↧ Jump to last read excerpt" ]
+        , div
+            [ class "actions" ]
+            [ div
+                [ class "modeHeading" ]
+                [ ul
+                    []
+                    (map
+                        (\sort ->
+                            li
+                                [ classList [ ( "active", sort == entrySort ) ] ]
+                                [ button
+                                    [ onClick <| SortEntries sort ]
+                                    [ text <| sortToString sort
+                                    , if
+                                        sort
+                                            == EntrySemanticSort
+                                            && entrySort
+                                            /= EntrySemanticSort
+                                      then
+                                        div
+                                            [ class "hint" ]
+                                            [ text "Sort by most semantically relevant to all passages" ]
 
-            _ ->
-                a [ href "#", class "hidden" ] [ text "↧" ]
+                                      else
+                                        null
+                                    ]
+                                ]
+                        )
+                        [ EntryPageSort, EntryFavSort, EntrySemanticSort ]
+                    )
+                ]
+            , case mBookmark of
+                Just id ->
+                    a
+                        [ href <| "#" ++ getEntryDomId id, target "_self" ]
+                        [ text "↧ Jump to last read excerpt" ]
+
+                _ ->
+                    null
+            ]
         ]
+
+
+sortToString : EntrySort -> String
+sortToString sort =
+    case sort of
+        EntryPageSort ->
+            "Page №"
+
+        EntryFavSort ->
+            "Favorites"
+
+        EntrySemanticSort ->
+            "Relevance"
