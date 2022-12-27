@@ -11,17 +11,14 @@
     margin-bottom: 0
     font-size: 2.4rem
 
-  .col:last-child
-    > div:first-child
-      margin-bottom: 3rem
+  .col:last-child > :first-child
+    margin-bottom: 3rem
 
 .ratingNum
   font-size: 2.4rem
 
   &.unrated
-    position: relative
     color: $mid3
-    top: -0.3rem
 
   .half
     font-variant-numeric: diagonal-fractions
@@ -32,6 +29,11 @@
   .ratingNum
     width: 4rem
 
+    &.unrated
+      position: relative
+      color: $mid3
+      top: -0.3rem
+
   input[type="range"]
     max-width: 9.9rem
     margin: 0
@@ -41,18 +43,18 @@
   margin: 3rem auto
   display: flex
 
-  > div
+  .col
     display: flex
     flex-direction: column
     padding: 1rem 0
     flex: 1
     padding-right: 2rem
+    border-right: 1px solid $mid2
 
     &:last-child
       display: flex
       flex-direction: column
       justify-content: space-between
-      border-left: 1px solid $fg
       padding-right: 0
       padding-left: 2rem
 
