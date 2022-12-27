@@ -70,3 +70,4 @@ type Msg
     | ReceiveUnicodeNormalized String
     | DebounceMsg Debounce.Msg
     | StartDemo
+    | GotDemoData (Result Http.Error String)

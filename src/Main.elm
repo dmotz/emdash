@@ -1272,3 +1272,11 @@ update message model =
                 , expect = Http.expectString GotDemoData
                 }
             )
+
+        GotDemoData result ->
+            case result of
+                Ok text ->
+                    update (ParseJsonText text) model
+
+                Err _ ->
+                    noOp
