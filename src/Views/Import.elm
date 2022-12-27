@@ -51,7 +51,8 @@ importView emptyOrDemo =
                             [ li
                                 []
                                 [ text "Plug your Kindle in via USB" ]
-                            , li []
+                            , li
+                                []
                                 [ text "Find "
                                 , code
                                     []
@@ -61,6 +62,9 @@ importView emptyOrDemo =
                             , li
                                 []
                                 [ text "Drag it onto this page or click the button above" ]
+                            , li
+                                []
+                                [ text "Repeat this process whenever you highlight new excerpts and theyʼll be added to your collection." ]
                             ]
                         ]
                     ]
