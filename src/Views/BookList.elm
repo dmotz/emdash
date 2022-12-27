@@ -1,7 +1,7 @@
 module Views.BookList exposing (bookList, bookView)
 
-import Html exposing (Html, a, div, li, text)
-import Html.Attributes exposing (class, href)
+import Html exposing (Html, a, div, img, li, span, text)
+import Html.Attributes exposing (class, href, src)
 import Html.Keyed as Keyed
 import List exposing (map)
 import Model exposing (Book, BookSort(..))
@@ -16,11 +16,14 @@ bookList books sort reverseSort =
     let
         showRating =
             sort == RatingSort
+
+        showFavCount =
+            sort == FavSort
     in
     Keyed.ul
         [ class "bookList" ]
         (map
-            (\book -> ( book.id, bookView li book showRating ))
+            (\book -> ( book.id, bookView li book showRating showFavCount ))
             (sortBooks sort reverseSort books)
         )
 
@@ -29,8 +32,9 @@ bookView :
     (List (Html.Attribute msg) -> List (Html Msg) -> Html Msg)
     -> Book
     -> Bool
+    -> Bool
     -> Html Msg
-bookView tag book showRating =
+bookView tag book showRating showFavCount =
     tag
         [ class "book" ]
         [ a
@@ -40,6 +44,22 @@ bookView tag book showRating =
             , div [ class "count" ] [ text <| fromInt book.count ]
             , if showRating then
                 ratingEl book
+
+              else
+                null
+            , if showFavCount then
+                div
+                    [ class "favCount" ]
+                    (if book.favCount > 0 then
+                        [ img
+                            [ class "favIcon", src "/images/favorite-filled.svg" ]
+                            []
+                        , text <| fromInt book.favCount
+                        ]
+
+                     else
+                        [ span [ class "unrated" ] [ text "—" ] ]
+                    )
 
               else
                 null
