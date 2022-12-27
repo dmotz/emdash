@@ -9,7 +9,7 @@ import Model exposing (Book, Entry)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
 import String exposing (fromFloat, fromInt)
-import Utils exposing (getEntryDomId)
+import Utils exposing (formatScore, getEntryDomId)
 
 
 citation : Entry -> Book -> Maybe Float -> Html Msg
@@ -59,7 +59,7 @@ citation entry book mScore =
                     Just score ->
                         [ div
                             [ class "score" ]
-                            [ span [] [ text (score * 100 |> round |> fromInt) ]
+                            [ span [] [ formatScore score ]
                             , meter [ score |> fromFloat |> value ] []
                             ]
                         ]
