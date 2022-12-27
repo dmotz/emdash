@@ -149,11 +149,11 @@ debounceConfig =
     }
 
 
-createModel : Maybe StoredModel -> Bool -> Url -> Nav.Key -> Model
-createModel maybeStoredModel demoMode url key =
+createModel : String -> Maybe StoredModel -> Bool -> Url -> Nav.Key -> Model
+createModel version mStoredModel demoMode url key =
     let
         restored =
-            withDefault initialStoredModel maybeStoredModel
+            withDefault initialStoredModel mStoredModel
 
         ( titleRouteMap, booksWithSlugs ) =
             Parser.getTitleRouteMap restored.books
@@ -195,10 +195,11 @@ createModel maybeStoredModel demoMode url key =
     , idToActiveTab = Dict.empty
     , searchQuery = ""
     , searchDebounce = Debounce.init
+    , version = version
     }
 
 
-main : Program (Maybe String) Model Msg
+main : Program ( String, Maybe String ) Model Msg
 main =
     application
         { init = init
@@ -271,11 +272,12 @@ main =
         }
 
 
-init : Maybe String -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init mStateString url key =
+init : ( String, Maybe String ) -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init ( version, mStateString ) url key =
     let
         model =
             createModel
+                version
                 (case decodeStoredModel (withDefault "" mStateString) of
                     Ok storedModel ->
                         Just storedModel
@@ -313,7 +315,12 @@ update message model =
         RestoreState maybeModel demoMode ->
             let
                 model_ =
-                    createModel maybeModel demoMode model.url model.key
+                    createModel
+                        model.version
+                        maybeModel
+                        demoMode
+                        model.url
+                        model.key
             in
             update (UrlChanged model.url) model_
                 |> addCmd (model_ |> modelToStoredModel |> handleNewEntries)
