@@ -110,9 +110,9 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                         button
                             [ classList
                                 [ ( "bookmark", True )
-                                , ( "bookmarked", isMarked )
+                                , ( "active", isMarked )
                                 ]
-                            , onClick (SetLastRead entry.bookId entry.id)
+                            , onClick (SetBookmark entry.bookId entry.id)
                             ]
                             [ img
                                 [ src <|
@@ -138,16 +138,14 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                                         ++ " as last read in this book"
                                 ]
                             ]
-                    , if entry.page /= -1 then
-                        div
-                            [ class "page" ]
-                            [ text <| "p. " ++ fromInt entry.page ]
-
-                      else
-                        null
                     , a
                         [ href <| entryToRoute books entry ]
-                        [ text "¶"
+                        [ text <|
+                            if entry.page == -1 then
+                                "¶"
+
+                            else
+                                "p. " ++ fromInt entry.page
                         , div [ class "hint left" ] [ text "Permalink" ]
                         ]
                     ]
