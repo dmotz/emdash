@@ -1,7 +1,6 @@
 module Utils exposing
     ( KeyEvent
     , dedupe
-    , embeddingBatchSize
     , excerptCountLabel
     , findMatches
     , formatNumber
@@ -103,16 +102,6 @@ modelToStoredModel model =
     , hiddenEntries = Set.toList model.hiddenEntries
     , bookmarks = Dict.toList model.bookmarks
     }
-
-
-charLimit : Int
-charLimit =
-    42
-
-
-embeddingBatchSize : Int
-embeddingBatchSize =
-    10
 
 
 juxt : (a -> b) -> (a -> c) -> a -> ( b, c )

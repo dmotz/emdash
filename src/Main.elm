@@ -64,7 +64,6 @@ import Utils
     exposing
         ( KeyEvent
         , dedupe
-        , embeddingBatchSize
         , findMatches
         , getTagCounts
         , insertOnce
@@ -146,6 +145,11 @@ maxSearchResults =
 minSemanticQueryLen : Int
 minSemanticQueryLen =
     5
+
+
+embeddingBatchSize : Int
+embeddingBatchSize =
+    10
 
 
 debounceConfig : Debounce.Config Msg
