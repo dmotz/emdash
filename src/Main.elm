@@ -809,6 +809,28 @@ update message model =
                 _ ->
                     noOp
 
+        ReceiveSemanticRank ( bookId, ids ) ->
+            let
+                model_ =
+                    { model
+                        | semanticRankMap =
+                            insert
+                                bookId
+                                ids
+                                model.semanticRankMap
+                    }
+            in
+            case model.page of
+                TitlePage book _ ->
+                    if book.id == bookId && model.entrySort == EntrySemanticSort then
+                        update (SortEntries model.entrySort) model_
+
+                    else
+                        ( model_, none )
+
+                _ ->
+                    ( model_, none )
+
         SetSemanticThreshold s ->
             case String.toFloat s of
                 Just n ->
