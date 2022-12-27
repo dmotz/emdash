@@ -5,6 +5,7 @@ module Model exposing
     , BookSort(..)
     , Entry
     , EntryMap
+    , EntrySort(..)
     , EntryTab(..)
     , Id
     , InputFocus(..)
@@ -50,6 +51,12 @@ type BookSort
     | NumSort
     | RatingSort
     | FavSort
+
+
+type EntrySort
+    = EntryPageSort
+    | EntryFavSort
+    | EntrySemanticSort
 
 
 type TagSort
