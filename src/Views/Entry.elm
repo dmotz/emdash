@@ -207,7 +207,7 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                     [ case activeTab of
                         Related ->
                             section
-                                [ class "related" ]
+                                [ class "relatedExcerpts" ]
                                 [ case mProgress of
                                     Just progressView ->
                                         progressView
