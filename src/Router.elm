@@ -1,7 +1,6 @@
 module Router exposing
     ( Route(..)
     , authorToRoute
-    , deslugify
     , entryToRoute
     , routeParser
     , searchToRoute
@@ -89,8 +88,3 @@ slugify : String -> String
 slugify =
     replace (rx "\\s") (always "-")
         >> replace (rx "[^\\w-]") (always "")
-
-
-deslugify : String -> String
-deslugify =
-    replace (rx "-") (always " ")

@@ -34,7 +34,6 @@ import Model
         , BookSort(..)
         , EntrySort(..)
         , EntryTab(..)
-        , InputFocus(..)
         , Model
         , Page(..)
         , Tag
