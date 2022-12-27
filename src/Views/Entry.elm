@@ -66,23 +66,62 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
         [ classList [ ( "entry", True ), ( "permalink", perma ) ]
         , id <| getEntryDomId entry.id
         ]
-        [ figure []
-            [ if not perma then
-                figcaption
-                    [ class "meta" ]
-                    [ div [] [ text <| fromInt (i + 1) ]
-                    , button
-                        [ onClick (ToggleFavorite entry.id)
-                        , classList
-                            [ ( "favorite", True )
-                            , ( "active", entry.isFavorite )
+        [ figure
+            []
+            [ figcaption
+                [ class "meta" ]
+                [ if perma then
+                    null
+
+                  else
+                    div [] [ text <| fromInt (i + 1) ]
+                , button
+                    [ onClick (ToggleFavorite entry.id)
+                    , classList
+                        [ ( "favorite", True )
+                        , ( "active", entry.isFavorite )
+                        ]
+                    ]
+                    [ img
+                        [ class "favoriteIcon"
+                        , src <|
+                            "/images/favorite"
+                                ++ (if entry.isFavorite then
+                                        "-filled"
+
+                                    else
+                                        ""
+                                   )
+                                ++ ".svg"
+                        ]
+                        []
+                    , div
+                        [ class "hint left" ]
+                        [ text <|
+                            (if entry.isFavorite then
+                                "Unmark"
+
+                             else
+                                "Mark"
+                            )
+                                ++ " as favorite"
+                        ]
+                    ]
+                , if perma then
+                    null
+
+                  else
+                    button
+                        [ classList
+                            [ ( "bookmark", True )
+                            , ( "active", isMarked )
                             ]
+                        , onClick (SetBookmark entry.bookId entry.id)
                         ]
                         [ img
-                            [ class "favoriteIcon"
-                            , src <|
-                                "/images/favorite"
-                                    ++ (if entry.isFavorite then
+                            [ src <|
+                                "/images/bookmark"
+                                    ++ (if isMarked then
                                             "-filled"
 
                                         else
@@ -94,51 +133,20 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                         , div
                             [ class "hint left" ]
                             [ text <|
-                                (if entry.isFavorite then
+                                (if isMarked then
                                     "Unmark"
 
                                  else
                                     "Mark"
                                 )
-                                    ++ " as favorite"
+                                    ++ " as last read in this book"
                             ]
                         ]
-                    , if perma then
-                        text ""
+                , if perma then
+                    null
 
-                      else
-                        button
-                            [ classList
-                                [ ( "bookmark", True )
-                                , ( "active", isMarked )
-                                ]
-                            , onClick (SetBookmark entry.bookId entry.id)
-                            ]
-                            [ img
-                                [ src <|
-                                    "/images/bookmark"
-                                        ++ (if isMarked then
-                                                "-filled"
-
-                                            else
-                                                ""
-                                           )
-                                        ++ ".svg"
-                                ]
-                                []
-                            , div
-                                [ class "hint left" ]
-                                [ text <|
-                                    (if isMarked then
-                                        "Unmark"
-
-                                     else
-                                        "Mark"
-                                    )
-                                        ++ " as last read in this book"
-                                ]
-                            ]
-                    , a
+                  else
+                    a
                         [ href <| entryToRoute books entry ]
                         [ text <|
                             if entry.page == -1 then
@@ -148,10 +156,7 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                                 "p. " ++ fromInt entry.page
                         , div [ class "hint left" ] [ text "Permalink" ]
                         ]
-                    ]
-
-              else
-                null
+                ]
             , blockquote [] [ text entry.text ]
             , if perma then
                 case get entry.bookId books of
