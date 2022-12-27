@@ -1,47 +1,33 @@
 module Utils exposing
     ( KeyEvent
-    , charLimit
     , dedupe
     , embeddingBatchSize
     , excerptCountLabel
-    , favoriteCountLabel
-    , find
     , findMatches
     , formatNumber
     , formatScore
     , getEntryDomId
-    , getIndex
-    , getNextIndex
-    , getPrevIndex
     , getTagCounts
     , insertOnce
     , juxt
     , modelToStoredModel
-    , normalizeTitle
     , null
-    , pluckIds
-    , queryCharMin
     , ratingEl
     , removeItem
     , rx
     , rx_
     , sortBooks
-    , takeExcerpt
     , titleCountLabel
-    , toDict
     , untaggedKey
-    , updateItem
-    , updateItems
     )
 
-import Dict exposing (Dict, empty, get, insert, update, values)
+import Dict exposing (Dict, empty, insert, update, values)
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (class, classList)
 import List
     exposing
         ( concatMap
         , filter
-        , filterMap
         , foldl
         , isEmpty
         , length
@@ -64,7 +50,7 @@ import Model
         )
 import Regex exposing (Regex, replace)
 import Set
-import String exposing (fromChar, fromInt, join, split, toList, toLower)
+import String exposing (fromInt, join, split, toLower)
 
 
 type alias KeyEvent =
@@ -72,11 +58,6 @@ type alias KeyEvent =
     , control : Bool
     , meta : Bool
     }
-
-
-queryCharMin : Int
-queryCharMin =
-    4
 
 
 untaggedKey : String
@@ -110,75 +91,6 @@ removeItem list x =
     Set.toList <| Set.remove x (Set.fromList list)
 
 
-updateItem : List a -> a -> a -> List a
-updateItem list old new =
-    map
-        (\x ->
-            if x == old then
-                new
-
-            else
-                x
-        )
-        list
-
-
-updateItems :
-    List { a | id : comparable }
-    -> Dict comparable { a | id : comparable }
-    -> List { a | id : comparable }
-updateItems list mapping =
-    map
-        (\x ->
-            withDefault x (get x.id mapping)
-        )
-        list
-
-
-getIndex : List a -> a -> Int
-getIndex list item =
-    let
-        f l target n =
-            case l of
-                [] ->
-                    -1
-
-                x :: xs ->
-                    if x == target then
-                        n
-
-                    else
-                        f xs target (n + 1)
-    in
-    f list item 0
-
-
-getNextIndex : List a -> a -> Int
-getNextIndex list item =
-    let
-        idx =
-            getIndex list item + 1
-    in
-    if idx == length list then
-        0
-
-    else
-        idx
-
-
-getPrevIndex : List a -> a -> Int
-getPrevIndex list item =
-    let
-        idx =
-            getIndex list item
-    in
-    if idx == 0 then
-        length list - 1
-
-    else
-        idx - 1
-
-
 dedupe : List comparable -> List comparable
 dedupe =
     Set.fromList >> Set.toList
@@ -203,51 +115,9 @@ embeddingBatchSize =
     10
 
 
-takeExcerpt : String -> String
-takeExcerpt text =
-    let
-        f acc chars n =
-            case chars of
-                x :: xs ->
-                    if n < charLimit || n >= charLimit && x /= ' ' then
-                        f (acc ++ fromChar x) xs (n + 1)
-
-                    else
-                        acc
-
-                [] ->
-                    acc
-    in
-    f "" (toList text) 0 ++ " …"
-
-
-find : List a -> (a -> Bool) -> Maybe a
-find l f =
-    case l of
-        x :: xs ->
-            if f x then
-                Just x
-
-            else
-                find xs f
-
-        [] ->
-            Nothing
-
-
 juxt : (a -> b) -> (a -> c) -> a -> ( b, c )
 juxt f g x =
     ( f x, g x )
-
-
-pluckIds : Dict Id a -> List Id -> List a
-pluckIds xs ids =
-    filterMap (\id -> get id xs) ids
-
-
-toDict : List { a | id : comparable } -> Dict comparable { a | id : comparable }
-toDict =
-    map (juxt .id identity) >> Dict.fromList
 
 
 phraseMatch : Regex -> (a -> String) -> a -> Bool
@@ -322,11 +192,6 @@ excerptCountLabel =
 titleCountLabel : Int -> String
 titleCountLabel =
     countLabel "title"
-
-
-favoriteCountLabel : Int -> String
-favoriteCountLabel =
-    countLabel "favorite"
 
 
 normalizeTitle : String -> String
