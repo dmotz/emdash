@@ -8,6 +8,7 @@ module Utils exposing
     , find
     , findMatches
     , formatNumber
+    , formatScore
     , getEntryDomId
     , getIndex
     , getNextIndex
@@ -307,6 +308,11 @@ countLabel label n =
             else
                 "s"
            )
+
+
+formatScore : Float -> Html msg
+formatScore =
+    (*) 100 >> round >> fromInt >> (\s -> s ++ "%") >> text
 
 
 excerptCountLabel : Int -> String
