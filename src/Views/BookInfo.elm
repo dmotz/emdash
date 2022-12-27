@@ -14,6 +14,7 @@ import Html
         , li
         , p
         , section
+        , span
         , text
         , ul
         )
@@ -33,8 +34,7 @@ import Maybe exposing (withDefault)
 import Model exposing (Book, BookMap, Id, NeighborMap, Tag)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
-import String exposing (fromInt)
-import Utils exposing (excerptCountLabel, getEntryDomId, null, ratingEl)
+import Utils exposing (excerptCountLabel, formatScore, getEntryDomId, null, ratingEl)
 import Views.TagSection exposing (tagSection)
 
 
@@ -45,9 +45,10 @@ bookInfo :
     -> Maybe Tag
     -> NeighborMap
     -> Maybe Id
+    -> EntrySort
     -> Maybe (Html Msg)
     -> Html Msg
-bookInfo book books tags pendingTag bookNeighborMap mBookmark progressView =
+bookInfo book books tags pendingTag bookNeighborMap mBookmark entrySort progressView =
     div
         [ class "bookInfo" ]
         [ h1 [] [ text book.title ]
@@ -75,7 +76,7 @@ bookInfo book books tags pendingTag bookNeighborMap mBookmark progressView =
                             (case get book.id bookNeighborMap of
                                 Just ids ->
                                     map
-                                        (\( id, _ ) ->
+                                        (\( id, score ) ->
                                             case
                                                 get id books
                                             of
@@ -88,6 +89,9 @@ bookInfo book books tags pendingTag bookNeighborMap mBookmark progressView =
                                                                     neighbor.slug
                                                             ]
                                                             [ text neighbor.title ]
+                                                        , span
+                                                            [ class "score" ]
+                                                            [ formatScore score ]
                                                         ]
 
                                                 _ ->
