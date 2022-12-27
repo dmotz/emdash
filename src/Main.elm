@@ -143,6 +143,11 @@ maxSearchResults =
     100
 
 
+minSemanticQueryLen : Int
+minSemanticQueryLen =
+    5
+
+
 debounceConfig : Debounce.Config Msg
 debounceConfig =
     { strategy = Debounce.soon 999
@@ -1243,7 +1248,7 @@ update message model =
                             )
                             []
                   }
-                , if String.length query >= 5 then
+                , if String.length query >= minSemanticQueryLen then
                     requestSemanticSearch ( query, model.semanticThreshold )
 
                   else
