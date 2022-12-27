@@ -26,12 +26,13 @@ import Html.Attributes exposing (class, classList, draggable, href, id, src)
 import Html.Events exposing (onClick, preventDefaultOn)
 import Html.Keyed as Keyed
 import Json.Decode as Decode exposing (Decoder)
-import List exposing (foldl, length, map, reverse, sortBy)
+import List exposing (filter, foldl, isEmpty, length, map, reverse, sortBy)
 import Maybe exposing (withDefault)
 import Model
     exposing
         ( BookMap
         , BookSort(..)
+        , EntrySort(..)
         , EntryTab(..)
         , InputFocus(..)
         , Model
@@ -187,6 +188,14 @@ view model =
                                 ]
 
                         TitlePage book entries ->
+                            let
+                                entries_ =
+                                    if model.entrySort == EntryFavSort then
+                                        filter .isFavorite entries
+
+                                    else
+                                        entries
+                            in
                             div
                                 []
                                 [ bookInfo
@@ -196,9 +205,17 @@ view model =
                                     model.pendingTag
                                     model.bookNeighborMap
                                     (get book.id model.bookmarks)
+                                    model.entrySort
                                     progressView
+                                , if isEmpty entries_ then
+                                    div
+                                        [ class "noFav" ]
+                                        [ text "No favorites yet" ]
+
+                                  else
+                                    null
                                 , entryList
-                                    entries
+                                    entries_
                                     model.entries
                                     model.books
                                     model.neighborMap
