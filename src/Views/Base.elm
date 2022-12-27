@@ -299,6 +299,7 @@ view model =
 
                         SettingsPage ->
                             settingsView
+                                model.version
                                 (size model.entries)
                                 (size model.books)
                                 (size model.authorRouteMap)
