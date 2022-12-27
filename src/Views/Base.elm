@@ -96,7 +96,7 @@ view model =
                     [ a
                         [ href "/settings" ]
                         [ img [ src "/images/focus.svg" ] []
-                        , div [ class "hint left" ] [ text "Settings" ]
+                        , div [ class "hint left" ] [ text "Settings &c." ]
                         ]
                     , button
                         [ class "random"
