@@ -24,6 +24,7 @@ import Utils exposing (KeyEvent)
 
 type Msg
     = NoOp
+    | RestoreState (Maybe StoredModel) Bool
     | ShowRandom
     | GotRandomIndex Int
     | DragEnter
