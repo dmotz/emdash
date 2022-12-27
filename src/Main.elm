@@ -881,22 +881,22 @@ update message model =
                             |> andThen (\id -> get id model.books)
                     of
                         Just book ->
+                            let
+                                entries =
+                                    model.entries
+                                        |> Dict.filter
+                                            (\_ { bookId } ->
+                                                bookId == book.id
+                                            )
+                                        |> values
+                                        |> sortBy .page
+                            in
                             ( { model_
-                                | page =
-                                    TitlePage
-                                        book
-                                        (model.entries
-                                            |> Dict.filter
-                                                (\_ { bookId } ->
-                                                    bookId == book.id
-                                                )
-                                            |> values
-                                            |> sortBy .page
-                                        )
+                                | page = TitlePage book entries
                                 , entrySort = EntryPageSort
                               }
                             , batch
-                                [ case mFragment of
+                                ((case mFragment of
                                     Just entryId ->
                                         attempt
                                             ScrollToElement
@@ -913,12 +913,19 @@ update message model =
 
                                             _ ->
                                                 scrollTop
-                                , if model.embeddingsReady then
-                                    requestBookNeighbors book.id
+                                 )
+                                    :: (if model.embeddingsReady then
+                                            [ requestBookNeighbors book.id
+                                            , requestSemanticRank
+                                                ( book.id
+                                                , map .id entries
+                                                )
+                                            ]
 
-                                  else
-                                    none
-                                ]
+                                        else
+                                            []
+                                       )
+                                )
                             )
 
                         _ ->
