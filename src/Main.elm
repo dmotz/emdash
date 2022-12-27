@@ -114,6 +114,12 @@ port receiveExcerptNeighbors : (( Id, ScorePairs ) -> msg) -> Sub msg
 port receiveBookNeighbors : (( Id, ScorePairs ) -> msg) -> Sub msg
 
 
+port requestSemanticRank : ( Id, List Id ) -> Cmd msg
+
+
+port receiveSemanticRank : (( Id, ScorePairs ) -> msg) -> Sub msg
+
+
 port requestUnicodeNormalized : String -> Cmd msg
 
 
@@ -257,6 +263,7 @@ main =
                     , receiveBookEmbeddings ReceiveBookEmbeddings
                     , receiveUnicodeNormalized ReceiveUnicodeNormalized
                     , receiveSemanticSearch ReceiveSemanticSearch
+                    , receiveSemanticRank ReceiveSemanticRank
                     ]
         , onUrlChange = UrlChanged
         , onUrlRequest = LinkClicked
