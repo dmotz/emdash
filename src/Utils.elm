@@ -123,7 +123,7 @@ findMatches query accessor xs =
         pattern =
             split " " query
                 |> map (\word -> "(?=.*\\b" ++ word ++ ")")
-                |> join ""
+                |> String.concat
 
         wordsRx =
             "^" ++ pattern ++ ".*$" |> rx

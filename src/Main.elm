@@ -172,7 +172,7 @@ createModel version mStoredModel demoMode url key =
             Dict.fromList (map (juxt .id identity) booksWithSlugs)
 
         tags =
-            restored.books |> map .tags |> concat |> dedupe
+            restored.books |> concatMap .tags |> dedupe
     in
     { page = MainPage (values books) Nothing
     , demoMode = demoMode
@@ -185,7 +185,7 @@ createModel version mStoredModel demoMode url key =
     , hiddenEntries = Set.fromList restored.hiddenEntries
     , completedEmbeddings = Set.empty
     , embeddingsReady = False
-    , tags = restored.books |> map .tags |> concat |> dedupe
+    , tags = restored.books |> concatMap .tags |> dedupe
     , tagCounts = getTagCounts books
     , tagSort = TagAlphaSort
     , showTagHeader = length tags > 0

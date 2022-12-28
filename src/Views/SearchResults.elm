@@ -80,11 +80,8 @@ searchResults bookMap entryMap books entries semanticMatches semanticReady query
                                     (filterMap
                                         (\( id, score ) ->
                                             get id entryMap
-                                                |> andThen
-                                                    (\entry ->
-                                                        Just
-                                                            ( entry, score )
-                                                    )
+                                                |> Maybe.map
+                                                    (\entry -> ( entry, score ))
                                         )
                                         semanticMatches
                                     )
