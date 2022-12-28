@@ -1,14 +1,14 @@
 module Views.Citation exposing (citation)
 
-import Html exposing (Html, a, cite, div, meter, span, text)
-import Html.Attributes exposing (class, href, value)
+import Html exposing (Html, a, cite, div, span, text)
+import Html.Attributes exposing (class, href)
 import Html.Events exposing (stopPropagationOn)
 import Json.Decode exposing (succeed)
 import List exposing (intersperse, map)
 import Model exposing (Book, Entry)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
-import String exposing (fromFloat, fromInt)
+import String exposing (fromInt)
 import Utils exposing (formatScore, getEntryDomId)
 
 
@@ -60,7 +60,7 @@ citation entry book mScore =
                         [ div
                             [ class "score" ]
                             [ span [] [ formatScore score ]
-                            , meter [ score |> fromFloat |> value ] []
+                            , div [ class "hint" ] [ text "Similarity score" ]
                             ]
                         ]
 
