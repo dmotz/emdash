@@ -626,8 +626,12 @@ update message model =
                 , batch
                     [ deleteEmbedding id
                     , case model.page of
-                        EntryPage _ _ ->
-                            Nav.pushUrl model.key "/"
+                        EntryPage entry _ ->
+                            if entry.id == id then
+                                Nav.pushUrl model.key "/"
+
+                            else
+                                none
 
                         _ ->
                             none
