@@ -8,6 +8,7 @@ import Html
         , Html
         , a
         , button
+        , code
         , div
         , footer
         , h1
@@ -17,6 +18,7 @@ import Html
         , img
         , li
         , main_
+        , p
         , span
         , sup
         , text
@@ -341,6 +343,24 @@ view model =
                  else
                     text ""
                ]
+            ++ (case model.parsingError of
+                    Just msg ->
+                        [ div
+                            [ class "modal" ]
+                            [ div
+                                [ class "errorBox" ]
+                                [ p [] [ text "An error occurred parsing the file:" ]
+                                , div [] [ code [] [ text msg ] ]
+                                , button
+                                    [ class "button", onClick ResetError ]
+                                    [ text "Dismiss" ]
+                                ]
+                            ]
+                        ]
+
+                    _ ->
+                        []
+               )
         )
 
 
