@@ -79,6 +79,7 @@ button
   font-family: $font
   padding: 0.5rem 1rem
   border: 1px solid $fg
+  background: $bg
   box-shadow: 2px 2px 0 0 $fg
   position: relative
   top: 0
@@ -199,6 +200,7 @@ progress
   @include fade
   position: absolute
   display: flex
+  font-weight: normal
   align-items: center
   pointer-events: none
   width: max-content
@@ -246,6 +248,7 @@ progress
 
 .smallCaps
   font-variant: small-caps
+  font-weight: 500
 
 .modeHeading
   margin: 0 auto
@@ -293,7 +296,7 @@ progress
       text-decoration-color: $fg
 
   button
-    text-decoration: underline 2px transparent
+    text-decoration: underline 3px transparent
     color: $mid4
     font-size: 1.8rem
 
@@ -376,3 +379,26 @@ footer
 
   p
     margin-bottom: 4rem
+
+.modal
+  position: fixed
+  display: flex
+  justify-content: center
+  align-items: center
+  background: rgba(255, 255, 255, 0.9)
+  inset: 0
+  z-index: 9999
+
+  .errorBox
+    font-size: 1.8rem
+    max-width: 60rem
+    border: 4px double $mid2
+    padding: 4rem
+    background: $bg
+
+    div
+      margin: 3rem 0
+      font-size: 1.4rem
+
+      code
+        user-select: text
