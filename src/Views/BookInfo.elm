@@ -91,7 +91,11 @@ bookInfo book books tags pendingTag bookNeighborMap mBookmark entrySort progress
                                                             [ text neighbor.title ]
                                                         , span
                                                             [ class "score" ]
-                                                            [ formatScore score ]
+                                                            [ formatScore score
+                                                            , div
+                                                                [ class "hint" ]
+                                                                [ text "Similarity score" ]
+                                                            ]
                                                         ]
 
                                                 _ ->
