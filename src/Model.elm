@@ -148,7 +148,7 @@ type alias Model =
     , isDragging : Bool
     , reverseSort : Bool
     , inputFocused : Maybe InputFocus
-    , parsingError : Bool
+    , parsingError : Maybe String
     , url : Url
     , key : Nav.Key
     , bookSort : BookSort

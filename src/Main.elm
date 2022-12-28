@@ -195,7 +195,7 @@ createModel version mStoredModel demoMode url key =
     , isDragging = False
     , reverseSort = True
     , inputFocused = Nothing
-    , parsingError = False
+    , parsingError = Nothing
     , url = url
     , key = key
     , bookSort = RecencySort
@@ -342,8 +342,10 @@ update message model =
                         (RestoreState (Just storedModel) model.demoMode)
                         model
 
-                _ ->
-                    noOp
+                Err e ->
+                    ( { model | parsingError = Just (Decode.errorToString e) }
+                    , none
+                    )
 
         DragEnter ->
             ( { model | isDragging = True }, none )
@@ -399,11 +401,11 @@ update message model =
                     Parser.getTitleRouteMap bookVals
             in
             if Dict.isEmpty newEntries then
-                ( { model | parsingError = True }, none )
+                ( { model | parsingError = Just "Failed to parse file." }, none )
 
             else
                 ( { model
-                    | parsingError = False
+                    | parsingError = Nothing
                     , entries =
                         Dict.union model.entries newEntries
                             |> Dict.filter hiddenPred
@@ -424,7 +426,7 @@ update message model =
                     |> store
 
         ResetError ->
-            ( { model | parsingError = False }, none )
+            ( { model | parsingError = Nothing }, none )
 
         ShowRandom ->
             ( model
