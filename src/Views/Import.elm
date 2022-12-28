@@ -39,6 +39,7 @@ importView emptyOrDemo =
                     null
                 , button
                     [ class "button"
+                    , onClick PickKindleFile
                     ]
                     [ text "Import from Kindle "
                     ]

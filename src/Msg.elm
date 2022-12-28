@@ -31,8 +31,8 @@ type Msg
     | DragEnter
     | DragLeave
     | GotFiles (String -> Msg) File (List File)
-    | FileLoad String
-    | PickFile
+    | LoadKindleFile String
+    | PickKindleFile
     | KeyDown KeyEvent
     | SetInputFocus (Maybe InputFocus)
     | HideEntry Id

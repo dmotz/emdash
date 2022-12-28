@@ -358,10 +358,10 @@ update message model =
             , perform msg (File.toString file)
             )
 
-        PickFile ->
-            ( model, Select.files [ "text/plain" ] (GotFiles FileLoad) )
+        PickKindleFile ->
+            ( model, Select.files [ "text/plain" ] (GotFiles LoadKindleFile) )
 
-        FileLoad text ->
+        LoadKindleFile text ->
             ( model, requestUnicodeNormalized text )
 
         ReceiveUnicodeNormalized text ->
