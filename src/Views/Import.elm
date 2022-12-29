@@ -51,7 +51,9 @@ importView emptyOrDemo =
                         , ol []
                             [ li
                                 []
-                                [ text "Plug your Kindle in via USB" ]
+                                [ text "Plug your Kindle in via "
+                                , span [ class "smallCaps" ] [ text "usb" ]
+                                ]
                             , li
                                 []
                                 [ text "Find "
