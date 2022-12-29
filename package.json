@@ -13,7 +13,8 @@
     "start": "vite",
     "build": "vite build",
     "postinstall": "elm-tooling install",
-    "prebuild": "elm-tooling install"
+    "prebuild": "elm-tooling install",
+    "lint": "elm-review --template jfmengels/elm-review-unused/example && elm-review --template jfmengels/elm-review-simplify/example"
   },
   "dependencies": {
     "@tensorflow-models/universal-sentence-encoder": "^1.3.3",
