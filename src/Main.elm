@@ -14,8 +14,7 @@ import Http
 import Json.Decode as Decode
 import List
     exposing
-        ( concat
-        , concatMap
+        ( concatMap
         , drop
         , filter
         , filterMap

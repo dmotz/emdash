@@ -49,7 +49,7 @@ import Model
         )
 import Regex exposing (Regex, replace)
 import Set
-import String exposing (fromInt, join, split, toLower)
+import String exposing (fromInt, split, toLower)
 
 
 type alias KeyEvent =
