@@ -38,25 +38,32 @@
     opacity: 0
     @include fade
 
-  .bookmark
+  .bookmark, .favorite
     position: relative
-    width: 0.8rem
-    margin: 1rem 0
+    width: 8px
+    transform: translateZ(0.1px)
+    // height: 11px
+    // width: 1.6rem
+    margin: 0.6rem 0
     opacity: 0
     @include fade
 
-    &.bookmarked
+    &.active
       opacity: 1
 
-    img
-      width: 100%
+  img
+    width: 100%
+
+  .favorite
+    width: 15.33px
+    margin-right: -3.3px
 
   &:hover
     .tabs, hr
       opacity: 1
 
     .meta
-      .page, a, .bookmark
+      .page, a, .bookmark, .favorite
         opacity: 1
 
   .wait
@@ -69,6 +76,9 @@
       font-size: 2.4rem
       margin: 4rem 0
       margin-bottom: 6rem
+
+    .favorite
+      margin-top: 1rem
 
 blockquote
   font-size: 2.4rem
