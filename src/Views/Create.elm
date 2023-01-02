@@ -72,7 +72,7 @@ createView pendingEntry titles authors =
                     , spellcheck False
                     ]
                     []
-                , text "Book / Title"
+                , text "Book title"
                 , datalist
                     [ id listId ]
                     (map (\t -> option [ value t ] []) titles)
@@ -94,7 +94,7 @@ createView pendingEntry titles authors =
                     , spellcheck False
                     ]
                     []
-                , text "Author"
+                , text "Author name"
                 , datalist
                     [ id listId ]
                     (map (\t -> option [ value t ] []) authors)
@@ -119,8 +119,11 @@ createView pendingEntry titles authors =
                         )
                     ]
                     []
-                , text "Page № "
-                , span [] [ text "(optional)" ]
+                , div
+                    []
+                    [ text "Page № "
+                    , span [] [ text "(optional)" ]
+                    ]
                 ]
             ]
         , button
