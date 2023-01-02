@@ -38,7 +38,7 @@ type Page
     | SettingsPage
     | LandingPage
     | ImportPage
-    | CreatePage (List Title) (List Author)
+    | CreatePage PendingEntry (List Title) (List Author)
 
 
 type InputFocus
@@ -158,7 +158,6 @@ type alias Model =
     , isDragging : Bool
     , reverseSort : Bool
     , inputFocused : Maybe InputFocus
-    , pendingEntry : PendingEntry
     , parsingError : Maybe String
     , url : Url
     , key : Nav.Key
