@@ -631,7 +631,7 @@ update message model =
                                 )
 
                         _ ->
-                            model.books
+                            ( model.books, model.bookmarks )
             in
             store
                 ( { model
