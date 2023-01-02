@@ -55,6 +55,7 @@ import Utils
         )
 import Views.BookInfo exposing (bookInfo)
 import Views.BookList exposing (bookList)
+import Views.Create exposing (createView)
 import Views.EmbeddingProgress exposing (embeddingProgress)
 import Views.Entry exposing (entryView)
 import Views.EntryList exposing (entryList)
@@ -312,6 +313,9 @@ view model =
                                 (model.demoMode
                                     || Dict.isEmpty model.entries
                                 )
+
+                        CreatePage pEntry books authors ->
+                            createView pEntry books authors
 
                         _ ->
                             null
