@@ -9,6 +9,7 @@ import Model
     exposing
         ( Book
         , BookSort
+        , Entry
         , EntrySort
         , EntryTab
         , Id
@@ -37,7 +38,7 @@ type Msg
     | PickKindleFile
     | KeyDown KeyEvent
     | SetInputFocus (Maybe InputFocus)
-    | HideEntry Id
+    | HideEntry Entry
     | UpdateNotes Id String
     | SetBookmark Id Id
     | ToggleFavorite Id

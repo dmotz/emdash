@@ -260,7 +260,7 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                                 []
                                 [ button
                                     [ class "button"
-                                    , onClick (HideEntry entry.id)
+                                    , onClick (HideEntry entry)
                                     ]
                                     [ text "× Delete"
                                     , div
