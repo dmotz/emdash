@@ -1327,115 +1327,134 @@ update message model =
             let
                 entryId =
                     getEntryId entry.text (entry.title ++ " " ++ entry.author)
-
-                mBook =
-                    model.books
-                        |> values
-                        |> filter
-                            (\b ->
-                                b.title
-                                    == entry.title
-                                    && member entry.author b.authors
-                            )
-                        |> head
-
-                timestamp =
-                    posixToMillis time
-
-                fullEntry =
-                    \bookId ->
-                        { id = entryId
-                        , text = entry.text
-                        , bookId = bookId
-                        , date = timestamp
-                        , page = entry.page
-                        , notes = ""
-                        , isFavorite = False
-                        }
-
-                model_ =
-                    { model
-                        | neighborMap = Dict.empty
-                        , bookNeighborMap = Dict.empty
-                        , embeddingsReady = False
-                    }
             in
-            store
-                (case mBook of
-                    Just book ->
-                        let
-                            newBooks =
-                                Dict.update
-                                    book.id
-                                    (Maybe.map
-                                        (\b ->
-                                            { b
-                                                | count = b.count + 1
-                                                , sortIndex =
-                                                    max
-                                                        b.sortIndex
-                                                        timestamp
-                                            }
-                                        )
+            case get entryId model.entries of
+                Just existingEntry ->
+                    ( model
+                    , Nav.pushUrl
+                        model.key
+                        (entryToRoute model.books existingEntry)
+                    )
+
+                _ ->
+                    let
+                        mBook =
+                            model.books
+                                |> values
+                                |> filter
+                                    (\b ->
+                                        b.title
+                                            == entry.title
+                                            && member entry.author b.authors
                                     )
-                                    model.books
+                                |> head
 
-                            newEntry =
-                                fullEntry book.id
-                        in
-                        ( { model_
-                            | books = newBooks
-                            , entries =
-                                Dict.insert entryId newEntry model.entries
-                            , semanticRankMap =
-                                Dict.remove
-                                    book.id
-                                    model.semanticRankMap
-                            , tagCounts = getTagCounts newBooks
-                          }
-                        , Nav.pushUrl model.key (entryToRoute newBooks newEntry)
+                        timestamp =
+                            posixToMillis time
+
+                        fullEntry =
+                            \bookId ->
+                                { id = entryId
+                                , text = entry.text
+                                , bookId = bookId
+                                , date = timestamp
+                                , page = entry.page
+                                , notes = ""
+                                , isFavorite = False
+                                }
+
+                        model_ =
+                            { model
+                                | neighborMap = Dict.empty
+                                , bookNeighborMap = Dict.empty
+                                , embeddingsReady = False
+                            }
+                    in
+                    store
+                        (case mBook of
+                            Just book ->
+                                let
+                                    newBooks =
+                                        Dict.update
+                                            book.id
+                                            (Maybe.map
+                                                (\b ->
+                                                    { b
+                                                        | count = b.count + 1
+                                                        , sortIndex =
+                                                            max
+                                                                b.sortIndex
+                                                                timestamp
+                                                    }
+                                                )
+                                            )
+                                            model.books
+
+                                    newEntry =
+                                        fullEntry book.id
+                                in
+                                ( { model_
+                                    | books = newBooks
+                                    , entries =
+                                        Dict.insert entryId
+                                            newEntry
+                                            model.entries
+                                    , semanticRankMap =
+                                        Dict.remove
+                                            book.id
+                                            model.semanticRankMap
+                                    , tagCounts = getTagCounts newBooks
+                                  }
+                                , Nav.pushUrl
+                                    model.key
+                                    (entryToRoute newBooks newEntry)
+                                )
+
+                            _ ->
+                                let
+                                    bookId =
+                                        getEntryId entry.title entry.author
+
+                                    ( titleRouteMap, booksWithSlugs ) =
+                                        Dict.insert
+                                            bookId
+                                            { id = bookId
+                                            , title = entry.title
+                                            , authors = [ entry.author ]
+                                            , count = 1
+                                            , rating = 0
+                                            , sortIndex = timestamp
+                                            , tags = []
+                                            , slug = ""
+                                            , favCount = 0
+                                            }
+                                            model.books
+                                            |> values
+                                            |> Parser.getTitleRouteMap
+
+                                    newBooks =
+                                        Dict.fromList
+                                            (map
+                                                (juxt .id identity)
+                                                booksWithSlugs
+                                            )
+
+                                    newEntry =
+                                        fullEntry bookId
+                                in
+                                ( { model_
+                                    | books = newBooks
+                                    , entries =
+                                        Dict.insert entryId newEntry model.entries
+                                    , titleRouteMap = titleRouteMap
+                                    , authorRouteMap =
+                                        Parser.getAuthorRouteMap booksWithSlugs
+                                  }
+                                , Nav.pushUrl
+                                    model.key
+                                    (entryToRoute newBooks newEntry)
+                                )
                         )
-
-                    _ ->
-                        let
-                            bookId =
-                                getEntryId entry.title entry.author
-
-                            ( titleRouteMap, booksWithSlugs ) =
-                                Dict.insert
-                                    bookId
-                                    { id = bookId
-                                    , title = entry.title
-                                    , authors = [ entry.author ]
-                                    , count = 1
-                                    , rating = 0
-                                    , sortIndex = timestamp
-                                    , tags = []
-                                    , slug = ""
-                                    , favCount = 0
-                                    }
-                                    model.books
-                                    |> values
-                                    |> Parser.getTitleRouteMap
-
-                            newBooks =
-                                Dict.fromList
-                                    (map (juxt .id identity) booksWithSlugs)
-
-                            newEntry =
-                                fullEntry bookId
-                        in
-                        ( { model_
-                            | books = newBooks
-                            , entries =
-                                Dict.insert entryId newEntry model.entries
-                            , titleRouteMap = titleRouteMap
-                            , authorRouteMap =
-                                Parser.getAuthorRouteMap booksWithSlugs
-                          }
-                        , Nav.pushUrl model.key (entryToRoute newBooks newEntry)
-                        )
-                )
 
         PendingTitleBlur ->
             case model.page of
