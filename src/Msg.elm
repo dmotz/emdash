@@ -50,7 +50,7 @@ type Msg
     | ExportJson
     | ImportJson
     | ResetError
-    | ExportEpub
+    | ExportEpub Posix
     | RequestEmbeddings
     | ReceiveEmbeddings (List Id)
     | ReceiveBookEmbeddings ()

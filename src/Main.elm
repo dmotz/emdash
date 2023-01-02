@@ -688,8 +688,8 @@ update message model =
                     )
                     model
 
-        ExportEpub ->
-            ( model, Epub.export (values model.books) (values model.entries) )
+        ExportEpub time ->
+            ( model, Epub.export time (values model.books) (values model.entries) )
 
         RequestEmbeddings ->
             let
