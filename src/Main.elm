@@ -194,6 +194,7 @@ createModel version mStoredModel demoMode url key =
     , isDragging = False
     , reverseSort = True
     , inputFocused = Nothing
+    , pendingEntry = PendingEntry "" "" "" -1
     , parsingError = Nothing
     , url = url
     , key = key

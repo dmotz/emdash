@@ -12,6 +12,7 @@ module Model exposing
     , Model
     , NeighborMap
     , Page(..)
+    , PendingEntry
     , ScorePairs
     , StoredModel
     , Tag
@@ -114,6 +115,14 @@ type alias Entry =
     }
 
 
+type alias PendingEntry =
+    { title : Title
+    , author : Author
+    , text : String
+    , page : Int
+    }
+
+
 type alias EntryMap =
     Dict Id Entry
 
@@ -148,6 +157,7 @@ type alias Model =
     , isDragging : Bool
     , reverseSort : Bool
     , inputFocused : Maybe InputFocus
+    , pendingEntry : PendingEntry
     , parsingError : Maybe String
     , url : Url
     , key : Nav.Key
