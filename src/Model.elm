@@ -38,6 +38,7 @@ type Page
     | SettingsPage
     | LandingPage
     | ImportPage
+    | CreatePage (List Title) (List Author)
 
 
 type InputFocus

@@ -250,6 +250,9 @@ main =
                                 ImportPage ->
                                     "Import"
 
+                                CreatePage _ _ ->
+                                    "New excerpt"
+
                                 NotFoundPage _ ->
                                     "404"
 
@@ -1073,6 +1076,16 @@ update message model =
 
                 Just ImportRoute ->
                     ( { model_ | page = ImportPage }, scrollTop )
+
+                Just CreateRoute ->
+                    ( { model_
+                        | page =
+                            CreatePage
+                                (values model.books |> map .title |> sort)
+                                (values model.authorRouteMap)
+                      }
+                    , scrollTop
+                    )
 
                 _ ->
                     ( { model_ | page = NotFoundPage "Route not found." }
