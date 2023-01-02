@@ -608,7 +608,16 @@ update message model =
                                         (\b -> { b | count = b.count - 1 })
                                     )
                                     model.books
-                                , model.bookmarks
+                                , case get book.id model.bookmarks of
+                                    Just id ->
+                                        if id == entry.id then
+                                            remove book.id model.bookmarks
+
+                                        else
+                                            model.bookmarks
+
+                                    _ ->
+                                        model.bookmarks
                                 )
 
                         _ ->
