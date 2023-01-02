@@ -1294,3 +1294,6 @@ update message model =
 
                 Err _ ->
                     noOp
+
+        GetTime msg ->
+            ( model, perform msg Time.now )
