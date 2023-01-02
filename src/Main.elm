@@ -588,33 +588,31 @@ update message model =
         SetTagSort sort ->
             ( { model | tagSort = sort }, none )
 
-        HideEntry id ->
+        HideEntry entry ->
             let
                 entries =
-                    remove id model.entries
+                    remove entry.id model.entries
 
                 books =
-                    withDefault
-                        model.books
-                        (get id model.entries
-                            |> Maybe.map
-                                (\{ bookId } ->
-                                    Dict.update
-                                        bookId
-                                        (Maybe.map
-                                            (\book ->
-                                                { book
-                                                    | count = book.count - 1
-                                                }
-                                            )
-                                        )
-                                        model.books
-                                )
-                        )
+                    case get entry.bookId model.books of
+                        Just book ->
+                            if book.count == 1 then
+                                remove book.id model.books
+
+                            else
+                                Dict.update
+                                    book.id
+                                    (Maybe.map
+                                        (\b -> { b | count = b.count - 1 })
+                                    )
+                                    model.books
+
+                        _ ->
+                            model.books
             in
             store
                 ( { model
-                    | hiddenEntries = Set.insert id model.hiddenEntries
+                    | hiddenEntries = Set.insert entry.id model.hiddenEntries
                     , entries = entries
                     , books = books
                     , page =
@@ -623,18 +621,26 @@ update message model =
                                 TitlePage
                                     (withDefault oldBook (get oldBook.id books))
                                     (filter
-                                        (\entry -> entry.id /= id)
+                                        (\e -> e.id /= entry.id)
                                         oldEntries
                                     )
 
                             _ ->
                                 model.page
+                    , tagCounts = getTagCounts books
                   }
                 , batch
-                    [ deleteEmbedding id
+                    [ deleteEmbedding entry.id
                     , case model.page of
-                        EntryPage entry _ ->
-                            if entry.id == id then
+                        EntryPage { id } _ ->
+                            if id == entry.id then
+                                Nav.pushUrl model.key "/"
+
+                            else
+                                none
+
+                        TitlePage book ents ->
+                            if book.id == entry.bookId && length ents == 1 then
                                 Nav.pushUrl model.key "/"
 
                             else
@@ -1385,11 +1391,9 @@ update message model =
                                 ( { model_
                                     | books = newBooks
                                     , entries =
-                                        Dict.insert entryId
-                                            newEntry
-                                            model.entries
+                                        insert entryId newEntry model.entries
                                     , semanticRankMap =
-                                        Dict.remove
+                                        remove
                                             book.id
                                             model.semanticRankMap
                                     , tagCounts = getTagCounts newBooks
@@ -1405,7 +1409,7 @@ update message model =
                                         getEntryId entry.title entry.author
 
                                     ( titleRouteMap, booksWithSlugs ) =
-                                        Dict.insert
+                                        insert
                                             bookId
                                             { id = bookId
                                             , title = entry.title
@@ -1434,7 +1438,7 @@ update message model =
                                 ( { model_
                                     | books = newBooks
                                     , entries =
-                                        Dict.insert entryId newEntry model.entries
+                                        insert entryId newEntry model.entries
                                     , titleRouteMap = titleRouteMap
                                     , authorRouteMap =
                                         Parser.getAuthorRouteMap booksWithSlugs
