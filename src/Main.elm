@@ -605,7 +605,17 @@ update message model =
                                 ( Dict.update
                                     book.id
                                     (Maybe.map
-                                        (\b -> { b | count = b.count - 1 })
+                                        (\b ->
+                                            { b
+                                                | count = b.count - 1
+                                                , favCount =
+                                                    if entry.isFavorite then
+                                                        b.favCount - 1
+
+                                                    else
+                                                        b.favCount
+                                            }
+                                        )
                                     )
                                     model.books
                                 , case get book.id model.bookmarks of
