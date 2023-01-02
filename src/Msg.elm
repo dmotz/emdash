@@ -13,6 +13,7 @@ import Model
         , EntryTab
         , Id
         , InputFocus
+        , PendingEntry
         , ScorePairs
         , StoredModel
         , Tag
@@ -72,3 +73,4 @@ type Msg
     | StartDemo
     | GotDemoData (Result Http.Error String)
     | GetTime (Posix -> Msg)
+    | UpdatePendingEntry PendingEntry

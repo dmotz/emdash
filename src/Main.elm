@@ -1297,3 +1297,6 @@ update message model =
 
         GetTime msg ->
             ( model, perform msg Time.now )
+
+        UpdatePendingEntry pEntry ->
+            ( { model | pendingEntry = pEntry }, none )
