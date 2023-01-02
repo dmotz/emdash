@@ -1361,7 +1361,7 @@ update message model =
                     }
             in
             store
-                ( case mBook of
+                (case mBook of
                     Just book ->
                         let
                             newBooks =
@@ -1379,27 +1379,29 @@ update message model =
                                         )
                                     )
                                     model.books
+
+                            newEntry =
+                                fullEntry book.id
                         in
-                        { model_
+                        ( { model_
                             | books = newBooks
                             , entries =
-                                Dict.insert
-                                    entryId
-                                    (fullEntry book.id)
-                                    model.entries
+                                Dict.insert entryId newEntry model.entries
                             , semanticRankMap =
                                 Dict.remove
                                     book.id
                                     model.semanticRankMap
                             , tagCounts = getTagCounts newBooks
-                        }
+                          }
+                        , Nav.pushUrl model.key (entryToRoute newBooks newEntry)
+                        )
 
                     _ ->
                         let
                             bookId =
                                 getEntryId entry.title entry.author
 
-                            newBooks =
+                            ( titleRouteMap, booksWithSlugs ) =
                                 Dict.insert
                                     bookId
                                     { id = bookId
@@ -1414,23 +1416,25 @@ update message model =
                                     }
                                     model.books
                                     |> values
+                                    |> Parser.getTitleRouteMap
 
-                            ( titleRouteMap, booksWithSlugs ) =
-                                Parser.getTitleRouteMap newBooks
-                        in
-                        { model_
-                            | books =
+                            newBooks =
                                 Dict.fromList
                                     (map (juxt .id identity) booksWithSlugs)
+
+                            newEntry =
+                                fullEntry bookId
+                        in
+                        ( { model_
+                            | books = newBooks
                             , entries =
-                                Dict.insert
-                                    entryId
-                                    (fullEntry bookId)
-                                    model.entries
+                                Dict.insert entryId newEntry model.entries
                             , titleRouteMap = titleRouteMap
-                            , authorRouteMap = Parser.getAuthorRouteMap newBooks
-                        }
-                , none
+                            , authorRouteMap =
+                                Parser.getAuthorRouteMap booksWithSlugs
+                          }
+                        , Nav.pushUrl model.key (entryToRoute newBooks newEntry)
+                        )
                 )
 
         PendingTitleBlur ->
