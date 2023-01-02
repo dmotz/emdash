@@ -194,7 +194,6 @@ createModel version mStoredModel demoMode url key =
     , isDragging = False
     , reverseSort = True
     , inputFocused = Nothing
-    , pendingEntry = PendingEntry "" "" "" -1
     , parsingError = Nothing
     , url = url
     , key = key
@@ -250,7 +249,7 @@ main =
                                 ImportPage ->
                                     "Import"
 
-                                CreatePage _ _ ->
+                                CreatePage _ _ _ ->
                                     "New excerpt"
 
                                 NotFoundPage _ ->
@@ -1081,6 +1080,7 @@ update message model =
                     ( { model_
                         | page =
                             CreatePage
+                                (PendingEntry "" "" "" -1)
                                 (values model.books |> map .title |> sort)
                                 (values model.authorRouteMap)
                       }
@@ -1313,4 +1313,9 @@ update message model =
             ( model, perform msg Time.now )
 
         UpdatePendingEntry pEntry ->
-            ( { model | pendingEntry = pEntry }, none )
+            case model.page of
+                CreatePage _ titles authors ->
+                    ( { model | page = CreatePage pEntry titles authors }, none )
+
+                _ ->
+                    noOp
