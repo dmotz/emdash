@@ -24,6 +24,7 @@ import List
         , length
         , map
         , member
+        , sort
         , sortBy
         , take
         )
@@ -1431,3 +1432,34 @@ update message model =
                         }
                 , none
                 )
+
+        PendingTitleBlur ->
+            case model.page of
+                CreatePage pEntry titles authors ->
+                    case
+                        model.books
+                            |> values
+                            |> filter (\book -> book.title == pEntry.title)
+                            |> head
+                    of
+                        Just book ->
+                            ( { model
+                                | page =
+                                    CreatePage
+                                        { pEntry
+                                            | author =
+                                                withDefault
+                                                    ""
+                                                    (head book.authors)
+                                        }
+                                        titles
+                                        authors
+                              }
+                            , none
+                            )
+
+                        _ ->
+                            noOp
+
+                _ ->
+                    noOp
