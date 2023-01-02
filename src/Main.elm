@@ -630,6 +630,8 @@ update message model =
                     , tagCounts = getTagCounts books
                     , completedEmbeddings =
                         Set.remove entry.id model.completedEmbeddings
+                    , neighborMap = Dict.empty
+                    , bookNeighborMap = Dict.empty
                   }
                 , batch
                     [ deleteEmbedding entry.id
