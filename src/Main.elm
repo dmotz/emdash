@@ -681,18 +681,7 @@ update message model =
                     noOp
 
             else
-                update
-                    (case key of
-                        "r" ->
-                            ShowRandom
-
-                        "s" ->
-                            Sort
-
-                        _ ->
-                            NoOp
-                    )
-                    model
+                noOp
 
         ExportEpub time ->
             ( model, Epub.export time (values model.books) (values model.entries) )
