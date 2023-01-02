@@ -593,19 +593,23 @@ update message model =
                 entries =
                     remove entry.id model.entries
 
-                books =
+                ( books, bookmarks ) =
                     case get entry.bookId model.books of
                         Just book ->
                             if book.count == 1 then
-                                remove book.id model.books
+                                ( remove book.id model.books
+                                , remove book.id model.bookmarks
+                                )
 
                             else
-                                Dict.update
+                                ( Dict.update
                                     book.id
                                     (Maybe.map
                                         (\b -> { b | count = b.count - 1 })
                                     )
                                     model.books
+                                , model.bookmarks
+                                )
 
                         _ ->
                             model.books
@@ -615,6 +619,7 @@ update message model =
                     | hiddenEntries = Set.insert entry.id model.hiddenEntries
                     , entries = entries
                     , books = books
+                    , bookmarks = bookmarks
                     , page =
                         case model.page of
                             TitlePage oldBook oldEntries ->
