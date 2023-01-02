@@ -66,9 +66,9 @@ entryToRoute books entry =
             ""
 
 
-titleSlugToRoute : Title -> String
-titleSlugToRoute title =
-    absolute [ "title", slugify title ] []
+titleSlugToRoute : String -> String
+titleSlugToRoute slug =
+    absolute [ "title", slug ] []
 
 
 authorToRoute : Author -> String
