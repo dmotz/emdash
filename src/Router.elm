@@ -60,7 +60,7 @@ entryToRoute : BookMap -> Entry -> String
 entryToRoute books entry =
     case get entry.bookId books of
         Just book ->
-            absolute [ "title", slugify book.title, entry.id ] []
+            absolute [ "title", book.slug, entry.id ] []
 
         _ ->
             ""
