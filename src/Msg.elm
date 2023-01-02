@@ -71,3 +71,4 @@ type Msg
     | DebounceMsg Debounce.Msg
     | StartDemo
     | GotDemoData (Result Http.Error String)
+    | GetTime (Posix -> Msg)
