@@ -9,6 +9,7 @@
 @import 'tabs'
 @import 'settings'
 @import 'import'
+@import 'create'
 
 *
   box-sizing: border-box
@@ -131,16 +132,19 @@ input, textarea
   &::placeholder
     color: $mid3
 
+  &:focus
+    border-color: $fg
+
 input
   border: none
-  border-bottom: 1px solid $fg
+  border-bottom: 1px solid $mid2
   padding: 0
   padding-top: 0.2rem
   padding-bottom: 0.4rem
   font-size: $baseFontSize
 
 textarea
-  border-color: $fg
+  border-color: $mid2
   padding: 1rem
   font-family: $monoFont
   font-size: 1.4rem
