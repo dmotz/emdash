@@ -19,6 +19,7 @@ import Model
         , Tag
         , TagSort
         )
+import Time exposing (Posix)
 import Url exposing (Url)
 import Utils exposing (KeyEvent)
 
@@ -74,3 +75,5 @@ type Msg
     | GotDemoData (Result Http.Error String)
     | GetTime (Posix -> Msg)
     | UpdatePendingEntry PendingEntry
+    | PendingTitleBlur
+    | CreateEntry PendingEntry Posix
