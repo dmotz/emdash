@@ -1444,6 +1444,7 @@ update message model =
                                     (entryToRoute newBooks newEntry)
                                 )
                         )
+                        |> Update.andThen update RequestEmbeddings
 
         PendingTitleBlur ->
             case model.page of
