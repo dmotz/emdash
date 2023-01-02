@@ -36,13 +36,14 @@ import Model
         , InputFocus(..)
         , Model
         , Page(..)
+        , PendingEntry
         , ScorePairs
         , StoredModel
         , TagSort(..)
         , initialStoredModel
         )
 import Msg exposing (Msg(..))
-import Parser
+import Parser exposing (getEntryId)
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Router
@@ -56,6 +57,7 @@ import Router
 import Set exposing (diff, toList, union)
 import String exposing (fromInt, join, toLower, trim)
 import Task exposing (attempt, perform)
+import Time exposing (posixToMillis)
 import Update.Extra as Update exposing (addCmd)
 import Url exposing (Url)
 import Url.Parser exposing (parse)
@@ -1319,3 +1321,113 @@ update message model =
 
                 _ ->
                     noOp
+
+        CreateEntry entry time ->
+            let
+                entryId =
+                    getEntryId entry.text (entry.title ++ " " ++ entry.author)
+
+                mBook =
+                    model.books
+                        |> values
+                        |> filter
+                            (\b ->
+                                b.title
+                                    == entry.title
+                                    && member entry.author b.authors
+                            )
+                        |> head
+
+                timestamp =
+                    posixToMillis time
+
+                fullEntry =
+                    \bookId ->
+                        { id = entryId
+                        , text = entry.text
+                        , bookId = bookId
+                        , date = timestamp
+                        , page = entry.page
+                        , notes = ""
+                        , isFavorite = False
+                        }
+
+                model_ =
+                    { model
+                        | neighborMap = Dict.empty
+                        , bookNeighborMap = Dict.empty
+                        , embeddingsReady = False
+                    }
+            in
+            store
+                ( case mBook of
+                    Just book ->
+                        let
+                            newBooks =
+                                Dict.update
+                                    book.id
+                                    (Maybe.map
+                                        (\b ->
+                                            { b
+                                                | count = b.count + 1
+                                                , sortIndex =
+                                                    max
+                                                        b.sortIndex
+                                                        timestamp
+                                            }
+                                        )
+                                    )
+                                    model.books
+                        in
+                        { model_
+                            | books = newBooks
+                            , entries =
+                                Dict.insert
+                                    entryId
+                                    (fullEntry book.id)
+                                    model.entries
+                            , semanticRankMap =
+                                Dict.remove
+                                    book.id
+                                    model.semanticRankMap
+                            , tagCounts = getTagCounts newBooks
+                        }
+
+                    _ ->
+                        let
+                            bookId =
+                                getEntryId entry.title entry.author
+
+                            newBooks =
+                                Dict.insert
+                                    bookId
+                                    { id = bookId
+                                    , title = entry.title
+                                    , authors = [ entry.author ]
+                                    , count = 1
+                                    , rating = 0
+                                    , sortIndex = timestamp
+                                    , tags = []
+                                    , slug = ""
+                                    , favCount = 0
+                                    }
+                                    model.books
+                                    |> values
+
+                            ( titleRouteMap, booksWithSlugs ) =
+                                Parser.getTitleRouteMap newBooks
+                        in
+                        { model_
+                            | books =
+                                Dict.fromList
+                                    (map (juxt .id identity) booksWithSlugs)
+                            , entries =
+                                Dict.insert
+                                    entryId
+                                    (fullEntry bookId)
+                                    model.entries
+                            , titleRouteMap = titleRouteMap
+                            , authorRouteMap = Parser.getAuthorRouteMap newBooks
+                        }
+                , none
+                )
