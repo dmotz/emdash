@@ -628,6 +628,8 @@ update message model =
                             _ ->
                                 model.page
                     , tagCounts = getTagCounts books
+                    , completedEmbeddings =
+                        Set.remove entry.id model.completedEmbeddings
                   }
                 , batch
                     [ deleteEmbedding entry.id
