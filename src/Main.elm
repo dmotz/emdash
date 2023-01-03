@@ -139,11 +139,6 @@ appName =
     "Marginalia"
 
 
-maxSearchResults : Int
-maxSearchResults =
-    100
-
-
 minSemanticQueryLen : Int
 minSemanticQueryLen =
     5
@@ -1293,7 +1288,6 @@ update message model =
                             (model.entries
                                 |> values
                                 |> findMatches query .text
-                                |> take maxSearchResults
                             )
                             []
                   }

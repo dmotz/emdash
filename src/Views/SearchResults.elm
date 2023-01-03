@@ -1,15 +1,20 @@
 module Views.SearchResults exposing (searchResults)
 
 import Dict exposing (get)
-import Html exposing (Html, div, h2, p, sup, text, ul)
+import Html exposing (Html, div, h2, p, sup, text)
 import Html.Attributes exposing (class)
 import Html.Keyed as Keyed
-import List exposing (filterMap, isEmpty, length, map)
+import List exposing (filterMap, isEmpty, length, map, take)
 import Model exposing (Book, BookMap, BookSort(..), Entry, EntryMap, ScorePairs)
 import Msg exposing (Msg)
 import Utils exposing (juxt, null)
 import Views.BookList exposing (bookList)
 import Views.Snippet exposing (snippetView)
+
+
+maxResults : Int
+maxResults =
+    100
 
 
 searchResults :
@@ -74,12 +79,23 @@ searchResults bookMap entryMap books entries semanticMatches semanticReady query
 
 resultsSection : String -> String -> BookMap -> List ( Entry, Maybe Float ) -> Html Msg
 resultsSection title query bookMap items =
+    let
+        len =
+            length items
+    in
     div
         []
         [ h2
             []
             [ text title
-            , sup [] [ items |> length |> String.fromInt |> text ]
+            , sup []
+                [ text <|
+                    if len > maxResults then
+                        ">" ++ String.fromInt maxResults
+
+                    else
+                        String.fromInt len
+                ]
             ]
         , Keyed.ul
             []
@@ -87,6 +103,6 @@ resultsSection title query bookMap items =
                 (\( entry, mScore ) ->
                     ( entry.id, snippetView bookMap mScore (Just query) entry )
                 )
-                items
+                (take maxResults items)
             )
         ]
