@@ -7,6 +7,7 @@ const embKey = 'embeddings'
 const model = load()
 const embStep = 512
 const neighborsK = 5
+const semanticSearchLimit = 100
 const bookEmbMap = {}
 const embsInProgress = {}
 const embStore = createStore(`${dbNs}:${embKey}`, embKey)
@@ -41,7 +42,7 @@ const semanticSearch = async (query, threshold) => {
     .map(([k, v]) => [k, similarity(embedding, v)])
     .filter(([, v]) => v >= threshold)
     .sort(([, a], [, b]) => b - a)
-    .slice(0, neighborsK)
+    .slice(0, semanticSearchLimit)
 }
 
 const semanticSort = ids =>
