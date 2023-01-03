@@ -1,13 +1,13 @@
 module Views.SearchResults exposing (searchResults)
 
 import Dict exposing (get)
-import Html exposing (Html, div, h2, p, text, ul)
+import Html exposing (Html, div, h2, p, sup, text, ul)
 import Html.Attributes exposing (class)
-import Html.Lazy exposing (lazy4)
+import Html.Keyed as Keyed
 import List exposing (filterMap, isEmpty, length, map)
 import Model exposing (Book, BookMap, BookSort(..), Entry, EntryMap, ScorePairs)
 import Msg exposing (Msg)
-import Utils exposing (null)
+import Utils exposing (juxt, null)
 import Views.BookList exposing (bookList)
 import Views.Snippet exposing (snippetView)
 
@@ -38,52 +38,30 @@ searchResults bookMap entryMap books entries semanticMatches semanticReady query
             , div
                 [ class "snippets" ]
                 ((if not (isEmpty entries) then
-                    [ h2
-                        []
-                        [ text <|
-                            "Text matches "
-                                ++ "("
-                                ++ (entries |> length |> String.fromInt)
-                                ++ ")"
-                        ]
-                    , ul
-                        []
-                        (map
-                            (lazy4 snippetView bookMap Nothing (Just query))
-                            entries
-                        )
+                    [ resultsSection
+                        "Text matches"
+                        query
+                        bookMap
+                        (map (juxt identity (always Nothing)) entries)
                     ]
 
                   else
                     []
                  )
                     ++ (if not (isEmpty semanticMatches) then
-                            [ h2
-                                []
-                                [ text <|
-                                    "Semantic matches "
-                                        ++ "("
-                                        ++ (semanticMatches |> length |> String.fromInt)
-                                        ++ ")"
-                                ]
-                            , ul
-                                []
-                                (map
-                                    (\( entry, score ) ->
-                                        snippetView
-                                            bookMap
-                                            (Just score)
-                                            (Just query)
-                                            entry
+                            [ resultsSection
+                                "Semantic matches"
+                                query
+                                bookMap
+                                (filterMap
+                                    (\( id, score ) ->
+                                        get id entryMap
+                                            |> Maybe.map
+                                                (\entry ->
+                                                    ( entry, Just score )
+                                                )
                                     )
-                                    (filterMap
-                                        (\( id, score ) ->
-                                            get id entryMap
-                                                |> Maybe.map
-                                                    (\entry -> ( entry, score ))
-                                        )
-                                        semanticMatches
-                                    )
+                                    semanticMatches
                                 )
                             ]
 
@@ -92,3 +70,23 @@ searchResults bookMap entryMap books entries semanticMatches semanticReady query
                        )
                 )
             ]
+
+
+resultsSection : String -> String -> BookMap -> List ( Entry, Maybe Float ) -> Html Msg
+resultsSection title query bookMap items =
+    div
+        []
+        [ h2
+            []
+            [ text title
+            , sup [] [ items |> length |> String.fromInt |> text ]
+            ]
+        , Keyed.ul
+            []
+            (map
+                (\( entry, mScore ) ->
+                    ( entry.id, snippetView bookMap mScore (Just query) entry )
+                )
+                items
+            )
+        ]
