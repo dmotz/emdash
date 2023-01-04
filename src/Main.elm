@@ -1269,7 +1269,7 @@ update message model =
         OnSearchEnd val ->
             let
                 query =
-                    val |> toLower |> trim
+                    trim val
             in
             if String.isEmpty query then
                 noOp
