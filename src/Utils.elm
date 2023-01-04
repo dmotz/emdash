@@ -118,15 +118,16 @@ findMatches : String -> (a -> String) -> List a -> List a
 findMatches query accessor xs =
     let
         ( phraseMatches, rest ) =
-            partition (phraseMatch (rx <| "\\b" ++ query) accessor) xs
-
-        pattern =
-            split " " query
-                |> map (\word -> "(?=.*\\b" ++ word ++ ")")
-                |> String.concat
+            partition (phraseMatch (rx_ <| "\\b" ++ query) accessor) xs
 
         wordsRx =
-            "^" ++ pattern ++ ".*$" |> rx
+            "^"
+                ++ (split " " query
+                        |> map (\word -> "(?=.*\\b" ++ word ++ ")")
+                        |> String.concat
+                   )
+                ++ ".*$"
+                |> rx_
     in
     phraseMatches
         ++ filter
