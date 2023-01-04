@@ -1270,6 +1270,14 @@ update message model =
             let
                 query =
                     trim val
+
+                prevSemantic =
+                    case model.page of
+                        SearchPage _ _ _ _ semanticMatches ->
+                            Just semanticMatches
+
+                        _ ->
+                            Nothing
             in
             if String.isEmpty query then
                 noOp
@@ -1289,7 +1297,7 @@ update message model =
                                 |> values
                                 |> findMatches query .text
                             )
-                            []
+                            (withDefault [] prevSemantic)
                   }
                 , if String.length query >= minSemanticQueryLen then
                     requestSemanticSearch ( query, model.semanticThreshold )
