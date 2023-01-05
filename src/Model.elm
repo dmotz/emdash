@@ -14,6 +14,7 @@ module Model exposing
     , Page(..)
     , PendingEntry
     , ScorePairs
+    , SearchMode(..)
     , StoredModel
     , Tag
     , TagSort(..)
@@ -30,7 +31,7 @@ import Url exposing (Url)
 
 type Page
     = MainPage (List Book) (Maybe Tag)
-    | SearchPage String Bool (List Book) (List Entry) ScorePairs
+    | SearchPage String SearchMode (List Book) (List Entry) ScorePairs
     | TitlePage Book (List Entry)
     | AuthorPage Author (List Book)
     | EntryPage Entry Book
@@ -70,6 +71,11 @@ type EntryTab
     = Related
     | Notes
     | Etc
+
+
+type SearchMode
+    = TextMatches
+    | SemanticMatches
 
 
 type alias Id =
