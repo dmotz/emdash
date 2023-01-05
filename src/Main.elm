@@ -39,6 +39,7 @@ import Model
         , Page(..)
         , PendingEntry
         , ScorePairs
+        , SearchMode(..)
         , StoredModel
         , TagSort(..)
         , initialStoredModel
@@ -838,12 +839,12 @@ update message model =
 
         ReceiveSemanticSearch ( _, idScores ) ->
             case model.page of
-                SearchPage query _ books entries _ ->
+                SearchPage query mode books entries _ ->
                     ( { model
                         | page =
                             SearchPage
                                 query
-                                True
+                                mode
                                 books
                                 entries
                                 (filter
@@ -1271,13 +1272,13 @@ update message model =
                 query =
                     trim val
 
-                prevSemantic =
+                ( mode, prevSemantic ) =
                     case model.page of
-                        SearchPage _ _ _ _ semanticMatches ->
-                            Just semanticMatches
+                        SearchPage _ m _ _ semanticMatches ->
+                            ( Just m, Just semanticMatches )
 
                         _ ->
-                            Nothing
+                            ( Nothing, Nothing )
             in
             if String.isEmpty query then
                 noOp
@@ -1287,7 +1288,7 @@ update message model =
                     | page =
                         SearchPage
                             query
-                            False
+                            (withDefault TextMatches mode)
                             (findMatches
                                 query
                                 (\b -> b.title ++ " " ++ join " " b.authors)
@@ -1305,6 +1306,19 @@ update message model =
                   else
                     none
                 )
+
+        SetSearchTab mode ->
+            case model.page of
+                SearchPage query _ books entries semanticMatches ->
+                    ( { model
+                        | page =
+                            SearchPage query mode books entries semanticMatches
+                      }
+                    , none
+                    )
+
+                _ ->
+                    noOp
 
         DebounceMsg msg ->
             let

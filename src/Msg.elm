@@ -16,6 +16,7 @@ import Model
         , InputFocus
         , PendingEntry
         , ScorePairs
+        , SearchMode
         , StoredModel
         , Tag
         , TagSort
@@ -70,6 +71,7 @@ type Msg
     | ScrollToTop
     | OnSearchStart String
     | OnSearchEnd String
+    | SetSearchTab SearchMode
     | ReceiveUnicodeNormalized String
     | DebounceMsg Debounce.Msg
     | StartDemo
