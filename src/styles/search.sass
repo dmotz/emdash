@@ -33,13 +33,48 @@
   display: flex
   justify-content: center
 
+  @media (max-width: 1000px)
+    max-width: calc(100vw - 200px)
+    margin: 0 auto
+
   > *
     flex: 2
-    padding: 2rem 6rem
+    padding: 2rem 0
+
+  .modeHeading
+    margin-left: 0
+    margin-bottom: 4rem
+
+    li
+      &::after
+        content: ''
+
+      + li
+        margin-left: 1.6rem
+
+    button
+      font-size: 2.4rem
+      text-align: left
+
+    sup
+      font-size: 1.4rem
+      display: inline-block
+      width: 3rem
+      margin-left: 0.4rem
+      font-weight: 500
+
+    @media (max-width: 600px)
+      ul
+        flex-direction: column
+
+      li + li
+        margin: 0
+        margin-top: 1rem
 
   .bookList
     max-width: 60rem
     margin: 0
+    margin-right: 2rem
     align-items: flex-start
     justify-content: center
     display: flex
@@ -49,17 +84,6 @@
   .snippets
     flex: 3
     max-width: $maxWidth
-
-  h2
-    margin-bottom: 3rem
-
-    sup
-      font-size: 1.4rem
-      margin-left: 0.4rem
-      font-weight: 500
-
-  ul + h2
-    margin-top: 8rem
 
 .noResults
   text-align: center
