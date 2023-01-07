@@ -208,10 +208,15 @@ makeDicts =
                             case
                                 Regex.find dateRx meta
                                     |> head
-                                    |> Maybe.map .submatches
+                                    |> andThen
+                                        (.submatches
+                                            >> foldr
+                                                (Maybe.map2 (::))
+                                                (Just [])
+                                        )
                             of
-                                Just [ Just month, Just dayRaw, Just yearRaw, Just hourRaw, Just minuteRaw, Just secondRaw, Just meridian ] ->
-                                    case [ toInt yearRaw, toInt dayRaw, toInt hourRaw, toInt minuteRaw, toInt secondRaw ] of
+                                Just [ month, d, y, h, m, s, meridian ] ->
+                                    case map toInt [ y, d, h, m, s ] of
                                         [ Just year, Just day, Just hour, Just minute, Just second ] ->
                                             fromRawParts
                                                 { day = day
