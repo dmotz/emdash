@@ -125,8 +125,8 @@ let zipWorker
     worker.port.postMessage({method: 'semanticSearch', query, threshold})
   )
 
-  app.ports.requestSemanticRank.subscribe(([bookId, entryIds]) =>
-    worker.port.postMessage({method: 'requestSemanticRank', bookId, entryIds})
+  app.ports.requestSemanticRank.subscribe(([bookId, excerptIds]) =>
+    worker.port.postMessage({method: 'requestSemanticRank', bookId, excerptIds})
   )
 
   app.ports.scrollToTop.subscribe(() =>

@@ -9,12 +9,12 @@ import Model
     exposing
         ( Book
         , BookSort
-        , Entry
-        , EntrySort
-        , EntryTab
+        , Excerpt
+        , ExcerptSort
+        , ExcerptTab
         , Id
         , InputFocus
-        , PendingEntry
+        , PendingExcerpt
         , ScorePairs
         , SearchMode
         , StoredModel
@@ -39,7 +39,7 @@ type Msg
     | PickKindleFile
     | KeyDown KeyEvent
     | SetInputFocus (Maybe InputFocus)
-    | HideEntry Entry
+    | HideExcerpt Excerpt
     | UpdateNotes Id String
     | SetBookmark Id Id
     | ToggleFavorite Id
@@ -66,8 +66,8 @@ type Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
     | SortBooks BookSort
-    | SortEntries EntrySort
-    | SetEntryTab Id EntryTab Bool
+    | SortExcerpts ExcerptSort
+    | SetExcerptTab Id ExcerptTab Bool
     | ScrollToTop
     | OnSearchStart String
     | OnSearchEnd String
@@ -77,6 +77,6 @@ type Msg
     | StartDemo
     | GotDemoData (Result Http.Error String)
     | GetTime (Posix -> Msg)
-    | UpdatePendingEntry PendingEntry
+    | UpdatePendingExcerpt PendingExcerpt
     | PendingTitleBlur
-    | CreateEntry PendingEntry Posix
+    | CreateExcerpt PendingExcerpt Posix

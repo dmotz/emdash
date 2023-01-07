@@ -34,8 +34,8 @@ import Model
     exposing
         ( BookMap
         , BookSort(..)
-        , EntrySort(..)
-        , EntryTab(..)
+        , ExcerptSort(..)
+        , ExcerptTab(..)
         , Model
         , Page(..)
         , Tag
@@ -57,8 +57,8 @@ import Views.BookInfo exposing (bookInfo)
 import Views.BookList exposing (bookList)
 import Views.Create exposing (createView)
 import Views.EmbeddingProgress exposing (embeddingProgress)
-import Views.Entry exposing (entryView)
-import Views.EntryList exposing (entryList)
+import Views.Excerpt exposing (excerptView)
+import Views.ExcerptList exposing (excerptList)
 import Views.Import exposing (importView)
 import Views.Landing exposing (landingView)
 import Views.SearchInput exposing (searchInput)
@@ -136,7 +136,7 @@ view model =
                             Set.size model.completedEmbeddings
 
                         totalCount =
-                            size model.entries
+                            size model.excerpts
 
                         progressView =
                             if
@@ -175,28 +175,28 @@ view model =
                                     model.reverseSort
                                 ]
 
-                        SearchPage query mode books entries semanticMatches ->
+                        SearchPage query mode books excerpts semanticMatches ->
                             div
                                 [ class "searchPage fullWidth" ]
                                 [ searchInput model.searchQuery
                                 , searchResults
                                     mode
                                     model.books
-                                    model.entries
+                                    model.excerpts
                                     books
-                                    entries
+                                    excerpts
                                     semanticMatches
                                     query
                                 ]
 
-                        TitlePage book entries ->
+                        TitlePage book excerpts ->
                             let
-                                entries_ =
-                                    if model.entrySort == EntryFavSort then
-                                        filter .isFavorite entries
+                                excerpts_ =
+                                    if model.excerptSort == ExcerptFavSort then
+                                        filter .isFavorite excerpts
 
                                     else
-                                        entries
+                                        excerpts
                             in
                             div
                                 []
@@ -207,18 +207,18 @@ view model =
                                     model.pendingTag
                                     model.bookNeighborMap
                                     (get book.id model.bookmarks)
-                                    model.entrySort
+                                    model.excerptSort
                                     progressView
-                                , if isEmpty entries_ then
+                                , if isEmpty excerpts_ then
                                     div
                                         [ class "noFav" ]
                                         [ text "No favorites yet" ]
 
                                   else
                                     null
-                                , entryList
-                                    entries_
-                                    model.entries
+                                , excerptList
+                                    excerpts_
+                                    model.excerpts
                                     model.books
                                     model.neighborMap
                                     model.idToShowDetails
@@ -259,18 +259,18 @@ view model =
                                     model.reverseSort
                                 ]
 
-                        EntryPage entry _ ->
+                        ExcerptPage excerpt _ ->
                             div
                                 []
                                 [ ul
-                                    [ class "entries" ]
-                                    [ entryView
-                                        model.entries
+                                    [ class "excerpts" ]
+                                    [ excerptView
+                                        model.excerpts
                                         model.books
                                         (withDefault
                                             []
                                             (get
-                                                entry.id
+                                                excerpt.id
                                                 model.neighborMap
                                             )
                                         )
@@ -278,7 +278,7 @@ view model =
                                         (withDefault
                                             Related
                                             (get
-                                                entry.id
+                                                excerpt.id
                                                 model.idToActiveTab
                                             )
                                         )
@@ -286,7 +286,7 @@ view model =
                                         True
                                         False
                                         progressView
-                                        entry
+                                        excerpt
                                     ]
                                 ]
 
@@ -302,7 +302,7 @@ view model =
                         SettingsPage ->
                             settingsView
                                 model.version
-                                (size model.entries)
+                                (size model.excerpts)
                                 (size model.books)
                                 (size model.authorRouteMap)
                                 (length model.tags)
@@ -311,11 +311,11 @@ view model =
                         ImportPage ->
                             importView
                                 (model.demoMode
-                                    || Dict.isEmpty model.entries
+                                    || Dict.isEmpty model.excerpts
                                 )
 
-                        CreatePage pEntry books authors ->
-                            createView pEntry books authors
+                        CreatePage pExcerpt books authors ->
+                            createView pExcerpt books authors
 
                         _ ->
                             null
@@ -328,7 +328,7 @@ view model =
                         [ class "links" ]
                         [ a [ href "" ] [ text "Send feedback" ]
                         , a [ href "/import" ] [ text "Import excerpts" ]
-                        , if Dict.isEmpty model.entries then
+                        , if Dict.isEmpty model.excerpts then
                             null
 
                           else

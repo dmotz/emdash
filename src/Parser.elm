@@ -1,4 +1,4 @@
-module Parser exposing (getAuthorRouteMap, getTitleRouteMap, process)
+module Parser exposing (getAuthorRouteMap, getExcerptId, getTitleRouteMap, process)
 
 import Base64 exposing (fromBytes)
 import Bytes.Encode exposing (encode, sequence, unsignedInt8)
@@ -8,7 +8,7 @@ import Dict exposing (Dict, get, insert, update)
 import List exposing (all, concatMap, foldr, head, map, reverse, sortBy)
 import MD5 exposing (bytes)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Author, Book, BookMap, EntryMap, Id)
+import Model exposing (Author, Book, BookMap, ExcerptMap, Id)
 import Regex exposing (Match, Regex, replace)
 import Router exposing (slugify)
 import String exposing (join, lines, repeat, right, split, startsWith, toInt, trim)
@@ -16,7 +16,7 @@ import Time exposing (Month(..), posixToMillis)
 import Utils exposing (juxt, rx, rx_)
 
 
-process : String -> ( EntryMap, BookMap )
+process : String -> ( ExcerptMap, BookMap )
 process =
     lines
         >> foldr folder ( [], [] )
@@ -30,7 +30,7 @@ separator =
     repeat 10 "="
 
 
-hashId : String -> String
+hashId : String -> Id
 hashId =
     bytes
         >> map unsignedInt8
@@ -41,6 +41,11 @@ hashId =
         >> String.replace "==" ""
         >> String.replace "+" "-"
         >> String.replace "/" "_"
+
+
+getExcerptId : String -> String -> Id
+getExcerptId text meta =
+    (text ++ meta) |> hashId
 
 
 folder :
@@ -167,13 +172,13 @@ authorSplitRx =
     rx "[;&]|\\sand\\s"
 
 
-makeDicts : List ( List String, String ) -> ( EntryMap, BookMap )
+makeDicts : List ( List String, String ) -> ( ExcerptMap, BookMap )
 makeDicts =
     foldr
-        (\( raw, notes ) ( entries, books ) ->
+        (\( raw, notes ) ( excerpts, books ) ->
             let
                 noOp =
-                    ( entries, books )
+                    ( excerpts, books )
             in
             case raw of
                 [ text, meta, titleAuthor ] ->
@@ -277,7 +282,7 @@ makeDicts =
                         [ titleRaw, authorRaw ] ->
                             let
                                 id =
-                                    hashId <| text ++ meta
+                                    getExcerptId text meta
 
                                 title =
                                     replaceApostrophes titleRaw
@@ -304,7 +309,7 @@ makeDicts =
                                 , notes = notes
                                 , isFavorite = False
                                 }
-                                entries
+                                excerpts
                             , update bookId
                                 (\mBook ->
                                     Just <|

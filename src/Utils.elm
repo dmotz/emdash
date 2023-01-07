@@ -5,7 +5,7 @@ module Utils exposing
     , findMatches
     , formatNumber
     , formatScore
-    , getEntryDomId
+    , getExcerptDomId
     , getTagCounts
     , insertOnce
     , juxt
@@ -97,9 +97,9 @@ dedupe =
 
 modelToStoredModel : Model -> StoredModel
 modelToStoredModel model =
-    { entries = values model.entries
+    { excerpts = values model.excerpts
     , books = values model.books
-    , hiddenEntries = Set.toList model.hiddenEntries
+    , hiddenExcerpts = Set.toList model.hiddenExcerpts
     , bookmarks = Dict.toList model.bookmarks
     }
 
@@ -151,8 +151,8 @@ getTagCounts bookMap =
             (filter (\{ tags } -> isEmpty tags) books |> length)
 
 
-getEntryDomId : Id -> String
-getEntryDomId =
+getExcerptDomId : Id -> String
+getExcerptDomId =
     (++) "excerpt-"
 
 

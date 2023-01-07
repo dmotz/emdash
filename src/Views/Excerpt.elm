@@ -1,4 +1,4 @@
-module Views.Entry exposing (entryView)
+module Views.Excerpt exposing (excerptView)
 
 import Dict exposing (get)
 import Html
@@ -35,36 +35,36 @@ import List exposing (isEmpty, map)
 import Model
     exposing
         ( BookMap
-        , Entry
-        , EntryMap
-        , EntryTab(..)
+        , Excerpt
+        , ExcerptMap
+        , ExcerptTab(..)
         , InputFocus(..)
         , ScorePairs
         )
 import Msg exposing (Msg(..))
-import Router exposing (entryToRoute)
+import Router exposing (excerptToRoute)
 import String exposing (fromInt)
-import Utils exposing (getEntryDomId, null)
+import Utils exposing (getExcerptDomId, null)
 import Views.Citation exposing (citation)
 import Views.Snippet exposing (snippetView)
 
 
-entryView :
-    EntryMap
+excerptView :
+    ExcerptMap
     -> BookMap
     -> ScorePairs
     -> Bool
-    -> EntryTab
+    -> ExcerptTab
     -> Int
     -> Bool
     -> Bool
     -> Maybe (Html Msg)
-    -> Entry
+    -> Excerpt
     -> Html Msg
-entryView entries books neighbors showDetails activeTab i perma isMarked mProgress entry =
+excerptView excerpts books neighbors showDetails activeTab i perma isMarked mProgress excerpt =
     li
-        [ classList [ ( "entry", True ), ( "permalink", perma ) ]
-        , id <| getEntryDomId entry.id
+        [ classList [ ( "excerpt", True ), ( "permalink", perma ) ]
+        , id <| getExcerptDomId excerpt.id
         ]
         [ figure
             []
@@ -76,17 +76,17 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                   else
                     div [] [ text <| fromInt (i + 1) ]
                 , button
-                    [ onClick (ToggleFavorite entry.id)
+                    [ onClick (ToggleFavorite excerpt.id)
                     , classList
                         [ ( "favorite", True )
-                        , ( "active", entry.isFavorite )
+                        , ( "active", excerpt.isFavorite )
                         ]
                     ]
                     [ img
                         [ class "favoriteIcon"
                         , src <|
                             "/images/favorite"
-                                ++ (if entry.isFavorite then
+                                ++ (if excerpt.isFavorite then
                                         "-filled"
 
                                     else
@@ -98,7 +98,7 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                     , div
                         [ class "hint left" ]
                         [ text <|
-                            (if entry.isFavorite then
+                            (if excerpt.isFavorite then
                                 "Unmark"
 
                              else
@@ -116,7 +116,7 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                             [ ( "bookmark", True )
                             , ( "active", isMarked )
                             ]
-                        , onClick (SetBookmark entry.bookId entry.id)
+                        , onClick (SetBookmark excerpt.bookId excerpt.id)
                         ]
                         [ img
                             [ src <|
@@ -147,21 +147,21 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
 
                   else
                     a
-                        [ href <| entryToRoute books entry ]
+                        [ href <| excerptToRoute books excerpt ]
                         [ text <|
-                            if entry.page == -1 then
+                            if excerpt.page == -1 then
                                 "¶"
 
                             else
-                                "p. " ++ fromInt entry.page
+                                "p. " ++ fromInt excerpt.page
                         , div [ class "hint left" ] [ text "Permalink" ]
                         ]
                 ]
-            , blockquote [] [ text entry.text ]
+            , blockquote [] [ text excerpt.text ]
             , if perma then
-                case get entry.bookId books of
+                case get excerpt.bookId books of
                     Just book ->
-                        citation entry book Nothing
+                        citation excerpt book Nothing
 
                     _ ->
                         null
@@ -174,8 +174,8 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                     (\tab ->
                         button
                             [ onClick <|
-                                SetEntryTab
-                                    entry.id
+                                SetExcerptTab
+                                    excerpt.id
                                     tab
                                     (not perma
                                         && (not showDetails || tab == activeTab)
@@ -193,7 +193,7 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
 
                                     Notes ->
                                         "Notes"
-                                            ++ (if String.isEmpty entry.notes then
+                                            ++ (if String.isEmpty excerpt.notes then
                                                     ""
 
                                                 else
@@ -221,13 +221,13 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                                         if isEmpty neighbors then
                                             p
                                                 [ class "wait" ]
-                                                [ text "Finding related entries…" ]
+                                                [ text "Finding related excerpts…" ]
 
                                         else
                                             ul [ class "neighbors" ]
                                                 (map
                                                     (\( id, score ) ->
-                                                        case get id entries of
+                                                        case get id excerpts of
                                                             Just neighbor ->
                                                                 lazy4
                                                                     snippetView
@@ -248,11 +248,11 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                                 [ class "notes" ]
                                 [ textarea
                                     [ onFocus <| SetInputFocus (Just NoteFocus)
-                                    , onInput (UpdateNotes entry.id)
-                                    , value entry.notes
+                                    , onInput (UpdateNotes excerpt.id)
+                                    , value excerpt.notes
                                     , placeholder "Add notes here"
                                     ]
-                                    [ text entry.notes ]
+                                    [ text excerpt.notes ]
                                 ]
 
                         Etc ->
@@ -260,7 +260,7 @@ entryView entries books neighbors showDetails activeTab i perma isMarked mProgre
                                 []
                                 [ button
                                     [ class "button"
-                                    , onClick (HideEntry entry)
+                                    , onClick (HideExcerpt excerpt)
                                     ]
                                     [ text "× Delete"
                                     , div

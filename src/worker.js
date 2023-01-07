@@ -141,8 +141,8 @@ const methods = {
   requestBookNeighbors: ({target}, cb) =>
     cb([target, findNeighbors(target, bookEmbMap)]),
 
-  requestSemanticRank: ({bookId, entryIds}, cb) =>
-    cb([bookId, semanticSort(entryIds)]),
+  requestSemanticRank: ({bookId, excerptIds}, cb) =>
+    cb([bookId, semanticSort(excerptIds)]),
 
   semanticSearch: ({query, threshold}, cb) =>
     semanticSearch(query, threshold).then(matches => cb([query, matches])),

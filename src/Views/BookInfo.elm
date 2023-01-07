@@ -31,10 +31,10 @@ import Html.Attributes as H
 import Html.Events exposing (onClick, onInput)
 import List exposing (intersperse, map, repeat)
 import Maybe exposing (withDefault)
-import Model exposing (Book, BookMap, EntrySort(..), Id, NeighborMap, Tag)
+import Model exposing (Book, BookMap, ExcerptSort(..), Id, NeighborMap, Tag)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
-import Utils exposing (excerptCountLabel, formatScore, getEntryDomId, null, ratingEl)
+import Utils exposing (excerptCountLabel, formatScore, getExcerptDomId, null, ratingEl)
 import Views.TagSection exposing (tagSection)
 
 
@@ -45,10 +45,10 @@ bookInfo :
     -> Maybe Tag
     -> NeighborMap
     -> Maybe Id
-    -> EntrySort
+    -> ExcerptSort
     -> Maybe (Html Msg)
     -> Html Msg
-bookInfo book books tags pendingTag bookNeighborMap mBookmark entrySort progressView =
+bookInfo book books tags pendingTag bookNeighborMap mBookmark excerptSort progressView =
     div
         [ class "bookInfo" ]
         [ h1 [] [ text book.title ]
@@ -147,15 +147,15 @@ bookInfo book books tags pendingTag bookNeighborMap mBookmark entrySort progress
                     (map
                         (\sort ->
                             li
-                                [ classList [ ( "active", sort == entrySort ) ] ]
+                                [ classList [ ( "active", sort == excerptSort ) ] ]
                                 [ button
-                                    [ onClick <| SortEntries sort ]
+                                    [ onClick <| SortExcerpts sort ]
                                     [ text <| sortToString sort
                                     , if
                                         sort
-                                            == EntrySemanticSort
-                                            && entrySort
-                                            /= EntrySemanticSort
+                                            == ExcerptSemanticSort
+                                            && excerptSort
+                                            /= ExcerptSemanticSort
                                       then
                                         div
                                             [ class "hint" ]
@@ -166,13 +166,13 @@ bookInfo book books tags pendingTag bookNeighborMap mBookmark entrySort progress
                                     ]
                                 ]
                         )
-                        [ EntryPageSort, EntryFavSort, EntrySemanticSort ]
+                        [ ExcerptPageSort, ExcerptFavSort, ExcerptSemanticSort ]
                     )
                 ]
             , case mBookmark of
                 Just id ->
                     a
-                        [ href <| "#" ++ getEntryDomId id, target "_self" ]
+                        [ href <| "#" ++ getExcerptDomId id, target "_self" ]
                         [ text "↧ Jump to last read excerpt" ]
 
                 _ ->
@@ -181,14 +181,14 @@ bookInfo book books tags pendingTag bookNeighborMap mBookmark entrySort progress
         ]
 
 
-sortToString : EntrySort -> String
+sortToString : ExcerptSort -> String
 sortToString sort =
     case sort of
-        EntryPageSort ->
+        ExcerptPageSort ->
             "Page №"
 
-        EntryFavSort ->
+        ExcerptFavSort ->
             "Favorites"
 
-        EntrySemanticSort ->
+        ExcerptSemanticSort ->
             "Relevance"

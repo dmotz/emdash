@@ -1,7 +1,7 @@
 module Router exposing
     ( Route(..)
     , authorToRoute
-    , entryToRoute
+    , excerptToRoute
     , routeParser
     , searchToRoute
     , slugify
@@ -10,7 +10,7 @@ module Router exposing
     )
 
 import Dict exposing (get)
-import Model exposing (Author, BookMap, Entry, Id, Tag, Title)
+import Model exposing (Author, BookMap, Excerpt, Id, Tag, Title)
 import Regex exposing (replace)
 import Url.Builder exposing (absolute)
 import Url.Parser
@@ -32,7 +32,7 @@ import Utils exposing (rx)
 type Route
     = RootRoute
     | TitleRoute Title (Maybe String)
-    | EntryRoute Title Id
+    | ExcerptRoute Title Id
     | AuthorRoute Author
     | TagRoute Tag
     | SearchRoute (Maybe String)
@@ -46,7 +46,7 @@ routeParser =
     oneOf
         [ map RootRoute top
         , map TitleRoute (s "title" </> string </> fragment identity)
-        , map EntryRoute (s "title" </> string </> string)
+        , map ExcerptRoute (s "title" </> string </> string)
         , map AuthorRoute (s "author" </> string)
         , map TagRoute (s "tag" </> string)
         , map SearchRoute (s "search" <?> Query.string "q")
@@ -56,11 +56,11 @@ routeParser =
         ]
 
 
-entryToRoute : BookMap -> Entry -> String
-entryToRoute books entry =
-    case get entry.bookId books of
+excerptToRoute : BookMap -> Excerpt -> String
+excerptToRoute books excerpt =
+    case get excerpt.bookId books of
         Just book ->
-            absolute [ "title", book.slug, entry.id ] []
+            absolute [ "title", book.slug, excerpt.id ] []
 
         _ ->
             ""

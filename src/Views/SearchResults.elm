@@ -11,8 +11,8 @@ import Model
         ( Book
         , BookMap
         , BookSort(..)
-        , Entry
-        , EntryMap
+        , Excerpt
+        , ExcerptMap
         , ScorePairs
         , SearchMode(..)
         )
@@ -30,13 +30,13 @@ maxResults =
 searchResults :
     SearchMode
     -> BookMap
-    -> EntryMap
+    -> ExcerptMap
     -> List Book
-    -> List Entry
+    -> List Excerpt
     -> ScorePairs
     -> String
     -> Html Msg
-searchResults mode bookMap entryMap books matches semanticMatches query =
+searchResults mode bookMap excerptMap books matches semanticMatches query =
     let
         textMatches =
             map (juxt identity (always Nothing)) matches
@@ -44,10 +44,10 @@ searchResults mode bookMap entryMap books matches semanticMatches query =
         semMatches =
             filterMap
                 (\( id, score ) ->
-                    get id entryMap
+                    get id excerptMap
                         |> Maybe.map
-                            (\entry ->
-                                ( entry, Just score )
+                            (\excerpt ->
+                                ( excerpt, Just score )
                             )
                 )
                 semanticMatches
@@ -103,9 +103,9 @@ searchResults mode bookMap entryMap books matches semanticMatches query =
                 Keyed.ul
                     []
                     (map
-                        (\( entry, mScore ) ->
-                            ( entry.id
-                            , snippetView bookMap mScore (Just query) entry
+                        (\( excerpt, mScore ) ->
+                            ( excerpt.id
+                            , snippetView bookMap mScore (Just query) excerpt
                             )
                         )
                         (take maxResults list)

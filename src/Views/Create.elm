@@ -28,13 +28,13 @@ import Html.Attributes as H
 import Html.Events exposing (onBlur, onClick, onInput)
 import List exposing (map)
 import Maybe exposing (withDefault)
-import Model exposing (Author, PendingEntry, Title)
+import Model exposing (Author, PendingExcerpt, Title)
 import Msg exposing (Msg(..))
 import String exposing (isEmpty)
 
 
-createView : PendingEntry -> List Title -> List Author -> Html Msg
-createView pendingEntry titles authors =
+createView : PendingExcerpt -> List Title -> List Author -> Html Msg
+createView pendingExcerpt titles authors =
     div
         [ class "createPage" ]
         [ h1 [] [ text "Create a new excerpt" ]
@@ -43,11 +43,11 @@ createView pendingEntry titles authors =
             [ label
                 []
                 [ textarea
-                    [ value pendingEntry.text
+                    [ value pendingExcerpt.text
                     , onInput
                         (\s ->
-                            UpdatePendingEntry
-                                { pendingEntry | text = s }
+                            UpdatePendingExcerpt
+                                { pendingExcerpt | text = s }
                         )
                     , spellcheck False
                     ]
@@ -61,12 +61,12 @@ createView pendingEntry titles authors =
               label
                 []
                 [ input
-                    [ value pendingEntry.title
+                    [ value pendingExcerpt.title
                     , list listId
                     , onInput
                         (\s ->
-                            UpdatePendingEntry
-                                { pendingEntry | title = s }
+                            UpdatePendingExcerpt
+                                { pendingExcerpt | title = s }
                         )
                     , onBlur PendingTitleBlur
                     , spellcheck False
@@ -84,12 +84,12 @@ createView pendingEntry titles authors =
               label
                 []
                 [ input
-                    [ value pendingEntry.author
+                    [ value pendingExcerpt.author
                     , list listId
                     , onInput
                         (\s ->
-                            UpdatePendingEntry
-                                { pendingEntry | author = s }
+                            UpdatePendingExcerpt
+                                { pendingExcerpt | author = s }
                         )
                     , spellcheck False
                     ]
@@ -105,15 +105,15 @@ createView pendingEntry titles authors =
                     [ type_ "number"
                     , H.min "0"
                     , value <|
-                        if pendingEntry.page > -1 then
-                            String.fromInt pendingEntry.page
+                        if pendingExcerpt.page > -1 then
+                            String.fromInt pendingExcerpt.page
 
                         else
                             ""
                     , onInput
                         (\s ->
-                            UpdatePendingEntry
-                                { pendingEntry
+                            UpdatePendingExcerpt
+                                { pendingExcerpt
                                     | page = withDefault -1 (String.toInt s)
                                 }
                         )
@@ -128,11 +128,11 @@ createView pendingEntry titles authors =
             ]
         , button
             [ class "button"
-            , onClick (GetTime (CreateEntry pendingEntry))
+            , onClick (GetTime (CreateExcerpt pendingExcerpt))
             , disabled
-                (isEmpty pendingEntry.text
-                    || isEmpty pendingEntry.title
-                    || isEmpty pendingEntry.author
+                (isEmpty pendingExcerpt.text
+                    || isEmpty pendingExcerpt.title
+                    || isEmpty pendingExcerpt.author
                 )
             ]
             [ text "Create" ]

@@ -3,16 +3,16 @@ module Model exposing
     , Book
     , BookMap
     , BookSort(..)
-    , Entry
-    , EntryMap
-    , EntrySort(..)
-    , EntryTab(..)
+    , Excerpt
+    , ExcerptMap
+    , ExcerptSort(..)
+    , ExcerptTab(..)
     , Id
     , InputFocus(..)
     , Model
     , NeighborMap
     , Page(..)
-    , PendingEntry
+    , PendingExcerpt
     , ScorePairs
     , SearchMode(..)
     , StoredModel
@@ -31,15 +31,15 @@ import Url exposing (Url)
 
 type Page
     = MainPage (List Book) (Maybe Tag)
-    | SearchPage String SearchMode (List Book) (List Entry) ScorePairs
-    | TitlePage Book (List Entry)
+    | SearchPage String SearchMode (List Book) (List Excerpt) ScorePairs
+    | TitlePage Book (List Excerpt)
     | AuthorPage Author (List Book)
-    | EntryPage Entry Book
+    | ExcerptPage Excerpt Book
     | NotFoundPage String
     | SettingsPage
     | LandingPage
     | ImportPage
-    | CreatePage PendingEntry (List Title) (List Author)
+    | CreatePage PendingExcerpt (List Title) (List Author)
 
 
 type InputFocus
@@ -56,10 +56,10 @@ type BookSort
     | FavSort
 
 
-type EntrySort
-    = EntryPageSort
-    | EntryFavSort
-    | EntrySemanticSort
+type ExcerptSort
+    = ExcerptPageSort
+    | ExcerptFavSort
+    | ExcerptSemanticSort
 
 
 type TagSort
@@ -67,7 +67,7 @@ type TagSort
     | TagNumSort
 
 
-type EntryTab
+type ExcerptTab
     = Related
     | Notes
     | Etc
@@ -111,7 +111,7 @@ type alias Book =
     }
 
 
-type alias Entry =
+type alias Excerpt =
     { id : Id
     , text : String
     , bookId : Id
@@ -122,7 +122,7 @@ type alias Entry =
     }
 
 
-type alias PendingEntry =
+type alias PendingExcerpt =
     { title : Title
     , author : Author
     , text : String
@@ -130,8 +130,8 @@ type alias PendingEntry =
     }
 
 
-type alias EntryMap =
-    Dict Id Entry
+type alias ExcerptMap =
+    Dict Id Excerpt
 
 
 type alias BookMap =
@@ -145,13 +145,13 @@ type alias NeighborMap =
 type alias Model =
     { page : Page
     , demoMode : Bool
-    , entries : EntryMap
+    , excerpts : ExcerptMap
     , books : BookMap
     , semanticThreshold : Float
     , neighborMap : NeighborMap
     , bookNeighborMap : NeighborMap
     , semanticRankMap : NeighborMap
-    , hiddenEntries : Set Id
+    , hiddenExcerpts : Set Id
     , completedEmbeddings : Set Id
     , embeddingsReady : Bool
     , titleRouteMap : Dict String Id
@@ -168,10 +168,10 @@ type alias Model =
     , url : Url
     , key : Nav.Key
     , bookSort : BookSort
-    , entrySort : EntrySort
+    , excerptSort : ExcerptSort
     , bookmarks : Dict Id Id
     , idToShowDetails : Dict Id Bool
-    , idToActiveTab : Dict Id EntryTab
+    , idToActiveTab : Dict Id ExcerptTab
     , searchQuery : String
     , searchDebounce : Debounce String
     , version : String
@@ -179,17 +179,17 @@ type alias Model =
 
 
 type alias StoredModel =
-    { entries : List Entry
+    { excerpts : List Excerpt
     , books : List Book
-    , hiddenEntries : List Id
+    , hiddenExcerpts : List Id
     , bookmarks : List ( Id, Id )
     }
 
 
 initialStoredModel : StoredModel
 initialStoredModel =
-    { entries = []
+    { excerpts = []
     , books = []
-    , hiddenEntries = []
+    , hiddenExcerpts = []
     , bookmarks = []
     }

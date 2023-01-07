@@ -2,7 +2,7 @@ port module Epub exposing (export)
 
 import List exposing (concat, filter, indexedMap, map, sortBy)
 import MD5 exposing (hex)
-import Model exposing (Author, Book, BookSort(..), Entry, Title)
+import Model exposing (Author, Book, BookSort(..), Excerpt, Title)
 import Regex exposing (Regex)
 import String exposing (fromInt, join, padLeft, replace, toLower)
 import Time
@@ -75,8 +75,8 @@ normalizeTitle n title =
         ++ ".xhtml"
 
 
-tocEntry : Int -> Title -> String
-tocEntry i title =
+tocExcerpt : Int -> Title -> String
+tocExcerpt i title =
     "<li><a href=\"" ++ normalizeTitle i title ++ "\">" ++ title ++ "</a></li>"
 
 
@@ -103,7 +103,7 @@ generateToc titles =
           <ol>
             <li><a href="toc.xhtml">- Table of Contents -</a></li>
       """
-        ++ (String.concat <| indexedMap tocEntry titles)
+        ++ (String.concat <| indexedMap tocExcerpt titles)
         ++ """
           </ol>
         </nav>
@@ -285,8 +285,8 @@ generateContent epubId timeString titles =
     )
 
 
-generateChapter : Int -> Title -> List Author -> List Entry -> ( String, String )
-generateChapter i title authors entries =
+generateChapter : Int -> Title -> List Author -> List Excerpt -> ( String, String )
+generateChapter i title authors excerpts =
     ( "OEBPS/" ++ normalizeTitle i title
     , """
     <?xml version="1.0" encoding="UTF-8"?>
@@ -323,7 +323,7 @@ generateChapter i title authors entries =
                                     ""
                                )
                     )
-                    entries
+                    excerpts
            )
         ++ """
       </body>
@@ -332,8 +332,8 @@ generateChapter i title authors entries =
     )
 
 
-export : Posix -> List Book -> List Entry -> Cmd msg
-export time books entries =
+export : Posix -> List Book -> List Excerpt -> Cmd msg
+export time books excerpts =
     let
         sortedBooks =
             sortBooks RecencySort True books
@@ -371,7 +371,7 @@ export time books entries =
                 i
                 (replace " & " " and " title)
                 authors
-                (entries |> filter (.bookId >> (==) id) |> sortBy .page)
+                (excerpts |> filter (.bookId >> (==) id) |> sortBy .page)
         )
         sortedBooks
     ]

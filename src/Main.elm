@@ -32,12 +32,12 @@ import Maybe exposing (andThen, withDefault)
 import Model
     exposing
         ( BookSort(..)
-        , EntrySort(..)
+        , ExcerptSort(..)
         , Id
         , InputFocus(..)
         , Model
         , Page(..)
-        , PendingEntry
+        , PendingExcerpt
         , ScorePairs
         , SearchMode(..)
         , StoredModel
@@ -45,13 +45,13 @@ import Model
         , initialStoredModel
         )
 import Msg exposing (Msg(..))
-import Parser exposing (getEntryId)
+import Parser exposing (getExcerptId)
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Router
     exposing
         ( Route(..)
-        , entryToRoute
+        , excerptToRoute
         , routeParser
         , searchToRoute
         , slugify
@@ -87,7 +87,7 @@ port scrollToTop : () -> Cmd msg
 port exportJson : StoredModel -> Cmd msg
 
 
-port handleNewEntries : StoredModel -> Cmd msg
+port handleNewExcerpts : StoredModel -> Cmd msg
 
 
 port requestExcerptEmbeddings : List ( Id, String ) -> Cmd msg
@@ -174,13 +174,13 @@ createModel version mStoredModel demoMode url key =
     in
     { page = MainPage (values books) Nothing
     , demoMode = demoMode
-    , entries = Dict.fromList (map (juxt .id identity) restored.entries)
+    , excerpts = Dict.fromList (map (juxt .id identity) restored.excerpts)
     , books = books
     , semanticThreshold = 0.1
     , neighborMap = Dict.empty
     , bookNeighborMap = Dict.empty
     , semanticRankMap = Dict.empty
-    , hiddenEntries = Set.fromList restored.hiddenEntries
+    , hiddenExcerpts = Set.fromList restored.hiddenExcerpts
     , completedEmbeddings = Set.empty
     , embeddingsReady = False
     , tags = restored.books |> concatMap .tags |> dedupe
@@ -197,7 +197,7 @@ createModel version mStoredModel demoMode url key =
     , url = url
     , key = key
     , bookSort = RecencySort
-    , entrySort = EntryPageSort
+    , excerptSort = ExcerptPageSort
     , bookmarks = restored.bookmarks |> Dict.fromList
     , idToShowDetails = Dict.empty
     , idToActiveTab = Dict.empty
@@ -236,11 +236,11 @@ main =
                                 AuthorPage author _ ->
                                     author
 
-                                EntryPage entry book ->
+                                ExcerptPage excerpt book ->
                                     book.title
                                         ++ " "
                                         ++ "p. "
-                                        ++ fromInt entry.page
+                                        ++ fromInt excerpt.page
 
                                 SettingsPage ->
                                     "Settings"
@@ -301,7 +301,7 @@ init ( version, mStateString ) url key =
                 key
     in
     update (UrlChanged url) model
-        |> addCmd (model |> modelToStoredModel |> handleNewEntries)
+        |> addCmd (model |> modelToStoredModel |> handleNewExcerpts)
 
 
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
@@ -334,7 +334,7 @@ update message model =
                         model.key
             in
             update (UrlChanged model.url) model_
-                |> addCmd (model_ |> modelToStoredModel |> handleNewEntries)
+                |> addCmd (model_ |> modelToStoredModel |> handleNewExcerpts)
 
         ParseJsonText text ->
             case decodeStoredModel text of
@@ -367,21 +367,21 @@ update message model =
 
         ReceiveUnicodeNormalized text ->
             let
-                ( newEntries, newBooks ) =
+                ( newExcerpts, newBooks ) =
                     Parser.process text
 
                 hiddenPred =
-                    \id _ -> not <| Set.member id model.hiddenEntries
+                    \id _ -> not <| Set.member id model.hiddenExcerpts
 
-                unseenEntries =
-                    Dict.diff newEntries model.entries |> Dict.filter hiddenPred
+                unseenExcerpts =
+                    Dict.diff newExcerpts model.excerpts |> Dict.filter hiddenPred
 
                 bookVals =
-                    unseenEntries
+                    unseenExcerpts
                         |> Dict.foldl
-                            (\_ entry acc ->
+                            (\_ excerpt acc ->
                                 Dict.update
-                                    entry.bookId
+                                    excerpt.bookId
                                     (Maybe.map
                                         (\book ->
                                             { book
@@ -389,7 +389,7 @@ update message model =
                                                 , sortIndex =
                                                     max
                                                         book.sortIndex
-                                                        entry.date
+                                                        excerpt.date
                                             }
                                         )
                                     )
@@ -401,14 +401,14 @@ update message model =
                 ( titleRouteMap, booksWithSlugs ) =
                     Parser.getTitleRouteMap bookVals
             in
-            if Dict.isEmpty newEntries then
+            if Dict.isEmpty newExcerpts then
                 ( { model | parsingError = Just "Failed to parse file." }, none )
 
             else
                 ( { model
                     | parsingError = Nothing
-                    , entries =
-                        Dict.union model.entries newEntries
+                    , excerpts =
+                        Dict.union model.excerpts newExcerpts
                             |> Dict.filter hiddenPred
                     , books =
                         Dict.fromList
@@ -423,7 +423,7 @@ update message model =
                 )
                     |> Update.andThen update (SortBooks model.bookSort)
                     |> Update.andThen update (UrlChanged model.url)
-                    |> addCmd (model |> modelToStoredModel |> handleNewEntries)
+                    |> addCmd (model |> modelToStoredModel |> handleNewExcerpts)
                     |> store
 
         ResetError ->
@@ -433,14 +433,14 @@ update message model =
             ( model
             , generate
                 GotRandomIndex
-                (Random.int 0 ((model.entries |> values |> length) - 1))
+                (Random.int 0 ((model.excerpts |> values |> length) - 1))
             )
 
         GotRandomIndex n ->
-            case model.entries |> values |> drop n |> head of
-                Just entry ->
+            case model.excerpts |> values |> drop n |> head of
+                Just excerpt ->
                     ( model
-                    , Nav.pushUrl model.key (entryToRoute model.books entry)
+                    , Nav.pushUrl model.key (excerptToRoute model.books excerpt)
                     )
 
                 _ ->
@@ -452,28 +452,28 @@ update message model =
         UpdateNotes id text ->
             store
                 ( { model
-                    | entries =
+                    | excerpts =
                         Dict.update
                             id
-                            (Maybe.map (\entry -> { entry | notes = text }))
-                            model.entries
+                            (Maybe.map (\excerpt -> { excerpt | notes = text }))
+                            model.excerpts
                     , page =
                         case model.page of
-                            EntryPage entry book ->
-                                EntryPage { entry | notes = text } book
+                            ExcerptPage excerpt book ->
+                                ExcerptPage { excerpt | notes = text } book
 
-                            TitlePage book entries ->
+                            TitlePage book excerpts ->
                                 TitlePage
                                     book
                                     (map
-                                        (\entry ->
-                                            if entry.id == id then
-                                                { entry | notes = text }
+                                        (\excerpt ->
+                                            if excerpt.id == id then
+                                                { excerpt | notes = text }
 
                                             else
-                                                entry
+                                                excerpt
                                         )
-                                        entries
+                                        excerpts
                                     )
 
                             _ ->
@@ -487,7 +487,7 @@ update message model =
 
         AddTag ->
             case model.page of
-                TitlePage book entries ->
+                TitlePage book excerpts ->
                     case model.pendingTag of
                         Just tag ->
                             let
@@ -518,7 +518,7 @@ update message model =
                                         , page =
                                             TitlePage
                                                 { book | tags = newTagSet }
-                                                entries
+                                                excerpts
                                       }
                                     , none
                                     )
@@ -531,7 +531,7 @@ update message model =
 
         RemoveTag tag ->
             case model.page of
-                TitlePage book entries ->
+                TitlePage book excerpts ->
                     let
                         newTagSet =
                             removeItem book.tags tag
@@ -554,7 +554,7 @@ update message model =
                             , page =
                                 TitlePage
                                     { book | tags = newTagSet }
-                                    entries
+                                    excerpts
                           }
                         , none
                         )
@@ -572,8 +572,8 @@ update message model =
                     | books = insert book.id newBook model.books
                     , page =
                         case model.page of
-                            TitlePage _ entries ->
-                                TitlePage newBook entries
+                            TitlePage _ excerpts ->
+                                TitlePage newBook excerpts
 
                             _ ->
                                 model.page
@@ -584,13 +584,13 @@ update message model =
         SetTagSort sort ->
             ( { model | tagSort = sort }, none )
 
-        HideEntry entry ->
+        HideExcerpt excerpt ->
             let
-                entries =
-                    remove entry.id model.entries
+                excerpts =
+                    remove excerpt.id model.excerpts
 
                 ( books, bookmarks ) =
-                    case get entry.bookId model.books of
+                    case get excerpt.bookId model.books of
                         Just book ->
                             if book.count == 1 then
                                 ( remove book.id model.books
@@ -605,7 +605,7 @@ update message model =
                                             { b
                                                 | count = b.count - 1
                                                 , favCount =
-                                                    if entry.isFavorite then
+                                                    if excerpt.isFavorite then
                                                         b.favCount - 1
 
                                                     else
@@ -616,7 +616,7 @@ update message model =
                                     model.books
                                 , case get book.id model.bookmarks of
                                     Just id ->
-                                        if id == entry.id then
+                                        if id == excerpt.id then
                                             remove book.id model.bookmarks
 
                                         else
@@ -631,40 +631,40 @@ update message model =
             in
             store
                 ( { model
-                    | hiddenEntries = Set.insert entry.id model.hiddenEntries
-                    , entries = entries
+                    | hiddenExcerpts = Set.insert excerpt.id model.hiddenExcerpts
+                    , excerpts = excerpts
                     , books = books
                     , bookmarks = bookmarks
                     , page =
                         case model.page of
-                            TitlePage oldBook oldEntries ->
+                            TitlePage oldBook oldExcerpts ->
                                 TitlePage
                                     (withDefault oldBook (get oldBook.id books))
                                     (filter
-                                        (\e -> e.id /= entry.id)
-                                        oldEntries
+                                        (\e -> e.id /= excerpt.id)
+                                        oldExcerpts
                                     )
 
                             _ ->
                                 model.page
                     , tagCounts = getTagCounts books
                     , completedEmbeddings =
-                        Set.remove entry.id model.completedEmbeddings
+                        Set.remove excerpt.id model.completedEmbeddings
                     , neighborMap = Dict.empty
                     , bookNeighborMap = Dict.empty
                   }
                 , batch
-                    [ deleteEmbedding entry.id
+                    [ deleteEmbedding excerpt.id
                     , case model.page of
-                        EntryPage { id } _ ->
-                            if id == entry.id then
+                        ExcerptPage { id } _ ->
+                            if id == excerpt.id then
                                 Nav.pushUrl model.key "/"
 
                             else
                                 none
 
                         TitlePage book ents ->
-                            if book.id == entry.bookId && length ents == 1 then
+                            if book.id == excerpt.bookId && length ents == 1 then
                                 Nav.pushUrl model.key "/"
 
                             else
@@ -714,20 +714,20 @@ update message model =
                 noOp
 
         ExportEpub time ->
-            ( model, Epub.export time (values model.books) (values model.entries) )
+            ( model, Epub.export time (values model.books) (values model.excerpts) )
 
         RequestEmbeddings ->
             let
                 nextBatch =
                     diff
                         (diff
-                            (model.entries |> keys |> Set.fromList)
+                            (model.excerpts |> keys |> Set.fromList)
                             model.completedEmbeddings
                         )
-                        model.hiddenEntries
+                        model.hiddenExcerpts
                         |> toList
-                        |> filterMap (\id -> get id model.entries)
-                        |> map (\entry -> ( entry.id, entry.text ))
+                        |> filterMap (\id -> get id model.excerpts)
+                        |> map (\excerpt -> ( excerpt.id, excerpt.text ))
                         |> take embeddingBatchSize
             in
             if isEmpty nextBatch then
@@ -737,7 +737,7 @@ update message model =
                     |> map
                         (\{ id } ->
                             ( id
-                            , model.entries
+                            , model.excerpts
                                 |> values
                                 |> filter (.bookId >> (==) id)
                                 |> map .id
@@ -767,7 +767,7 @@ update message model =
                         [ requestBookNeighbors book.id
                         , requestSemanticRank
                             ( book.id
-                            , model.entries
+                            , model.excerpts
                                 |> Dict.filter
                                     (\_ { bookId } ->
                                         bookId == book.id
@@ -777,8 +777,8 @@ update message model =
                             )
                         ]
 
-                EntryPage entry _ ->
-                    requestExcerptNeighbors ( entry.id, True )
+                ExcerptPage excerpt _ ->
+                    requestExcerptNeighbors ( excerpt.id, True )
 
                 SearchPage query _ _ _ _ ->
                     requestSemanticSearch ( query, model.semanticThreshold )
@@ -788,16 +788,16 @@ update message model =
             )
 
         ReceiveNeighbors ( targetId, idScores ) ->
-            if Dict.member targetId model.entries then
+            if Dict.member targetId model.excerpts then
                 ( { model
                     | neighborMap =
                         insert
                             targetId
                             (filterMap
                                 (\( id, score ) ->
-                                    case get id model.entries of
-                                        Just entry ->
-                                            Just ( entry.id, score )
+                                    case get id model.excerpts of
+                                        Just excerpt ->
+                                            Just ( excerpt.id, score )
 
                                         _ ->
                                             Nothing
@@ -839,14 +839,14 @@ update message model =
 
         ReceiveSemanticSearch ( _, idScores ) ->
             case model.page of
-                SearchPage query mode books entries _ ->
+                SearchPage query mode books excerpts _ ->
                     ( { model
                         | page =
                             SearchPage
                                 query
                                 mode
                                 books
-                                entries
+                                excerpts
                                 (filter
                                     (\( id, _ ) ->
                                         not <|
@@ -857,7 +857,7 @@ update message model =
                                                         == id
                                                 )
                                                 False
-                                                entries
+                                                excerpts
                                     )
                                     idScores
                                 )
@@ -881,8 +881,8 @@ update message model =
             in
             case model.page of
                 TitlePage book _ ->
-                    if book.id == bookId && model.entrySort == EntrySemanticSort then
-                        update (SortEntries model.entrySort) model_
+                    if book.id == bookId && model.excerptSort == ExcerptSemanticSort then
+                        update (SortExcerpts model.excerptSort) model_
 
                     else
                         ( model_, none )
@@ -941,8 +941,8 @@ update message model =
                     of
                         Just book ->
                             let
-                                entries =
-                                    model.entries
+                                excerpts =
+                                    model.excerpts
                                         |> Dict.filter
                                             (\_ { bookId } ->
                                                 bookId == book.id
@@ -951,15 +951,15 @@ update message model =
                                         |> sortBy .page
                             in
                             ( { model_
-                                | page = TitlePage book entries
-                                , entrySort = EntryPageSort
+                                | page = TitlePage book excerpts
+                                , excerptSort = ExcerptPageSort
                               }
                             , batch
                                 ((case mFragment of
-                                    Just entryId ->
+                                    Just excerptId ->
                                         attempt
                                             ScrollToElement
-                                            (getElement entryId)
+                                            (getElement excerptId)
 
                                     _ ->
                                         case parse routeParser model.url of
@@ -977,7 +977,7 @@ update message model =
                                             [ requestBookNeighbors book.id
                                             , requestSemanticRank
                                                 ( book.id
-                                                , map .id entries
+                                                , map .id excerpts
                                                 )
                                             ]
 
@@ -994,22 +994,22 @@ update message model =
                             , none
                             )
 
-                Just (EntryRoute titleSlug entrySlug) ->
+                Just (ExcerptRoute titleSlug excerptSlug) ->
                     let
-                        mEntry =
-                            get entrySlug model.entries
+                        mExcerpt =
+                            get excerptSlug model.excerpts
 
                         mBook =
                             get titleSlug model.titleRouteMap
                                 |> andThen (\id -> get id model.books)
                     in
-                    case ( mEntry, mBook ) of
-                        ( Just entry, Just book ) ->
-                            ( { model_ | page = EntryPage entry book }
+                    case ( mExcerpt, mBook ) of
+                        ( Just excerpt, Just book ) ->
+                            ( { model_ | page = ExcerptPage excerpt book }
                             , batch
                                 [ scrollTop
                                 , if model.embeddingsReady then
-                                    requestExcerptNeighbors ( entry.id, True )
+                                    requestExcerptNeighbors ( excerpt.id, True )
 
                                   else
                                     none
@@ -1102,7 +1102,7 @@ update message model =
                     ( { model_
                         | page =
                             CreatePage
-                                (PendingEntry "" "" "" -1)
+                                (PendingExcerpt "" "" "" -1)
                                 (values model.books |> map .title |> sort)
                                 (values model.authorRouteMap)
                       }
@@ -1119,29 +1119,29 @@ update message model =
             , none
             )
 
-        SortEntries sort ->
+        SortExcerpts sort ->
             ( { model
-                | entrySort = sort
+                | excerptSort = sort
                 , page =
                     case model.page of
-                        TitlePage book entries ->
+                        TitlePage book excerpts ->
                             TitlePage
                                 book
                                 (case sort of
-                                    EntrySemanticSort ->
+                                    ExcerptSemanticSort ->
                                         case get book.id model.semanticRankMap of
                                             Just ids ->
                                                 filterMap
                                                     (\( id, _ ) ->
-                                                        get id model.entries
+                                                        get id model.excerpts
                                                     )
                                                     ids
 
                                             _ ->
-                                                sortBy .page entries
+                                                sortBy .page excerpts
 
                                     _ ->
-                                        sortBy .page entries
+                                        sortBy .page excerpts
                                 )
 
                         _ ->
@@ -1150,20 +1150,20 @@ update message model =
             , none
             )
 
-        SetBookmark bookId entryId ->
+        SetBookmark bookId excerptId ->
             store
                 ( { model
                     | bookmarks =
                         case get bookId model.bookmarks of
-                            Just prevEntryId ->
-                                if prevEntryId == entryId then
+                            Just prevExcerptId ->
+                                if prevExcerptId == excerptId then
                                     remove bookId model.bookmarks
 
                                 else
-                                    insert bookId entryId model.bookmarks
+                                    insert bookId excerptId model.bookmarks
 
                             _ ->
-                                insert bookId entryId model.bookmarks
+                                insert bookId excerptId model.bookmarks
                   }
                 , none
                 )
@@ -1171,17 +1171,17 @@ update message model =
         ToggleFavorite id ->
             let
                 toggle =
-                    \entry -> { entry | isFavorite = not entry.isFavorite }
+                    \excerpt -> { excerpt | isFavorite = not excerpt.isFavorite }
 
-                newEntries =
+                newExcerpts =
                     Dict.update
                         id
                         (Maybe.map toggle)
-                        model.entries
+                        model.excerpts
 
                 countDelta =
                     if
-                        newEntries
+                        newExcerpts
                             |> get id
                             |> Maybe.map .isFavorite
                             |> withDefault False
@@ -1196,12 +1196,12 @@ update message model =
             in
             store
                 ( { model
-                    | entries = newEntries
+                    | excerpts = newExcerpts
                     , books =
-                        case get id newEntries of
-                            Just entry ->
+                        case get id newExcerpts of
+                            Just excerpt ->
                                 Dict.update
-                                    entry.bookId
+                                    excerpt.bookId
                                     (Maybe.map updateCount)
                                     model.books
 
@@ -1209,21 +1209,21 @@ update message model =
                                 model.books
                     , page =
                         case model.page of
-                            EntryPage entry book ->
-                                EntryPage (toggle entry) (updateCount book)
+                            ExcerptPage excerpt book ->
+                                ExcerptPage (toggle excerpt) (updateCount book)
 
-                            TitlePage book entries ->
+                            TitlePage book excerpts ->
                                 TitlePage
                                     (updateCount book)
                                     (map
-                                        (\entry ->
-                                            if entry.id == id then
-                                                toggle entry
+                                        (\excerpt ->
+                                            if excerpt.id == id then
+                                                toggle excerpt
 
                                             else
-                                                entry
+                                                excerpt
                                         )
-                                        entries
+                                        excerpts
                                     )
 
                             _ ->
@@ -1232,7 +1232,7 @@ update message model =
                 , none
                 )
 
-        SetEntryTab id tab toggle ->
+        SetExcerptTab id tab toggle ->
             let
                 m =
                     { model
@@ -1294,7 +1294,7 @@ update message model =
                                 (\b -> b.title ++ " " ++ join " " b.authors)
                                 (values model.books)
                             )
-                            (model.entries
+                            (model.excerpts
                                 |> values
                                 |> findMatches query .text
                             )
@@ -1314,10 +1314,10 @@ update message model =
 
         SetSearchTab mode ->
             case model.page of
-                SearchPage query _ books entries semanticMatches ->
+                SearchPage query _ books excerpts semanticMatches ->
                     ( { model
                         | page =
-                            SearchPage query mode books entries semanticMatches
+                            SearchPage query mode books excerpts semanticMatches
                       }
                     , none
                     )
@@ -1359,25 +1359,25 @@ update message model =
         GetTime msg ->
             ( model, perform msg Time.now )
 
-        UpdatePendingEntry pEntry ->
+        UpdatePendingExcerpt pExcerpt ->
             case model.page of
                 CreatePage _ titles authors ->
-                    ( { model | page = CreatePage pEntry titles authors }, none )
+                    ( { model | page = CreatePage pExcerpt titles authors }, none )
 
                 _ ->
                     noOp
 
-        CreateEntry entry time ->
+        CreateExcerpt excerpt time ->
             let
-                entryId =
-                    getEntryId entry.text (entry.title ++ " " ++ entry.author)
+                excerptId =
+                    getExcerptId excerpt.text (excerpt.title ++ " " ++ excerpt.author)
             in
-            case get entryId model.entries of
-                Just existingEntry ->
+            case get excerptId model.excerpts of
+                Just existingExcerpt ->
                     ( model
                     , Nav.pushUrl
                         model.key
-                        (entryToRoute model.books existingEntry)
+                        (excerptToRoute model.books existingExcerpt)
                     )
 
                 _ ->
@@ -1388,21 +1388,21 @@ update message model =
                                 |> filter
                                     (\b ->
                                         b.title
-                                            == entry.title
-                                            && member entry.author b.authors
+                                            == excerpt.title
+                                            && member excerpt.author b.authors
                                     )
                                 |> head
 
                         timestamp =
                             posixToMillis time
 
-                        fullEntry =
+                        fullExcerpt =
                             \bookId ->
-                                { id = entryId
-                                , text = entry.text
+                                { id = excerptId
+                                , text = excerpt.text
                                 , bookId = bookId
                                 , date = timestamp
-                                , page = entry.page
+                                , page = excerpt.page
                                 , notes = ""
                                 , isFavorite = False
                                 }
@@ -1434,13 +1434,13 @@ update message model =
                                             )
                                             model.books
 
-                                    newEntry =
-                                        fullEntry book.id
+                                    newExcerpt =
+                                        fullExcerpt book.id
                                 in
                                 ( { model_
                                     | books = newBooks
-                                    , entries =
-                                        insert entryId newEntry model.entries
+                                    , excerpts =
+                                        insert excerptId newExcerpt model.excerpts
                                     , semanticRankMap =
                                         remove
                                             book.id
@@ -1449,20 +1449,20 @@ update message model =
                                   }
                                 , Nav.pushUrl
                                     model.key
-                                    (entryToRoute newBooks newEntry)
+                                    (excerptToRoute newBooks newExcerpt)
                                 )
 
                             _ ->
                                 let
                                     bookId =
-                                        getEntryId entry.title entry.author
+                                        getExcerptId excerpt.title excerpt.author
 
                                     ( titleRouteMap, booksWithSlugs ) =
                                         insert
                                             bookId
                                             { id = bookId
-                                            , title = entry.title
-                                            , authors = [ entry.author ]
+                                            , title = excerpt.title
+                                            , authors = [ excerpt.author ]
                                             , count = 1
                                             , rating = 0
                                             , sortIndex = timestamp
@@ -1481,38 +1481,38 @@ update message model =
                                                 booksWithSlugs
                                             )
 
-                                    newEntry =
-                                        fullEntry bookId
+                                    newExcerpt =
+                                        fullExcerpt bookId
                                 in
                                 ( { model_
                                     | books = newBooks
-                                    , entries =
-                                        insert entryId newEntry model.entries
+                                    , excerpts =
+                                        insert excerptId newExcerpt model.excerpts
                                     , titleRouteMap = titleRouteMap
                                     , authorRouteMap =
                                         Parser.getAuthorRouteMap booksWithSlugs
                                   }
                                 , Nav.pushUrl
                                     model.key
-                                    (entryToRoute newBooks newEntry)
+                                    (excerptToRoute newBooks newExcerpt)
                                 )
                         )
                         |> Update.andThen update RequestEmbeddings
 
         PendingTitleBlur ->
             case model.page of
-                CreatePage pEntry titles authors ->
+                CreatePage pExcerpt titles authors ->
                     case
                         model.books
                             |> values
-                            |> filter (\book -> book.title == pEntry.title)
+                            |> filter (\book -> book.title == pExcerpt.title)
                             |> head
                     of
                         Just book ->
                             ( { model
                                 | page =
                                     CreatePage
-                                        { pEntry
+                                        { pExcerpt
                                             | author =
                                                 withDefault
                                                     ""

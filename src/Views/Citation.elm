@@ -5,15 +5,15 @@ import Html.Attributes exposing (class, href)
 import Html.Events exposing (stopPropagationOn)
 import Json.Decode exposing (succeed)
 import List exposing (intersperse, map)
-import Model exposing (Book, Entry)
+import Model exposing (Book, Excerpt)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
 import String exposing (fromInt)
-import Utils exposing (formatScore, getEntryDomId)
+import Utils exposing (formatScore, getExcerptDomId)
 
 
-citation : Entry -> Book -> Maybe Float -> Html Msg
-citation entry book mScore =
+citation : Excerpt -> Book -> Maybe Float -> Html Msg
+citation excerpt book mScore =
     cite
         []
         ([ div []
@@ -33,7 +33,7 @@ citation entry book mScore =
                 book.authors
                 |> intersperse (text " / ")
              )
-                ++ (if entry.page /= -1 then
+                ++ (if excerpt.page /= -1 then
                         [ span [ class "divider" ] [ text "•" ] ]
 
                     else
@@ -41,15 +41,15 @@ citation entry book mScore =
                    )
             )
          ]
-            ++ (if entry.page /= -1 then
+            ++ (if excerpt.page /= -1 then
                     [ a
                         [ href <|
                             titleSlugToRoute book.slug
                                 ++ "#"
-                                ++ getEntryDomId entry.id
+                                ++ getExcerptDomId excerpt.id
                         , stopLinkProp
                         ]
-                        [ text <| "p. " ++ fromInt entry.page ]
+                        [ text <| "p. " ++ fromInt excerpt.page ]
                     ]
 
                 else

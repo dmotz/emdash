@@ -15,16 +15,16 @@ import Json.Decode
         , succeed
         )
 import Json.Decode.Pipeline exposing (optional, required)
-import Model exposing (Book, Entry, StoredModel)
+import Model exposing (Book, Excerpt, StoredModel)
 import Tuple exposing (pair)
 
 
 decodeStoredModel : String -> Result Error StoredModel
 decodeStoredModel =
     succeed StoredModel
-        |> required "entries" (list entryDecoder)
+        |> required "excerpts" (list excerptDecoder)
         |> required "books" (list bookDecoder)
-        |> optional "hiddenEntries" (list string) []
+        |> optional "hiddenExcerpts" (list string) []
         |> optional
             "bookmarks"
             (list (map2 pair (index 0 string) (index 1 string)))
@@ -32,9 +32,9 @@ decodeStoredModel =
         |> decodeString
 
 
-entryDecoder : Decoder Entry
-entryDecoder =
-    succeed Entry
+excerptDecoder : Decoder Excerpt
+excerptDecoder =
+    succeed Excerpt
         |> required "id" string
         |> required "text" string
         |> required "bookId" string
