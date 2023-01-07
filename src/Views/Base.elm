@@ -175,17 +175,17 @@ view model =
                                     model.reverseSort
                                 ]
 
-                        SearchPage query semanticReady books entries semanticMatches ->
+                        SearchPage query mode books entries semanticMatches ->
                             div
                                 [ class "searchPage fullWidth" ]
                                 [ searchInput model.searchQuery
                                 , searchResults
+                                    mode
                                     model.books
                                     model.entries
                                     books
                                     entries
                                     semanticMatches
-                                    semanticReady
                                     query
                                 ]
 
