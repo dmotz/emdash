@@ -439,7 +439,7 @@ tagHeader show allBooks tagSort tags tagCounts mActiveTag =
                                                 "A–Z"
 
                                             TagNumSort ->
-                                                "№ excerpts"
+                                                "№ titles"
                                     ]
                                 ]
                         )
