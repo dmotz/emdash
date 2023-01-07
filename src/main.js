@@ -59,7 +59,7 @@ let zipWorker
   }
 
   try {
-    app = Elm.Main.init({flags: [version, restored]})
+    app = Elm.Main.init({flags: [version, restored || null]})
   } catch (e) {
     console.warn('malformed restored state:', restored)
     app = Elm.Main.init({flags: [version, null]})
