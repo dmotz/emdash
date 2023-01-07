@@ -1298,7 +1298,12 @@ update message model =
                                 |> values
                                 |> findMatches query .text
                             )
-                            (withDefault [] prevSemantic)
+                            (if String.length query >= minSemanticQueryLen then
+                                withDefault [] prevSemantic
+
+                             else
+                                []
+                            )
                   }
                 , if String.length query >= minSemanticQueryLen then
                     requestSemanticSearch ( query, model.semanticThreshold )
