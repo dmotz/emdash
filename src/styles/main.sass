@@ -396,10 +396,17 @@ footer
     border: 4px double $mid2
     padding: 4rem
     background: $bg
+    max-height: 80vh
+    display: flex
+    flex-direction: column
 
     div
       margin: 3rem 0
       font-size: 1.4rem
+      overflow: auto
 
       code
         user-select: text
+
+    button
+      align-self: center
