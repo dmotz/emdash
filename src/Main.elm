@@ -354,13 +354,13 @@ update message model =
         DragLeave ->
             ( { model | isDragging = False }, none )
 
-        GotFiles msg file _ ->
+        GotFile msg file ->
             ( { model | isDragging = False }
             , perform msg (File.toString file)
             )
 
         PickKindleFile ->
-            ( model, Select.files [ "text/plain" ] (GotFiles LoadKindleFile) )
+            ( model, Select.file [ "text/plain" ] (GotFile LoadKindleFile) )
 
         LoadKindleFile text ->
             ( model, requestUnicodeNormalized text )
@@ -696,7 +696,7 @@ update message model =
 
         ImportJson ->
             ( model
-            , Select.files [ "application/json" ] (GotFiles ParseJsonText)
+            , Select.file [ "application/json" ] (GotFile ParseJsonText)
             )
 
         KeyDown { key, control, meta } ->

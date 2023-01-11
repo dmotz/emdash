@@ -34,7 +34,7 @@ type Msg
     | GotRandomIndex Int
     | DragEnter
     | DragLeave
-    | GotFiles (String -> Msg) File (List File)
+    | GotFile (String -> Msg) File
     | LoadKindleFile String
     | PickKindleFile
     | KeyDown KeyEvent
