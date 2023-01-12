@@ -102,7 +102,7 @@ port requestBookEmbeddings : List ( Id, List Id ) -> Cmd msg
 port receiveBookEmbeddings : (() -> msg) -> Sub msg
 
 
-port deleteEmbedding : Id -> Cmd msg
+port deleteEmbedding : ( Id, Id ) -> Cmd msg
 
 
 port requestExcerptNeighbors : ( Id, Bool ) -> Cmd msg
@@ -662,11 +662,12 @@ update message model =
                     , tagCounts = getTagCounts books
                     , completedEmbeddings =
                         Set.remove excerpt.id model.completedEmbeddings
-                    , neighborMap = Dict.empty
                     , bookNeighborMap = Dict.empty
+
+                    -- , neighborMap = Dict.empty
                   }
                 , batch
-                    [ deleteEmbedding excerpt.id
+                    [ deleteEmbedding ( excerpt.id, excerpt.bookId )
                     , case model.page of
                         ExcerptPage { id } _ ->
                             if id == excerpt.id then
