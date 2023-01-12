@@ -37,7 +37,7 @@ type Page
     | ExcerptPage Excerpt Book
     | NotFoundPage String
     | SettingsPage
-    | LandingPage
+    | LandingPage (List Book)
     | ImportPage
     | CreatePage PendingExcerpt (List Title) (List Author)
 
