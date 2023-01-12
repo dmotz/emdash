@@ -17,7 +17,8 @@ const messageToPort = {
   requestExcerptNeighbors: 'receiveExcerptNeighbors',
   requestBookNeighbors: 'receiveBookNeighbors',
   requestSemanticRank: 'receiveSemanticRank',
-  semanticSearch: 'receiveSemanticSearch'
+  semanticSearch: 'receiveSemanticSearch',
+  setDemoEmbeddings: 'receiveExcerptEmbeddings'
 }
 
 const downloadFile = (name, data) => {
@@ -135,6 +136,10 @@ let zipWorker
 
   app.ports.requestUnicodeNormalized.subscribe(str =>
     app.ports.receiveUnicodeNormalized.send(str.normalize('NFKD'))
+  )
+
+  app.ports.fetchDemoEmbeddings.subscribe(ids =>
+    worker.port.postMessage({method: 'setDemoEmbeddings', ids})
   )
 
   worker.port.start()
