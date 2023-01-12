@@ -5,7 +5,7 @@ import {createStore, del, entries, setMany} from 'idb-keyval'
 const dbNs = 'marginalia'
 const embKey = 'embeddings'
 const model = load()
-const embStep = 512
+const embSize = 512
 const neighborsK = 5
 const semanticSearchLimit = 111
 const bookEmbMap = {}
@@ -28,7 +28,7 @@ const computeEmbeddings = async pairs => {
 
   return pairs.map(([id], i) => [
     id,
-    embeddings.slice(i * embStep, (i + 1) * embStep)
+    embeddings.slice(i * embSize, (i + 1) * embSize)
   ])
 }
 
@@ -153,6 +153,26 @@ const methods = {
     if (embStore) {
       del(target, embStore)
     }
+  },
+
+  setDemoEmbeddings: async ({ids}, cb) => {
+    let buff
+
+    try {
+      buff = await (await fetch('/demo/embs')).arrayBuffer()
+    } catch (e) {
+      return
+    }
+
+    const vecSize = embSize * 4
+
+    excerptEmbMap = Object.fromEntries(
+      new Array(buff.byteLength / vecSize)
+        .fill()
+        .map((_, i) => [ids[i], new Float32Array(buff, i * vecSize, embSize)])
+    )
+
+    cb(ids)
   }
 }
 
