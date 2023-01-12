@@ -135,6 +135,9 @@ port requestSemanticSearch : ( String, Float ) -> Cmd msg
 port receiveSemanticSearch : (( String, ScorePairs ) -> msg) -> Sub msg
 
 
+port fetchDemoEmbeddings : List Id -> Cmd msg
+
+
 appName : String
 appName =
     "Marginalia"
@@ -334,7 +337,16 @@ update message model =
                         model.key
             in
             update (UrlChanged model.url) model_
-                |> addCmd (model_ |> modelToStoredModel |> handleNewExcerpts)
+                |> addCmd
+                    (batch
+                        [ model_ |> modelToStoredModel |> handleNewExcerpts
+                        , if demoMode then
+                            fetchDemoEmbeddings (keys model_.excerpts)
+
+                          else
+                            none
+                        ]
+                    )
 
         ParseJsonText text ->
             case decodeStoredModel text of
