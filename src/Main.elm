@@ -23,6 +23,7 @@ import List
         , isEmpty
         , length
         , map
+        , map2
         , member
         , sort
         , sortBy
@@ -31,7 +32,8 @@ import List
 import Maybe exposing (andThen, withDefault)
 import Model
     exposing
-        ( BookSort(..)
+        ( Book
+        , BookSort(..)
         , ExcerptSort(..)
         , Id
         , InputFocus(..)
@@ -48,6 +50,7 @@ import Msg exposing (Msg(..))
 import Parser exposing (getExcerptId)
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
+import Random.List exposing (shuffle)
 import Router
     exposing
         ( Route(..)
@@ -76,6 +79,7 @@ import Utils
         , untaggedKey
         )
 import Views.Base exposing (view)
+import Views.Landing exposing (landingPageBooks)
 
 
 port setStorage : StoredModel -> Cmd msg
@@ -222,7 +226,7 @@ main =
                         MainPage _ Nothing ->
                             appName
 
-                        LandingPage ->
+                        LandingPage _ ->
                             appName
 
                         _ ->
@@ -935,16 +939,35 @@ update message model =
                 parse routeParser url
             of
                 Just RootRoute ->
+                    let
+                        showLanding =
+                            Dict.isEmpty model.books
+                    in
                     ( { model_
                         | page =
-                            if Dict.isEmpty model.books then
-                                LandingPage
+                            if showLanding then
+                                LandingPage []
 
                             else
                                 MainPage (values model.books) Nothing
                         , searchQuery = ""
                       }
-                    , scrollTop
+                    , batch
+                        [ scrollTop
+                        , if showLanding then
+                            generate
+                                GotLandingData
+                                (Random.pair
+                                    (shuffle landingPageBooks)
+                                    (Random.list
+                                        (length landingPageBooks)
+                                        (Random.int 3 79)
+                                    )
+                                )
+
+                          else
+                            none
+                        ]
                     )
 
                 Just (TitleRoute slug mFragment) ->
@@ -1367,6 +1390,26 @@ update message model =
                     update (ParseJsonText text) model
 
                 Err _ ->
+                    noOp
+
+        GotLandingData ( titles, nums ) ->
+            case model.page of
+                LandingPage _ ->
+                    ( { model
+                        | page =
+                            LandingPage
+                                (map2
+                                    (\( title, author ) n ->
+                                        Book "" title [ author ] n 0 0 [] "" 0
+                                    )
+                                    titles
+                                    nums
+                                )
+                      }
+                    , none
+                    )
+
+                _ ->
                     noOp
 
         GetTime msg ->
