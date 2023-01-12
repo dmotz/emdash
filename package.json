@@ -23,6 +23,7 @@
     "jszip": "^3.9.1"
   },
   "devDependencies": {
+    "@tensorflow/tfjs-node": "^4.2.0",
     "elm-review": "^2.7.3",
     "elm-tooling": "^1.8.0",
     "sass": "^1.53.0",
