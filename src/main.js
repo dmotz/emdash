@@ -66,11 +66,11 @@ let zipWorker
     app = Elm.Main.init({flags: [version, null]})
   }
 
-  app.ports.handleNewEntries.subscribe(state =>
+  app.ports.handleNewExcerpts.subscribe(state =>
     worker.port.postMessage({
       method: 'processNewExcerpts',
       books: state.books,
-      excerpts: state.entries
+      excerpts: state.excerpts
     })
   )
 
