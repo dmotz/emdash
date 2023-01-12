@@ -76,6 +76,7 @@ type Msg
     | DebounceMsg Debounce.Msg
     | StartDemo
     | GotDemoData (Result Http.Error String)
+    | GotLandingData ( List ( String, String ), List Int )
     | GetTime (Posix -> Msg)
     | UpdatePendingExcerpt PendingExcerpt
     | PendingTitleBlur
