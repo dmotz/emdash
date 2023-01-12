@@ -121,18 +121,17 @@ const methods = {
   },
 
   computeBookEmbeddings: ({targets}, cb) => {
-    const embeddings = targets.map(([bookId, ids]) => [
-      bookId,
-      ids.length
-        ? ids
-            .flatMap(id => excerptEmbMap[id] || [])
-            .reduce((a, c) => a.map((n, i) => n + c[i]))
-            .map(n => n / targets[0][1][0].length)
-        : []
-    ])
+    targets.forEach(
+      ([bookId, ids]) =>
+        (bookEmbMap[bookId] = ids.length
+          ? ids
+              .flatMap(id => excerptEmbMap[id] || [])
+              .reduce((a, c) => a.map((n, i) => n + c[i]))
+              .map(n => n / targets[0][1][0].length)
+          : [])
+    )
 
     cb(null)
-    embeddings.forEach(([k, v]) => (bookEmbMap[k] = v))
   },
 
   requestExcerptNeighbors: ({target}, cb) =>
