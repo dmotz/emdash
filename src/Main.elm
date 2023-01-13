@@ -930,7 +930,7 @@ update message model =
         UrlChanged url ->
             let
                 model_ =
-                    { model | url = url }
+                    { model | url = url, pendingTag = Nothing }
 
                 scrollTop =
                     perform (always NoOp) (setViewport 0 0)
