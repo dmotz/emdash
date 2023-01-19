@@ -1,7 +1,7 @@
 module Views.SearchResults exposing (searchResults)
 
 import Dict exposing (get)
-import Html exposing (Html, button, div, li, p, span, sup, text, ul)
+import Html exposing (Html, button, div, li, p, span, text, ul)
 import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
 import Html.Keyed as Keyed
@@ -80,7 +80,7 @@ searchResults mode bookMap excerptMap books matches semanticMatches query =
                                 ]
                                 [ button []
                                     [ span [] [ text title ]
-                                    , sup []
+                                    , div [ class "count" ]
                                         [ text <|
                                             if len > maxResults then
                                                 ">" ++ String.fromInt maxResults
