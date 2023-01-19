@@ -384,21 +384,27 @@ bookSorter activeSort reverseSort =
                         , if sort == activeSort then
                             button
                                 [ onClick Sort, class "sorter" ]
-                                (let
-                                    ( arrow, f ) =
-                                        if reverseSort then
-                                            ( "▼", reverse )
-
-                                        else
-                                            ( "▲", identity )
-                                 in
-                                 [ span
+                                [ span
                                     []
-                                    [ span [ class "arrow" ] [ text arrow ]
-                                    , activeSort |> sortToBounds |> f |> join "–" |> text
+                                    [ span
+                                        [ classList
+                                            [ ( "arrow", True )
+                                            , ( "reverse", reverseSort )
+                                            ]
+                                        ]
+                                        [ text "▲" ]
+                                    , activeSort
+                                        |> sortToBounds
+                                        |> (if reverseSort then
+                                                reverse
+
+                                            else
+                                                identity
+                                           )
+                                        |> join "–"
+                                        |> text
                                     ]
-                                 ]
-                                )
+                                ]
 
                           else
                             null

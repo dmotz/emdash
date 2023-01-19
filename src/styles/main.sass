@@ -307,12 +307,14 @@ progress
 
     .arrow
       font-size: 1rem
-      margin-right: 0.5rem
       padding: 0
-      line-height: 2.6
+      line-height: 2.1
       transform: translateX(-150%)
       position: absolute
       left: 0
+
+      &.reverse
+        transform: translateX(-150%) rotate(180deg)
 
 footer
   display: flex
