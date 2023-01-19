@@ -23,22 +23,28 @@ bookList books sort reverseSort =
     Keyed.ul
         [ class "bookList" ]
         (map
-            (\book -> ( book.id, bookView li book showRating showFavCount ))
+            (\book -> ( book.id, bookView book showRating showFavCount False ))
             (sortBooks sort reverseSort books)
         )
 
 
-bookView :
-    (List (Html.Attribute msg) -> List (Html Msg) -> Html Msg)
-    -> Book
-    -> Bool
-    -> Bool
-    -> Html Msg
-bookView tag book showRating showFavCount =
-    tag
+bookView : Book -> Bool -> Bool -> Bool -> Html Msg
+bookView book showRating showFavCount isLandingPage =
+    (if isLandingPage then
+        div
+
+     else
+        li
+    )
         [ class "book" ]
         [ a
-            [ href <| titleSlugToRoute book.slug ]
+            [ href <|
+                if isLandingPage then
+                    "#"
+
+                else
+                    titleSlugToRoute book.slug
+            ]
             [ div [ class "title" ] [ text book.title ]
             , div [ class "author" ] [ text <| join " / " book.authors ]
             , div [ class "count" ] [ text <| fromInt book.count ]
@@ -52,7 +58,9 @@ bookView tag book showRating showFavCount =
                     [ class "favCount" ]
                     (if book.favCount > 0 then
                         [ img
-                            [ class "favIcon", src "/images/favorite-filled.svg" ]
+                            [ class "favoriteIcon"
+                            , src "/images/favorite-filled.svg"
+                            ]
                             []
                         , text <| fromInt book.favCount
                         ]
