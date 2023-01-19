@@ -150,19 +150,22 @@ bookInfo book books tags pendingTag bookNeighborMap mBookmark excerptSort progre
                                 [ classList [ ( "active", sort == excerptSort ) ] ]
                                 [ button
                                     [ onClick <| SortExcerpts sort ]
-                                    [ text <| sortToString sort
-                                    , if
-                                        sort
-                                            == ExcerptSemanticSort
-                                            && excerptSort
-                                            /= ExcerptSemanticSort
-                                      then
-                                        div
-                                            [ class "hint" ]
-                                            [ text "Sort by most semantically relevant to all passages" ]
+                                    [ span
+                                        []
+                                        [ text <| sortToString sort
+                                        , if
+                                            sort
+                                                == ExcerptSemanticSort
+                                                && excerptSort
+                                                /= ExcerptSemanticSort
+                                          then
+                                            div
+                                                [ class "hint" ]
+                                                [ text "Sort by most semantically relevant to all passages" ]
 
-                                      else
-                                        null
+                                          else
+                                            null
+                                        ]
                                     ]
                                 ]
                         )

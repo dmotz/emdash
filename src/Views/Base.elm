@@ -371,7 +371,7 @@ view model =
 bookSorter : BookSort -> Bool -> Html Msg
 bookSorter activeSort reverseSort =
     div
-        [ class "modeHeading" ]
+        [ class "modeHeading center" ]
         [ ul
             []
             (map
@@ -380,28 +380,32 @@ bookSorter activeSort reverseSort =
                         [ classList [ ( "active", sort == activeSort ) ] ]
                         [ button
                             [ onClick <| SortBooks sort ]
-                            [ text <| sortToString sort ]
+                            [ span [] [ text <| sortToString sort ] ]
+                        , if sort == activeSort then
+                            button
+                                [ onClick Sort, class "sorter" ]
+                                (let
+                                    ( arrow, f ) =
+                                        if reverseSort then
+                                            ( "▼", reverse )
+
+                                        else
+                                            ( "▲", identity )
+                                 in
+                                 [ span
+                                    []
+                                    [ span [ class "arrow" ] [ text arrow ]
+                                    , activeSort |> sortToBounds |> f |> join "–" |> text
+                                    ]
+                                 ]
+                                )
+
+                          else
+                            null
                         ]
                 )
                 [ RecencySort, TitleSort, RatingSort, NumSort, FavSort ]
             )
-        , div [ class "divider" ] [ text "|" ]
-        , div []
-            [ button
-                [ onClick Sort ]
-                (let
-                    ( arrow, f ) =
-                        if reverseSort then
-                            ( "▼", reverse )
-
-                        else
-                            ( "▲", identity )
-                 in
-                 [ span [] [ text arrow ]
-                 , activeSort |> sortToBounds |> f |> join "–" |> text
-                 ]
-                )
-            ]
         ]
 
 
@@ -433,13 +437,16 @@ tagHeader show allBooks tagSort tags tagCounts mActiveTag =
                                 [ classList [ ( "active", sort == tagSort ) ] ]
                                 [ button
                                     [ onClick <| SetTagSort sort ]
-                                    [ text <|
-                                        case sort of
-                                            TagAlphaSort ->
-                                                "A–Z"
+                                    [ span
+                                        []
+                                        [ text <|
+                                            case sort of
+                                                TagAlphaSort ->
+                                                    "A–Z"
 
-                                            TagNumSort ->
-                                                "№ titles"
+                                                TagNumSort ->
+                                                    "№ titles"
+                                        ]
                                     ]
                                 ]
                         )

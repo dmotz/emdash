@@ -260,56 +260,59 @@ progress
   position: relative
   width: fit-content
 
-  > div
-    margin-bottom: 0.6rem
-    color: $fg
-    font-weight: 500
-    margin-right: 0.5rem
-    left: 0
-    color: $mid4
+  &.center
+    margin-bottom: 4rem
 
   ul
     display: flex
     margin-bottom: 0.6rem
 
-    &.last
-      margin-left: 1rem
-
-      &::before
-        content: "|"
-        margin-right: 1rem
-
   li
-    &:after
-      content: '•'
-      margin-left: 1rem
-      color: $mid2
+    border-left: 1px solid $mid2
+    text-align: center
 
-    + li
-      margin-left: 1rem
+    &:last-child
+      border-right: 1px solid $mid2
 
-    &:last-child:after
-      content: ''
-      margin: 0
+    &.active
+      button
+        color: $fg
 
-    &.active button
-      color: $fg
-      text-decoration-color: $fg
+        span
+          border-color: $fg
 
   button
-    text-decoration: underline 3px transparent
+    width: 11.88rem
     color: $mid4
-    font-size: 1.8rem
+    font-size: 1.6rem
+    display: flex
+    justify-content: center
+
+    span
+      padding: 0.6rem 0
+      font-size: inherit
+      border-bottom: 1px solid transparent
 
     &:hover
       color: $fg
 
-  span
-    font-size: 1rem
-    margin-right: 0.5rem
+  .sorter
+    position: absolute
+    font-size: 1.4rem
+    margin-top: 0.5rem
 
-  .divider
-    margin: 0 1rem
+    span
+      position: relative
+      border-bottom: none !important
+
+    .arrow
+      font-size: 1rem
+      margin-right: 0.5rem
+      padding: 0
+      line-height: 2.6
+      transform: translateX(-150%)
+      position: absolute
+      left: 0
 
 footer
   display: flex
