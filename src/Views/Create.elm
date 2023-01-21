@@ -122,7 +122,7 @@ createView pendingExcerpt titles authors =
                 , div
                     []
                     [ text "Page № "
-                    , span [] [ text "(optional)" ]
+                    , span [] [ text "optional" ]
                     ]
                 ]
             ]
