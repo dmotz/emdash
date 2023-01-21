@@ -1,5 +1,6 @@
 module Utils exposing
     ( KeyEvent
+    , appName
     , dedupe
     , excerptCountLabel
     , findMatches
@@ -57,6 +58,11 @@ type alias KeyEvent =
     , control : Bool
     , meta : Bool
     }
+
+
+appName : String
+appName =
+    "Marginalia"
 
 
 untaggedKey : String

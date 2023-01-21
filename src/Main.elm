@@ -69,6 +69,7 @@ import Url.Parser exposing (parse)
 import Utils
     exposing
         ( KeyEvent
+        , appName
         , dedupe
         , findMatches
         , getTagCounts
@@ -140,11 +141,6 @@ port receiveSemanticSearch : (( String, ScorePairs ) -> msg) -> Sub msg
 
 
 port fetchDemoEmbeddings : List Id -> Cmd msg
-
-
-appName : String
-appName =
-    "Marginalia"
 
 
 minSemanticQueryLen : Int
