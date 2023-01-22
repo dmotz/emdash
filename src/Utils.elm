@@ -21,6 +21,7 @@ module Utils exposing
     , slugify
     , sortBooks
     , titleCountLabel
+    , toDict
     , untaggedKey
     )
 
@@ -118,6 +119,11 @@ modelToStoredModel model =
 juxt : (a -> b) -> (a -> c) -> a -> ( b, c )
 juxt f g x =
     ( f x, g x )
+
+
+toDict : List { a | id : comparable } -> Dict comparable { a | id : comparable }
+toDict =
+    map (juxt .id identity) >> Dict.fromList
 
 
 phraseMatch : Regex -> (a -> String) -> a -> Bool
