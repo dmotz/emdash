@@ -51,14 +51,7 @@ import Parser exposing (getExcerptId)
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Random.List exposing (shuffle)
-import Router
-    exposing
-        ( Route(..)
-        , excerptToRoute
-        , routeParser
-        , searchToRoute
-        , slugify
-        )
+import Router exposing (Route(..), excerptToRoute, routeParser, searchToRoute)
 import Set exposing (diff, toList, union)
 import String exposing (fromInt, join, toLower, trim)
 import Task exposing (attempt, perform)
@@ -72,11 +65,14 @@ import Utils
         , appName
         , dedupe
         , findMatches
+        , getAuthorRouteMap
         , getTagCounts
+        , getTitleRouteMap
         , insertOnce
         , juxt
         , modelToStoredModel
         , removeItem
+        , slugify
         , untaggedKey
         )
 import Views.Base exposing (view)
@@ -167,7 +163,7 @@ createModel version mStoredModel demoMode url key =
             withDefault initialStoredModel mStoredModel
 
         ( titleRouteMap, booksWithSlugs ) =
-            Parser.getTitleRouteMap restored.books
+            getTitleRouteMap restored.books
 
         books =
             Dict.fromList (map (juxt .id identity) booksWithSlugs)
@@ -191,7 +187,7 @@ createModel version mStoredModel demoMode url key =
     , tagSort = TagAlphaSort
     , showTagHeader = length tags > 0
     , titleRouteMap = titleRouteMap
-    , authorRouteMap = Parser.getAuthorRouteMap restored.books
+    , authorRouteMap = getAuthorRouteMap restored.books
     , pendingTag = Nothing
     , isDragging = False
     , reverseSort = True
@@ -411,7 +407,7 @@ update message model =
                         |> values
 
                 ( titleRouteMap, booksWithSlugs ) =
-                    Parser.getTitleRouteMap bookVals
+                    getTitleRouteMap bookVals
             in
             if Dict.isEmpty newExcerpts then
                 ( { model | parsingError = Just "Failed to parse file." }, none )
@@ -427,7 +423,7 @@ update message model =
                             (map (juxt .id identity) booksWithSlugs)
                     , titleRouteMap = titleRouteMap
                     , authorRouteMap =
-                        Parser.getAuthorRouteMap bookVals
+                        getAuthorRouteMap bookVals
                     , embeddingsReady = False
                     , neighborMap = Dict.empty
                   }
@@ -1524,7 +1520,7 @@ update message model =
                                             }
                                             model.books
                                             |> values
-                                            |> Parser.getTitleRouteMap
+                                            |> getTitleRouteMap
 
                                     newBooks =
                                         Dict.fromList
@@ -1542,7 +1538,7 @@ update message model =
                                         insert excerptId newExcerpt model.excerpts
                                     , titleRouteMap = titleRouteMap
                                     , authorRouteMap =
-                                        Parser.getAuthorRouteMap booksWithSlugs
+                                        getAuthorRouteMap booksWithSlugs
                                   }
                                 , Nav.pushUrl
                                     model.key

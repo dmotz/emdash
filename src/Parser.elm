@@ -1,19 +1,18 @@
-module Parser exposing (getAuthorRouteMap, getExcerptId, getTitleRouteMap, process)
+module Parser exposing (getExcerptId, process)
 
 import Base64 exposing (fromBytes)
 import Bytes.Encode exposing (encode, sequence, unsignedInt8)
 import Char exposing (isDigit)
 import DateTime exposing (fromRawParts, toPosix)
-import Dict exposing (Dict, get, insert, update)
-import List exposing (all, concatMap, foldr, head, map, reverse, sortBy)
+import Dict exposing (insert, update)
+import List exposing (all, foldr, head, map)
 import MD5 exposing (bytes)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (Author, Book, BookMap, ExcerptMap, Id)
+import Model exposing (BookMap, ExcerptMap, Id)
 import Regex exposing (Match, Regex, replace)
-import Router exposing (slugify)
-import String exposing (join, lines, repeat, right, split, startsWith, toInt, trim)
+import String exposing (lines, repeat, right, split, startsWith, toInt, trim)
 import Time exposing (Month(..), posixToMillis)
-import Utils exposing (juxt, rx, rx_)
+import Utils exposing (rx, rx_)
 
 
 process : String -> ( ExcerptMap, BookMap )
@@ -349,34 +348,3 @@ makeDicts =
                     noOp
         )
         ( Dict.empty, Dict.empty )
-
-
-getTitleRouteMap : List Book -> ( Dict String Id, List Book )
-getTitleRouteMap =
-    sortBy .sortIndex
-        >> reverse
-        >> foldr
-            (\book ( slugToId, newBooks ) ->
-                let
-                    slug =
-                        case get (slugify book.title) slugToId of
-                            Just _ ->
-                                slugify
-                                    (book.title
-                                        ++ " by "
-                                        ++ join " & " book.authors
-                                    )
-
-                            _ ->
-                                slugify book.title
-                in
-                ( insert slug book.id slugToId
-                , { book | slug = slug } :: newBooks
-                )
-            )
-            ( Dict.empty, [] )
-
-
-getAuthorRouteMap : List Book -> Dict String Author
-getAuthorRouteMap =
-    concatMap (.authors >> map (juxt slugify identity)) >> Dict.fromList

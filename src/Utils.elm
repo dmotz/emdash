@@ -6,8 +6,10 @@ module Utils exposing
     , findMatches
     , formatNumber
     , formatScore
+    , getAuthorRouteMap
     , getExcerptDomId
     , getTagCounts
+    , getTitleRouteMap
     , insertOnce
     , juxt
     , modelToStoredModel
@@ -16,12 +18,13 @@ module Utils exposing
     , removeItem
     , rx
     , rx_
+    , slugify
     , sortBooks
     , titleCountLabel
     , untaggedKey
     )
 
-import Dict exposing (Dict, empty, insert, update, values)
+import Dict exposing (Dict, empty, get, insert, update, values)
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (class, classList)
 import List
@@ -29,6 +32,7 @@ import List
         ( concatMap
         , filter
         , foldl
+        , foldr
         , isEmpty
         , length
         , map
@@ -40,7 +44,8 @@ import List
 import Maybe exposing (withDefault)
 import Model
     exposing
-        ( Book
+        ( Author
+        , Book
         , BookMap
         , BookSort(..)
         , Id
@@ -50,7 +55,7 @@ import Model
         )
 import Regex exposing (Regex, replace)
 import Set
-import String exposing (fromInt, split, toLower)
+import String exposing (fromInt, join, split, toLower)
 
 
 type alias KeyEvent =
@@ -254,3 +259,40 @@ ratingEl book =
 null : Html msg
 null =
     text ""
+
+
+getTitleRouteMap : List Book -> ( Dict String Id, List Book )
+getTitleRouteMap =
+    sortBy .sortIndex
+        >> reverse
+        >> foldr
+            (\book ( slugToId, newBooks ) ->
+                let
+                    slug =
+                        case get (slugify book.title) slugToId of
+                            Just _ ->
+                                slugify
+                                    (book.title
+                                        ++ " by "
+                                        ++ join " & " book.authors
+                                    )
+
+                            _ ->
+                                slugify book.title
+                in
+                ( insert slug book.id slugToId
+                , { book | slug = slug } :: newBooks
+                )
+            )
+            ( Dict.empty, [] )
+
+
+getAuthorRouteMap : List Book -> Dict String Author
+getAuthorRouteMap =
+    concatMap (.authors >> map (juxt slugify identity)) >> Dict.fromList
+
+
+slugify : String -> String
+slugify =
+    replace (rx "\\s") (always "-")
+        >> replace (rx "[^\\w-]") (always "")

@@ -4,7 +4,6 @@ module Router exposing
     , excerptToRoute
     , routeParser
     , searchToRoute
-    , slugify
     , tagToRoute
     , titleSlugToRoute
     )
@@ -26,7 +25,7 @@ import Url.Parser
         , top
         )
 import Url.Parser.Query as Query
-import Utils exposing (rx)
+import Utils exposing (slugify)
 
 
 type Route
@@ -84,9 +83,3 @@ tagToRoute tag =
 searchToRoute : String -> String
 searchToRoute query =
     absolute [ "search" ] [ Url.Builder.string "q" query ]
-
-
-slugify : String -> String
-slugify =
-    replace (rx "\\s") (always "-")
-        >> replace (rx "[^\\w-]") (always "")
