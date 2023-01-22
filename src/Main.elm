@@ -5,13 +5,13 @@ import Browser.Dom exposing (getElement, setViewport)
 import Browser.Events exposing (onKeyDown)
 import Browser.Navigation as Nav
 import Debounce
-import Decoder exposing (decodeStoredModel)
 import Dict exposing (get, insert, keys, remove, values)
 import Epub
 import File
 import File.Select as Select
 import Http
 import Json.Decode as Decode
+import JsonParser exposing (decodeStoredModel)
 import List
     exposing
         ( concatMap
