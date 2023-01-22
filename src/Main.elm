@@ -139,6 +139,9 @@ port receiveSemanticSearch : (( String, ScorePairs ) -> msg) -> Sub msg
 port fetchDemoEmbeddings : List Id -> Cmd msg
 
 
+port syncState : (StoredModel -> msg) -> Sub msg
+
+
 minSemanticQueryLen : Int
 minSemanticQueryLen =
     5
@@ -276,6 +279,7 @@ main =
                     , receiveUnicodeNormalized ReceiveUnicodeNormalized
                     , receiveSemanticSearch ReceiveSemanticSearch
                     , receiveSemanticRank ReceiveSemanticRank
+                    , syncState SyncState
                     ]
         , onUrlChange = UrlChanged
         , onUrlRequest = LinkClicked
@@ -355,6 +359,17 @@ update message model =
                     ( { model | parsingError = Just (Decode.errorToString e) }
                     , none
                     )
+
+        SyncState sModel ->
+            ( { model
+                | excerpts = toDict sModel.excerpts
+                , books = toDict sModel.books
+                , hiddenExcerpts = Set.fromList sModel.hiddenExcerpts
+                , bookmarks = Dict.fromList sModel.bookmarks
+              }
+            , none
+            )
+                |> Update.andThen update (UrlChanged model.url)
 
         DragEnter ->
             ( { model | isDragging = True }, none )

@@ -10,6 +10,7 @@ const worker = new SharedWorker(new URL('./worker.js', import.meta.url), {
   name: 'marginalia',
   type: 'module'
 })
+const channel = new BroadcastChannel(dbNs)
 const messageToPort = {
   processNewExcerpts: 'receiveExcerptEmbeddings',
   computeExcerptEmbeddings: 'receiveExcerptEmbeddings',
@@ -66,6 +67,8 @@ let zipWorker
     app = Elm.Main.init({flags: [version, null]})
   }
 
+  channel.onmessage = ({data}) => app.ports.syncState.send(data)
+
   app.ports.handleNewExcerpts.subscribe(state =>
     worker.port.postMessage({
       method: 'processNewExcerpts',
@@ -84,10 +87,10 @@ let zipWorker
   app.ports.setStorage.subscribe(state => {
     clearTimeout(writeTimer)
     if (stateStore) {
-      writeTimer = setTimeout(
-        () => set(stateKey, JSON.stringify(state), stateStore),
-        writeMs
-      )
+      writeTimer = setTimeout(() => {
+        set(stateKey, JSON.stringify(state), stateStore)
+        channel.postMessage(state)
+      }, writeMs)
     }
   })
 
