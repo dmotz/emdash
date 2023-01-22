@@ -53,6 +53,7 @@ type Msg
     | ScrollToElement (Result Error Element)
     | ExportJson
     | ImportJson
+    | SyncState StoredModel
     | ResetError
     | ExportEpub Posix
     | RequestEmbeddings
