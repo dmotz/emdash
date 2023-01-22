@@ -976,7 +976,14 @@ update message model =
                                                 bookId == book.id
                                             )
                                         |> values
-                                        |> sortBy .page
+                                        |> sortBy
+                                            (\{ page, date } ->
+                                                if page == -1 then
+                                                    date
+
+                                                else
+                                                    page
+                                            )
                             in
                             ( { model_
                                 | page = TitlePage book excerpts
