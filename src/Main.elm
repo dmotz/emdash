@@ -69,10 +69,10 @@ import Utils
         , getTagCounts
         , getTitleRouteMap
         , insertOnce
-        , juxt
         , modelToStoredModel
         , removeItem
         , slugify
+        , toDict
         , untaggedKey
         )
 import Views.Base exposing (view)
@@ -166,14 +166,14 @@ createModel version mStoredModel demoMode url key =
             getTitleRouteMap restored.books
 
         books =
-            Dict.fromList (map (juxt .id identity) booksWithSlugs)
+            toDict booksWithSlugs
 
         tags =
             restored.books |> concatMap .tags |> dedupe
     in
     { page = MainPage (values books) Nothing
     , demoMode = demoMode
-    , excerpts = Dict.fromList (map (juxt .id identity) restored.excerpts)
+    , excerpts = toDict restored.excerpts
     , books = books
     , semanticThreshold = 0.1
     , neighborMap = Dict.empty
@@ -418,9 +418,7 @@ update message model =
                     , excerpts =
                         Dict.union model.excerpts newExcerpts
                             |> Dict.filter hiddenPred
-                    , books =
-                        Dict.fromList
-                            (map (juxt .id identity) booksWithSlugs)
+                    , books = toDict booksWithSlugs
                     , titleRouteMap = titleRouteMap
                     , authorRouteMap =
                         getAuthorRouteMap bookVals
@@ -1530,11 +1528,7 @@ update message model =
                                             |> getTitleRouteMap
 
                                     newBooks =
-                                        Dict.fromList
-                                            (map
-                                                (juxt .id identity)
-                                                booksWithSlugs
-                                            )
+                                        toDict booksWithSlugs
 
                                     newExcerpt =
                                         fullExcerpt bookId
