@@ -1,4 +1,4 @@
-module Parser exposing (getExcerptId, process)
+module KindleParser exposing (getExcerptId, process)
 
 import Base64 exposing (fromBytes)
 import Bytes.Encode exposing (encode, sequence, unsignedInt8)

@@ -12,6 +12,7 @@ import File.Select as Select
 import Http
 import Json.Decode as Decode
 import JsonParser exposing (decodeStoredModel)
+import KindleParser exposing (getExcerptId)
 import List
     exposing
         ( concatMap
@@ -47,7 +48,6 @@ import Model
         , initialStoredModel
         )
 import Msg exposing (Msg(..))
-import Parser exposing (getExcerptId)
 import Platform.Cmd exposing (batch, none)
 import Random exposing (generate)
 import Random.List exposing (shuffle)
@@ -376,7 +376,7 @@ update message model =
         ReceiveUnicodeNormalized text ->
             let
                 ( newExcerpts, newBooks ) =
-                    Parser.process text
+                    KindleParser.process text
 
                 hiddenPred =
                     \id _ -> not <| Set.member id model.hiddenExcerpts
