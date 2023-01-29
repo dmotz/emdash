@@ -12,6 +12,7 @@ module Utils exposing
     , getTitleRouteMap
     , insertOnce
     , juxt
+    , makeExcerpt
     , modelToStoredModel
     , null
     , ratingEl
@@ -25,12 +26,16 @@ module Utils exposing
     , untaggedKey
     )
 
+import Base64 exposing (fromBytes)
+import Bytes.Encode exposing (encode, sequence, unsignedInt8)
+import Char exposing (isDigit)
 import Dict exposing (Dict, empty, get, insert, update, values)
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (class, classList)
 import List
     exposing
-        ( concatMap
+        ( all
+        , concatMap
         , filter
         , foldl
         , foldr
@@ -42,6 +47,7 @@ import List
         , sortBy
         , sortWith
         )
+import MD5 exposing (bytes)
 import Maybe exposing (withDefault)
 import Model
     exposing
@@ -49,14 +55,16 @@ import Model
         , Book
         , BookMap
         , BookSort(..)
+        , Excerpt
         , Id
         , Model
         , StoredModel
         , Tag
+        , Title
         )
-import Regex exposing (Regex, replace)
+import Regex exposing (Match, Regex, replace)
 import Set
-import String exposing (fromInt, join, split, toLower)
+import String exposing (fromInt, join, split, toLower, trim)
 
 
 type alias KeyEvent =
@@ -302,3 +310,124 @@ slugify : String -> String
 slugify =
     replace (rx "\\s") (always "-")
         >> replace (rx "[^\\w-]") (always "")
+
+
+apostropheRx : Regex
+apostropheRx =
+    rx "(\\w)(')(\\w)"
+
+
+apostropheReplacer : Match -> String
+apostropheReplacer match =
+    String.concat <|
+        map
+            (\sub ->
+                let
+                    s =
+                        withDefault "" sub
+                in
+                if s == "'" then
+                    "’"
+
+                else
+                    s
+            )
+            match.submatches
+
+
+replaceApostrophes : String -> String
+replaceApostrophes =
+    replace apostropheRx apostropheReplacer
+
+
+authorSplitRx : Regex
+authorSplitRx =
+    rx "[;&]|\\sand\\s"
+
+
+footnoteRx : Regex
+footnoteRx =
+    rx "([^\\s\\d]{2,})(\\d+)"
+
+
+footnoteReplacer : Match -> String
+footnoteReplacer match =
+    String.concat <|
+        map
+            (\sub ->
+                let
+                    s =
+                        withDefault "" sub
+                in
+                if all isDigit (String.toList s) then
+                    ""
+
+                else
+                    s
+            )
+            match.submatches
+
+
+hashId : String -> Id
+hashId =
+    bytes
+        >> map unsignedInt8
+        >> sequence
+        >> encode
+        >> fromBytes
+        >> withDefault ""
+        >> String.replace "==" ""
+        >> String.replace "+" "-"
+        >> String.replace "/" "_"
+
+
+getBookId : String -> List String -> Id
+getBookId title authors =
+    hashId (title ++ join " / " authors)
+
+
+getExcerptId : String -> String -> Int -> Id
+getExcerptId text bookId page =
+    hashId (text ++ bookId ++ String.fromInt page)
+
+
+makeExcerpt : String -> String -> String -> Maybe Int -> Maybe Int -> String -> ( Excerpt, Book )
+makeExcerpt titleRaw authorRaw excerptText mPage mDate notes =
+    let
+        title =
+            replaceApostrophes titleRaw
+
+        authors =
+            authorRaw
+                |> replaceApostrophes
+                |> Regex.split authorSplitRx
+                |> map trim
+
+        page =
+            withDefault -1 mPage
+
+        bookId =
+            getBookId title authors
+
+        date =
+            withDefault 0 mDate
+    in
+    ( { id = getExcerptId excerptText bookId page
+      , text = replace footnoteRx footnoteReplacer excerptText
+      , bookId = bookId
+      , date = date
+      , page = page
+      , notes = notes
+      , isFavorite = False
+      }
+    , { id = bookId
+      , title = title
+      , authors = authors
+      , count = 0
+      , rating = 0
+      , sortIndex = date
+      , tags = []
+      , slug = ""
+      , favCount = 0
+      }
+    )
