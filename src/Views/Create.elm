@@ -105,16 +105,21 @@ createView pendingExcerpt titles authors =
                     [ type_ "number"
                     , H.min "0"
                     , value <|
-                        if pendingExcerpt.page > -1 then
-                            String.fromInt pendingExcerpt.page
+                        case pendingExcerpt.page of
+                            Just page ->
+                                if page > -1 then
+                                    String.fromInt page
 
-                        else
-                            ""
+                                else
+                                    ""
+
+                            _ ->
+                                ""
                     , onInput
                         (\s ->
                             UpdatePendingExcerpt
                                 { pendingExcerpt
-                                    | page = withDefault -1 (String.toInt s)
+                                    | page = String.toInt s
                                 }
                         )
                     ]
