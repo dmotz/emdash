@@ -1,18 +1,14 @@
-module KindleParser exposing (getExcerptId, process)
+module KindleParser exposing (process)
 
-import Base64 exposing (fromBytes)
-import Bytes.Encode exposing (encode, sequence, unsignedInt8)
-import Char exposing (isDigit)
 import DateTime exposing (fromRawParts, toPosix)
 import Dict exposing (insert, update)
-import List exposing (all, foldr, head, map)
-import MD5 exposing (bytes)
+import List exposing (foldr, head, map)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (BookMap, ExcerptMap, Id)
-import Regex exposing (Match, Regex, replace)
+import Model exposing (BookMap, ExcerptMap)
+import Regex exposing (Regex)
 import String exposing (lines, repeat, right, split, startsWith, toInt, trim)
 import Time exposing (Month(..), posixToMillis)
-import Utils exposing (rx, rx_)
+import Utils exposing (makeExcerpt, rx, rx_)
 
 
 process : String -> ( ExcerptMap, BookMap )
@@ -27,24 +23,6 @@ process =
 separator : String
 separator =
     repeat 10 "="
-
-
-hashId : String -> Id
-hashId =
-    bytes
-        >> map unsignedInt8
-        >> sequence
-        >> encode
-        >> fromBytes
-        >> withDefault ""
-        >> String.replace "==" ""
-        >> String.replace "+" "-"
-        >> String.replace "/" "_"
-
-
-getExcerptId : String -> String -> Id
-getExcerptId text meta =
-    (text ++ meta) |> hashId
 
 
 folder :
@@ -113,62 +91,6 @@ pageRx =
 dateRx : Regex
 dateRx =
     rx " \\| Added on \\w+, (\\w+) (\\d+), (\\d+) (\\d+):(\\d+):(\\d+) (\\w+)"
-
-
-footnoteRx : Regex
-footnoteRx =
-    rx "([^\\s\\d]{2,})(\\d+)"
-
-
-footnoteReplacer : Match -> String
-footnoteReplacer match =
-    String.concat <|
-        map
-            (\sub ->
-                let
-                    s =
-                        withDefault "" sub
-                in
-                if all isDigit (String.toList s) then
-                    ""
-
-                else
-                    s
-            )
-            match.submatches
-
-
-apostropheRx : Regex
-apostropheRx =
-    rx "(\\w)(')(\\w)"
-
-
-apostropheReplacer : Match -> String
-apostropheReplacer match =
-    String.concat <|
-        map
-            (\sub ->
-                let
-                    s =
-                        withDefault "" sub
-                in
-                if s == "'" then
-                    "’"
-
-                else
-                    s
-            )
-            match.submatches
-
-
-replaceApostrophes : String -> String
-replaceApostrophes =
-    replace apostropheRx apostropheReplacer
-
-
-authorSplitRx : Regex
-authorSplitRx =
-    rx "[;&]|\\sand\\s"
 
 
 makeDicts : List ( List String, String ) -> ( ExcerptMap, BookMap )
@@ -285,58 +207,24 @@ makeDicts =
                     case pair of
                         [ titleRaw, authorRaw ] ->
                             let
-                                id =
-                                    getExcerptId text meta
-
-                                title =
-                                    replaceApostrophes titleRaw
-
-                                authors =
-                                    authorRaw
-                                        |> replaceApostrophes
-                                        |> Regex.split authorSplitRx
-                                        |> map trim
-
-                                bookId =
-                                    hashId <| title ++ " " ++ authorRaw
-
-                                date =
-                                    withDefault 0 dateRaw
+                                ( excerpt, book ) =
+                                    makeExcerpt titleRaw authorRaw text page dateRaw notes
                             in
-                            ( insert
-                                id
-                                { id = id
-                                , text = replace footnoteRx footnoteReplacer text
-                                , bookId = bookId
-                                , date = date
-                                , page = withDefault -1 page
-                                , notes = notes
-                                , isFavorite = False
-                                }
-                                excerpts
-                            , update bookId
+                            ( insert excerpt.id excerpt excerpts
+                            , update excerpt.bookId
                                 (\mBook ->
                                     Just <|
                                         case mBook of
-                                            Just book ->
-                                                { book
+                                            Just b ->
+                                                { b
                                                     | sortIndex =
                                                         max
                                                             book.sortIndex
-                                                            date
+                                                            excerpt.date
                                                 }
 
                                             _ ->
-                                                { id = bookId
-                                                , title = title
-                                                , authors = authors
-                                                , count = 0
-                                                , rating = 0
-                                                , sortIndex = date
-                                                , tags = []
-                                                , slug = ""
-                                                , favCount = 0
-                                                }
+                                                book
                                 )
                                 books
                             )
