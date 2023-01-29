@@ -12,7 +12,7 @@ import File.Select as Select
 import Http
 import Json.Decode as Decode
 import JsonParser exposing (decodeStoredModel)
-import KindleParser exposing (getExcerptId)
+import KindleParser
 import List
     exposing
         ( concatMap
@@ -69,6 +69,7 @@ import Utils
         , getTagCounts
         , getTitleRouteMap
         , insertOnce
+        , makeExcerpt
         , modelToStoredModel
         , removeItem
         , slugify
@@ -1435,12 +1436,18 @@ update message model =
                 _ ->
                     noOp
 
-        CreateExcerpt excerpt time ->
+        CreateExcerpt pendingExcerpt time ->
             let
-                excerptId =
-                    getExcerptId excerpt.text (excerpt.title ++ " " ++ excerpt.author)
+                ( excerpt, book ) =
+                    makeExcerpt
+                        pendingExcerpt.title
+                        pendingExcerpt.author
+                        pendingExcerpt.text
+                        pendingExcerpt.page
+                        (time |> posixToMillis |> Just)
+                        ""
             in
-            case get excerptId model.excerpts of
+            case get excerpt.id model.excerpts of
                 Just existingExcerpt ->
                     ( model
                     , Nav.pushUrl
@@ -1450,41 +1457,18 @@ update message model =
 
                 _ ->
                     let
-                        mBook =
-                            model.books
-                                |> values
-                                |> filter
-                                    (\b ->
-                                        b.title
-                                            == excerpt.title
-                                            && member excerpt.author b.authors
-                                    )
-                                |> head
-
-                        timestamp =
-                            posixToMillis time
-
-                        fullExcerpt =
-                            \bookId ->
-                                { id = excerptId
-                                , text = excerpt.text
-                                , bookId = bookId
-                                , date = timestamp
-                                , page = excerpt.page
-                                , notes = ""
-                                , isFavorite = False
-                                }
-
                         model_ =
                             { model
                                 | neighborMap = Dict.empty
                                 , bookNeighborMap = Dict.empty
                                 , embeddingsReady = False
+                                , excerpts =
+                                    insert excerpt.id excerpt model.excerpts
                             }
                     in
                     store
-                        (case mBook of
-                            Just book ->
+                        (case get book.id model.books of
+                            Just _ ->
                                 let
                                     newBooks =
                                         Dict.update
@@ -1496,19 +1480,14 @@ update message model =
                                                         , sortIndex =
                                                             max
                                                                 b.sortIndex
-                                                                timestamp
+                                                                excerpt.date
                                                     }
                                                 )
                                             )
                                             model.books
-
-                                    newExcerpt =
-                                        fullExcerpt book.id
                                 in
                                 ( { model_
                                     | books = newBooks
-                                    , excerpts =
-                                        insert excerptId newExcerpt model.excerpts
                                     , semanticRankMap =
                                         remove
                                             book.id
@@ -1517,48 +1496,28 @@ update message model =
                                   }
                                 , Nav.pushUrl
                                     model.key
-                                    (excerptToRoute newBooks newExcerpt)
+                                    (excerptToRoute newBooks excerpt)
                                 )
 
                             _ ->
                                 let
-                                    bookId =
-                                        getExcerptId excerpt.title excerpt.author
-
                                     ( titleRouteMap, booksWithSlugs ) =
-                                        insert
-                                            bookId
-                                            { id = bookId
-                                            , title = excerpt.title
-                                            , authors = [ excerpt.author ]
-                                            , count = 1
-                                            , rating = 0
-                                            , sortIndex = timestamp
-                                            , tags = []
-                                            , slug = ""
-                                            , favCount = 0
-                                            }
-                                            model.books
+                                        insert book.id book model.books
                                             |> values
                                             |> getTitleRouteMap
 
                                     newBooks =
                                         toDict booksWithSlugs
-
-                                    newExcerpt =
-                                        fullExcerpt bookId
                                 in
                                 ( { model_
                                     | books = newBooks
-                                    , excerpts =
-                                        insert excerptId newExcerpt model.excerpts
                                     , titleRouteMap = titleRouteMap
                                     , authorRouteMap =
                                         getAuthorRouteMap booksWithSlugs
                                   }
                                 , Nav.pushUrl
                                     model.key
-                                    (excerptToRoute newBooks newExcerpt)
+                                    (excerptToRoute newBooks excerpt)
                                 )
                         )
                         |> Update.andThen update RequestEmbeddings
