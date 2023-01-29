@@ -126,7 +126,7 @@ type alias PendingExcerpt =
     { title : Title
     , author : Author
     , text : String
-    , page : Int
+    , page : Maybe Int
     }
 
 

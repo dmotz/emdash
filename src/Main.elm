@@ -1151,7 +1151,7 @@ update message model =
                     ( { model_
                         | page =
                             CreatePage
-                                (PendingExcerpt "" "" "" -1)
+                                (PendingExcerpt "" "" "" Nothing)
                                 (values model.books |> map .title |> sort)
                                 (values model.authorRouteMap)
                       }
