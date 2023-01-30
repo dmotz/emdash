@@ -392,7 +392,7 @@ update message model =
         ReceiveUnicodeNormalized text ->
             let
                 ( newExcerpts, newBooks ) =
-                    KindleParser.process text
+                    KindleParser.parse text
 
                 hiddenPred =
                     \id _ -> not <| Set.member id model.hiddenExcerpts

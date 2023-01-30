@@ -1,4 +1,4 @@
-module KindleParser exposing (process)
+module KindleParser exposing (parse)
 
 import DateTime exposing (fromRawParts, toPosix)
 import Dict exposing (insert, update)
@@ -11,8 +11,8 @@ import Time exposing (Month(..), posixToMillis)
 import Utils exposing (makeExcerpt, rx, rx_)
 
 
-process : String -> ( ExcerptMap, BookMap )
-process =
+parse : String -> ( ExcerptMap, BookMap )
+parse =
     lines
         >> foldr folder ( [], [] )
         >> (\( xs, x ) -> x :: xs)
@@ -211,7 +211,8 @@ makeDicts =
                                     makeExcerpt titleRaw authorRaw text page dateRaw notes
                             in
                             ( insert excerpt.id excerpt excerpts
-                            , update excerpt.bookId
+                            , update
+                                excerpt.bookId
                                 (\mBook ->
                                     Just <|
                                         case mBook of
