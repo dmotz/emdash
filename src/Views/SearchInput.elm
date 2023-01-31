@@ -2,8 +2,7 @@ module Views.SearchInput exposing (searchInput)
 
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (class, placeholder, spellcheck, value)
-import Html.Events exposing (onBlur, onClick, onFocus, onInput)
-import Model exposing (InputFocus(..))
+import Html.Events exposing (onClick, onInput)
 import Msg exposing (Msg(..))
 
 
@@ -13,8 +12,6 @@ searchInput searchQuery =
         [ class "search" ]
         [ input
             [ onInput OnSearchStart
-            , onFocus <| SetInputFocus (Just SearchFocus)
-            , onBlur <| SetInputFocus Nothing
             , spellcheck False
             , placeholder "Search"
             , value searchQuery

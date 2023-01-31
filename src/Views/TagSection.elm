@@ -27,9 +27,9 @@ import Html.Attributes
         , spellcheck
         , value
         )
-import Html.Events exposing (onBlur, onClick, onFocus, onInput, onSubmit)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import List exposing (filter, length, map, member)
-import Model exposing (InputFocus(..), Tag)
+import Model exposing (Tag)
 import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
 import Utils exposing (null)
@@ -87,8 +87,6 @@ tagSection tags globalTags pendingTag =
                 )
             , input
                 [ onInput UpdatePendingTag
-                , onFocus <| SetInputFocus (Just TagFocus)
-                , onBlur <| SetInputFocus Nothing
                 , value pendTag
                 , list datalistId
                 , placeholder "add tag"

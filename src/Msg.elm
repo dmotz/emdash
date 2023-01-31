@@ -13,7 +13,6 @@ import Model
         , ExcerptSort
         , ExcerptTab
         , Id
-        , InputFocus
         , PendingExcerpt
         , ScorePairs
         , SearchMode
@@ -36,7 +35,6 @@ type Msg
     | GotFile (String -> Msg) File
     | LoadKindleFile String
     | PickKindleFile
-    | SetInputFocus (Maybe InputFocus)
     | HideExcerpt Excerpt
     | UpdateNotes Id String
     | SetBookmark Id Id

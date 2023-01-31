@@ -29,18 +29,10 @@ import Html.Attributes
         , src
         , value
         )
-import Html.Events exposing (onClick, onFocus, onInput)
+import Html.Events exposing (onClick, onInput)
 import Html.Lazy exposing (lazy4)
 import List exposing (isEmpty, map)
-import Model
-    exposing
-        ( BookMap
-        , Excerpt
-        , ExcerptMap
-        , ExcerptTab(..)
-        , InputFocus(..)
-        , ScorePairs
-        )
+import Model exposing (BookMap, Excerpt, ExcerptMap, ExcerptTab(..), ScorePairs)
 import Msg exposing (Msg(..))
 import Router exposing (excerptToRoute)
 import String exposing (fromInt)
@@ -247,8 +239,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                             section
                                 [ class "notes" ]
                                 [ textarea
-                                    [ onFocus <| SetInputFocus (Just NoteFocus)
-                                    , onInput (UpdateNotes excerpt.id)
+                                    [ onInput (UpdateNotes excerpt.id)
                                     , value excerpt.notes
                                     , placeholder "Add notes here"
                                     ]

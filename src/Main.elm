@@ -36,7 +36,6 @@ import Model
         , BookSort(..)
         , ExcerptSort(..)
         , Id
-        , InputFocus(..)
         , Model
         , Page(..)
         , PendingExcerpt
@@ -193,7 +192,6 @@ createModel version mStoredModel demoMode url key =
     , pendingTag = Nothing
     , isDragging = False
     , reverseSort = True
-    , inputFocused = Nothing
     , parsingError = Nothing
     , url = url
     , key = key
@@ -459,9 +457,6 @@ update message model =
 
                 _ ->
                     noOp
-
-        SetInputFocus focus ->
-            ( { model | inputFocused = focus }, none )
 
         UpdateNotes id text ->
             store

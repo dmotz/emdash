@@ -8,7 +8,6 @@ module Model exposing
     , ExcerptSort(..)
     , ExcerptTab(..)
     , Id
-    , InputFocus(..)
     , Model
     , NeighborMap
     , Page(..)
@@ -40,12 +39,6 @@ type Page
     | LandingPage (List Book)
     | ImportPage
     | CreatePage PendingExcerpt (List Title) (List Author)
-
-
-type InputFocus
-    = NoteFocus
-    | TagFocus
-    | SearchFocus
 
 
 type BookSort
@@ -163,7 +156,6 @@ type alias Model =
     , pendingTag : Maybe Tag
     , isDragging : Bool
     , reverseSort : Bool
-    , inputFocused : Maybe InputFocus
     , parsingError : Maybe String
     , url : Url
     , key : Nav.Key
