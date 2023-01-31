@@ -10,7 +10,6 @@ module Router exposing
 
 import Dict exposing (get)
 import Model exposing (Author, BookMap, Excerpt, Id, Tag, Title)
-import Regex exposing (replace)
 import Url.Builder exposing (absolute)
 import Url.Parser
     exposing
