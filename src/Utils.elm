@@ -1,6 +1,5 @@
 module Utils exposing
-    ( KeyEvent
-    , appName
+    ( appName
     , dedupe
     , excerptCountLabel
     , findMatches
@@ -60,18 +59,10 @@ import Model
         , Model
         , StoredModel
         , Tag
-        , Title
         )
 import Regex exposing (Match, Regex, replace)
 import Set
 import String exposing (fromInt, join, split, toLower, trim)
-
-
-type alias KeyEvent =
-    { key : String
-    , control : Bool
-    , meta : Bool
-    }
 
 
 appName : String

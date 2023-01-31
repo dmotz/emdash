@@ -2,7 +2,6 @@ port module Main exposing (main)
 
 import Browser exposing (application)
 import Browser.Dom exposing (getElement, setViewport)
-import Browser.Events exposing (onKeyDown)
 import Browser.Navigation as Nav
 import Debounce
 import Dict exposing (get, insert, keys, remove, values)
@@ -61,8 +60,7 @@ import Url exposing (Url)
 import Url.Parser exposing (parse)
 import Utils
     exposing
-        ( KeyEvent
-        , appName
+        ( appName
         , dedupe
         , findMatches
         , getAuthorRouteMap
@@ -267,13 +265,7 @@ main =
         , subscriptions =
             \_ ->
                 Sub.batch
-                    [ Decode.map3 KeyEvent
-                        (Decode.field "key" Decode.string)
-                        (Decode.field "ctrlKey" Decode.bool)
-                        (Decode.field "metaKey" Decode.bool)
-                        |> Decode.map KeyDown
-                        |> onKeyDown
-                    , receiveExcerptNeighbors ReceiveNeighbors
+                    [ receiveExcerptNeighbors ReceiveNeighbors
                     , receiveBookNeighbors ReceiveBookNeighbors
                     , receiveExcerptEmbeddings ReceiveEmbeddings
                     , receiveBookEmbeddings ReceiveBookEmbeddings
@@ -722,25 +714,13 @@ update message model =
             , Select.file [ "application/json" ] (GotFile ParseJsonText)
             )
 
-        KeyDown { key, control, meta } ->
-            if control || meta then
-                noOp
-
-            else if model.inputFocused /= Nothing then
-                if key == "Enter" && model.inputFocused == Just TagFocus then
-                    update AddTag model
-
-                else
-                    noOp
-
-            else
-                noOp
-
         ExportEpub time ->
             ( model, Epub.export time (values model.books) (values model.excerpts) )
 
         RequestEmbeddings ->
             let
+                -- _ =
+                --     Debug.log "requestEmbeddings" []
                 nextBatch =
                     diff
                         (diff

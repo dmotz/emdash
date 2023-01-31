@@ -23,7 +23,6 @@ import Model
         )
 import Time exposing (Posix)
 import Url exposing (Url)
-import Utils exposing (KeyEvent)
 
 
 type Msg
@@ -37,7 +36,6 @@ type Msg
     | GotFile (String -> Msg) File
     | LoadKindleFile String
     | PickKindleFile
-    | KeyDown KeyEvent
     | SetInputFocus (Maybe InputFocus)
     | HideExcerpt Excerpt
     | UpdateNotes Id String
