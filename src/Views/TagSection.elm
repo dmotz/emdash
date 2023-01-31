@@ -7,6 +7,7 @@ import Html
         , button
         , datalist
         , div
+        , form
         , h5
         , input
         , li
@@ -26,7 +27,7 @@ import Html.Attributes
         , spellcheck
         , value
         )
-import Html.Events exposing (onBlur, onClick, onFocus, onInput)
+import Html.Events exposing (onBlur, onClick, onFocus, onInput, onSubmit)
 import List exposing (filter, length, map, member)
 import Model exposing (InputFocus(..), Tag)
 import Msg exposing (Msg(..))
@@ -70,7 +71,8 @@ tagSection tags globalTags pendingTag =
             pendTag =
                 Maybe.withDefault "" pendingTag
           in
-          div [ class "tagInput" ]
+          form
+            [ class "tagInput", onSubmit AddTag ]
             [ datalist [ id datalistId ]
                 (map
                     (\tag -> option [ value tag ] [])
@@ -95,7 +97,7 @@ tagSection tags globalTags pendingTag =
                 ]
                 []
             , button
-                [ class "button", onClick AddTag, disabled <| pendTag == "" ]
+                [ class "button", disabled <| pendTag == "" ]
                 [ text "+" ]
             ]
         ]
