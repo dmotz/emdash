@@ -14,3 +14,11 @@ $maxWidth: 80rem
 
 @mixin fade
   transition: opacity 0.2s
+
+@mixin mobile
+  @media(max-width: 733px)
+    @content
+
+@mixin touch
+  @media(hover: none)
+    @content

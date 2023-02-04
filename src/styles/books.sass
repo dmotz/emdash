@@ -8,6 +8,21 @@
   justify-items: center
   padding: 2rem
 
+  @include mobile
+    padding: 0
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr))
+    gap: 2rem
+
+    .author
+      font-size: 1.3rem
+      overflow: hidden
+      display: -webkit-box
+      -webkit-box-orient: vertical
+      -webkit-line-clamp: 3
+
+    .count, .favCount
+      font-size: 1.3rem
+
 .book
   transform: scale(0.95)
   transition: transform .2s
@@ -17,6 +32,7 @@
 
     a
       text-decoration: none
+      border-color: $accent
 
       &:after
         transform: translateX(0) translateY(0)
@@ -35,6 +51,10 @@
     text-align: center
     position: relative
 
+    @include mobile
+      width: 14rem
+      height: 21rem
+
     &:after
       transition: transform .2s
       content: ''
@@ -49,6 +69,13 @@
   .title
     margin-bottom: 2rem
     font-size: 2rem
+    overflow: hidden
+    display: -webkit-box
+    -webkit-box-orient: vertical
+    -webkit-line-clamp: 3
+
+    @include mobile
+      font-size: 1.8rem
 
   .count, .ratingNum, .favCount
     position: absolute

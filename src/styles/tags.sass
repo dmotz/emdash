@@ -17,6 +17,10 @@
     margin-left: 1rem
     color: $mid2
 
+    @include mobile
+      font-size: 1.2rem
+      margin-left: 0.6rem
+
   &:last-child::after
     visibility: hidden
 
@@ -24,9 +28,15 @@
     font-size: 2rem
     font-style: italic
 
+    @include mobile
+      font-size: 1.6rem
+
   .count
     margin-left: 0.4rem
     margin-top: -0.8rem
+
+    @include mobile
+      font-size: 1rem
 
   &.active
     a

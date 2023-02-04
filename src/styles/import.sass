@@ -3,6 +3,9 @@
     display: flex
     margin-top: 4rem
 
+    @include mobile
+      flex-direction: column
+
     .buttonStack
       flex: 1
 
@@ -10,8 +13,17 @@
         padding-right: 6rem
         border-right: 1px solid $mid3
 
+        @include mobile
+          padding: 0
+          border: none
+          border-bottom: 1px solid $mid3
+
       &:last-child
         padding-left: 6rem
+
+        @include mobile
+          padding: 0
+          padding-top: 4rem
 
   code
     font-family: $monoFont

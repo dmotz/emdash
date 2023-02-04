@@ -38,6 +38,10 @@
     max-width: calc(100vw - 200px)
     margin: 0 auto
 
+  @include mobile
+    flex-direction: column
+    max-width: 100%
+
   > *
     flex: 2
     padding: 2rem 0
@@ -57,6 +61,9 @@
       width: 22rem
       position: relative
 
+      @include mobile
+        width: 100%
+
   .count
     font-size: 1.4rem
     display: inline-block
@@ -73,6 +80,9 @@
     display: flex
     flex-wrap: wrap
     align-content: flex-start
+
+    @include mobile
+      margin-bottom: 3rem
 
   .snippets
     flex: 3

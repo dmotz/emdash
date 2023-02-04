@@ -36,6 +36,7 @@ body
   min-height: 100vh
   display: flex
   flex-direction: column
+  overflow: hidden
 
 main
   display: flex
@@ -63,6 +64,9 @@ h1
   font-size: 5rem
   line-height: 1.2
   margin-bottom: 1rem
+
+  @include mobile
+    font-size: 4rem
 
 h5
   font-size: 2rem
@@ -216,6 +220,9 @@ progress
   line-height: 1.4
   padding-left: 0
 
+  @include mobile
+    display: none
+
   &:before
     content: ''
     position: absolute
@@ -263,6 +270,9 @@ progress
   &.center
     margin-bottom: 4rem
 
+    @include mobile
+      margin-bottom: 6rem
+
   ul
     display: flex
     margin-bottom: 0.6rem
@@ -270,6 +280,10 @@ progress
   li
     border-left: 1px solid $mid2
     text-align: center
+    display: flex
+    align-items: center
+    justify-content: center
+    position: relative
 
     &:last-child
       border-right: 1px solid $mid2
@@ -296,10 +310,14 @@ progress
     &:hover
       color: $fg
 
+      span
+        border-color: $mid2
+
   .sorter
     position: absolute
+    bottom: -3.4rem
     font-size: 1.4rem
-    margin-top: 0.5rem
+    white-space: nowrap
 
     span
       position: relative
@@ -316,6 +334,20 @@ progress
       &.reverse
         transform: translateX(-150%) rotate(180deg)
 
+  @include mobile
+    width: 100%
+
+    ul
+      width: 100%
+
+    li
+      flex: 1
+
+    button
+      font-size: 1.3rem
+      width: 100%
+      padding: 0 0.6rem
+
 footer
   display: flex
   flex-direction: column
@@ -325,11 +357,17 @@ footer
   align-items: center
   justify-content: center
 
+  @include mobile
+    padding: 4rem
+
   .links
     margin: 4rem 0
+    text-align: center
 
     a
       margin: 0 1rem
+      display: inline-block
+      margin-bottom: 1rem
 
   .fleuron
     font-size: 4rem

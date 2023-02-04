@@ -23,6 +23,9 @@
     button:last-child
       text-transform: unset
 
+    @include touch
+      opacity: 1
+
   hr
     opacity: 0
     @include fade
@@ -64,6 +67,9 @@
       margin: 4rem 0
       margin-bottom: 6rem
 
+      @include mobile
+        font-size: 1.8rem
+
     .favorite
       margin-top: 1rem
 
@@ -72,6 +78,9 @@ blockquote
   line-height: 1.8
   user-select: text
   hyphens: auto
+
+  @include mobile
+    font-size: 2rem
 
 .meta
   position: absolute
@@ -84,6 +93,18 @@ blockquote
   margin-top: 0.4rem
   text-align: right
   line-height: 2
+
+  @include mobile
+    margin-bottom: 1rem
+    position: static
+    flex-direction: row
+    transform: none
+    align-items: center
+
+    > *
+      margin-right: 1.8rem !important
+      transform: none !important
+      opacity: 1 !important
 
   .page, a
     opacity: 0

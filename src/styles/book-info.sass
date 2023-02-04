@@ -7,6 +7,9 @@
   h1
     font-style: italic
 
+    @include mobile
+      font-size: 4rem
+
   h2
     margin-bottom: 0
     font-size: 2.4rem
@@ -34,7 +37,7 @@
       color: $mid3
       top: -0.3rem
 
-  input[type="range"]
+  input[type='range']
     max-width: 9.9rem
     margin: 0
     padding: 0
@@ -42,6 +45,10 @@
 .bookMeta
   margin: 3rem auto
   display: flex
+
+  @include mobile
+    flex-direction: column
+    margin-bottom: 0
 
   .col
     display: flex
@@ -51,12 +58,19 @@
     padding-right: 2rem
     border-right: 1px solid $mid2
 
+    @include mobile
+      border: none
+
     &:last-child
       display: flex
       flex-direction: column
       justify-content: space-between
       padding-right: 0
       padding-left: 2rem
+
+      @include mobile
+        padding: 0
+        margin: 2rem 0
 
   h5
     margin-bottom: 1rem
@@ -94,16 +108,25 @@
   max-width: 150rem
   margin: 0 auto
 
+  @include mobile
+    padding: 0
+
 .actions
   display: flex
   justify-content: space-between
   align-items: center
   font-size: 1.8rem
 
+  @include mobile
+    flex-direction: column-reverse
+
   .modeHeading
     margin: 0
 
+    @include mobile
+      margin-top: 4rem
+
 .noFav
-  padding: 4rem
+  padding: 8rem
   font-size: 1.8rem
   text-align: center
