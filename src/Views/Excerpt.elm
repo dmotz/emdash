@@ -139,7 +139,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
 
                   else
                     a
-                        [ href <| excerptToRoute books excerpt ]
+                        [ class "page", href <| excerptToRoute books excerpt ]
                         [ text <|
                             if excerpt.page == -1 then
                                 "¶"
