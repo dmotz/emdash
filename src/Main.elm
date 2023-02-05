@@ -3,6 +3,7 @@ port module Main exposing (main)
 import Browser exposing (application)
 import Browser.Dom exposing (getElement, setViewport)
 import Browser.Navigation as Nav
+import CsvParser
 import Debounce
 import Dict exposing (get, insert, keys, remove, values)
 import Epub
@@ -351,6 +352,15 @@ update message model =
                     , none
                     )
 
+        ParseCsvText text ->
+            case CsvParser.parse text of
+                Ok ( excerpts, books ) ->
+                    update (MergeNewExcerpts excerpts books) model
+                        |> addCmd (Nav.pushUrl model.key "/")
+
+                Err err ->
+                    ( { model | parsingError = Just err }, none )
+
         SyncState sModel ->
             ( { model
                 | excerpts = toDict sModel.excerpts
@@ -381,9 +391,17 @@ update message model =
 
         ReceiveUnicodeNormalized text ->
             let
-                ( newExcerpts, newBooks ) =
+                ( excerpts, books ) =
                     KindleParser.parse text
+            in
+            if Dict.isEmpty excerpts then
+                ( { model | parsingError = Just "Failed to parse file." }, none )
 
+            else
+                update (MergeNewExcerpts excerpts books) model
+
+        MergeNewExcerpts newExcerpts newBooks ->
+            let
                 hiddenPred =
                     \id _ -> not <| Set.member id model.hiddenExcerpts
 
@@ -415,28 +433,24 @@ update message model =
                 ( titleRouteMap, booksWithSlugs ) =
                     getTitleRouteMap bookVals
             in
-            if Dict.isEmpty newExcerpts then
-                ( { model | parsingError = Just "Failed to parse file." }, none )
-
-            else
-                ( { model
-                    | parsingError = Nothing
-                    , excerpts =
-                        Dict.union model.excerpts newExcerpts
-                            |> Dict.filter hiddenPred
-                    , books = toDict booksWithSlugs
-                    , titleRouteMap = titleRouteMap
-                    , authorRouteMap =
-                        getAuthorRouteMap bookVals
-                    , embeddingsReady = False
-                    , neighborMap = Dict.empty
-                  }
-                , none
-                )
-                    |> Update.andThen update (SortBooks model.bookSort)
-                    |> Update.andThen update (UrlChanged model.url)
-                    |> addCmd (model |> modelToStoredModel |> handleNewExcerpts)
-                    |> store
+            ( { model
+                | parsingError = Nothing
+                , excerpts =
+                    Dict.union model.excerpts newExcerpts
+                        |> Dict.filter hiddenPred
+                , books = toDict booksWithSlugs
+                , titleRouteMap = titleRouteMap
+                , authorRouteMap =
+                    getAuthorRouteMap bookVals
+                , embeddingsReady = False
+                , neighborMap = Dict.empty
+              }
+            , none
+            )
+                |> Update.andThen update (SortBooks model.bookSort)
+                |> Update.andThen update (UrlChanged model.url)
+                |> addCmd (model |> modelToStoredModel |> handleNewExcerpts)
+                |> store
 
         ResetError ->
             ( { model | parsingError = Nothing }, none )
@@ -707,6 +721,11 @@ update message model =
         ImportJson ->
             ( model
             , Select.file [ "application/json" ] (GotFile ParseJsonText)
+            )
+
+        ImportCsv ->
+            ( model
+            , Select.file [ "text/csv" ] (GotFile ParseCsvText)
             )
 
         ExportEpub time ->
