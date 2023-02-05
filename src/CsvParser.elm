@@ -25,7 +25,7 @@ parse raw =
         decodeCsv
             NoFieldNames
             (into
-                (\text title author page date notes ->
+                (\title author text page date notes ->
                     { title = title
                     , author = author
                     , text = text
