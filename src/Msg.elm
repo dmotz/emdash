@@ -8,8 +8,10 @@ import Http
 import Model
     exposing
         ( Book
+        , BookMap
         , BookSort
         , Excerpt
+        , ExcerptMap
         , ExcerptSort
         , ExcerptTab
         , Id
@@ -27,7 +29,9 @@ import Url exposing (Url)
 type Msg
     = NoOp
     | RestoreState (Maybe StoredModel) Bool
+    | MergeNewExcerpts ExcerptMap BookMap
     | ParseJsonText String
+    | ParseCsvText String
     | ShowRandom
     | GotRandomIndex Int
     | DragEnter
@@ -49,6 +53,7 @@ type Msg
     | ScrollToElement (Result Error Element)
     | ExportJson
     | ImportJson
+    | ImportCsv
     | SyncState StoredModel
     | ResetError
     | ExportEpub Posix
