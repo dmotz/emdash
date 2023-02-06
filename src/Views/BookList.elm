@@ -58,8 +58,8 @@ bookView book showRating showFavCount isLandingPage =
                     [ class "favCount" ]
                     (if book.favCount > 0 then
                         [ img
-                            [ class "favoriteIcon"
-                            , src "/images/favorite-filled.svg"
+                            [ class "icon"
+                            , src "/images/icons/favorite.svg"
                             ]
                             []
                         , text <| fromInt book.favCount

@@ -75,9 +75,9 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                         ]
                     ]
                     [ img
-                        [ class "favoriteIcon"
+                        [ class "icon"
                         , src <|
-                            "/images/favorite"
+                            "/images/icons/favorite"
                                 ++ (if excerpt.isFavorite then
                                         "-filled"
 
@@ -111,8 +111,9 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                         , onClick (SetBookmark excerpt.bookId excerpt.id)
                         ]
                         [ img
-                            [ src <|
-                                "/images/bookmark"
+                            [ class "icon"
+                            , src <|
+                                "/images/icons/bookmark"
                                     ++ (if isMarked then
                                             "-filled"
 
