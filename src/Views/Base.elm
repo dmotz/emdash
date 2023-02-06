@@ -24,7 +24,7 @@ import Html
         , text
         , ul
         )
-import Html.Attributes exposing (class, classList, draggable, href, id, src, target)
+import Html.Attributes exposing (alt, class, classList, draggable, href, id, src, target)
 import Html.Events exposing (onClick, preventDefaultOn)
 import Html.Keyed as Keyed
 import Json.Decode as Decode exposing (Decoder)
@@ -47,7 +47,8 @@ import Set
 import String exposing (join)
 import Utils
     exposing
-        ( excerptCountLabel
+        ( appName
+        , excerptCountLabel
         , formatNumber
         , null
         , titleCountLabel
@@ -83,7 +84,7 @@ view model =
                 [ a
                     [ class "logo", href "/" ]
                     [ img
-                        [ src "/images/logo.svg", draggable "false" ]
+                        [ src "/images/logo.svg", draggable "false", alt appName ]
                         []
                     , case model.page of
                         MainPage _ _ ->
@@ -98,21 +99,58 @@ view model =
                     [ class "toolbar" ]
                     [ a
                         [ href "/settings" ]
-                        [ img [ src "/images/focus.svg" ] []
+                        [ img
+                            [ class "icon"
+                            , src "/images/icons/settings.svg"
+                            , alt "Settings et cetera"
+                            ]
+                            []
                         , div [ class "hint left" ] [ text "Settings &c." ]
                         ]
                     , button
-                        [ class "random"
-                        , onClick ShowRandom
-                        ]
-                        [ img [ src "/images/random.svg" ] []
+                        [ onClick ShowRandom ]
+                        [ img
+                            [ class "icon"
+                            , src "/images/icons/random.svg"
+                            , alt "Random excerpt"
+                            ]
+                            []
                         , div
                             [ class "hint left" ]
                             [ text "Discover a random excerpt" ]
                         ]
+                    , a
+                        [ href "/import" ]
+                        [ img
+                            [ class "icon"
+                            , src "/images/icons/import.svg"
+                            , alt "Import/export excerpts"
+                            ]
+                            []
+                        , div
+                            [ class "hint left" ]
+                            [ text "Import/export excerpts" ]
+                        ]
+                    , a
+                        [ href "/create" ]
+                        [ img
+                            [ class "icon"
+                            , src "/images/icons/create.svg"
+                            , alt "Create a new excerpt"
+                            ]
+                            []
+                        , div
+                            [ class "hint left" ]
+                            [ text "Create a new excerpt" ]
+                        ]
                     , button
                         [ onClick ScrollToTop ]
-                        [ span [] [ text "↟" ]
+                        [ img
+                            [ class "icon"
+                            , src "/images/icons/scroll-top.svg"
+                            , alt "Create excerpt"
+                            ]
+                            []
                         , div
                             [ class "hint left" ]
                             [ text "Scroll to top" ]
@@ -338,6 +376,11 @@ view model =
                             , target "_blank"
                             ]
                             [ text "Source code" ]
+                        , a
+                            [ href "https://github.com/dmotz/marginalia/issues/new"
+                            , target "_blank"
+                            ]
+                            [ text "Report a bug" ]
                         ]
                     , div [ class "fleuron" ] [ text "❦" ]
                     ]
