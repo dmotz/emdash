@@ -577,7 +577,7 @@ tagHeader show allBooks tagSort tags tagCounts mActiveTag =
 
 allBooksKey : String
 allBooksKey =
-    "all books"
+    "all"
 
 
 sortToString : BookSort -> String
