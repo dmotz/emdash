@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11">
+  <defs>
+    <style>
+      path {
+        fill: #333;
+      }
+    </style>
+  </defs>
+  <g id="random">
+    <path class="cls-1" d="m8.15,2.85v5.3H2.85V2.85h5.3m.6-.6H2.25v6.5h6.5V2.25h0Z"/>
+    <circle cx="5.5" cy="5.5" r=".62"/>
+    <circle cx="4.15" cy="6.85" r=".62"/>
+    <circle cx="6.85" cy="4.15" r=".62"/>
+    <circle cx="6.85" cy="6.85" r=".62"/>
+    <circle cx="4.15" cy="4.15" r=".62"/>
+  </g>
+</svg>

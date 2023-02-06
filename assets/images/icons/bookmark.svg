@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11">
+  <defs>
+    <style>
+      path {
+        fill: #333;
+      }
+    </style>
+  </defs>
+  <g id="Layer_7" data-name="Layer 7">
+    <path d="m6.55,2.39v4.91l-.62-1.03-.43-.71-.43.71-.62,1.03V2.39h2.1m.5-.5h-3.1v7.22l1.55-2.58,1.55,2.57V1.89h0Z"/>
+  </g>
+</svg>
