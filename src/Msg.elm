@@ -83,3 +83,6 @@ type Msg
     | UpdatePendingExcerpt PendingExcerpt
     | PendingTitleBlur
     | CreateExcerpt PendingExcerpt Posix
+    | SubscribeToMailingList
+    | UpdateMailingListEmail String
+    | DidSubmitEmail (Result Http.Error ())
