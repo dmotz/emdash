@@ -1552,3 +1552,25 @@ update message model =
 
                 _ ->
                     noOp
+
+        UpdateMailingListEmail val ->
+            ( { model | mailingListEmail = val }, none )
+
+        SubscribeToMailingList ->
+            if String.isEmpty model.mailingListEmail then
+                noOp
+
+            else
+                ( { model | didSubmitEmail = True }
+                , Http.post
+                    { url = model.mailingListUrl
+                    , body =
+                        Http.stringBody
+                            "application/x-www-form-urlencoded"
+                            (model.mailingListField ++ "=" ++ model.mailingListEmail)
+                    , expect = Http.expectWhatever DidSubmitEmail
+                    }
+                )
+
+        DidSubmitEmail _ ->
+            noOp
