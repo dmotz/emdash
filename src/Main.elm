@@ -158,8 +158,8 @@ debounceConfig =
     }
 
 
-createModel : String -> Maybe StoredModel -> Bool -> Url -> Nav.Key -> Model
-createModel version mStoredModel demoMode url key =
+createModel : String -> Maybe StoredModel -> Bool -> Url -> Nav.Key -> ( String, String ) -> Model
+createModel version mStoredModel demoMode url key ( mailingListUrl, mailingListField ) =
     let
         restored =
             withDefault initialStoredModel mStoredModel
@@ -204,10 +204,14 @@ createModel version mStoredModel demoMode url key =
     , searchQuery = ""
     , searchDebounce = Debounce.init
     , version = version
+    , mailingListEmail = ""
+    , didSubmitEmail = False
+    , mailingListUrl = mailingListUrl
+    , mailingListField = mailingListField
     }
 
 
-main : Program ( String, Maybe String ) Model Msg
+main : Program ( String, Maybe String, ( String, String ) ) Model Msg
 main =
     application
         { init = init
@@ -278,8 +282,8 @@ main =
         }
 
 
-init : ( String, Maybe String ) -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init ( version, mStateString ) url key =
+init : ( String, Maybe String, ( String, String ) ) -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init ( version, mStateString, mailingListParams ) url key =
     let
         model =
             createModel
@@ -294,6 +298,7 @@ init ( version, mStateString ) url key =
                 False
                 url
                 key
+                mailingListParams
     in
     update (UrlChanged url) model
         |> addCmd (model |> modelToStoredModel |> handleNewExcerpts)
@@ -327,6 +332,7 @@ update message model =
                         demoMode
                         model.url
                         model.key
+                        ( model.mailingListUrl, model.mailingListField )
             in
             update (UrlChanged model.url) model_
                 |> addCmd
