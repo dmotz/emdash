@@ -61,7 +61,16 @@ let zipWorker
   }
 
   try {
-    app = Elm.Main.init({flags: [version, restored || null]})
+    app = Elm.Main.init({
+      flags: [
+        version,
+        restored || null,
+        [
+          import.meta.env.VITE_MAILING_LIST_URL || '',
+          import.meta.env.VITE_MAILING_LIST_FIELD || ''
+        ]
+      ]
+    })
   } catch (e) {
     console.warn('malformed restored state:', restored)
     app = Elm.Main.init({flags: [version, null]})
