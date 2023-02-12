@@ -167,6 +167,10 @@ type alias Model =
     , searchQuery : String
     , searchDebounce : Debounce String
     , version : String
+    , mailingListUrl : String
+    , mailingListField : String
+    , mailingListEmail : String
+    , didSubmitEmail : Bool
     }
 
 
