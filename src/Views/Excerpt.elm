@@ -88,7 +88,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                         ]
                         []
                     , div
-                        [ class "hint left" ]
+                        [ class "hint left swapRight" ]
                         [ text <|
                             (if excerpt.isFavorite then
                                 "Unmark"
@@ -124,7 +124,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                             ]
                             []
                         , div
-                            [ class "hint left" ]
+                            [ class "hint left swapRight" ]
                             [ text <|
                                 (if isMarked then
                                     "Unmark"
@@ -147,7 +147,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
 
                             else
                                 "p. " ++ fromInt excerpt.page
-                        , div [ class "hint left" ] [ text "Permalink" ]
+                        , div [ class "hint left swapRight" ] [ text "Permalink" ]
                         ]
                 ]
             , blockquote [] [ text excerpt.text ]

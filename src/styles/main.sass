@@ -253,6 +253,19 @@ progress
       right: 0
       transform: translateX(100%) rotate(45deg)
 
+    &.swapRight
+      @include midWidth
+        transform: translateX(100%)
+        left: unset
+        right: -2rem
+        padding: 0.2rem 0.6rem
+        padding-left: 0
+
+        &:before
+          left: 0
+          right: unset
+          transform: rotate(45deg)
+
 *:has(> .hint)
   display: flex
   align-items: center
