@@ -148,7 +148,7 @@ let zipWorker
   )
 
   app.ports.requestUnicodeNormalized.subscribe(str =>
-    app.ports.receiveUnicodeNormalized.send(str.normalize('NFKD'))
+    app.ports.receiveUnicodeNormalized.send(str.normalize('NFC'))
   )
 
   app.ports.fetchDemoEmbeddings.subscribe(ids =>
