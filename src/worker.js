@@ -163,7 +163,10 @@ const methods = {
     cb([target, bookEmbMap[target] ? await findBookNeighbors(target) : []]),
 
   requestSemanticRank: async ({bookId, excerptIds}, cb) =>
-    cb([bookId, await semanticSort(bookId, excerptIds)]),
+    cb([
+      bookId,
+      excerptIds.length ? await semanticSort(bookId, excerptIds) : []
+    ]),
 
   semanticSearch: ({query, threshold}, cb) =>
     semanticSearch(query, threshold).then(matches => cb([query, matches])),
