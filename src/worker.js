@@ -69,31 +69,6 @@ const semanticSort = (bookId, exIds) =>
     exIds.length
   )
 
-const findNeighbors = async (target, embMap, limit, ignoreSameTitle) => {
-  const targetEmb = typeof target === 'string' ? embMap[target] : target
-  const targetTitle = titleMap[target]
-
-  const embs = ignoreSameTitle
-    ? Object.entries(embMap).filter(([k]) => titleMap[k] !== targetTitle)
-    : Object.entries(embMap)
-
-  console.time('mktensor')
-  const data = tf.tensor(embs.map(([, v]) => v))
-  console.timeEnd('mktensor')
-
-  console.time('topk')
-  const {values, indices} = tf.topk(
-    tf.metrics.cosineProximity(targetEmb, data).neg(),
-    limit + 1,
-    true
-  )
-  console.timeEnd('topk')
-
-  const [scores, inds] = await Promise.all([values.array(), indices.array()])
-
-  return inds.slice(1).map((n, i) => [embs[n][0], scores[i + 1]])
-}
-
 const findExcerptNeighbors = async targetId => {
   const targetTitle = titleMap[targetId]
 
