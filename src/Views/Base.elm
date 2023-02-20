@@ -250,7 +250,16 @@ view model =
                                 , if isEmpty excerpts_ then
                                     div
                                         [ class "noFav" ]
-                                        [ text "No favorites yet" ]
+                                        [ text <|
+                                            "No "
+                                                ++ (if model.excerptSort == ExcerptFavSort then
+                                                        "favorites"
+
+                                                    else
+                                                        "excerpts"
+                                                   )
+                                                ++ " yet"
+                                        ]
 
                                   else
                                     null
