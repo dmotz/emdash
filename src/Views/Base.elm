@@ -77,8 +77,8 @@ view model =
         , on "drop" dropDecoder
         ]
         ((case model.page of
-            LandingPage bookList ->
-                [ landingView bookList ]
+            LandingPage bookList didSubmitEmail ->
+                [ landingView bookList didSubmitEmail ]
 
             _ ->
                 [ a

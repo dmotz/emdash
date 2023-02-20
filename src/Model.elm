@@ -36,7 +36,7 @@ type Page
     | ExcerptPage Excerpt Book
     | NotFoundPage String
     | SettingsPage
-    | LandingPage (List Book)
+    | LandingPage (List Book) Bool
     | ImportPage
     | CreatePage PendingExcerpt (List Title) (List Author)
 
@@ -170,7 +170,6 @@ type alias Model =
     , mailingListUrl : String
     , mailingListField : String
     , mailingListEmail : String
-    , didSubmitEmail : Bool
     }
 
 

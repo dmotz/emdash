@@ -205,7 +205,6 @@ createModel version mStoredModel demoMode url key ( mailingListUrl, mailingListF
     , searchDebounce = Debounce.init
     , version = version
     , mailingListEmail = ""
-    , didSubmitEmail = False
     , mailingListUrl = mailingListUrl
     , mailingListField = mailingListField
     }
@@ -223,7 +222,7 @@ main =
                         MainPage _ Nothing ->
                             appName
 
-                        LandingPage _ ->
+                        LandingPage _ _ ->
                             appName
 
                         _ ->
@@ -941,18 +940,20 @@ update message model =
                 scrollTop =
                     perform (always NoOp) (setViewport 0 0)
             in
+            -- redirect in empty mode
             case
                 parse routeParser url
             of
                 Just RootRoute ->
                     let
                         showLanding =
+                            -- True
                             Dict.isEmpty model.books
                     in
                     ( { model_
                         | page =
                             if showLanding then
-                                LandingPage []
+                                LandingPage [] False
 
                             else
                                 MainPage (values model.books) Nothing
@@ -1407,7 +1408,7 @@ update message model =
 
         GotLandingData ( titles, nums ) ->
             case model.page of
-                LandingPage _ ->
+                LandingPage _ didSubmit ->
                     ( { model
                         | page =
                             LandingPage
@@ -1418,6 +1419,7 @@ update message model =
                                     titles
                                     nums
                                 )
+                                didSubmit
                       }
                     , none
                     )
@@ -1561,16 +1563,21 @@ update message model =
                 noOp
 
             else
-                ( { model | didSubmitEmail = True }
-                , Http.post
-                    { url = model.mailingListUrl
-                    , body =
-                        Http.stringBody
-                            "application/x-www-form-urlencoded"
-                            (model.mailingListField ++ "=" ++ model.mailingListEmail)
-                    , expect = Http.expectWhatever DidSubmitEmail
-                    }
-                )
+                case model.page of
+                    LandingPage bookList _ ->
+                        ( { model | page = LandingPage bookList True }
+                        , Http.post
+                            { url = model.mailingListUrl
+                            , body =
+                                Http.stringBody
+                                    "application/x-www-form-urlencoded"
+                                    (model.mailingListField ++ "=" ++ model.mailingListEmail)
+                            , expect = Http.expectWhatever DidSubmitEmail
+                            }
+                        )
+
+                    _ ->
+                        noOp
 
         DidSubmitEmail _ ->
             noOp
