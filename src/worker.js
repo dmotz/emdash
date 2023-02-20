@@ -39,7 +39,7 @@ const computeEmbeddings = async pairs => {
 const getTopK = async (tensor, keys, targetEmb, limit, dropFirst) => {
   const {values, indices} = tf.topk(
     tf.metrics.cosineProximity(targetEmb, tensor).neg(),
-    limit,
+    Math.min(limit + +!!dropFirst, keys.length),
     true
   )
 
