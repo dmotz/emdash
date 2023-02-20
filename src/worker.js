@@ -1,4 +1,4 @@
-import '@tensorflow/tfjs'
+import * as tf from '@tensorflow/tfjs'
 import {load} from '@tensorflow-models/universal-sentence-encoder'
 import {createStore, del, entries, setMany} from 'idb-keyval'
 
@@ -45,31 +45,37 @@ const semanticSearch = async (query, threshold) => {
     .slice(0, semanticSearchLimit)
 }
 
-const semanticSort = ids =>
-  ids
-    .map(id => [
-      id,
-      ids.reduce(
-        (a, c) =>
-          a + (c === id ? 0 : similarity(excerptEmbMap[id], excerptEmbMap[c])),
-        0
-      ) /
-        (ids.length - 1)
-    ])
-    .sort(([, a], [, b]) => b - a)
+const semanticSort = ids => ids.map(id => [id, 1])
+// ids
+//   .map(id => [
+//     id,
+//     ids.reduce(
+//       (a, c) =>
+//         a + (c === id ? 0 : similarity(excerptEmbMap[id], excerptEmbMap[c])),
+//       0
+//     ) /
+//       (ids.length - 1)
+//   ])
+//   .sort(([, a], [, b]) => b - a)
 
-const findNeighbors = (targetId, embMap, ignoreSameTitle) => {
+const findNeighbors = async (targetId, embMap, ignoreSameTitle) => {
   const target = embMap[targetId]
-  const predicate = ignoreSameTitle
-    ? k => titleMap[k] !== titleMap[targetId]
-    : x => x
 
-  return Object.entries(embMap)
-    .flatMap(([k, v]) =>
-      k === targetId || !predicate(k) ? [] : [[k, similarity(target, v)]]
-    )
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, neighborsK)
+  const embs = ignoreSameTitle
+    ? Object.entries(embMap).filter(([k]) => titleMap[k] !== titleMap[targetId])
+    : Object.entries(embMap)
+
+  const data = tf.tensor(embs.map(([, v]) => v))
+
+  const {values, indices} = tf.topk(
+    tf.metrics.cosineProximity(target, data).neg(),
+    neighborsK + 1,
+    true
+  )
+
+  const [scores, inds] = await Promise.all([values.array(), indices.array()])
+
+  return inds.slice(1).map((n, i) => [embs[n][0], scores[i + 1]])
 }
 
 const methods = {
@@ -134,11 +140,12 @@ const methods = {
     cb(null)
   },
 
-  requestExcerptNeighbors: ({target}, cb) =>
-    cb([target, findNeighbors(target, excerptEmbMap, true)]),
+  requestExcerptNeighbors: async ({target}, cb) =>
+    cb([target, await findNeighbors(target, excerptEmbMap, true)]),
 
-  requestBookNeighbors: ({target}, cb) =>
-    cb([target, findNeighbors(target, bookEmbMap)]),
+  requestBookNeighbors: async ({target}, cb) => {
+    cb([target, await findNeighbors(target, bookEmbMap)])
+  },
 
   requestSemanticRank: ({bookId, excerptIds}, cb) =>
     cb([bookId, semanticSort(excerptIds)]),
