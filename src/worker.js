@@ -121,6 +121,9 @@ const findExcerptNeighbors = async targetId => {
   )
 }
 
+const findBookNeighbors = bookId =>
+  getTopK(booksTensor, booksKeyList, bookEmbMap[bookId], neighborsK, true)
+
 const methods = {
   processNewExcerpts: async ({books, excerpts}, cb) => {
     const bookIdToTitle = Object.fromEntries(
@@ -187,11 +190,11 @@ const methods = {
     cb([target, await findExcerptNeighbors(target)]),
 
   requestBookNeighbors: async ({target}, cb) => {
-    cb([target, await findNeighbors(target, bookEmbMap, neighborsK)])
+    cb([target, await findBookNeighbors(target)])
   },
 
-  requestSemanticRank: ({bookId, excerptIds}, cb) =>
-    cb([bookId, semanticSort(excerptIds)]),
+  requestSemanticRank: async ({bookId, excerptIds}, cb) =>
+    cb([bookId, await semanticSort(bookId, excerptIds)]),
 
   semanticSearch: ({query, threshold}, cb) =>
     semanticSearch(query, threshold).then(matches => cb([query, matches])),
