@@ -38,11 +38,9 @@ const semanticSearch = async (query, threshold) => {
 
   setTimeout(() => tensor.dispose())
 
-  return Object.entries(excerptEmbMap)
-    .map(([k, v]) => [k, similarity(embedding, v)])
-    .filter(([, v]) => v >= threshold)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, semanticSearchLimit)
+  return (
+    await findNeighbors(embedding, excerptEmbMap, semanticSearchLimit)
+  ).filter(([, v]) => v >= threshold)
 }
 
 const semanticSort = ids => ids.map(id => [id, 1])
@@ -58,18 +56,19 @@ const semanticSort = ids => ids.map(id => [id, 1])
 //   ])
 //   .sort(([, a], [, b]) => b - a)
 
-const findNeighbors = async (targetId, embMap, ignoreSameTitle) => {
-  const target = embMap[targetId]
+const findNeighbors = async (target, embMap, limit, ignoreSameTitle) => {
+  const targetEmb = typeof target === 'string' ? embMap[target] : target
+  const targetTitle = titleMap[target]
 
   const embs = ignoreSameTitle
-    ? Object.entries(embMap).filter(([k]) => titleMap[k] !== titleMap[targetId])
+    ? Object.entries(embMap).filter(([k]) => titleMap[k] !== targetTitle)
     : Object.entries(embMap)
 
   const data = tf.tensor(embs.map(([, v]) => v))
 
   const {values, indices} = tf.topk(
-    tf.metrics.cosineProximity(target, data).neg(),
-    neighborsK + 1,
+    tf.metrics.cosineProximity(targetEmb, data).neg(),
+    limit + 1,
     true
   )
 
@@ -141,10 +140,10 @@ const methods = {
   },
 
   requestExcerptNeighbors: async ({target}, cb) =>
-    cb([target, await findNeighbors(target, excerptEmbMap, true)]),
+    cb([target, await findNeighbors(target, excerptEmbMap, neighborsK, true)]),
 
   requestBookNeighbors: async ({target}, cb) => {
-    cb([target, await findNeighbors(target, bookEmbMap)])
+    cb([target, await findNeighbors(target, bookEmbMap, neighborsK)])
   },
 
   requestSemanticRank: ({bookId, excerptIds}, cb) =>
