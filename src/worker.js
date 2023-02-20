@@ -39,7 +39,7 @@ const computeEmbeddings = async pairs => {
 const getTopK = async (tensor, keys, targetEmb, limit, dropFirst) => {
   const {values, indices} = tf.topk(
     tf.metrics.cosineProximity(targetEmb, tensor).neg(),
-    limit + +!!dropFirst,
+    limit,
     true
   )
 
@@ -82,17 +82,43 @@ const findNeighbors = async (target, embMap, limit, ignoreSameTitle) => {
     ? Object.entries(embMap).filter(([k]) => titleMap[k] !== targetTitle)
     : Object.entries(embMap)
 
+  console.time('mktensor')
   const data = tf.tensor(embs.map(([, v]) => v))
+  console.timeEnd('mktensor')
 
+  console.time('topk')
   const {values, indices} = tf.topk(
     tf.metrics.cosineProximity(targetEmb, data).neg(),
     limit + 1,
     true
   )
+  console.timeEnd('topk')
 
   const [scores, inds] = await Promise.all([values.array(), indices.array()])
 
   return inds.slice(1).map((n, i) => [embs[n][0], scores[i + 1]])
+}
+
+const findExcerptNeighbors = async targetId => {
+  const targetTitle = titleMap[targetId]
+
+  return (
+    await getTopK(
+      excerptsTensor,
+      excerptsKeyList,
+      excerptEmbMap[targetId],
+      excerptsKeyList.length,
+      true
+    )
+  ).reduce(
+    (a, c) =>
+      a.length === neighborsK
+        ? a
+        : titleMap[c[0]] === targetTitle
+        ? a
+        : [...a, c],
+    []
+  )
 }
 
 const methods = {
@@ -158,7 +184,7 @@ const methods = {
   },
 
   requestExcerptNeighbors: async ({target}, cb) =>
-    cb([target, await findNeighbors(target, excerptEmbMap, neighborsK, true)]),
+    cb([target, await findExcerptNeighbors(target)]),
 
   requestBookNeighbors: async ({target}, cb) => {
     cb([target, await findNeighbors(target, bookEmbMap, neighborsK)])
