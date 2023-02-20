@@ -57,7 +57,12 @@ const semanticSearch = async (query, threshold) => {
   setTimeout(() => tensor.dispose())
 
   return (
-    await findNeighbors(embedding, excerptEmbMap, semanticSearchLimit)
+    await getTopK(
+      excerptsTensor,
+      excerptsKeyList,
+      embedding,
+      semanticSearchLimit
+    )
   ).filter(([, v]) => v >= threshold)
 }
 
