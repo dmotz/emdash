@@ -159,9 +159,8 @@ const methods = {
   requestExcerptNeighbors: async ({target}, cb) =>
     cb([target, await findExcerptNeighbors(target)]),
 
-  requestBookNeighbors: async ({target}, cb) => {
-    cb([target, await findBookNeighbors(target)])
-  },
+  requestBookNeighbors: async ({target}, cb) =>
+    cb([target, bookEmbMap[target] ? await findBookNeighbors(target) : []]),
 
   requestSemanticRank: async ({bookId, excerptIds}, cb) =>
     cb([bookId, await semanticSort(bookId, excerptIds)]),
