@@ -14,6 +14,10 @@ const embStore = createStore(`${dbNs}:${embKey}`, embKey)
 
 let excerptEmbMap = {}
 let titleMap = {}
+let excerptsTensor
+let booksTensor
+let excerptsKeyList
+let booksKeyList
 
 const dot = (a, b) => a.reduce((acc, c, i) => acc + c * b[i], 0)
 
@@ -30,6 +34,20 @@ const computeEmbeddings = async pairs => {
     id,
     embeddings.slice(i * embSize, (i + 1) * embSize)
   ])
+}
+
+const getTopK = async (tensor, keys, targetEmb, limit, dropFirst) => {
+  const {values, indices} = tf.topk(
+    tf.metrics.cosineProximity(targetEmb, tensor).neg(),
+    limit + +!!dropFirst,
+    true
+  )
+
+  const [scores, inds] = (
+    await Promise.all([values.array(), indices.array()])
+  ).map(dropFirst ? xs => xs.slice(1) : xs => xs)
+
+  return inds.map((n, i) => [keys[n], scores[i]])
 }
 
 const semanticSearch = async (query, threshold) => {
