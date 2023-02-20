@@ -19,11 +19,6 @@ let booksTensor
 let excerptsKeyList
 let booksKeyList
 
-const dot = (a, b) => a.reduce((acc, c, i) => acc + c * b[i], 0)
-
-const similarity = (a, b) =>
-  dot(a, b) / (Math.sqrt(dot(a, a)) * Math.sqrt(dot(b, b)))
-
 const computeEmbeddings = async pairs => {
   const tensor = await (await model).embed(pairs.map(([, text]) => text))
   const embeddings = await tensor.data()
