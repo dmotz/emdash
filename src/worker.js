@@ -143,15 +143,22 @@ const methods = {
   },
 
   computeBookEmbeddings: ({targets}, cb) => {
-    targets.forEach(
-      ([bookId, ids]) =>
-        (bookEmbMap[bookId] = ids.length
-          ? ids
-              .flatMap(id => excerptEmbMap[id] || [])
-              .reduce((a, c) => a.map((n, i) => n + c[i]))
-              .map(n => n / targets[0][1][0].length)
-          : [])
-    )
+    targets.forEach(([bookId, ids]) => {
+      if (ids.length) {
+        bookEmbMap[bookId] = ids
+          .flatMap(id => excerptEmbMap[id] || [])
+          .reduce((a, c) => a.map((n, i) => n + c[i]))
+          .map(n => n / targets[0][1][0].length)
+      }
+    })
+
+    excerptsTensor?.dispose()
+    booksTensor?.dispose()
+
+    excerptsKeyList = Object.keys(excerptEmbMap)
+    booksKeyList = Object.keys(bookEmbMap)
+    excerptsTensor = tf.tensor(Object.values(excerptEmbMap))
+    booksTensor = tf.tensor(Object.values(bookEmbMap))
 
     cb(null)
   },
