@@ -66,18 +66,13 @@ const semanticSearch = async (query, threshold) => {
   ).filter(([, v]) => v >= threshold)
 }
 
-const semanticSort = ids => ids.map(id => [id, 1])
-// ids
-//   .map(id => [
-//     id,
-//     ids.reduce(
-//       (a, c) =>
-//         a + (c === id ? 0 : similarity(excerptEmbMap[id], excerptEmbMap[c])),
-//       0
-//     ) /
-//       (ids.length - 1)
-//   ])
-//   .sort(([, a], [, b]) => b - a)
+const semanticSort = (bookId, exIds) =>
+  getTopK(
+    exIds.map(id => excerptEmbMap[id]),
+    exIds,
+    bookEmbMap[bookId],
+    exIds.length
+  )
 
 const findNeighbors = async (target, embMap, limit, ignoreSameTitle) => {
   const targetEmb = typeof target === 'string' ? embMap[target] : target
