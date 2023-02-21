@@ -212,9 +212,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
 
                                     _ ->
                                         if isEmpty neighbors then
-                                            p
-                                                [ class "wait" ]
-                                                [ text "Finding related excerpts…" ]
+                                            null
 
                                         else
                                             ul [ class "neighbors" ]
