@@ -940,14 +940,12 @@ update message model =
                 scrollTop =
                     perform (always NoOp) (setViewport 0 0)
             in
-            -- redirect in empty mode
             case
                 parse routeParser url
             of
                 Just RootRoute ->
                     let
                         showLanding =
-                            -- True
                             Dict.isEmpty model.books
                     in
                     ( { model_
@@ -1111,6 +1109,7 @@ update message model =
                                         |> values
                                     )
                                     (Just tag)
+                            , searchQuery = ""
                           }
                         , none
                         )
