@@ -8,7 +8,7 @@ import Model exposing (Book, BookMap, Excerpt)
 import Msg exposing (Msg)
 import Regex
 import Router exposing (excerptToRoute)
-import String exposing (split)
+import String exposing (join, split)
 import Utils exposing (null, rx_)
 import Views.Citation exposing (citation)
 
@@ -51,7 +51,7 @@ addHighlighting : String -> String -> List (Html msg)
 addHighlighting str query =
     str
         |> Regex.replace
-            (rx_ ("\\b" ++ query))
+            (rx_ ("\\b(" ++ (query |> split " " |> join "|") ++ ")"))
             (\{ match } -> sigil ++ match ++ sigil)
         |> split sigil
         |> indexedMap
