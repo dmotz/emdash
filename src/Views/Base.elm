@@ -373,23 +373,22 @@ view model =
                     []
                     [ div
                         [ class "links" ]
-                        [ a [ href "" ] [ text "Send feedback" ]
-                        , a [ href "/import" ] [ text "Import excerpts" ]
+                        [ a [ href "/import" ] [ text "Import excerpts" ]
                         , if Dict.isEmpty model.excerpts then
                             null
 
                           else
                             a [ href "/settings" ] [ text "Settings" ]
                         , a
-                            [ href "https://github.com/dmotz/marginalia"
-                            , target "_blank"
-                            ]
-                            [ text "Source code" ]
-                        , a
                             [ href "https://github.com/dmotz/marginalia/issues/new"
                             , target "_blank"
                             ]
                             [ text "Report a bug" ]
+                        , a
+                            [ href "https://github.com/dmotz/marginalia"
+                            , target "_blank"
+                            ]
+                            [ text "Source code" ]
                         ]
                     , div [ class "fleuron" ] [ text "❦" ]
                     ]
