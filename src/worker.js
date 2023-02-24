@@ -14,10 +14,10 @@ const embStore = createStore(`${dbNs}:${embKey}`, embKey)
 
 let excerptEmbMap = {}
 let titleMap = {}
-let excerptsTensor
-let booksTensor
-let excerptsKeyList
-let booksKeyList
+let excerptTensor
+let bookTensor
+let excerptKeyList
+let bookKeyList
 
 const computeEmbeddings = async pairs => {
   const tensor = await (await model).embed(pairs.map(([, text]) => text))
@@ -52,12 +52,7 @@ const semanticSearch = async (query, threshold) => {
   setTimeout(() => tensor.dispose())
 
   return (
-    await getTopK(
-      excerptsTensor,
-      excerptsKeyList,
-      embedding,
-      semanticSearchLimit
-    )
+    await getTopK(excerptTensor, excerptKeyList, embedding, semanticSearchLimit)
   ).filter(([, v]) => v >= threshold)
 }
 
@@ -74,10 +69,10 @@ const findExcerptNeighbors = async targetId => {
 
   return (
     await getTopK(
-      excerptsTensor,
-      excerptsKeyList,
+      excerptTensor,
+      excerptKeyList,
       excerptEmbMap[targetId],
-      excerptsKeyList.length,
+      excerptKeyList.length,
       true
     )
   ).reduce(
@@ -92,7 +87,7 @@ const findExcerptNeighbors = async targetId => {
 }
 
 const findBookNeighbors = bookId =>
-  getTopK(booksTensor, booksKeyList, bookEmbMap[bookId], neighborsK, true)
+  getTopK(bookTensor, bookKeyList, bookEmbMap[bookId], neighborsK, true)
 
 const methods = {
   processNewExcerpts: async ({books, excerpts}, cb) => {
@@ -152,13 +147,13 @@ const methods = {
       }
     })
 
-    excerptsTensor?.dispose()
-    booksTensor?.dispose()
+    excerptTensor?.dispose()
+    bookTensor?.dispose()
 
-    excerptsKeyList = Object.keys(excerptEmbMap)
-    booksKeyList = Object.keys(bookEmbMap)
-    excerptsTensor = tf.tensor(Object.values(excerptEmbMap))
-    booksTensor = tf.tensor(Object.values(bookEmbMap))
+    excerptKeyList = Object.keys(excerptEmbMap)
+    bookKeyList = Object.keys(bookEmbMap)
+    excerptTensor = tf.tensor(Object.values(excerptEmbMap))
+    bookTensor = tf.tensor(Object.values(bookEmbMap))
 
     cb(null)
   },
