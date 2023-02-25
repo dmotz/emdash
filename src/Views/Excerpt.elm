@@ -13,7 +13,6 @@ import Html
         , hr
         , img
         , li
-        , p
         , section
         , text
         , textarea
