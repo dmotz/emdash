@@ -188,6 +188,17 @@ input[type='range']
     height: 1px
     background: $mid2
 
+summary
+  cursor: pointer
+  text-decoration: underline 3px transparent
+
+  &:hover
+    text-decoration-color: $mid1
+
+details[open]
+  summary
+    text-decoration-color: $mid1
+
 progress
   accent-color: $fg
   appearance: none
