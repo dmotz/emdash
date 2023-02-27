@@ -22,15 +22,18 @@ $inset: 1.6rem
   margin-left: auto
   padding-top: 1rem
 
+  @include mobile
+    top: 0.8rem
+    right: 0.5rem
+
   a, button
     display: flex
     align-items: center
-    font-size: 2.8rem
-    line-height: 0.4
-    margin-bottom: 2rem
+    margin-bottom: 0.8rem
 
-  .random
-    width: 80%
+    &:hover img
+      opacity: 1
 
-  img
-    width: 2rem
+    &:hover .hint
+      opacity: 1
+      color: $bg
