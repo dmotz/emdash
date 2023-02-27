@@ -3,6 +3,8 @@ module Views.Create exposing (createView)
 import Html
     exposing
         ( Html
+        , a
+        , aside
         , button
         , datalist
         , div
@@ -19,8 +21,10 @@ import Html.Attributes as H
     exposing
         ( class
         , disabled
+        , href
         , id
         , list
+        , placeholder
         , spellcheck
         , type_
         , value
@@ -37,6 +41,11 @@ createView pendingExcerpt titles authors =
     div
         [ class "createPage" ]
         [ h1 [] [ text "Create a new excerpt" ]
+        , aside []
+            [ text "To create excerpts in bulk, visit the "
+            , a [ href "/import" ] [ text "import page" ]
+            , text "."
+            ]
         , form
             []
             [ label
@@ -49,6 +58,7 @@ createView pendingExcerpt titles authors =
                                 { pendingExcerpt | text = s }
                         )
                     , spellcheck False
+                    , placeholder "Paste excerpt text here"
                     ]
                     []
                 , text "Excerpt text"
