@@ -102,12 +102,20 @@ searchResults mode bookMap excerptMap books matches semanticMatches query =
                     [ text <| "No " ++ label ++ " found." ]
 
               else
+                let
+                    q =
+                        if mode == TextMatches then
+                            Just query
+
+                        else
+                            Nothing
+                in
                 Keyed.ul
                     []
                     (map
                         (\( excerpt, mScore ) ->
                             ( excerpt.id
-                            , snippetView bookMap mScore (Just query) excerpt
+                            , snippetView bookMap mScore q excerpt
                             )
                         )
                         (take maxResults list)
