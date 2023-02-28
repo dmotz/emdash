@@ -1,7 +1,15 @@
 module Views.SearchInput exposing (searchInput)
 
 import Html exposing (Html, button, div, input, text)
-import Html.Attributes exposing (class, placeholder, spellcheck, value)
+import Html.Attributes
+    exposing
+        ( attribute
+        , class
+        , placeholder
+        , spellcheck
+        , title
+        , value
+        )
 import Html.Events exposing (onClick, onInput)
 import Msg exposing (Msg(..))
 
@@ -15,6 +23,7 @@ searchInput searchQuery =
             , spellcheck False
             , placeholder "Search your library"
             , value searchQuery
+            , attribute "enterkeyhint" "search"
             ]
             []
         , button
