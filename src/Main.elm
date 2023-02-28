@@ -240,10 +240,7 @@ main =
                                     author
 
                                 ExcerptPage excerpt book ->
-                                    book.title
-                                        ++ " "
-                                        ++ "p. "
-                                        ++ fromInt excerpt.page
+                                    book.title ++ " p. " ++ fromInt excerpt.page
 
                                 SettingsPage ->
                                     "Settings"
@@ -387,6 +384,37 @@ update message model =
             ( { model | isDragging = False }
             , perform msg (File.toString file)
             )
+
+        GotDroppedFile file ->
+            let
+                mime =
+                    File.mime file
+
+                mMsg =
+                    case mime of
+                        "text/plain" ->
+                            Just LoadKindleFile
+
+                        "text/csv" ->
+                            Just ParseCsvText
+
+                        "application/json" ->
+                            Just ParseJsonText
+
+                        _ ->
+                            Nothing
+            in
+            case mMsg of
+                Just msg ->
+                    update (GotFile msg file) model
+
+                _ ->
+                    ( { model
+                        | parsingError =
+                            Just <| "Unsupported file type (" ++ mime ++ ")"
+                      }
+                    , none
+                    )
 
         PickKindleFile ->
             ( model, Select.file [ "text/plain" ] (GotFile LoadKindleFile) )
@@ -738,8 +766,6 @@ update message model =
 
         RequestEmbeddings ->
             let
-                -- _ =
-                --     Debug.log "requestEmbeddings" []
                 nextBatch =
                     diff
                         (diff
