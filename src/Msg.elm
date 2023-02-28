@@ -37,6 +37,7 @@ type Msg
     | DragEnter
     | DragLeave
     | GotFile (String -> Msg) File
+    | GotDroppedFile File
     | LoadKindleFile String
     | PickKindleFile
     | HideExcerpt Excerpt
