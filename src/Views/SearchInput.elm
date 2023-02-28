@@ -35,6 +35,7 @@ searchInput searchQuery =
                  else
                     "active"
                 )
+            , title "Clear"
             ]
             [ text "✕" ]
         ]
