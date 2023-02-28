@@ -10,6 +10,7 @@ import Html
         , div
         , em
         , h1
+        , h3
         , li
         , ol
         , p
@@ -32,113 +33,129 @@ importView emptyOrDemo =
         , section
             []
             [ div
-                [ class "buttonStack" ]
-                [ if emptyOrDemo then
-                    p [] [ text "Ready to import your collection?" ]
-
-                  else
-                    null
-                , button
-                    [ class "button"
-                    , onClick PickKindleFile
-                    ]
-                    [ text "Import from Kindle "
-                    ]
-                , p []
-                    [ text "Import new excerpts from a Kindle clippings file."
-                    , details
-                        []
-                        [ summary [] [ text "How?" ]
-                        , ol []
-                            [ li
-                                []
-                                [ text "Plug your Kindle in via "
-                                , span [ class "smallCaps" ] [ text "usb" ]
-                                ]
-                            , li
-                                []
-                                [ text "Find "
-                                , code
-                                    []
-                                    [ text "Kindle/Documents/My Clippings.txt" ]
-                                , text " in a file browser"
-                                ]
-                            , li
-                                []
-                                [ text "Drag it onto this page or click the button above" ]
-                            , li
-                                []
-                                [ text "Repeat this process whenever you highlight new excerpts and theyʼll be added to your collection." ]
-                            ]
-                        ]
-                    ]
-                , button
-                    [ class "button"
-                    , onClick ImportCsv
-                    ]
-                    [ text "Import "
-                    , span
-                        [ class "smallCaps" ]
-                        [ text "csv" ]
-                    ]
-                , p []
-                    [ text "Import new excerpts from a "
+                [ class "dropZone" ]
+                [ p
+                    []
+                    [ h3 [] [ text "Drop a file here" ]
+                    , text "(Kindle clippings "
+                    , span [ class "smallCaps" ] [ text "txt" ]
+                    , text ", "
                     , span [ class "smallCaps" ] [ text "csv" ]
-                    , text " file."
-                    , details
-                        []
-                        [ summary [] [ text "Format details" ]
-                        , p []
-                            [ text "Provide rows of excerpts in the following schema: "
-                            , br [] []
-                            , code
-                                []
-                                [ text "title, author, text, pageNum (optional), date (unix time, optional), notes (optional)" ]
-                            ]
-                        ]
-                    ]
-                , button
-                    [ class "button"
-                    , onClick ImportJson
-                    ]
-                    [ text "Import "
-                    , span
-                        [ class "smallCaps" ]
-                        [ text "json" ]
-                    ]
-                , p []
-                    [ text "Restore your collection and all settings via a previously exported Marginalia "
+                    , text ", or "
                     , span [ class "smallCaps" ] [ text "json" ]
-                    , text " file. This will replace all existing state."
+                    , text ")"
                     ]
                 ]
-            , div
-                [ class "buttonStack" ]
-                [ button
-                    [ class "button"
-                    , onClick ExportJson
+            , div []
+                [ div
+                    [ class "buttonStack" ]
+                    [ if emptyOrDemo then
+                        p [] [ text "Ready to import your collection?" ]
+
+                      else
+                        null
+                    , button
+                        [ class "button"
+                        , onClick PickKindleFile
+                        ]
+                        [ text "Import from Kindle "
+                        ]
+                    , p []
+                        [ text "Import new excerpts from a Kindle clippings file."
+                        , details
+                            []
+                            [ summary [] [ text "How?" ]
+                            , ol []
+                                [ li
+                                    []
+                                    [ text "Plug your Kindle in via "
+                                    , span [ class "smallCaps" ] [ text "usb" ]
+                                    ]
+                                , li
+                                    []
+                                    [ text "Find "
+                                    , code
+                                        []
+                                        [ text "Kindle/Documents/My Clippings.txt" ]
+                                    , text " in a file browser"
+                                    ]
+                                , li
+                                    []
+                                    [ text "Drag it onto this page or click the button above" ]
+                                , li
+                                    []
+                                    [ text "Repeat this process whenever you highlight new excerpts and theyʼll be added to your collection." ]
+                                ]
+                            ]
+                        ]
+                    , button
+                        [ class "button"
+                        , onClick ImportCsv
+                        ]
+                        [ text "Import "
+                        , span
+                            [ class "smallCaps" ]
+                            [ text "csv" ]
+                        ]
+                    , p []
+                        [ text "Import new excerpts from a "
+                        , span [ class "smallCaps" ] [ text "csv" ]
+                        , text " file."
+                        , details
+                            []
+                            [ summary [] [ text "Format details" ]
+                            , p []
+                                [ text "Provide rows of excerpts in the following schema: "
+                                , br [] []
+                                , code
+                                    []
+                                    [ text "title, author, text, pageNum (optional), date (unix time, optional), notes (optional)" ]
+                                ]
+                            ]
+                        ]
+                    , button
+                        [ class "button"
+                        , onClick ImportJson
+                        ]
+                        [ text "Import "
+                        , span
+                            [ class "smallCaps" ]
+                            [ text "json" ]
+                        ]
+                    , p []
+                        [ text "Restore your collection and all settings via a previously exported Marginalia "
+                        , span [ class "smallCaps" ] [ text "json" ]
+                        , text " file. This will replace all existing state."
+                        ]
                     ]
-                    [ text "Export "
-                    , span
-                        [ class "smallCaps" ]
-                        [ text "json" ]
-                    ]
-                , p
-                    []
-                    [ text "Exports your full collection including tags, notes, and ratings for safekeeping." ]
-                , button
-                    [ class "button"
-                    , onClick (GetTime ExportEpub)
-                    ]
-                    [ text "Export "
-                    , span
-                        [ class "smallCaps" ]
-                        [ text "epub" ]
-                    ]
-                , p []
-                    [ text "Exports your excerpts into an organized "
-                    , span [ class "smallCaps" ] [ text "epub" ]
-                    , text " file for review on an e-reader."
+                , div
+                    [ class "buttonStack" ]
+                    [ button
+                        [ class "button"
+                        , onClick ExportJson
+                        ]
+                        [ text "Export "
+                        , span
+                            [ class "smallCaps" ]
+                            [ text "json" ]
+                        ]
+                    , p
+                        []
+                        [ text "Exports your full collection including tags, notes, and ratings for safekeeping." ]
+                    , button
+                        [ class "button"
+                        , onClick (GetTime ExportEpub)
+                        ]
+                        [ text "Export "
+                        , span
+                            [ class "smallCaps" ]
+                            [ text "epub" ]
+                        ]
+                    , p []
+                        [ text "Exports your excerpts into an organized "
+                        , span [ class "smallCaps" ] [ text "epub" ]
+                        , text " file for review on an e-reader."
+                        ]
                     ]
                 ]
             ]
