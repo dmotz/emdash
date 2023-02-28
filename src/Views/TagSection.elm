@@ -89,7 +89,7 @@ tagSection tags globalTags pendingTag =
                 [ onInput UpdatePendingTag
                 , value pendTag
                 , list datalistId
-                , placeholder "add tag"
+                , placeholder "Add tag"
                 , autocomplete False
                 , spellcheck False
                 ]
