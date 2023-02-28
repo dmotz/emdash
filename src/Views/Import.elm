@@ -1,8 +1,10 @@
 module Views.Import exposing (importView)
 
+import File
 import Html
     exposing
-        ( Html
+        ( Attribute
+        , Html
         , br
         , button
         , code
@@ -19,21 +21,27 @@ import Html
         , summary
         , text
         )
-import Html.Attributes exposing (class)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (class, classList)
+import Html.Events exposing (onClick, preventDefaultOn)
+import Json.Decode as Decode exposing (Decoder)
 import Msg exposing (Msg(..))
 import Utils exposing (null)
 
 
-importView : Bool -> Html Msg
-importView emptyOrDemo =
+importView : Bool -> Bool -> Html Msg
+importView emptyOrDemo isDragging =
     div
         [ class "import" ]
         [ h1 [] [ text "Imports ", em [] [ text "&" ], text " exports" ]
         , section
             []
             [ div
-                [ class "dropZone" ]
+                [ classList [ ( "dropZone", True ), ( "active", isDragging ) ]
+                , on "dragenter" (Decode.succeed DragEnter)
+                , on "dragover" (Decode.succeed DragEnter)
+                , on "dragleave" (Decode.succeed DragLeave)
+                , on "drop" dropDecoder
+                ]
                 [ p
                     []
                     [ h3 [] [ text "Drop a file here" ]
@@ -160,3 +168,15 @@ importView emptyOrDemo =
                 ]
             ]
         ]
+
+
+dropDecoder : Decoder Msg
+dropDecoder =
+    Decode.at
+        [ "dataTransfer", "files" ]
+        (Decode.oneOrMore (\f _ -> GotFile LoadKindleFile f) File.decoder)
+
+
+on : String -> Decoder msg -> Attribute msg
+on event decoder =
+    preventDefaultOn event (Decode.map (\m -> ( m, True )) decoder)
