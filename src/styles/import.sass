@@ -3,30 +3,35 @@
     user-select: text
 
   section
-    display: flex
     margin-top: 4rem
 
-    @include mobile
-      flex-direction: column
+    > div:last-child
+      display: flex
 
-    .buttonStack
-      flex: 1
+      @include mobile
+        flex-direction: column
 
-      &:first-child
-        padding-right: 6rem
-        border-right: 1px solid $mid3
-
-        @include mobile
-          padding: 0
-          border: none
-          border-bottom: 1px solid $mid3
-
-      &:last-child
-        padding-left: 6rem
+      > div
+        flex: 1
+        padding: 0 5rem
 
         @include mobile
           padding: 0
           padding-top: 4rem
+
+        &:first-child
+          padding-left: 0
+
+          @include mobile
+            padding: 0
+
+        &:last-child
+          border-left: 1px solid $mid3
+          padding-right: 0
+
+          @include mobile
+            border: none
+            border-top: 1px solid $mid3
 
   code
     font-family: $monoFont
@@ -43,3 +48,20 @@
 
   li
     margin-bottom: 1.6rem
+
+  .dropZone
+    border: 1px dashed $mid2
+    display: flex
+    align-items: center
+    justify-content: center
+    text-align: center
+    margin-bottom: 4rem
+    height: 15rem
+
+    h3
+      font-size: 2.2rem
+      font-style: italic
+      margin-bottom: 1rem
+
+    @include touch
+      display: none
