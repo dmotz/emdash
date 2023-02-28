@@ -174,7 +174,7 @@ dropDecoder : Decoder Msg
 dropDecoder =
     Decode.at
         [ "dataTransfer", "files" ]
-        (Decode.oneOrMore (\f _ -> GotFile LoadKindleFile f) File.decoder)
+        (Decode.oneOrMore (\f _ -> GotDroppedFile f) File.decoder)
 
 
 on : String -> Decoder msg -> Attribute msg
