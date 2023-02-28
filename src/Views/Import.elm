@@ -107,7 +107,7 @@ importView emptyOrDemo =
                         [ text "json" ]
                     ]
                 , p []
-                    [ text "Restore your collection and all metadata via a previously exported Marginalia "
+                    [ text "Restore your collection and all settings via a previously exported Marginalia "
                     , span [ class "smallCaps" ] [ text "json" ]
                     , text " file. This will replace all existing state."
                     ]
