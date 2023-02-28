@@ -158,6 +158,21 @@ debounceConfig =
     }
 
 
+mimeTxt : String
+mimeTxt =
+    "text/plain"
+
+
+mimeCsv : String
+mimeCsv =
+    "text/csv"
+
+
+mimeJson : String
+mimeJson =
+    "application/json"
+
+
 createModel : String -> Maybe StoredModel -> Bool -> Url -> Nav.Key -> ( String, String ) -> Model
 createModel version mStoredModel demoMode url key ( mailingListUrl, mailingListField ) =
     let
@@ -391,18 +406,17 @@ update message model =
                     File.mime file
 
                 mMsg =
-                    case mime of
-                        "text/plain" ->
-                            Just LoadKindleFile
+                    if mime == mimeTxt then
+                        Just LoadKindleFile
 
-                        "text/csv" ->
-                            Just ParseCsvText
+                    else if mime == mimeCsv then
+                        Just ParseCsvText
 
-                        "application/json" ->
-                            Just ParseJsonText
+                    else if mime == mimeJson then
+                        Just ParseJsonText
 
-                        _ ->
-                            Nothing
+                    else
+                        Nothing
             in
             case mMsg of
                 Just msg ->
@@ -417,7 +431,7 @@ update message model =
                     )
 
         PickKindleFile ->
-            ( model, Select.file [ "text/plain" ] (GotFile LoadKindleFile) )
+            ( model, Select.file [ mimeTxt ] (GotFile LoadKindleFile) )
 
         LoadKindleFile text ->
             ( model, requestUnicodeNormalized text )
@@ -753,12 +767,12 @@ update message model =
 
         ImportJson ->
             ( model
-            , Select.file [ "application/json" ] (GotFile ParseJsonText)
+            , Select.file [ mimeJson ] (GotFile ParseJsonText)
             )
 
         ImportCsv ->
             ( model
-            , Select.file [ "text/csv" ] (GotFile ParseCsvText)
+            , Select.file [ mimeCsv ] (GotFile ParseCsvText)
             )
 
         ExportEpub time ->
