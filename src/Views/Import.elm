@@ -3,6 +3,7 @@ module Views.Import exposing (importView)
 import Html
     exposing
         ( Html
+        , br
         , button
         , code
         , details
@@ -68,6 +69,31 @@ importView emptyOrDemo =
                             , li
                                 []
                                 [ text "Repeat this process whenever you highlight new excerpts and theyʼll be added to your collection." ]
+                            ]
+                        ]
+                    ]
+                , button
+                    [ class "button"
+                    , onClick ImportCsv
+                    ]
+                    [ text "Import "
+                    , span
+                        [ class "smallCaps" ]
+                        [ text "csv" ]
+                    ]
+                , p []
+                    [ text "Import new excerpts from a "
+                    , span [ class "smallCaps" ] [ text "csv" ]
+                    , text " file."
+                    , details
+                        []
+                        [ summary [] [ text "Format details" ]
+                        , p []
+                            [ text "Provide rows of excerpts in the following schema: "
+                            , br [] []
+                            , code
+                                []
+                                [ text "title, author, text, pageNum (optional), date (unix time, optional), notes (optional)" ]
                             ]
                         ]
                     ]
