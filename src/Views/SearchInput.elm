@@ -13,7 +13,7 @@ searchInput searchQuery =
         [ input
             [ onInput OnSearchStart
             , spellcheck False
-            , placeholder "Search"
+            , placeholder "Search your library"
             , value searchQuery
             ]
             []
