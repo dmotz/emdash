@@ -1,11 +1,9 @@
 module Views.Base exposing (view)
 
 import Dict exposing (Dict, get, size)
-import File
 import Html
     exposing
-        ( Attribute
-        , Html
+        ( Html
         , a
         , button
         , code
@@ -25,9 +23,8 @@ import Html
         , ul
         )
 import Html.Attributes exposing (alt, class, classList, draggable, href, id, src, target)
-import Html.Events exposing (onClick, preventDefaultOn)
+import Html.Events exposing (onClick)
 import Html.Keyed as Keyed
-import Json.Decode as Decode exposing (Decoder)
 import List exposing (filter, foldl, isEmpty, length, map, reverse, sortBy)
 import Maybe exposing (withDefault)
 import Model
@@ -70,12 +67,7 @@ import Views.Settings exposing (settingsView)
 view : Model -> Html Msg
 view model =
     div
-        [ id "root"
-        , on "dragenter" (Decode.succeed DragEnter)
-        , on "dragover" (Decode.succeed DragEnter)
-        , on "dragleave" (Decode.succeed DragLeave)
-        , on "drop" dropDecoder
-        ]
+        [ id "root" ]
         ((case model.page of
             LandingPage bookList didSubmitEmail ->
                 [ landingView bookList didSubmitEmail ]
@@ -360,6 +352,7 @@ view model =
                                 (model.demoMode
                                     || Dict.isEmpty model.excerpts
                                 )
+                                model.isDragging
 
                         CreatePage pExcerpt books authors ->
                             createView pExcerpt books authors
@@ -369,36 +362,30 @@ view model =
                     ]
                 ]
          )
-            ++ [ footer
-                    []
-                    [ div
-                        [ class "links" ]
-                        [ a [ href "/import" ] [ text "Import excerpts" ]
-                        , if Dict.isEmpty model.excerpts then
-                            null
+            ++ footer
+                []
+                [ div
+                    [ class "links" ]
+                    [ a [ href "/import" ] [ text "Import excerpts" ]
+                    , if Dict.isEmpty model.excerpts then
+                        null
 
-                          else
-                            a [ href "/settings" ] [ text "Settings" ]
-                        , a
-                            [ href "https://github.com/dmotz/marginalia/issues/new"
-                            , target "_blank"
-                            ]
-                            [ text "Report a bug" ]
-                        , a
-                            [ href "https://github.com/dmotz/marginalia"
-                            , target "_blank"
-                            ]
-                            [ text "Source code" ]
+                      else
+                        a [ href "/settings" ] [ text "Settings" ]
+                    , a
+                        [ href "https://github.com/dmotz/marginalia/issues/new"
+                        , target "_blank"
                         ]
-                    , div [ class "fleuron" ] [ text "❦" ]
+                        [ text "Report a bug" ]
+                    , a
+                        [ href "https://github.com/dmotz/marginalia"
+                        , target "_blank"
+                        ]
+                        [ text "Source code" ]
                     ]
-               , if model.isDragging then
-                    div [ class "dragNotice" ] [ text "Drop your file here." ]
-
-                 else
-                    text ""
-               ]
-            ++ (case model.parsingError of
+                , div [ class "fleuron" ] [ text "❦" ]
+                ]
+            :: (case model.parsingError of
                     Just msg ->
                         [ div
                             [ class "modal" ]
@@ -621,15 +608,3 @@ sortToBounds sort =
 
         _ ->
             [ "less", "more" ]
-
-
-dropDecoder : Decoder Msg
-dropDecoder =
-    Decode.at
-        [ "dataTransfer", "files" ]
-        (Decode.oneOrMore (\f _ -> GotFile LoadKindleFile f) File.decoder)
-
-
-on : String -> Decoder msg -> Attribute msg
-on event decoder =
-    preventDefaultOn event (Decode.map (\m -> ( m, True )) decoder)
