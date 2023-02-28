@@ -128,7 +128,7 @@ importView emptyOrDemo =
                     [ text "Exports your full collection including tags, notes, and ratings for safekeeping." ]
                 , button
                     [ class "button"
-                    , onClick ExportEpub
+                    , onClick (GetTime ExportEpub)
                     ]
                     [ text "Export "
                     , span
