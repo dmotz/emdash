@@ -159,3 +159,18 @@ let zipWorker
   worker.port.onmessage = ({data: {method, data}}) =>
     app.ports[messageToPort[method]].send(data)
 })()
+
+window.addEventListener(
+  'input',
+  ({target}) => {
+    const {value, selectionStart} = target
+
+    requestAnimationFrame(() => {
+      if (target.value !== value) {
+        target.selectionStart = target.selectionEnd =
+          selectionStart - (value.length - target.value.length)
+      }
+    })
+  },
+  true
+)

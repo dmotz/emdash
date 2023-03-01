@@ -1354,7 +1354,9 @@ update message model =
                 ( { model | searchQuery = "" }, Nav.replaceUrl model.key "/" )
 
             else
-                ( model, Nav.replaceUrl model.key (searchToRoute query) )
+                ( { model | searchQuery = query }
+                , Nav.replaceUrl model.key (searchToRoute query)
+                )
 
         OnSearchEnd val ->
             let
