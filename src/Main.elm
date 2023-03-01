@@ -1151,14 +1151,14 @@ update message model =
                                     (Just tag)
                             , searchQuery = ""
                           }
-                        , none
+                        , scrollTop
                         )
 
                     else
                         ( { model_
                             | page = NotFoundPage "Tag not found."
                           }
-                        , none
+                        , scrollTop
                         )
 
                 Just (SearchRoute query) ->
