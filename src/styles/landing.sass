@@ -1,0 +1,267 @@
+$scrollSpeed: 20s
+$centerGutter: 14rem
+$bookGap: 1rem
+$maxColWidth: 900px
+
+.landing
+  margin: 0 auto
+  padding: 8rem 0
+  padding-top: 0
+
+  *
+    user-select: text
+
+  .monogram
+    width: 20rem
+    margin: 0 auto
+    transform: translateX(-8%)
+    margin-top: -12rem
+    margin-bottom: -5rem
+    position: relative
+    z-index: 1
+    display: block
+
+  section, hr
+    max-width: $maxColWidth
+    padding: 0 4rem
+    margin: 0 auto
+
+  section
+    margin-top: 8rem
+
+  h2
+    font-size: 4rem
+    margin-bottom: 1.8rem
+    text-align: center
+
+  .anim
+    pointer-events: none
+    opacity: .5
+    display: flex
+    width: 100vw
+    height: 25rem
+    position: relative
+    overflow: hidden
+    margin-bottom: 5rem
+    border-bottom: 1px solid $mid2
+
+    .bookShelf
+      position: absolute
+      top: 0
+      left: calc(50% - $centerGutter)
+      display: flex
+      justify-content: flex-end
+      transform-origin: 0 0
+      transform: scale(.7) translateX(-100%)
+
+      &:last-child
+        left: calc(50% + $centerGutter)
+        transform: scale(.7)
+
+    .bookCol
+      margin-right: 2rem
+      height: fit-content
+
+      > div
+        animation: scrollUp $scrollSpeed linear infinite
+
+        @media (prefers-reduced-motion)
+          animation: none
+
+      &:nth-child(even)
+        > div
+          animation: scrollDown $scrollSpeed linear infinite
+
+          @media (prefers-reduced-motion)
+            animation: none
+            transform: translateY(-100px)
+
+    .book
+      list-style: none
+      margin-bottom: $bookGap
+
+  .cta
+    padding: 0
+    padding-bottom: 8rem
+    position: relative
+    overflow: hidden
+
+    h1
+      font-weight: normal
+      font-size: clamp(3rem, 4vw, 4rem)
+      margin: 0 auto
+      padding: 0 6rem
+      margin-bottom: 2rem
+      line-height: 1.8
+      text-align: center
+
+    img
+      pointer-events: none
+      position: absolute
+      width: clamp(2rem, 20vw, 200px)
+      user-select: none
+
+    .botanical1
+      left: 23%
+      top: 40%
+
+    .botanical2
+      bottom: 0
+      right: 4%
+      transform: translateY(35%)
+
+    button
+      font-size: 3rem
+      margin-top: 12rem
+      margin-bottom: 2rem
+      padding: 2rem 4rem
+      border: 3px double $fg
+
+      em
+        font-style: normal
+        border-bottom: 3px solid $fg
+        transition: border-bottom-color .3s
+
+      &:hover em
+        border-bottom-color: $accent
+
+    aside
+      text-align: center
+
+    p
+      font-size: 1.6rem
+
+    &::after
+      content: '❦'
+      font-size: 4rem
+      display: block
+      text-align: center
+      margin-top: 4rem
+
+    div
+      display: flex
+      flex-direction: column
+      align-items: center
+
+  hr
+    margin: 0 auto
+    margin-bottom: 0.5rem
+
+  .features
+    margin-bottom: 10rem
+    padding: 0
+
+    h2
+      margin-bottom: 6rem
+
+    h2, h4
+      text-align: center
+
+    ul
+      display: grid
+      grid: 1fr / 1fr 1fr
+      grid-gap: 14rem
+      row-gap: 8rem
+
+    li
+      text-align: center
+      position: relative
+
+    figcaption
+      font-style: italic
+      margin-bottom: 2rem
+
+    img
+      width: 30%
+      display: none
+
+    p
+      font-size: 2.3rem
+      line-height: 1.7
+
+  h3
+    font-size: 3rem
+    line-height: 1.4
+    margin-bottom: 3rem
+    text-align: center
+
+    span
+      font-style: italic
+
+  form
+    display: flex
+    flex-direction: column
+    align-items: center
+    margin-top: 10rem
+
+    > *
+      margin-bottom: 2rem
+
+    > div
+      width: 100%
+      max-width: 45rem
+      display: flex
+      justify-content: center
+      align-items: flex-end
+
+    input
+      margin-top: 2rem
+      margin-right: 1rem
+      font-size: 2.2rem
+      flex: 1
+
+      &:invalid, &:placeholder-shown
+        + button
+          opacity: .6
+          pointer-events: none
+
+  footer
+    margin-top: 8rem
+
+  .monk
+    border: 1px double $mid2
+    outline: 1px solid $mid2
+    outline-offset: 4px
+    box-shadow: 0 0 0 4px $bg
+    max-width: 500px !important
+    padding: 6rem 4rem !important
+    text-align: center
+    margin-top: 20rem
+    position: relative
+    z-index: 9
+    margin-bottom: 8rem !important
+    background: $bg
+
+    ul
+      font-size: 2rem
+
+      li
+        line-height: 2
+
+        &::before
+          content: '• '
+
+    aside
+      margin-bottom: 1rem
+
+  .mushrooms
+    position: absolute
+    max-width: 20rem
+    left: 50%
+    transform: translateX(-30.5rem) translateY(3.8rem)
+    pointer-events: none
+    user-select: none
+
+@keyframes scrollUp
+  from
+    transform: translateY(0)
+
+  to
+    transform: translateY(calc(-100% - $bookGap))
+
+@keyframes scrollDown
+  from
+    transform: translateY(-100%)
+
+  to
+    transform: translateY($bookGap)
