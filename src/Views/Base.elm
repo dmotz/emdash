@@ -116,12 +116,12 @@ view model =
                         [ img
                             [ class "icon"
                             , src "/images/icons/import.svg"
-                            , alt "Import/export excerpts"
+                            , alt "Import & export excerpts"
                             ]
                             []
                         , div
                             [ class "hint left" ]
-                            [ text "Import/export excerpts" ]
+                            [ text "Import & export excerpts" ]
                         ]
                     , a
                         [ href "/create" ]
