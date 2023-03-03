@@ -427,19 +427,38 @@ footer
 
 .demoNotice
   position: fixed
-  bottom: 0
-  width: 100vw
+  bottom: 2rem
+  left: 2rem
+  @include dropShadow
   background: $bg
-  padding: 1.6rem
+  padding: 3rem
   z-index: 99
-  display: flex
   justify-content: center
   align-items: center
-  border-top: 1px solid $mid1
+  border: 1px solid $mid1
+  font-size: 2rem
+
+  aside
+    font-size: 1.6rem
+    margin-bottom: 1.5rem
 
   span
     margin-right: 0.7rem
     font-size: 2rem
+
+  @include mobile
+    bottom: 0
+    left: 0
+    right: 0
+    border-bottom: none
+    border-left: none
+    border-right: none
+    text-align: center
+    padding: 2rem
+    font-size: 1.6rem
+
+    aside
+      display: none
 
 .buttonStack
   button
