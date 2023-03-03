@@ -38,7 +38,7 @@ import Html.Attributes
         , type_
         )
 import Html.Events exposing (onClick, onInput, onSubmit)
-import List exposing (drop, length, map, range, take)
+import List exposing (drop, length, map, range, reverse, take)
 import Model exposing (Book)
 import Msg exposing (Msg(..))
 import Utils exposing (appName)
@@ -65,6 +65,12 @@ landingView bookList didSubmitEmail =
                             |> drop (n * colSize)
                             |> take colSize
                     )
+
+        list1 =
+            take (bookCols // 2) bookLists
+
+        list2 =
+            drop (bookCols // 2) bookLists
     in
     div
         [ class "landing" ]
@@ -96,9 +102,7 @@ landingView bookList didSubmitEmail =
                             col
                         )
                 )
-                [ take (bookCols // 2) bookLists
-                , drop (bookCols // 2) bookLists
-                ]
+                [ map reverse list2 ++ list1, list2 ++ map reverse list1 ]
             )
         , img [ src "/images/logo.svg", class "monogram", draggable "false", alt appName ] []
         , section [ class "cta" ]
