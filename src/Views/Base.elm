@@ -62,6 +62,7 @@ import Views.Landing exposing (landingView)
 import Views.SearchInput exposing (searchInput)
 import Views.SearchResults exposing (searchResults)
 import Views.Settings exposing (settingsView)
+import Views.Toolbar exposing (toolbar)
 
 
 view : Model -> Html Msg
@@ -87,67 +88,7 @@ view model =
                                 [ class "hint" ]
                                 [ text "Back to the index" ]
                     ]
-                , div
-                    [ class "toolbar" ]
-                    [ a
-                        [ href "/settings" ]
-                        [ img
-                            [ class "icon"
-                            , src "/images/icons/settings.svg"
-                            , alt "Settings et cetera"
-                            ]
-                            []
-                        , div [ class "hint left" ] [ text "Settings &c." ]
-                        ]
-                    , button
-                        [ onClick ShowRandom ]
-                        [ img
-                            [ class "icon"
-                            , src "/images/icons/random.svg"
-                            , alt "Random excerpt"
-                            ]
-                            []
-                        , div
-                            [ class "hint left" ]
-                            [ text "Discover a random excerpt" ]
-                        ]
-                    , a
-                        [ href "/import" ]
-                        [ img
-                            [ class "icon"
-                            , src "/images/icons/import.svg"
-                            , alt "Import & export excerpts"
-                            ]
-                            []
-                        , div
-                            [ class "hint left" ]
-                            [ text "Import & export excerpts" ]
-                        ]
-                    , a
-                        [ href "/create" ]
-                        [ img
-                            [ class "icon"
-                            , src "/images/icons/create.svg"
-                            , alt "Create a new excerpt"
-                            ]
-                            []
-                        , div
-                            [ class "hint left" ]
-                            [ text "Create a new excerpt" ]
-                        ]
-                    , button
-                        [ onClick ScrollToTop ]
-                        [ img
-                            [ class "icon"
-                            , src "/images/icons/scroll-top.svg"
-                            , alt "Create excerpt"
-                            ]
-                            []
-                        , div
-                            [ class "hint left" ]
-                            [ text "Scroll to top" ]
-                        ]
-                    ]
+                , toolbar
                 , if model.demoMode && model.page /= ImportPage then
                     div
                         [ class "demoNotice" ]
