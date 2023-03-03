@@ -5,6 +5,7 @@ import Html
     exposing
         ( Html
         , a
+        , aside
         , button
         , code
         , div
@@ -92,10 +93,16 @@ view model =
                 , if model.demoMode && model.page /= ImportPage then
                     div
                         [ class "demoNotice" ]
-                        [ span [] [ text "❧" ]
-                        , a
-                            [ href "/import" ]
-                            [ text "Ready to try Marginalia with your own collection?" ]
+                        [ aside
+                            []
+                            [ text "Feel free to peruse this sample library. Make yourself at home." ]
+                        , div
+                            []
+                            [ span [] [ text "❧" ]
+                            , a
+                                [ href "/import" ]
+                                [ text "Ready to try Marginalia with your own collection?" ]
+                            ]
                         ]
 
                   else
