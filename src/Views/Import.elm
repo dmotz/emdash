@@ -5,6 +5,7 @@ import Html
     exposing
         ( Attribute
         , Html
+        , aside
         , br
         , button
         , code
@@ -35,7 +36,12 @@ importView emptyOrDemo isDragging =
         [ h1 [] [ text "Imports ", em [] [ text "&" ], text " exports" ]
         , section
             []
-            [ div
+            [ if emptyOrDemo then
+                aside [] [ text "Ready to import your collection? Drop a file or read the instructions below." ]
+
+              else
+                null
+            , div
                 [ classList [ ( "dropZone", True ), ( "active", isDragging ) ]
                 , on "dragenter" (Decode.succeed DragEnter)
                 , on "dragover" (Decode.succeed DragEnter)
@@ -57,12 +63,7 @@ importView emptyOrDemo isDragging =
             , div []
                 [ div
                     [ class "buttonStack" ]
-                    [ if emptyOrDemo then
-                        p [] [ text "Ready to import your collection?" ]
-
-                      else
-                        null
-                    , button
+                    [ button
                         [ class "button"
                         , onClick PickKindleFile
                         ]
