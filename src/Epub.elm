@@ -17,7 +17,7 @@ import Time
         , toYear
         , utc
         )
-import Utils exposing (rx, sortBooks)
+import Utils exposing (appName, rx, sortBooks)
 
 
 type alias Epub =
@@ -29,12 +29,7 @@ port createEpub : Epub -> Cmd msg
 
 globalTitle : String
 globalTitle =
-    "Marginalia Excerpts"
-
-
-globalAuthor : String
-globalAuthor =
-    "Marginalia"
+    appName ++ " Excerpts"
 
 
 container : ( String, String )
@@ -123,7 +118,9 @@ generateTocNcx epubId titles =
           <meta name="dtb:uid" content=\""""
         ++ epubId
         ++ """" />
-          <meta name="dtb:generator" content="Marginalia"/>
+          <meta name="dtb:generator" content=\""""
+        ++ appName
+        ++ """"/>
           <meta name="dtb:depth" content="1"/>
           <meta name="dtb:totalPageCount" content="0"/>
           <meta name="dtb:maxPageNumber" content="0"/>
@@ -135,7 +132,7 @@ generateTocNcx epubId titles =
         </docTitle>
         <docAuthor>
           <text>"""
-        ++ globalAuthor
+        ++ appName
         ++ """</text>
         </docAuthor>
         <navMap>
@@ -221,14 +218,16 @@ generateContent epubId timeString titles =
         ++ globalTitle
         ++ """</meta>
           <dc:creator id="creator">"""
-        ++ globalAuthor
+        ++ appName
         ++ """</dc:creator>
           <meta refines="#creator" property="file-as">"""
-        ++ globalAuthor
+        ++ appName
         ++ """</meta>
           <dc:language>en</dc:language>
           <meta property="dcterms:language" id="meta-language">en</meta>
-          <meta name="generator" content="Marginalia"/>
+          <meta name="generator" content=\""""
+        ++ appName
+        ++ """"/>
         </metadata>
         <manifest>
           <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
