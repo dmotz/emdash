@@ -10,7 +10,6 @@ import Html
         , code
         , div
         , footer
-        , h1
         , h2
         , h3
         , hr
@@ -26,7 +25,7 @@ import Html
 import Html.Attributes exposing (alt, class, classList, draggable, href, id, src, target)
 import Html.Events exposing (onClick)
 import Html.Keyed as Keyed
-import List exposing (filter, foldl, isEmpty, length, map, reverse, sortBy)
+import List exposing (filter, isEmpty, length, map, reverse, sortBy)
 import Maybe exposing (withDefault)
 import Model
     exposing
@@ -43,15 +42,8 @@ import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
 import Set
 import String exposing (join)
-import Utils
-    exposing
-        ( appName
-        , excerptCountLabel
-        , formatNumber
-        , null
-        , titleCountLabel
-        , untaggedKey
-        )
+import Utils exposing (appName, formatNumber, null, untaggedKey)
+import Views.AuthorInfo exposing (authorInfo)
 import Views.BookInfo exposing (bookInfo)
 import Views.BookList exposing (bookList)
 import Views.Create exposing (createView)
@@ -218,25 +210,7 @@ view model =
 
                         AuthorPage author books ->
                             div []
-                                [ div
-                                    [ class "authorInfo" ]
-                                    [ h1 [] [ text author ]
-                                    , h2
-                                        []
-                                        [ titleCountLabel
-                                            (length books)
-                                            ++ ", "
-                                            ++ (books
-                                                    |> foldl
-                                                        (\{ count } acc ->
-                                                            acc + count
-                                                        )
-                                                        0
-                                                    |> excerptCountLabel
-                                               )
-                                            |> text
-                                        ]
-                                    ]
+                                [ authorInfo author books
                                 , bookSorter
                                     model.bookSort
                                     model.reverseSort
