@@ -214,7 +214,7 @@ view model =
 
                         AuthorPage author books ->
                             div []
-                                [ authorInfo author books
+                                [ authorInfo author books model.authorNeighborMap
                                 , bookSorter
                                     model.bookSort
                                     model.reverseSort
