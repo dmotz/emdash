@@ -18,6 +18,7 @@ import Html
         , img
         , input
         , li
+        , main_
         , p
         , section
         , span
@@ -104,154 +105,159 @@ landingView bookList didSubmitEmail =
                 )
                 [ map reverse list2 ++ list1, list2 ++ map reverse list1 ]
             )
-        , img [ src "/images/logo.svg", class "monogram", draggable "false", alt appName ] []
-        , section [ class "cta" ]
-            [ h1 []
-                [ text <| appName ++ " uses AI to organize highlights from ebooks so you can "
-                , em [] [ text "actually remember & learn from" ]
-                , text " what you read."
-                ]
-            , aside [] [ text "And itʼs free & open-source." ]
-            , img [ src "/images/landing/botanical1.png", class "botanical1" ] []
-            , div
-                []
-                [ button
-                    [ class "button", onClick StartDemo ]
-                    [ text "Try an ", em [] [ text "instant" ], text " demo" ]
-                , aside [] [ text "Please, click." ]
-                ]
-            , img [ src "/images/landing/botanical2.png", class "botanical2" ] []
-            ]
-        , hr [] []
-        , hr [] []
-        , section
-            [ class "features" ]
-            [ h2 [] [ text "Featuring" ]
-            , ul []
-                [ li
+        , main_ []
+            [ img [ src "/images/logo.svg", class "monogram", draggable "false", alt appName ] []
+            , section
+                [ class "cta" ]
+                [ h1 []
+                    [ text <| appName ++ " uses AI to organize highlights from ebooks so you can "
+                    , em [] [ text "actually remember & learn from" ]
+                    , text " what you read."
+                    ]
+                , aside [] [ text "And itʼs free & open-source." ]
+                , div
                     []
-                    [ figure
+                    [ button
+                        [ class "button", onClick StartDemo ]
+                        [ text "Try an ", em [] [ text "instant" ], text " demo" ]
+                    , img [ src "/images/landing/botanical1.png", class "botanical1" ] []
+                    , aside [] [ text "Please, click." ]
+                    ]
+                , img [ src "/images/landing/botanical2.png", class "botanical2" ] []
+                ]
+            , hr [] []
+            , hr [] []
+            , section
+                [ class "features" ]
+                [ h2 [] [ text "Featuring" ]
+                , ul []
+                    [ li
                         []
-                        [ figcaption [] [ text "i" ] ]
-                    , h3 [] [ text "AI analysis" ]
-                    , p
-                        []
-                        [ text
-                            """
+                        [ figure
+                            []
+                            [ figcaption [] [ text "i" ] ]
+                        , h3 [] [ text "AI analysis" ]
+                        , p
+                            []
+                            [ text
+                                """
                             Draw new connections and discover related passages
                             from other books via on-device machine learning.
                             """
+                            ]
                         ]
-                    ]
-                , li
-                    []
-                    [ figure
+                    , li
                         []
-                        [ figcaption [] [ text "ii" ] ]
-                    , h3 [] [ text "Instant semantic search" ]
-                    , p
-                        []
-                        [ text
-                            """
+                        [ figure
+                            []
+                            [ figcaption [] [ text "ii" ] ]
+                        , h3 [] [ text "Instant semantic search" ]
+                        , p
+                            []
+                            [ text
+                                """
                             Find what youʼre looking for with both full-text
                             search and deeper semantic matching for fuzzy concepts.
                             """
+                            ]
                         ]
-                    ]
-                , li
-                    []
-                    [ figure
+                    , li
                         []
-                        [ figcaption [] [ text "iii" ] ]
-                    , h3 [] [ text "Tag, rate, note, reflect" ]
-                    , p
-                        []
-                        [ text
-                            """
+                        [ figure
+                            []
+                            [ figcaption [] [ text "iii" ] ]
+                        , h3 [] [ text "Tag, rate, note, reflect" ]
+                        , p
+                            []
+                            [ text
+                                """
                             Organize everything with tags, add ratings, and
                             filter and sort with both. Export back to
                             """
-                        , span [ class "smallCaps" ] [ text "epub" ]
-                        , text " for review on an e-reader."
-                        ]
-                    ]
-                , li
-                    []
-                    [ figure
-                        []
-                        [ figcaption [] [ text "iv" ] ]
-                    , h3 [] [ text "Roll the dice" ]
-                    , p [] [ text "Unearth ideas youʼve forgotten about via random discovery." ]
-                    ]
-                , li
-                    []
-                    [ figure
-                        []
-                        [ figcaption [] [ text "v" ] ]
-                    , h3 [] [ text "No lock-in" ]
-                    , p []
-                        [ text "Bring in your highlights from your Kindle or as "
-                        , span [ class "smallCaps" ] [ text "json" ]
-                        , text " or "
-                        , span [ class "smallCaps" ] [ text "csv" ]
-                        , text ". Export instantly to the same open formats."
-                        ]
-                    ]
-                , li
-                    []
-                    [ figure
-                        []
-                        [ figcaption [] [ text "vi" ] ]
-                    , h3
-                        []
-                        [ text "Open source "
-                        , span [] [ text "&" ]
-                        , text " offline first"
-                        ]
-                    , p []
-                        [ text "Fully private AI analysis and fully "
-                        , a
-                            [ href "https://github.com/dmotz/marginalia"
-                            , target "_blank"
+                            , span [ class "smallCaps" ] [ text "epub" ]
+                            , text " for review on an e-reader."
                             ]
-                            [ text "open source" ]
-                        , text ". Your data stay on your device."
                         ]
-                    ]
-                ]
-            ]
-        , hr [] []
-        , hr [] []
-        , img [ src "/images/landing/botanical3.png", class "mushrooms" ] []
-        , section
-            [ class "monk" ]
-            [ aside [] [ text "Coming eventually" ]
-            , h2 [] [ text "Monk-Mode" ]
-            , ul
-                []
-                [ li [] [ text "More advanced AI analysis" ]
-                , li [] [ text "Socratic interaction (interrogate your books!)" ]
-                , li [] [ text "Cross device syncing and backup" ]
-                , li [] [ text "Publishing / sharing excerpts" ]
-                , li [] [ text "Sturdier gardening tools" ]
-                ]
-            ]
-        , if didSubmitEmail then
-            div [] [ h3 [] [ text "Thank you!" ] ]
-
-          else
-            form [ onSubmit SubscribeToMailingList ]
-                [ h3 [] [ text <| "Sign up for the occasional " ++ appName ++ " update:" ]
-                , div []
-                    [ input
-                        [ type_ "email"
-                        , placeholder "Your email address"
-                        , onInput UpdateMailingListEmail
-                        ]
+                    , li
                         []
-                    , button [ class "button" ] [ text "Submit" ]
+                        [ figure
+                            []
+                            [ figcaption [] [ text "iv" ] ]
+                        , h3 [] [ text "Roll the dice" ]
+                        , p [] [ text "Unearth ideas youʼve forgotten about via random discovery." ]
+                        ]
+                    , li
+                        []
+                        [ figure
+                            []
+                            [ figcaption [] [ text "v" ] ]
+                        , h3 [] [ text "No lock-in" ]
+                        , p []
+                            [ text "Bring in your highlights from your Kindle or as "
+                            , span [ class "smallCaps" ] [ text "json" ]
+                            , text " or "
+                            , span [ class "smallCaps" ] [ text "csv" ]
+                            , text ". Export instantly to the same open formats."
+                            ]
+                        ]
+                    , li
+                        []
+                        [ figure
+                            []
+                            [ figcaption [] [ text "vi" ] ]
+                        , h3
+                            []
+                            [ text "Open source "
+                            , span [] [ text "&" ]
+                            , text " offline first"
+                            ]
+                        , p []
+                            [ text "Fully private AI analysis and fully "
+                            , a
+                                [ href "https://github.com/dmotz/marginalia"
+                                , target "_blank"
+                                ]
+                                [ text "open source" ]
+                            , text ". Your data stay on your device."
+                            ]
+                        ]
                     ]
                 ]
+            , hr [] []
+            , hr [] []
+            , section
+                [ class "monk" ]
+                [ img [ src "/images/landing/botanical3.png", class "mushrooms" ] []
+                , div []
+                    [ aside [] [ text "Coming eventually" ]
+                    , h2 [] [ text "Monk-Mode" ]
+                    , ul
+                        []
+                        [ li [] [ text "More advanced AI analysis" ]
+                        , li [] [ text "Socratic interaction (interrogate your books!)" ]
+                        , li [] [ text "Cross device syncing and backup" ]
+                        , li [] [ text "Publishing / sharing excerpts" ]
+                        , li [] [ text "Sturdier gardening tools" ]
+                        ]
+                    ]
+                ]
+            , if didSubmitEmail then
+                div [] [ h3 [] [ text "Thank you!" ] ]
+
+              else
+                form [ onSubmit SubscribeToMailingList ]
+                    [ h3 [] [ text <| "Sign up for the occasional " ++ appName ++ " update:" ]
+                    , div []
+                        [ input
+                            [ type_ "email"
+                            , placeholder "Your email address"
+                            , onInput UpdateMailingListEmail
+                            ]
+                            []
+                        , button [ class "button" ] [ text "Submit" ]
+                        ]
+                    ]
+            ]
         ]
 
 
