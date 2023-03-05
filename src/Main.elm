@@ -1458,7 +1458,7 @@ update message model =
                             )
                             (model.excerpts
                                 |> values
-                                |> findMatches query .text
+                                |> findMatches query (\e -> e.text ++ " " ++ e.notes)
                             )
                             (if String.length query >= minSemanticQueryLen then
                                 withDefault [] prevSemantic
