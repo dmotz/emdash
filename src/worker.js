@@ -102,8 +102,15 @@ const findExcerptNeighbors = async targetId => {
 const findBookNeighbors = bookId =>
   getTopK(bookTensor, bookKeyList, bookEmbMap[bookId], neighborsK, true)
 
-const findAuthorNeighbors = authorId =>
-  getTopK(authorTensor, authorKeyList, authorEmbMap[authorId], neighborsK, true)
+const findAuthorNeighbors = async authorId =>
+  (
+    await getTopK(
+      authorTensor,
+      authorKeyList,
+      authorEmbMap[authorId],
+      neighborsK + 1
+    )
+  ).filter(([auth]) => auth !== authorId)
 
 const methods = {
   processNewExcerpts: async ({books, excerpts}, cb) => {
