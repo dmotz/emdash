@@ -107,7 +107,7 @@ landingView bookList didSubmitEmail =
         , img [ src "/images/logo.svg", class "monogram", draggable "false", alt appName ] []
         , section [ class "cta" ]
             [ h1 []
-                [ text "Marginalia uses AI to organize highlights from ebooks so you can "
+                [ text <| appName ++ " uses AI to organize highlights from ebooks so you can "
                 , em [] [ text "actually remember & learn from" ]
                 , text " what you read."
                 ]
@@ -169,8 +169,10 @@ landingView bookList didSubmitEmail =
                         [ text
                             """
                             Organize everything with tags, add ratings, and
-                            filter and sort with both.
+                            filter and sort with both. Export back to
                             """
+                        , span [ class "smallCaps" ] [ text "epub" ]
+                        , text " for review on an e-reader."
                         ]
                     ]
                 , li
@@ -231,7 +233,7 @@ landingView bookList didSubmitEmail =
                 , li [] [ text "Socratic interaction (interrogate your books!)" ]
                 , li [] [ text "Cross device syncing and backup" ]
                 , li [] [ text "Publishing / sharing excerpts" ]
-                , li [] [ text "Further gardening tools" ]
+                , li [] [ text "Sturdier gardening tools" ]
                 ]
             ]
         , if didSubmitEmail then
@@ -239,7 +241,7 @@ landingView bookList didSubmitEmail =
 
           else
             form [ onSubmit SubscribeToMailingList ]
-                [ h3 [] [ text "Sign up for the occasional Marginalia update:" ]
+                [ h3 [] [ text <| "Sign up for the occasional " ++ appName ++ " update:" ]
                 , div []
                     [ input
                         [ type_ "email"
