@@ -93,7 +93,11 @@ view model =
                             [ span [] [ text "❧" ]
                             , a
                                 [ href "/import" ]
-                                [ text "Ready to try Marginalia with your own collection?" ]
+                                [ text <|
+                                    "Ready to try "
+                                        ++ appName
+                                        ++ " with your own collection?"
+                                ]
                             ]
                         ]
 
