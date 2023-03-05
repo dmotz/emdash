@@ -45,6 +45,9 @@ $maxColWidth: 900px
     margin-bottom: 5rem
     border-bottom: 1px solid $mid2
 
+    *
+      user-select: none
+
     .bookShelf
       position: absolute
       top: 0
@@ -119,14 +122,33 @@ $maxColWidth: 900px
       margin-bottom: 2rem
       padding: 2rem 4rem
       border: 3px double $fg
+      user-select: none
 
       em
         font-style: normal
         border-bottom: 3px solid $fg
         transition: border-bottom-color .3s
 
-      &:hover em
-        border-bottom-color: $accent
+      &::after
+        width: calc(100% + 4px)
+        height: calc(100% + 4px)
+        top: 2px
+        left: 2px
+
+      &:hover
+        transform: translateX(-2px) translateY(-2px)
+
+        em
+          border-bottom-color: $accent
+
+        &::after
+          transform: translateZ(-1px) translateX(2px) translateY(2px)
+
+      &:active
+        transform: translateX(3px) translateY(3px)
+
+        &::after
+          transform: translateZ(-1px) translateX(-3px) translateY(-3px)
 
     aside
       text-align: center
