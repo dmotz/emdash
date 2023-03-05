@@ -15,8 +15,10 @@ const messageToPort = {
   processNewExcerpts: 'receiveExcerptEmbeddings',
   computeExcerptEmbeddings: 'receiveExcerptEmbeddings',
   computeBookEmbeddings: 'receiveBookEmbeddings',
+  computeAuthorEmbeddings: 'receiveAuthorEmbeddings',
   requestExcerptNeighbors: 'receiveExcerptNeighbors',
   requestBookNeighbors: 'receiveBookNeighbors',
+  requestAuthorNeighbors: 'receiveAuthorNeighbors',
   requestSemanticRank: 'receiveSemanticRank',
   semanticSearch: 'receiveSemanticSearch',
   setDemoEmbeddings: 'receiveExcerptEmbeddings'
@@ -122,6 +124,10 @@ let zipWorker
     worker.port.postMessage({method: 'computeBookEmbeddings', targets})
   )
 
+  app.ports.requestAuthorEmbeddings.subscribe(targets =>
+    worker.port.postMessage({method: 'computeAuthorEmbeddings', targets})
+  )
+
   app.ports.deleteEmbedding.subscribe(([target, bookId]) => {
     worker.port.postMessage({method: 'deleteEmbedding', target})
     worker.port.postMessage({method: 'requestBookNeighbors', target: bookId})
@@ -129,6 +135,10 @@ let zipWorker
 
   app.ports.requestExcerptNeighbors.subscribe(([target]) =>
     worker.port.postMessage({method: 'requestExcerptNeighbors', target})
+  )
+
+  app.ports.requestAuthorNeighbors.subscribe(target =>
+    worker.port.postMessage({method: 'requestAuthorNeighbors', target})
   )
 
   app.ports.requestBookNeighbors.subscribe(target =>
