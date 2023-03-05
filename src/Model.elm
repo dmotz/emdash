@@ -143,6 +143,7 @@ type alias Model =
     , semanticThreshold : Float
     , neighborMap : NeighborMap
     , bookNeighborMap : NeighborMap
+    , authorNeighborMap : NeighborMap
     , semanticRankMap : NeighborMap
     , hiddenExcerpts : Set Id
     , completedEmbeddings : Set Id

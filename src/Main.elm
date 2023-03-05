@@ -208,6 +208,7 @@ createModel version mStoredModel demoMode url key ( mailingListUrl, mailingListF
     , semanticThreshold = 0.1
     , neighborMap = Dict.empty
     , bookNeighborMap = Dict.empty
+    , authorNeighborMap = Dict.empty
     , semanticRankMap = Dict.empty
     , hiddenExcerpts = Set.fromList restored.hiddenExcerpts
     , completedEmbeddings = Set.empty
