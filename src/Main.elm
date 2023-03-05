@@ -861,6 +861,43 @@ update message model =
                 SearchPage query _ _ _ _ ->
                     requestSemanticSearch ( query, model.semanticThreshold )
 
+                AuthorPage _ _ ->
+                    model.excerpts
+                        |> values
+                        |> foldl
+                            (\excerpt acc ->
+                                foldl
+                                    (\author acc2 ->
+                                        insert
+                                            author
+                                            (excerpt.id
+                                                :: withDefault []
+                                                    (get author acc2)
+                                            )
+                                            acc2
+                                    )
+                                    acc
+                                    (withDefault
+                                        []
+                                        (get excerpt.bookId model.books
+                                            |> Maybe.map .authors
+                                        )
+                                    )
+                            )
+                            Dict.empty
+                        |> Dict.toList
+                        |> requestAuthorEmbeddings
+
+                _ ->
+                    none
+            )
+
+        ReceiveAuthorEmbeddings _ ->
+            ( model
+            , case model.page of
+                AuthorPage author _ ->
+                    requestAuthorNeighbors author
+
                 _ ->
                     none
             )
