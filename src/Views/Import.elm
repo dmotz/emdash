@@ -26,7 +26,7 @@ import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick, preventDefaultOn)
 import Json.Decode as Decode exposing (Decoder)
 import Msg exposing (Msg(..))
-import Utils exposing (null)
+import Utils exposing (appName, null)
 
 
 importView : Bool -> Bool -> Html Msg
@@ -132,7 +132,10 @@ importView emptyOrDemo isDragging =
                             [ text "json" ]
                         ]
                     , p []
-                        [ text "Restore your collection and all settings via a previously exported Marginalia "
+                        [ text <|
+                            "Restore your collection and all settings via a previously exported "
+                                ++ appName
+                                ++ " "
                         , span [ class "smallCaps" ] [ text "json" ]
                         , text " file. This will replace all existing state."
                         ]
