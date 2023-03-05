@@ -178,6 +178,9 @@ const methods = {
   requestBookNeighbors: async ({target}, cb) =>
     cb([target, bookEmbMap[target] ? await findBookNeighbors(target) : []]),
 
+  requestAuthorNeighbors: async ({target}, cb) =>
+    cb([target, authorEmbMap[target] ? await findAuthorNeighbors(target) : []]),
+
   requestSemanticRank: async ({bookId, excerptIds}, cb) =>
     cb([
       bookId,
