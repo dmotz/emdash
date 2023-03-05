@@ -952,6 +952,17 @@ update message model =
             else
                 noOp
 
+        ReceiveAuthorNeighbors ( targetAuthor, idScores ) ->
+            ( { model
+                | authorNeighborMap =
+                    insert
+                        targetAuthor
+                        idScores
+                        model.authorNeighborMap
+              }
+            , none
+            )
+
         ReceiveSemanticSearch ( _, idScores ) ->
             case model.page of
                 SearchPage query mode books excerpts _ ->
