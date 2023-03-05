@@ -9,7 +9,7 @@ import Msg exposing (Msg)
 import Regex
 import Router exposing (excerptToRoute)
 import String exposing (join, split)
-import Utils exposing (null, rx_)
+import Utils exposing (appName, null, rx_)
 import Views.Citation exposing (citation)
 
 
@@ -66,4 +66,4 @@ addHighlighting str query =
 
 sigil : String
 sigil =
-    "__marginalia_splitter__"
+    "__" ++ appName ++ "_splitter__"
