@@ -3,6 +3,12 @@ $centerGutter: 14rem
 $bookGap: 1rem
 $maxColWidth: 900px
 
+:root
+  --center-gutter: 14rem
+
+  @include mobile
+    --center-gutter: #{$bookGap}
+
 .landing
   margin: 0 auto
   padding: 8rem 0
@@ -11,10 +17,13 @@ $maxColWidth: 900px
   *
     user-select: text
 
+  main
+    position: relative
+
   .monogram
     width: 20rem
     margin: 0 auto
-    transform: translateX(-8%)
+    transform: translateX(-3%)
     margin-top: -12rem
     margin-bottom: -5rem
     position: relative
@@ -22,6 +31,7 @@ $maxColWidth: 900px
     display: block
 
   section, hr
+    width: 100%
     max-width: $maxColWidth
     padding: 0 4rem
     margin: 0 auto
@@ -51,14 +61,14 @@ $maxColWidth: 900px
     .bookShelf
       position: absolute
       top: 0
-      left: calc(50% - $centerGutter)
+      left: calc(50% - var(--center-gutter))
       display: flex
       justify-content: flex-end
       transform-origin: 0 0
       transform: scale(.7) translateX(-100%)
 
       &:last-child
-        left: calc(50% + $centerGutter)
+        left: calc(50% + var(--center-gutter))
         transform: scale(.7)
 
     .bookCol
@@ -90,35 +100,49 @@ $maxColWidth: 900px
     padding: 0
     padding-bottom: 8rem
     position: relative
-    overflow: hidden
+
+    > div
+      position: relative
+      display: flex
+      justify-content: center
+      margin-top: 8rem
+      margin-bottom: 2rem
 
     h1
       font-weight: normal
-      font-size: clamp(3rem, 4vw, 4rem)
+      font-size: clamp(2.6rem, 4vw, 4rem)
       margin: 0 auto
+      margin-bottom: 3rem
       padding: 0 6rem
-      margin-bottom: 2rem
       line-height: 1.8
       text-align: center
+
+      @include mobile
+        padding: 0
 
     img
       pointer-events: none
       position: absolute
-      width: clamp(2rem, 20vw, 200px)
+      width: clamp(12rem, 20vw, 200px)
       user-select: none
 
     .botanical1
-      left: 23%
-      top: 40%
+      transform: translateX(-17rem) translateY(-3rem)
+      z-index: -1
+
+      @include mobile
+        transform: translateX(-14rem) translateY(-2rem)
 
     .botanical2
       bottom: 0
-      right: 4%
-      transform: translateY(35%)
+      right: 0
+      object-position: 0 10rem
+
+      @include mobile
+        object-position: 0 7rem
 
     button
       font-size: 3rem
-      margin-top: 12rem
       margin-bottom: 2rem
       padding: 2rem 4rem
       border: 3px double $fg
@@ -188,6 +212,10 @@ $maxColWidth: 900px
       grid-gap: 14rem
       row-gap: 8rem
 
+      @include mobile
+        grid-template-columns: 1fr
+        row-gap: 5rem
+
     li
       text-align: center
       position: relative
@@ -195,6 +223,9 @@ $maxColWidth: 900px
     figcaption
       font-style: italic
       margin-bottom: 2rem
+
+      @include mobile
+        margin-bottom: 1rem
 
     img
       width: 30%
@@ -204,11 +235,17 @@ $maxColWidth: 900px
       font-size: 2.3rem
       line-height: 1.7
 
+      @include mobile
+        padding: 0 0.5rem
+
   h3
     font-size: 3rem
     line-height: 1.4
     margin-bottom: 3rem
     text-align: center
+
+    @include mobile
+      margin-bottom: 1.5rem
 
     span
       font-style: italic
@@ -237,31 +274,40 @@ $maxColWidth: 900px
 
       &:invalid, &:placeholder-shown
         + button
-          opacity: .6
           pointer-events: none
 
   footer
     margin-top: 8rem
 
   .monk
-    border: 1px double $mid2
-    outline: 1px solid $mid2
-    outline-offset: 4px
-    box-shadow: 0 0 0 4px $bg
-    max-width: 500px !important
-    padding: 6rem 4rem !important
-    text-align: center
-    margin-top: 20rem
+    display: flex
+    justify-content: center
     position: relative
-    z-index: 9
-    margin-bottom: 8rem !important
-    background: $bg
+    margin-top: 12rem
+    margin-bottom: 8rem
+
+    @include mobile
+      padding: 0
+      margin-top: 10rem
+
+    > div
+      border: 1px double $mid2
+      outline: 1px solid $mid2
+      outline-offset: 4px
+      box-shadow: 0 0 0 4px $bg
+      max-width: 500px
+      padding: 6rem 4rem
+      text-align: center
+      position: relative
+      z-index: 9
+      background: $bg
 
     ul
       font-size: 2rem
 
       li
-        line-height: 2
+        line-height: 1.6
+        margin-bottom: 1.4rem
 
         &::before
           content: '• '
@@ -273,9 +319,12 @@ $maxColWidth: 900px
     position: absolute
     max-width: 20rem
     left: 50%
-    transform: translateX(-30.5rem) translateY(3.8rem)
+    transform: translateX(-28rem) translateY(-87%)
     pointer-events: none
     user-select: none
+
+    @include mobile
+      left: 55%
 
 @keyframes scrollUp
   from
