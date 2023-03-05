@@ -295,8 +295,10 @@ main =
                 Sub.batch
                     [ receiveExcerptNeighbors ReceiveNeighbors
                     , receiveBookNeighbors ReceiveBookNeighbors
+                    , receiveAuthorNeighbors ReceiveAuthorNeighbors
                     , receiveExcerptEmbeddings ReceiveEmbeddings
                     , receiveBookEmbeddings ReceiveBookEmbeddings
+                    , receiveAuthorEmbeddings ReceiveAuthorEmbeddings
                     , receiveUnicodeNormalized ReceiveUnicodeNormalized
                     , receiveSemanticSearch ReceiveSemanticSearch
                     , receiveSemanticRank ReceiveSemanticRank
