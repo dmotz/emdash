@@ -94,26 +94,40 @@ button
   padding: 0.5rem 1rem
   border: 1px solid $fg
   background: $bg
-  box-shadow: 2px 2px 0 0 $fg
   position: relative
-  top: 0
-  left: 0
-  transition: all .15s
   color: $fg
+  transition: transform .1s ease-out
+  will-change: transform
+  text-decoration: 3px underline transparent
+  transform-style: preserve-3d
+  white-space: nowrap
+
+  &::after
+    content: ''
+    position: absolute
+    will-change: transform
+    transition: transform .1s ease-out
+    background: $fg
+    width: calc(100% + 2px)
+    height: calc(100% + 2px)
+    top: 1px
+    left: 1px
+    transform: translateZ(-1px)
 
   &:hover
-    top: -1px
-    left: -1px
-    box-shadow: 3px 3px 0 0 $fg
+    transform: translateX(-1px) translateY(-1px)
+
+    &::after
+      transform: translateZ(-1px) translateX(1px) translateY(1px)
 
   &:active
-    box-shadow: 0 0 0 0 $fg
-    top: 2px
-    left: 2px
+    transform: translateX(2px) translateY(2px)
+
+    &::after
+      transform: translateZ(-1px) translateX(-2px) translateY(-2px)
 
   &:disabled
     border-color: $mid3
-    box-shadow: 2px 2px 0 0 $mid3
     color: $mid3
     pointer-events: none
 
