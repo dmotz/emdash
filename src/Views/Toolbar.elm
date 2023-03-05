@@ -20,18 +20,6 @@ toolbar =
                 []
             , div [ class "hint left" ] [ text "Settings &c." ]
             ]
-        , button
-            [ onClick ShowRandom ]
-            [ img
-                [ class "icon"
-                , src "/images/icons/random.svg"
-                , alt "Random excerpt"
-                ]
-                []
-            , div
-                [ class "hint left" ]
-                [ text "Discover a random excerpt" ]
-            ]
         , a
             [ href "/import" ]
             [ img
@@ -55,6 +43,18 @@ toolbar =
             , div
                 [ class "hint left" ]
                 [ text "Create a new excerpt" ]
+            ]
+        , button
+            [ onClick ShowRandom ]
+            [ img
+                [ class "icon"
+                , src "/images/icons/random.svg"
+                , alt "Random excerpt"
+                ]
+                []
+            , div
+                [ class "hint left" ]
+                [ text "Discover a random excerpt" ]
             ]
         , button
             [ onClick ScrollToTop ]
