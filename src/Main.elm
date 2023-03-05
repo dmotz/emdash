@@ -1187,7 +1187,14 @@ update message model =
                                             |> values
                                         )
                               }
-                            , scrollTop
+                            , batch
+                                [ if model.embeddingsReady then
+                                    requestAuthorNeighbors author
+
+                                  else
+                                    none
+                                , scrollTop
+                                ]
                             )
 
                         _ ->
