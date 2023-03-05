@@ -7,7 +7,8 @@ import File exposing (File)
 import Http
 import Model
     exposing
-        ( Book
+        ( Author
+        , Book
         , BookMap
         , BookSort
         , Excerpt
@@ -61,8 +62,10 @@ type Msg
     | RequestEmbeddings
     | ReceiveEmbeddings (List Id)
     | ReceiveBookEmbeddings ()
+    | ReceiveAuthorEmbeddings ()
     | ReceiveNeighbors ( Id, ScorePairs )
     | ReceiveBookNeighbors ( Id, ScorePairs )
+    | ReceiveAuthorNeighbors ( Author, ScorePairs )
     | ReceiveSemanticSearch ( String, ScorePairs )
     | ReceiveSemanticRank ( Id, ScorePairs )
     | SetSemanticThreshold String
