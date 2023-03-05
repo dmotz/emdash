@@ -33,7 +33,8 @@ import List
 import Maybe exposing (andThen, withDefault)
 import Model
     exposing
-        ( Book
+        ( Author
+        , Book
         , BookSort(..)
         , ExcerptSort(..)
         , Id
@@ -102,19 +103,31 @@ port requestBookEmbeddings : List ( Id, List Id ) -> Cmd msg
 port receiveBookEmbeddings : (() -> msg) -> Sub msg
 
 
+port requestAuthorEmbeddings : List ( Id, List Id ) -> Cmd msg
+
+
+port receiveAuthorEmbeddings : (() -> msg) -> Sub msg
+
+
 port deleteEmbedding : ( Id, Id ) -> Cmd msg
 
 
 port requestExcerptNeighbors : ( Id, Bool ) -> Cmd msg
 
 
-port requestBookNeighbors : Id -> Cmd msg
-
-
 port receiveExcerptNeighbors : (( Id, ScorePairs ) -> msg) -> Sub msg
 
 
+port requestBookNeighbors : Id -> Cmd msg
+
+
 port receiveBookNeighbors : (( Id, ScorePairs ) -> msg) -> Sub msg
+
+
+port requestAuthorNeighbors : Author -> Cmd msg
+
+
+port receiveAuthorNeighbors : (( Author, ScorePairs ) -> msg) -> Sub msg
 
 
 port requestSemanticRank : ( Id, List Id ) -> Cmd msg
