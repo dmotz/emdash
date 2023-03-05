@@ -977,9 +977,9 @@ update message model =
                                     (\( id, _ ) ->
                                         not <|
                                             foldl
-                                                (\ent acc ->
+                                                (\excerpt acc ->
                                                     acc
-                                                        || ent.id
+                                                        || excerpt.id
                                                         == id
                                                 )
                                                 False
