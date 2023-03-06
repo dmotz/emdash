@@ -90,7 +90,7 @@ let zipWorker
 
   app.ports.exportJson.subscribe(state =>
     downloadFile(
-      `marginalia_backup_${new Date().toLocaleDateString()}.json`,
+      `${dbNs}_backup_${new Date().toLocaleDateString()}.json`,
       new Blob([JSON.stringify(state)], {type: 'text/plain'})
     )
   )
