@@ -1,7 +1,7 @@
 module Views.Toolbar exposing (toolbar)
 
 import Html exposing (Html, a, button, div, img, text)
-import Html.Attributes exposing (alt, class, href, src)
+import Html.Attributes exposing (alt, class, draggable, href, src)
 import Html.Events exposing (onClick)
 import Msg exposing (Msg(..))
 
@@ -16,6 +16,7 @@ toolbar =
                 [ class "icon"
                 , src "/images/icons/settings.svg"
                 , alt "Settings et cetera"
+                , draggable "false"
                 ]
                 []
             , div [ class "hint left" ] [ text "Settings &c." ]
@@ -26,6 +27,7 @@ toolbar =
                 [ class "icon"
                 , src "/images/icons/import.svg"
                 , alt "Import & export excerpts"
+                , draggable "false"
                 ]
                 []
             , div
@@ -38,6 +40,7 @@ toolbar =
                 [ class "icon"
                 , src "/images/icons/create.svg"
                 , alt "Create a new excerpt"
+                , draggable "false"
                 ]
                 []
             , div
@@ -50,6 +53,7 @@ toolbar =
                 [ class "icon"
                 , src "/images/icons/random.svg"
                 , alt "Random excerpt"
+                , draggable "false"
                 ]
                 []
             , div
@@ -62,6 +66,7 @@ toolbar =
                 [ class "icon"
                 , src "/images/icons/scroll-top.svg"
                 , alt "Create excerpt"
+                , draggable "false"
                 ]
                 []
             , div
