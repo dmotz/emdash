@@ -16,6 +16,7 @@ module Utils exposing
     , null
     , ratingEl
     , removeItem
+    , repoUrl
     , rx
     , rx_
     , slugify
@@ -68,6 +69,11 @@ import String exposing (fromInt, join, split, toLower, trim)
 appName : String
 appName =
     "Marginalia"
+
+
+repoUrl : String
+repoUrl =
+    "https://github.com/dmotz/marginalia"
 
 
 untaggedKey : String
