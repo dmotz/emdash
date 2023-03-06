@@ -42,7 +42,7 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import List exposing (drop, length, map, range, reverse, take)
 import Model exposing (Book)
 import Msg exposing (Msg(..))
-import Utils exposing (appName)
+import Utils exposing (appName, repoUrl)
 import Views.BookList exposing (bookView)
 
 
@@ -214,7 +214,7 @@ landingView bookList didSubmitEmail =
                         , p []
                             [ text "Fully private AI analysis and fully "
                             , a
-                                [ href "https://github.com/dmotz/marginalia"
+                                [ href repoUrl
                                 , target "_blank"
                                 ]
                                 [ text "open source" ]

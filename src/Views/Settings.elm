@@ -39,9 +39,11 @@ settingsView entryCount bookCount authorCount tagCount =
                         , ( "tag", tagCount )
                         ]
                     )
+                , h2 [] [ text "Version" ]
+                , p [] [ pre [] [ text version ] ]
                 , h2 [] [ text "Colophon" ]
                 , p [ class "colophon" ]
-                    [ text "Marginalia is an open-source tool created by "
+                    [ text <| appName ++ " is an open-source tool created by "
                     , a [ href "https://oxism.com" ] [ text "Dan Motzenbecker" ]
                     , text "."
                     ]

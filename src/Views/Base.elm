@@ -42,7 +42,7 @@ import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
 import Set
 import String exposing (join)
-import Utils exposing (appName, formatNumber, null, untaggedKey)
+import Utils exposing (appName, formatNumber, null, repoUrl, untaggedKey)
 import Views.AuthorInfo exposing (authorInfo)
 import Views.BookInfo exposing (bookInfo)
 import Views.BookList exposing (bookList)
@@ -299,12 +299,12 @@ view model =
                       else
                         a [ href "/settings" ] [ text "Settings" ]
                     , a
-                        [ href "https://github.com/dmotz/marginalia/issues/new"
+                        [ href <| repoUrl ++ "/issues/new"
                         , target "_blank"
                         ]
                         [ text "Report a bug" ]
                     , a
-                        [ href "https://github.com/dmotz/marginalia"
+                        [ href repoUrl
                         , target "_blank"
                         ]
                         [ text "Source code" ]
