@@ -292,7 +292,7 @@ update message model =
                             fetchDemoEmbeddings (keys model_.excerpts)
 
                           else
-                            none
+                            model_ |> modelToStoredModel |> setStorage
                         ]
                     )
 
