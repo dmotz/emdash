@@ -1028,6 +1028,7 @@ update message model =
                             ( { model_
                                 | page = TitlePage book excerpts
                                 , excerptSort = ExcerptPageSort
+                                , searchQuery = ""
                               }
                             , batch
                                 ((case mFragment of
@@ -1080,7 +1081,10 @@ update message model =
                     in
                     case ( mExcerpt, mBook ) of
                         ( Just excerpt, Just book ) ->
-                            ( { model_ | page = ExcerptPage excerpt book }
+                            ( { model_
+                                | page = ExcerptPage excerpt book
+                                , searchQuery = ""
+                              }
                             , batch
                                 [ scrollTop
                                 , if model.embeddingsReady then
@@ -1109,6 +1113,7 @@ update message model =
                                                 (\_ b -> member author b.authors)
                                             |> values
                                         )
+                                , searchQuery = ""
                               }
                             , batch
                                 [ if model.embeddingsReady then
@@ -1168,6 +1173,13 @@ update message model =
                             ( { model_
                                 | searchDebounce = debounce
                                 , searchQuery = text
+                                , page =
+                                    case model.page of
+                                        SearchPage _ _ _ _ _ ->
+                                            model.page
+
+                                        _ ->
+                                            SearchPage text TextMatches [] [] []
                               }
                             , cmd
                             )
@@ -1345,11 +1357,24 @@ update message model =
 
         OnSearchStart query ->
             if String.isEmpty query then
-                ( { model | searchQuery = "" }, Nav.replaceUrl model.key "/" )
+                ( { model | searchQuery = "" }, Nav.back model.key 1 )
 
             else
-                ( { model | searchQuery = query }
-                , Nav.replaceUrl model.key (searchToRoute query)
+                ( { model
+                    | searchQuery = query
+                    , page =
+                        case model.page of
+                            SearchPage _ _ _ _ _ ->
+                                model.page
+
+                            _ ->
+                                SearchPage query TextMatches [] [] []
+                  }
+                , if String.isEmpty model.searchQuery then
+                    Nav.pushUrl model.key (searchToRoute query)
+
+                  else
+                    Nav.replaceUrl model.key (searchToRoute query)
                 )
 
         OnSearchEnd val ->
@@ -1366,6 +1391,16 @@ update message model =
                             ( Nothing, Nothing )
             in
             if String.isEmpty query then
+                noOp
+
+            else if
+                case model.page of
+                    SearchPage _ _ _ _ _ ->
+                        False
+
+                    _ ->
+                        True
+            then
                 noOp
 
             else
