@@ -105,7 +105,8 @@ view model =
                     null
                 , main_
                     []
-                    [ let
+                    [ searchInput model.searchQuery
+                    , let
                         completedCount =
                             Set.size model.completedEmbeddings
 
@@ -132,8 +133,7 @@ view model =
                         MainPage books mTag ->
                             div
                                 [ class "fullWidth" ]
-                                [ searchInput model.searchQuery
-                                , tagHeader
+                                [ tagHeader
                                     (mTag /= Nothing || model.showTagHeader)
                                     model.books
                                     model.tagSort
@@ -152,8 +152,7 @@ view model =
                         SearchPage query mode books excerpts semanticMatches ->
                             div
                                 [ class "searchPage fullWidth" ]
-                                [ searchInput model.searchQuery
-                                , searchResults
+                                [ searchResults
                                     mode
                                     model.books
                                     model.excerpts
