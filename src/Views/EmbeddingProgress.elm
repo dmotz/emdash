@@ -11,7 +11,7 @@ embeddingProgress : Int -> Int -> Html Msg
 embeddingProgress done total =
     div
         [ class "embeddingProgress" ]
-        [ p [] [ text "Analyzing excerpts…" ]
+        [ p [] [ text "Analyzing new excerpts…" ]
         , div
             []
             [ progress
