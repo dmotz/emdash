@@ -214,14 +214,14 @@ main =
                 , body = [ view m ]
                 }
         , subscriptions =
-            \_ ->
+            always <|
                 Sub.batch
                     [ receiveExcerptNeighbors ReceiveNeighbors
                     , receiveBookNeighbors ReceiveBookNeighbors
                     , receiveAuthorNeighbors ReceiveAuthorNeighbors
                     , receiveExcerptEmbeddings ReceiveEmbeddings
-                    , receiveBookEmbeddings ReceiveBookEmbeddings
-                    , receiveAuthorEmbeddings ReceiveAuthorEmbeddings
+                    , receiveBookEmbeddings (always ReceiveBookEmbeddings)
+                    , receiveAuthorEmbeddings (always ReceiveAuthorEmbeddings)
                     , receiveUnicodeNormalized ReceiveUnicodeNormalized
                     , receiveSemanticSearch ReceiveSemanticSearch
                     , receiveSemanticRank ReceiveSemanticRank
@@ -760,7 +760,7 @@ update message model =
                         union model.completedEmbeddings (Set.fromList ids)
                 }
 
-        ReceiveBookEmbeddings _ ->
+        ReceiveBookEmbeddings ->
             ( { model | embeddingsReady = True }
             , case model.page of
                 TitlePage book _ ->
@@ -815,7 +815,7 @@ update message model =
                     none
             )
 
-        ReceiveAuthorEmbeddings _ ->
+        ReceiveAuthorEmbeddings ->
             ( model
             , case model.page of
                 AuthorPage author _ ->

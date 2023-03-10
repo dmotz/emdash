@@ -61,8 +61,8 @@ type Msg
     | ExportEpub Posix
     | RequestEmbeddings
     | ReceiveEmbeddings (List Id)
-    | ReceiveBookEmbeddings ()
-    | ReceiveAuthorEmbeddings ()
+    | ReceiveBookEmbeddings
+    | ReceiveAuthorEmbeddings
     | ReceiveNeighbors ( Id, ScorePairs )
     | ReceiveBookNeighbors ( Id, ScorePairs )
     | ReceiveAuthorNeighbors ( Author, ScorePairs )
