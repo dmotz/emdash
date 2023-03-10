@@ -1656,12 +1656,9 @@ update message model =
                                 Http.stringBody
                                     "application/x-www-form-urlencoded"
                                     (model.mailingListField ++ "=" ++ model.mailingListEmail)
-                            , expect = Http.expectWhatever DidSubmitEmail
+                            , expect = Http.expectWhatever (always NoOp)
                             }
                         )
 
                     _ ->
                         noOp
-
-        DidSubmitEmail _ ->
-            noOp
