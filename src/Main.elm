@@ -1050,11 +1050,19 @@ update message model =
                                                 scrollTop
                                  )
                                     :: (if model.embeddingsReady then
-                                            [ requestBookNeighbors book.id
-                                            , requestSemanticRank
-                                                ( book.id
-                                                , map .id excerpts
-                                                )
+                                            [ if not (Dict.member book.id model.bookNeighborMap) then
+                                                requestBookNeighbors book.id
+
+                                              else
+                                                none
+                                            , if not (Dict.member book.id model.semanticRankMap) then
+                                                requestSemanticRank
+                                                    ( book.id
+                                                    , map .id excerpts
+                                                    )
+
+                                              else
+                                                none
                                             ]
 
                                         else
@@ -1087,7 +1095,10 @@ update message model =
                               }
                             , batch
                                 [ scrollTop
-                                , if model.embeddingsReady then
+                                , if
+                                    model.embeddingsReady
+                                        && not (Dict.member excerpt.id model.neighborMap)
+                                  then
                                     requestExcerptNeighbors ( excerpt.id, True )
 
                                   else
@@ -1116,7 +1127,10 @@ update message model =
                                 , searchQuery = ""
                               }
                             , batch
-                                [ if model.embeddingsReady then
+                                [ if
+                                    model.embeddingsReady
+                                        && not (Dict.member author model.authorNeighborMap)
+                                  then
                                     requestAuthorNeighbors author
 
                                   else
@@ -1342,7 +1356,7 @@ update message model =
                 ( { m
                     | idToShowDetails = insert id newState model.idToShowDetails
                   }
-                , if newState && get id model.neighborMap == Nothing then
+                , if newState && not (Dict.member id model.neighborMap) then
                     requestExcerptNeighbors ( id, True )
 
                   else
