@@ -22,6 +22,7 @@ import Html.Attributes
     exposing
         ( class
         , classList
+        , draggable
         , href
         , id
         , placeholder
@@ -75,6 +76,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                     ]
                     [ img
                         [ class "icon"
+                        , draggable "false"
                         , src <|
                             "/images/icons/favorite"
                                 ++ (if excerpt.isFavorite then
@@ -111,6 +113,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                         ]
                         [ img
                             [ class "icon"
+                            , draggable "false"
                             , src <|
                                 "/images/icons/bookmark"
                                     ++ (if isMarked then
