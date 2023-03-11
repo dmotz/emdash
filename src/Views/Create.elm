@@ -8,6 +8,7 @@ import Html
         , button
         , datalist
         , div
+        , em
         , form
         , h1
         , input
@@ -108,46 +109,57 @@ createView pendingExcerpt titles authors =
                     [ id listId ]
                     (map (\t -> option [ value t ] []) authors)
                 ]
-            , label
-                []
-                [ input
-                    [ type_ "number"
-                    , H.min "0"
-                    , value <|
-                        case pendingExcerpt.page of
-                            Just page ->
-                                if page > -1 then
-                                    String.fromInt page
+            , div []
+                [ label
+                    []
+                    [ input
+                        [ type_ "number"
+                        , H.min "0"
+                        , value <|
+                            case pendingExcerpt.page of
+                                Just page ->
+                                    if page > -1 then
+                                        String.fromInt page
 
-                                else
+                                    else
+                                        ""
+
+                                _ ->
                                     ""
-
-                            _ ->
-                                ""
-                    , onInput
-                        (\s ->
-                            UpdatePendingExcerpt
-                                { pendingExcerpt
-                                    | page = String.toInt s
-                                }
-                        )
+                        , onInput
+                            (\s ->
+                                UpdatePendingExcerpt
+                                    { pendingExcerpt
+                                        | page = String.toInt s
+                                    }
+                            )
+                        ]
+                        []
+                    , div
+                        []
+                        [ text "Page № "
+                        , em [] [ text "optional" ]
+                        ]
                     ]
+                , label
                     []
-                , div
-                    []
-                    [ text "Page № "
-                    , span [] [ text "optional" ]
+                    [ input [ type_ "url", value pendingExcerpt.sourceUrl ] []
+                    , div
+                        []
+                        [ text "Source "
+                        , span [ class "smallCaps" ] [ text "url" ]
+                        , em [] [ text "optional" ]
+                        ]
                     ]
                 ]
             ]
         , button
             [ class "button"
-            , onClick (GetTime (CreateExcerpt pendingExcerpt))
-            , disabled
-                (isEmpty pendingExcerpt.text
+            , onClick <| GetTime (CreateExcerpt pendingExcerpt)
+            , disabled <|
+                isEmpty pendingExcerpt.text
                     || isEmpty pendingExcerpt.title
                     || isEmpty pendingExcerpt.author
-                )
             ]
             [ text "Create" ]
         ]
