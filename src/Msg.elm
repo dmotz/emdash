@@ -57,7 +57,7 @@ type Msg
     | ImportJson
     | ImportCsv
     | SyncState StoredModel
-    | ResetError
+    | ClearModal
     | ExportEpub Posix
     | RequestEmbeddings
     | ReceiveEmbeddings (List Id)
