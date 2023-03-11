@@ -31,7 +31,7 @@ type Msg
     = NoOp
     | RestoreState (Maybe StoredModel) Bool
     | MergeNewExcerpts ExcerptMap BookMap
-    | ParseJsonText String
+    | ParseJsonText Bool String
     | ParseCsvText String
     | ShowRandom
     | GotRandomIndex Int
