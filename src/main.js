@@ -13,6 +13,7 @@ const worker = new SharedWorker(new URL('./worker.js', import.meta.url), {
 const channel = new BroadcastChannel(dbNs)
 const messageToPort = {
   processNewExcerpts: 'receiveExcerptEmbeddings',
+  initWithClear: 'receiveExcerptEmbeddings',
   computeExcerptEmbeddings: 'receiveExcerptEmbeddings',
   computeBookEmbeddings: 'receiveBookEmbeddings',
   computeAuthorEmbeddings: 'receiveAuthorEmbeddings',
@@ -79,6 +80,14 @@ let zipWorker
   }
 
   channel.onmessage = ({data}) => app.ports.syncState.send(data)
+
+  app.ports.initWithClear.subscribe(state =>
+    worker.port.postMessage({
+      method: 'initWithClear',
+      books: state.books,
+      excerpts: state.excerpts
+    })
+  )
 
   app.ports.handleNewExcerpts.subscribe(state =>
     worker.port.postMessage({
