@@ -25,13 +25,14 @@ parse raw =
         decodeCsv
             NoFieldNames
             (into
-                (\title author text page date notes ->
+                (\title author text page date notes sourceUrl ->
                     { title = title
                     , author = author
                     , text = text
                     , page = page
                     , date = date
                     , notes = withDefault "" notes
+                    , sourceUrl = sourceUrl
                     }
                 )
                 |> pipeline (column 0 string)
@@ -40,6 +41,7 @@ parse raw =
                 |> pipeline (column 3 (blank int))
                 |> pipeline (column 4 (blank int))
                 |> pipeline (column 5 (blank string))
+                |> pipeline (column 6 (blank string))
             )
             raw
     of
@@ -56,6 +58,7 @@ parse raw =
                                     row.page
                                     row.date
                                     row.notes
+                                    row.sourceUrl
                         in
                         ( insert excerpt.id excerpt excerpts
                         , update
