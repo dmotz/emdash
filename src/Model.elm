@@ -112,6 +112,7 @@ type alias Excerpt =
     , page : Int
     , notes : String
     , isFavorite : Bool
+    , sourceUrl : Maybe String
     }
 
 
@@ -120,6 +121,7 @@ type alias PendingExcerpt =
     , author : Author
     , text : String
     , page : Maybe Int
+    , sourceUrl : String
     }
 
 
