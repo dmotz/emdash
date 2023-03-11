@@ -1297,7 +1297,7 @@ update message model =
                     ( { model_
                         | page =
                             CreatePage
-                                (PendingExcerpt "" "" "" Nothing)
+                                (PendingExcerpt "" "" "" Nothing "")
                                 (values model.books |> map .title |> sort)
                                 (values model.authorRouteMap)
                       }
@@ -1622,6 +1622,12 @@ update message model =
                         pendingExcerpt.page
                         (time |> posixToMillis |> Just)
                         ""
+                        (if pendingExcerpt.sourceUrl |> trim |> String.isEmpty then
+                            Nothing
+
+                         else
+                            pendingExcerpt.sourceUrl |> trim |> Just
+                        )
             in
             case get excerpt.id model.excerpts of
                 Just existingExcerpt ->
