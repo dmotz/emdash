@@ -7,6 +7,16 @@
   form
     margin-top: 4rem
 
+    > div
+      display: flex
+
+      label
+        flex: 1
+
+        + label
+          margin-left: 2rem
+          flex: 3
+
   form, label
     display: flex
     flex-direction: column
@@ -14,7 +24,7 @@
   label
     margin-bottom: 2rem
 
-    span
+    em
       color: $mid3
       font-style: italic
       margin-left: 0.6rem
