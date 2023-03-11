@@ -8,12 +8,12 @@ const model = load()
 const embSize = 512
 const neighborsK = 5
 const semanticSearchLimit = 203
-const bookEmbMap = {}
-const authorEmbMap = {}
 const embsInProgress = {}
 const embStore = createStore(`${dbNs}:${embKey}`, embKey)
 
 let excerptEmbMap = {}
+let bookEmbMap = {}
+let authorEmbMap = {}
 let titleMap = {}
 let excerptTensor
 let bookTensor
@@ -112,25 +112,27 @@ const findAuthorNeighbors = async authorId =>
     )
   ).filter(([auth]) => auth !== authorId)
 
-const methods = {
-  processNewExcerpts: async ({books, excerpts}, cb) => {
-    const bookIdToTitle = Object.fromEntries(
-      books.map(({id, title}) => [id, title])
+const processNewExcerpts = async ({books, excerpts}, cb) => {
+  const bookIdToTitle = Object.fromEntries(
+    books.map(({id, title}) => [id, title])
+  )
+
+  if (embStore && !Object.keys(excerptEmbMap).length) {
+    excerptEmbMap = Object.fromEntries(await entries(embStore))
+  }
+
+  titleMap = {
+    ...titleMap,
+    ...Object.fromEntries(
+      excerpts.map(({id, bookId}) => [id, bookIdToTitle[bookId]])
     )
+  }
 
-    if (embStore && !Object.keys(excerptEmbMap).length) {
-      excerptEmbMap = Object.fromEntries(await entries(embStore))
-    }
+  cb(Object.keys(excerptEmbMap))
+}
 
-    titleMap = {
-      ...titleMap,
-      ...Object.fromEntries(
-        excerpts.map(({id, bookId}) => [id, bookIdToTitle[bookId]])
-      )
-    }
-
-    cb(Object.keys(excerptEmbMap))
-  },
+const methods = {
+  processNewExcerpts,
 
   computeExcerptEmbeddings: ({targets}, cb) => {
     const [has, needed] = targets.reduce(
@@ -223,6 +225,17 @@ const methods = {
     )
 
     cb(ids)
+  },
+
+  initWithClear: (state, cb) => {
+    excerptEmbMap = {}
+    bookEmbMap = {}
+    authorEmbMap = {}
+    titleMap = {}
+    excerptTensor?.dispose()
+    bookTensor?.dispose()
+    authorTensor?.dispose()
+    processNewExcerpts(state, cb)
   }
 }
 
