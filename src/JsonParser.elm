@@ -11,6 +11,7 @@ import Json.Decode
         , int
         , list
         , map2
+        , nullable
         , string
         , succeed
         )
@@ -42,6 +43,7 @@ excerptDecoder =
         |> optional "page" int -1
         |> optional "notes" string ""
         |> optional "isFavorite" bool False
+        |> required "sourceUrl" (nullable string)
 
 
 bookDecoder : Decoder Book
