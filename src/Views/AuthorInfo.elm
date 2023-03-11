@@ -44,10 +44,7 @@ authorInfo author books neighborMap =
                             ids
 
                     _ ->
-                        [ li
-                            [ class "wait" ]
-                            [ text "…" ]
-                        ]
+                        [ li [ class "wait" ] [ text "…" ] ]
                 )
             ]
         ]

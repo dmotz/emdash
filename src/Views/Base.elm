@@ -310,18 +310,29 @@ view model =
                     ]
                 , div [ class "fleuron" ] [ text "❦" ]
                 ]
-            :: (case model.parsingError of
-                    Just msg ->
+            :: (case model.modalMessage of
+                    Just ( msg, isErr ) ->
                         [ div
                             [ class "modal" ]
                             [ div
-                                [ class "errorBox" ]
-                                [ p [] [ text "An error occurred parsing the file:" ]
-                                , div [] [ code [] [ text msg ] ]
-                                , button
-                                    [ class "button", onClick ResetError ]
-                                    [ text "Dismiss" ]
-                                ]
+                                [ class "modalBox" ]
+                                (if isErr then
+                                    [ p
+                                        []
+                                        [ text "An error occurred parsing the file:" ]
+                                    , div [] [ code [] [ text msg ] ]
+                                    , button
+                                        [ class "button", onClick ClearModal ]
+                                        [ text "Dismiss" ]
+                                    ]
+
+                                 else
+                                    [ p [] [ text msg ]
+                                    , button
+                                        [ class "button", onClick ClearModal ]
+                                        [ text "OK" ]
+                                    ]
+                                )
                             ]
                         ]
 
