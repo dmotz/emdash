@@ -389,8 +389,16 @@ getExcerptId text bookId page =
     hashId (text ++ bookId ++ String.fromInt page)
 
 
-makeExcerpt : String -> String -> String -> Maybe Int -> Maybe Int -> String -> ( Excerpt, Book )
-makeExcerpt titleRaw authorRaw excerptText mPage mDate notes =
+makeExcerpt :
+    String
+    -> String
+    -> String
+    -> Maybe Int
+    -> Maybe Int
+    -> String
+    -> Maybe String
+    -> ( Excerpt, Book )
+makeExcerpt titleRaw authorRaw excerptText mPage mDate notes mUrl =
     let
         title =
             replaceApostrophes titleRaw
@@ -417,6 +425,7 @@ makeExcerpt titleRaw authorRaw excerptText mPage mDate notes =
       , page = page
       , notes = notes
       , isFavorite = False
+      , sourceUrl = mUrl
       }
     , { id = bookId
       , title = title
