@@ -1031,15 +1031,17 @@ update message model =
 
                 scrollTop =
                     perform (always NoOp) (setViewport 0 0)
+
+                showLanding =
+                    Dict.isEmpty model.books
+
+                rootRedirect =
+                    ( model_, Nav.pushUrl model.key "/" )
             in
             case
                 parse routeParser url
             of
                 Just RootRoute ->
-                    let
-                        showLanding =
-                            Dict.isEmpty model.books
-                    in
                     ( { model_
                         | page =
                             if showLanding then
@@ -1137,11 +1139,15 @@ update message model =
                             )
 
                         _ ->
-                            ( { model_
-                                | page = NotFoundPage "Title not found."
-                              }
-                            , none
-                            )
+                            if showLanding then
+                                rootRedirect
+
+                            else
+                                ( { model_
+                                    | page = NotFoundPage "Title not found."
+                                  }
+                                , none
+                                )
 
                 Just (ExcerptRoute titleSlug excerptSlug) ->
                     let
@@ -1172,11 +1178,15 @@ update message model =
                             )
 
                         _ ->
-                            ( { model_
-                                | page = NotFoundPage "Excerpt not found."
-                              }
-                            , none
-                            )
+                            if showLanding then
+                                rootRedirect
+
+                            else
+                                ( { model_
+                                    | page = NotFoundPage "Excerpt not found."
+                                  }
+                                , none
+                                )
 
                 Just (AuthorRoute slug) ->
                     case get slug model.authorRouteMap of
@@ -1205,11 +1215,15 @@ update message model =
                             )
 
                         _ ->
-                            ( { model_
-                                | page = NotFoundPage "Author not found."
-                              }
-                            , none
-                            )
+                            if showLanding then
+                                rootRedirect
+
+                            else
+                                ( { model_
+                                    | page = NotFoundPage "Author not found."
+                                  }
+                                , none
+                                )
 
                 Just (TagRoute tag) ->
                     if tag == untaggedKey || member tag model.tags then
@@ -1231,6 +1245,9 @@ update message model =
                           }
                         , scrollTop
                         )
+
+                    else if showLanding then
+                        rootRedirect
 
                     else
                         ( { model_
@@ -1264,7 +1281,11 @@ update message model =
                             )
 
                         _ ->
-                            ( { model_ | searchQuery = "" }, none )
+                            if showLanding then
+                                rootRedirect
+
+                            else
+                                ( { model_ | searchQuery = "" }, none )
 
                 Just SettingsRoute ->
                     ( { model_ | page = SettingsPage }, scrollTop )
