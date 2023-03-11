@@ -157,7 +157,7 @@ type alias Model =
     , pendingTag : Maybe Tag
     , isDragging : Bool
     , reverseSort : Bool
-    , parsingError : Maybe String
+    , modalMessage : Maybe ( String, Bool )
     , url : Url
     , key : Nav.Key
     , bookSort : BookSort
