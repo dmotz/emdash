@@ -1,5 +1,6 @@
 module Utils exposing
     ( appName
+    , countLabel
     , dedupe
     , excerptCountLabel
     , findMatches
