@@ -208,7 +208,14 @@ makeDicts =
                         [ titleRaw, authorRaw ] ->
                             let
                                 ( excerpt, book ) =
-                                    makeExcerpt titleRaw authorRaw text page dateRaw notes
+                                    makeExcerpt
+                                        titleRaw
+                                        authorRaw
+                                        text
+                                        page
+                                        dateRaw
+                                        notes
+                                        Nothing
                             in
                             ( insert excerpt.id excerpt excerpts
                             , update
