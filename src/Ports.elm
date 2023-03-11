@@ -76,3 +76,6 @@ port fetchDemoEmbeddings : List Id -> Cmd msg
 
 
 port syncState : (StoredModel -> msg) -> Sub msg
+
+
+port initWithClear : StoredModel -> Cmd msg
