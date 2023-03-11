@@ -1356,7 +1356,11 @@ update message model =
                 ( { m
                     | idToShowDetails = insert id newState model.idToShowDetails
                   }
-                , if newState && not (Dict.member id model.neighborMap) then
+                , if
+                    newState
+                        && not (Dict.member id model.neighborMap)
+                        && model.embeddingsReady
+                  then
                     requestExcerptNeighbors ( id, True )
 
                   else
