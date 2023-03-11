@@ -14,6 +14,9 @@ $maxColWidth: 900px
   padding: 8rem 0
   padding-top: 0
 
+  @include mobile
+    padding-bottom: 0
+
   *
     user-select: text
 
@@ -43,6 +46,9 @@ $maxColWidth: 900px
     font-size: 4rem
     margin-bottom: 1.8rem
     text-align: center
+
+    @include mobile
+      font-size: 3rem
 
   .anim
     pointer-events: none
@@ -174,6 +180,9 @@ $maxColWidth: 900px
         &::after
           transform: translateZ(-1px) translateX(-3px) translateY(-3px)
 
+      @include mobile
+        font-size: 2.6rem
+
     aside
       text-align: center
 
@@ -202,6 +211,10 @@ $maxColWidth: 900px
 
     h2
       margin-bottom: 6rem
+
+      @include mobile
+        font-size: 3rem
+        margin-bottom: 4rem
 
     h2, h4
       text-align: center
@@ -237,6 +250,7 @@ $maxColWidth: 900px
 
       @include mobile
         padding: 0 0.5rem
+        font-size: 2rem
 
   h3
     font-size: 3rem
@@ -246,6 +260,7 @@ $maxColWidth: 900px
 
     @include mobile
       margin-bottom: 1.5rem
+      font-size: 2.6rem
 
     span
       font-style: italic
@@ -267,6 +282,10 @@ $maxColWidth: 900px
       justify-content: center
       align-items: flex-end
 
+      @include mobile
+        flex-direction: column
+        align-items: center
+
     input
       margin-top: 2rem
       margin-right: 1rem
@@ -276,6 +295,11 @@ $maxColWidth: 900px
       &:invalid, &:placeholder-shown
         + button
           pointer-events: none
+
+      @include mobile
+        text-align: center
+        width: 80%
+        margin-bottom: 2rem
 
   footer
     margin-top: 8rem
@@ -290,6 +314,7 @@ $maxColWidth: 900px
     @include mobile
       padding: 0
       margin-top: 10rem
+      margin-bottom: 3rem
 
     > div
       border: 1px double $mid2
@@ -303,15 +328,23 @@ $maxColWidth: 900px
       z-index: 9
       background: $bg
 
+      @include mobile
+        padding: 3rem 2rem
+
     ul
       font-size: 2rem
 
       li
         line-height: 1.6
-        margin-bottom: 1.4rem
+
+        + li
+          margin-top: 1.4rem
 
         &::before
           content: '• '
+
+      @include mobile
+        font-size: 1.8rem
 
     aside
       margin-bottom: 1rem
