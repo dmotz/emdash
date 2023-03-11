@@ -60,7 +60,9 @@ import Url.Parser exposing (parse)
 import Utils
     exposing
         ( appName
+        , countLabel
         , dedupe
+        , excerptCountLabel
         , findMatches
         , getAuthorRouteMap
         , getTagCounts
@@ -145,7 +147,7 @@ createModel version mStoredModel demoMode url key ( mailingListUrl, mailingListF
     , pendingTag = Nothing
     , isDragging = False
     , reverseSort = True
-    , parsingError = Nothing
+    , modalMessage = Nothing
     , url = url
     , key = key
     , bookSort = RecencySort
@@ -287,7 +289,7 @@ update message model =
             update (UrlChanged model.url) model_
                 |> addCmd
                     (batch
-                        [ model_ |> modelToStoredModel |> handleNewExcerpts
+                        [ model_ |> modelToStoredModel |> initWithClear
                         , if demoMode then
                             fetchDemoEmbeddings (keys model_.excerpts)
 
@@ -296,15 +298,38 @@ update message model =
                         ]
                     )
 
-        ParseJsonText text ->
+        ParseJsonText forceDemoExit text ->
+            let
+                demoMode =
+                    if forceDemoExit then
+                        False
+
+                    else
+                        model.demoMode
+            in
             case decodeStoredModel text of
                 Ok storedModel ->
                     update
-                        (RestoreState (Just storedModel) model.demoMode)
-                        model
+                        (RestoreState (Just storedModel) demoMode)
+                        { model
+                            | modalMessage =
+                                Just
+                                    ( "Restored "
+                                        ++ (storedModel.excerpts
+                                                |> length
+                                                |> excerptCountLabel
+                                           )
+                                        ++ "."
+                                    , False
+                                    )
+                            , demoMode = demoMode
+                            , completedEmbeddings = Set.empty
+                        }
 
                 Err e ->
-                    ( { model | parsingError = Just (Decode.errorToString e) }
+                    ( { model
+                        | modalMessage = Just ( Decode.errorToString e, True )
+                      }
                     , none
                     )
 
@@ -315,7 +340,7 @@ update message model =
                         |> addCmd (Nav.pushUrl model.key "/")
 
                 Err err ->
-                    ( { model | parsingError = Just err }, none )
+                    ( { model | modalMessage = Just ( err, True ) }, none )
 
         SyncState sModel ->
             ( { model
@@ -352,7 +377,7 @@ update message model =
                         Just ParseCsvText
 
                     else if mime == mimeJson then
-                        Just ParseJsonText
+                        Just <| ParseJsonText True
 
                     else
                         Nothing
@@ -363,8 +388,8 @@ update message model =
 
                 _ ->
                     ( { model
-                        | parsingError =
-                            Just <| "Unsupported file type (" ++ mime ++ ")"
+                        | modalMessage =
+                            Just ( "Unsupported file type (" ++ mime ++ ")", True )
                       }
                     , none
                     )
@@ -381,7 +406,11 @@ update message model =
                     KindleParser.parse text
             in
             if Dict.isEmpty excerpts then
-                ( { model | parsingError = Just "Failed to parse file." }, none )
+                ( { model
+                    | modalMessage = Just ( "Failed to parse text.", True )
+                  }
+                , none
+                )
 
             else
                 update (MergeNewExcerpts excerpts books) model
@@ -392,7 +421,11 @@ update message model =
                     \id _ -> not <| Set.member id model.hiddenExcerpts
 
                 unseenExcerpts =
-                    Dict.diff newExcerpts model.excerpts |> Dict.filter hiddenPred
+                    if model.demoMode then
+                        newExcerpts
+
+                    else
+                        Dict.diff newExcerpts model.excerpts |> Dict.filter hiddenPred
 
                 bookVals =
                     unseenExcerpts
@@ -413,33 +446,65 @@ update message model =
                                     )
                                     acc
                             )
-                            (Dict.union model.books newBooks)
+                            (if model.demoMode then
+                                newBooks
+
+                             else
+                                Dict.union model.books newBooks
+                            )
                         |> values
 
                 ( titleRouteMap, booksWithSlugs ) =
                     getTitleRouteMap bookVals
             in
-            ( { model
-                | parsingError = Nothing
-                , excerpts =
-                    Dict.union model.excerpts newExcerpts
-                        |> Dict.filter hiddenPred
-                , books = toDict booksWithSlugs
-                , titleRouteMap = titleRouteMap
-                , authorRouteMap =
-                    getAuthorRouteMap bookVals
-                , embeddingsReady = False
-                , neighborMap = Dict.empty
-              }
-            , none
-            )
-                |> Update.andThen update (SortBooks model.bookSort)
-                |> Update.andThen update (UrlChanged model.url)
-                |> addCmd (model |> modelToStoredModel |> handleNewExcerpts)
-                |> store
+            store
+                ( { model
+                    | demoMode = False
+                    , modalMessage =
+                        let
+                            n =
+                                Dict.size unseenExcerpts
+                        in
+                        Just
+                            ( countLabel "new excerpt" n
+                                ++ " imported."
+                            , False
+                            )
+                    , excerpts =
+                        if model.demoMode then
+                            newExcerpts
 
-        ResetError ->
-            ( { model | parsingError = Nothing }, none )
+                        else
+                            Dict.union model.excerpts newExcerpts
+                                |> Dict.filter hiddenPred
+                    , books = toDict booksWithSlugs
+                    , titleRouteMap = titleRouteMap
+                    , authorRouteMap =
+                        getAuthorRouteMap bookVals
+                    , embeddingsReady = False
+                    , neighborMap = Dict.empty
+                    , completedEmbeddings =
+                        if model.demoMode then
+                            Set.empty
+
+                        else
+                            model.completedEmbeddings
+                  }
+                , batch
+                    [ model
+                        |> modelToStoredModel
+                        |> (if model.demoMode then
+                                initWithClear
+
+                            else
+                                handleNewExcerpts
+                           )
+                    , Nav.pushUrl model.key "/"
+                    ]
+                )
+
+        ClearModal ->
+            ( { model | modalMessage = Nothing }, none )
 
         ShowRandom ->
             ( model
@@ -706,7 +771,7 @@ update message model =
 
         ImportJson ->
             ( model
-            , Select.file [ mimeJson ] (GotFile ParseJsonText)
+            , Select.file [ mimeJson ] (GotFile (ParseJsonText True))
             )
 
         ImportCsv ->
@@ -942,7 +1007,7 @@ update message model =
         SetSemanticThreshold s ->
             case String.toFloat s of
                 Just n ->
-                    ( { model | semanticThreshold = n }, none )
+                    store ( { model | semanticThreshold = n }, none )
 
                 _ ->
                     noOp
@@ -1489,7 +1554,7 @@ update message model =
         GotDemoData result ->
             case result of
                 Ok text ->
-                    update (ParseJsonText text) model
+                    update (ParseJsonText False text) model
 
                 Err _ ->
                     noOp
