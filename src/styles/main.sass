@@ -507,12 +507,12 @@ footer
   inset: 0
   z-index: 9999
 
-  .errorBox
+  .modalBox
     @include dropShadow
     font-size: 1.8rem
-    max-width: 60rem
-    border: 4px double $mid2
+    border: 1px solid $mid2
     padding: 4rem
+    max-width: 80vw
     background: $bg
     max-height: 80vh
     display: flex
@@ -527,4 +527,5 @@ footer
         user-select: text
 
     button
+      margin-top: 3rem
       align-self: center
