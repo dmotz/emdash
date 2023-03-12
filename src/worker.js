@@ -1,6 +1,6 @@
 import * as tf from '@tensorflow/tfjs'
 import {load} from '@tensorflow-models/universal-sentence-encoder'
-import {createStore, del, entries, setMany} from 'idb-keyval'
+import {createStore, del, delMany, entries, keys, setMany} from 'idb-keyval'
 
 const dbNs = 'marginalia'
 const embKey = 'embeddings'
@@ -34,10 +34,10 @@ const computeEmbeddings = async pairs => {
   ])
 }
 
-const getTopK = async (tensor, keys, targetEmb, limit, dropFirst) => {
+const getTopK = async (tensor, ids, targetEmb, limit, dropFirst) => {
   const {values, indices} = tf.topk(
     tf.metrics.cosineProximity(targetEmb, tensor).neg(),
-    Math.min(limit + +!!dropFirst, keys.length),
+    Math.min(limit + +!!dropFirst, ids.length),
     true
   )
 
@@ -45,7 +45,7 @@ const getTopK = async (tensor, keys, targetEmb, limit, dropFirst) => {
     await Promise.all([values.array(), indices.array()])
   ).map(dropFirst ? xs => xs.slice(1) : xs => xs)
 
-  return inds.map((n, i) => [keys[n], scores[i]])
+  return inds.map((n, i) => [ids[n], scores[i]])
 }
 
 const semanticSearch = async (query, threshold) => {
@@ -236,6 +236,17 @@ const methods = {
     bookTensor?.dispose()
     authorTensor?.dispose()
     processNewExcerpts(state, cb)
+
+    if (embStore) {
+      keys(embStore).then(ids => {
+        const toKeep = state.excerpts.map(({id}) => id)
+
+        delMany(
+          ids.filter(k => !toKeep.includes(k)),
+          embStore
+        )
+      })
+    }
   }
 }
 
