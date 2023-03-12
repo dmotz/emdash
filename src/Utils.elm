@@ -7,6 +7,7 @@ module Utils exposing
     , formatNumber
     , formatScore
     , getAuthorRouteMap
+    , getAuthors
     , getExcerptDomId
     , getTagCounts
     , getTitleRouteMap
@@ -438,3 +439,31 @@ makeExcerpt titleRaw authorRaw excerptText mPage mDate notes mUrl =
       , favCount = 0
       }
     )
+
+
+getAuthors : Model -> List ( Id, List Id )
+getAuthors model =
+    model.excerpts
+        |> values
+        |> foldl
+            (\excerpt acc ->
+                foldl
+                    (\author acc2 ->
+                        insert
+                            author
+                            (excerpt.id
+                                :: withDefault []
+                                    (get author acc2)
+                            )
+                            acc2
+                    )
+                    acc
+                    (withDefault
+                        []
+                        (get excerpt.bookId model.books
+                            |> Maybe.map .authors
+                        )
+                    )
+            )
+            Dict.empty
+        |> Dict.toList
