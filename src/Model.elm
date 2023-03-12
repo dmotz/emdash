@@ -150,6 +150,7 @@ type alias Model =
     , hiddenExcerpts : Set Id
     , completedEmbeddings : Set Id
     , embeddingsReady : Bool
+    , authorEmbeddingsReady : Bool
     , titleRouteMap : Dict String Id
     , authorRouteMap : Dict String Author
     , tags : List Tag
