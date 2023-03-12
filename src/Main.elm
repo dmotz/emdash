@@ -65,6 +65,7 @@ import Utils
         , excerptCountLabel
         , findMatches
         , getAuthorRouteMap
+        , getAuthors
         , getTagCounts
         , getTitleRouteMap
         , insertOnce
@@ -138,6 +139,7 @@ createModel version mStoredModel demoMode url key ( mailingListUrl, mailingListF
     , hiddenExcerpts = Set.fromList restored.hiddenExcerpts
     , completedEmbeddings = Set.empty
     , embeddingsReady = False
+    , authorEmbeddingsReady = False
     , tags = restored.books |> concatMap .tags |> dedupe
     , tagCounts = getTagCounts books
     , tagSort = TagAlphaSort
@@ -850,38 +852,14 @@ update message model =
                     requestSemanticSearch ( query, model.semanticThreshold )
 
                 AuthorPage _ _ ->
-                    model.excerpts
-                        |> values
-                        |> foldl
-                            (\excerpt acc ->
-                                foldl
-                                    (\author acc2 ->
-                                        insert
-                                            author
-                                            (excerpt.id
-                                                :: withDefault []
-                                                    (get author acc2)
-                                            )
-                                            acc2
-                                    )
-                                    acc
-                                    (withDefault
-                                        []
-                                        (get excerpt.bookId model.books
-                                            |> Maybe.map .authors
-                                        )
-                                    )
-                            )
-                            Dict.empty
-                        |> Dict.toList
-                        |> requestAuthorEmbeddings
+                    model |> getAuthors |> requestAuthorEmbeddings
 
                 _ ->
                     none
             )
 
         ReceiveAuthorEmbeddings ->
-            ( model
+            ( { model | authorEmbeddingsReady = True }
             , case model.page of
                 AuthorPage author _ ->
                     requestAuthorNeighbors author
@@ -1202,11 +1180,15 @@ update message model =
                                 , searchQuery = ""
                               }
                             , batch
-                                [ if
-                                    model.embeddingsReady
-                                        && not (Dict.member author model.authorNeighborMap)
-                                  then
-                                    requestAuthorNeighbors author
+                                [ if model.authorEmbeddingsReady then
+                                    if not <| Dict.member author model.authorNeighborMap then
+                                        requestAuthorNeighbors author
+
+                                    else
+                                        none
+
+                                  else if model.embeddingsReady then
+                                    model |> getAuthors |> requestAuthorEmbeddings
 
                                   else
                                     none
