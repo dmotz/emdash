@@ -253,6 +253,8 @@ const methods = {
 self.onconnect = e => {
   const [port] = e.ports
 
+  model.then(() => tf.setBackend('webgl'))
+
   port.onmessage = ({data: {method, ...payload}}) =>
     methods[method](payload, data => port.postMessage({method, data}))
 }
