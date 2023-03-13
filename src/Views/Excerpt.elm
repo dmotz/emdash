@@ -252,7 +252,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                                 []
                                 [ button
                                     [ class "button"
-                                    , onClick (HideExcerpt excerpt)
+                                    , onClick (DeleteExcerpt excerpt)
                                     ]
                                     [ text "× Delete"
                                     , div

@@ -41,7 +41,7 @@ type Msg
     | GotDroppedFile File
     | LoadKindleFile String
     | PickKindleFile
-    | HideExcerpt Excerpt
+    | DeleteExcerpt Excerpt
     | UpdateNotes Id String
     | SetBookmark Id Id
     | ToggleFavorite Id

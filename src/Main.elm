@@ -660,7 +660,7 @@ update message model =
         SetTagSort sort ->
             ( { model | tagSort = sort }, none )
 
-        HideExcerpt excerpt ->
+        DeleteExcerpt excerpt ->
             let
                 excerpts =
                     remove excerpt.id model.excerpts
