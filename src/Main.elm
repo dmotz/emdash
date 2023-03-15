@@ -314,22 +314,21 @@ update message model =
                         (RestoreState (Just storedModel) demoMode)
                         { model
                             | modalMessage =
-                                Just
-                                    ( "Restored "
-                                        ++ (storedModel.excerpts
-                                                |> length
-                                                |> excerptCountLabel
-                                           )
-                                        ++ "."
-                                    , False
-                                    )
+                                Just <|
+                                    InfoMsg <|
+                                        "Restored "
+                                            ++ (storedModel.excerpts
+                                                    |> length
+                                                    |> excerptCountLabel
+                                               )
+                                            ++ "."
                             , demoMode = demoMode
                             , completedEmbeddings = Set.empty
                         }
 
                 Err e ->
                     ( { model
-                        | modalMessage = Just ( Decode.errorToString e, True )
+                        | modalMessage = Just <| ErrMsg (Decode.errorToString e)
                       }
                     , none
                     )
@@ -341,7 +340,7 @@ update message model =
                         |> addCmd (Nav.pushUrl model.key "/")
 
                 Err err ->
-                    ( { model | modalMessage = Just ( err, True ) }, none )
+                    ( { model | modalMessage = Just <| ErrMsg err }, none )
 
         SyncState sModel ->
             ( { model
@@ -390,7 +389,11 @@ update message model =
                 _ ->
                     ( { model
                         | modalMessage =
-                            Just ( "Unsupported file type (" ++ mime ++ ")", True )
+                            Just <|
+                                ErrMsg <|
+                                    "Unsupported file type ("
+                                        ++ mime
+                                        ++ ")"
                       }
                     , none
                     )
@@ -408,7 +411,7 @@ update message model =
             in
             if Dict.isEmpty excerpts then
                 ( { model
-                    | modalMessage = Just ( "Failed to parse text.", True )
+                    | modalMessage = Just <| ErrMsg "Failed to parse text."
                   }
                 , none
                 )
@@ -466,11 +469,10 @@ update message model =
                             n =
                                 Dict.size unseenExcerpts
                         in
-                        Just
-                            ( countLabel "new excerpt" n
-                                ++ " imported."
-                            , False
-                            )
+                        Just <|
+                            InfoMsg <|
+                                countLabel "new excerpt" n
+                                    ++ " imported."
                     , excerpts =
                         if model.demoMode then
                             newExcerpts
