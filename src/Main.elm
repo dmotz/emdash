@@ -751,6 +751,11 @@ update message model =
                     ]
                 )
 
+        ShowConfirmation text action ->
+            ( { model | modalMessage = Just <| ConfirmationMsg text action }
+            , none
+            )
+
         Sort ->
             store ( { model | reverseSort = not model.reverseSort }, none )
 

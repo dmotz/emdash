@@ -59,6 +59,7 @@ type Msg
     | ImportCsv
     | SyncState StoredModel
     | ClearModal
+    | ShowConfirmation String Msg
     | ExportEpub Posix
     | RequestEmbeddings
     | ReceiveEmbeddings (List Id)
