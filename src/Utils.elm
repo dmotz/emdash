@@ -63,13 +63,9 @@ import Types
         , BookSort(..)
         , Excerpt
         , Id
-        , Model
         , StoredModel
         , Tag
         )
-import Regex exposing (Match, Regex, replace)
-import Set
-import String exposing (fromInt, join, split, toLower, trim)
 
 
 appName : String
