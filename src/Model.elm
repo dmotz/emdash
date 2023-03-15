@@ -46,7 +46,7 @@ type alias Model =
     , pendingTag : Maybe Tag
     , isDragging : Bool
     , reverseSort : Bool
-    , modalMessage : Maybe ( String, Bool )
+    , modalMessage : Maybe ModalMsg
     , url : Url
     , key : Nav.Key
     , bookSort : BookSort
@@ -70,3 +70,9 @@ initialStoredModel =
     , hiddenExcerpts = []
     , bookmarks = []
     }
+
+
+type ModalMsg
+    = InfoMsg String
+    | ErrMsg String
+    | ConfirmationMsg String Msg
