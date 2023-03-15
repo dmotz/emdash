@@ -42,6 +42,7 @@ type Msg
     | LoadKindleFile String
     | PickKindleFile
     | DeleteExcerpt Excerpt
+    | DeleteBook Book
     | UpdateNotes Id String
     | SetBookmark Id Id
     | ToggleFavorite Id
