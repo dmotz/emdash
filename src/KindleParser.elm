@@ -4,10 +4,10 @@ import DateTime exposing (fromRawParts, toPosix)
 import Dict exposing (insert, update)
 import List exposing (foldr, head, map)
 import Maybe exposing (andThen, withDefault)
-import Model exposing (BookMap, ExcerptMap)
 import Regex exposing (Regex)
 import String exposing (lines, repeat, right, split, startsWith, toInt, trim)
 import Time exposing (Month(..), posixToMillis)
+import Types exposing (BookMap, ExcerptMap)
 import Utils exposing (makeExcerpt, rx, rx_)
 
 

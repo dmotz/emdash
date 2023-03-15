@@ -4,11 +4,11 @@ import Dict exposing (get)
 import Html exposing (Html, a, blockquote, div, li, mark, text)
 import Html.Attributes exposing (class, href)
 import List exposing (indexedMap)
-import Model exposing (Book, BookMap, Excerpt)
 import Msg exposing (Msg)
 import Regex
 import Router exposing (excerptToRoute)
 import String exposing (join, split)
+import Types exposing (Book, BookMap, Excerpt)
 import Utils exposing (appName, null, rx_)
 import Views.Citation exposing (citation)
 

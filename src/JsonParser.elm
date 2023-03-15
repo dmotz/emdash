@@ -16,8 +16,8 @@ import Json.Decode
         , succeed
         )
 import Json.Decode.Pipeline exposing (optional, required)
-import Model exposing (Book, Excerpt, StoredModel)
 import Tuple exposing (pair)
+import Types exposing (Book, Excerpt, StoredModel)
 
 
 decodeStoredModel : String -> Result Error StoredModel

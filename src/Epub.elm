@@ -2,7 +2,6 @@ port module Epub exposing (export)
 
 import List exposing (concat, filter, indexedMap, map, sortBy)
 import MD5 exposing (hex)
-import Model exposing (Author, Book, BookSort(..), Excerpt, Title)
 import Regex exposing (Regex)
 import String exposing (fromInt, join, padLeft, replace, toLower)
 import Time
@@ -17,6 +16,7 @@ import Time
         , toYear
         , utc
         )
+import Types exposing (Author, Book, BookSort(..), Excerpt, Title)
 import Utils exposing (appName, rx, sortBooks)
 
 

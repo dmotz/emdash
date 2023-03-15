@@ -51,7 +51,11 @@ import List
         )
 import MD5 exposing (bytes)
 import Maybe exposing (withDefault)
-import Model
+import Model exposing (Model)
+import Regex exposing (Match, Regex, replace)
+import Set
+import String exposing (fromInt, join, split, toLower, trim)
+import Types
     exposing
         ( Author
         , Book

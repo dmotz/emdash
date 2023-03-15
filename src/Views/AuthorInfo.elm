@@ -4,9 +4,9 @@ import Dict exposing (get)
 import Html exposing (Html, a, div, h1, h2, h5, li, text, ul)
 import Html.Attributes exposing (class, href)
 import List exposing (foldl, length, map)
-import Model exposing (Book, NeighborMap)
 import Msg exposing (Msg)
 import Router exposing (authorToRoute)
+import Types exposing (Book, NeighborMap)
 import Utils exposing (excerptCountLabel, titleCountLabel)
 
 

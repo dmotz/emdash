@@ -6,7 +6,8 @@ import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
 import Html.Keyed as Keyed
 import List exposing (filterMap, isEmpty, length, map, take)
-import Model
+import Msg exposing (Msg(..))
+import Types
     exposing
         ( Book
         , BookMap
@@ -16,7 +17,6 @@ import Model
         , ScorePairs
         , SearchMode(..)
         )
-import Msg exposing (Msg(..))
 import Utils exposing (juxt, null)
 import Views.BookList exposing (bookList)
 import Views.Snippet exposing (snippetView)

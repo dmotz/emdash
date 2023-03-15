@@ -27,21 +27,21 @@ import Html.Events exposing (onClick)
 import Html.Keyed as Keyed
 import List exposing (filter, isEmpty, length, map, reverse, sortBy)
 import Maybe exposing (withDefault)
-import Model
+import Model exposing (ModalMsg(..), Model)
+import Msg exposing (Msg(..))
+import Router exposing (tagToRoute)
+import Set
+import String exposing (join)
+import Types
     exposing
         ( BookMap
         , BookSort(..)
         , ExcerptSort(..)
         , ExcerptTab(..)
-        , Model
         , Page(..)
         , Tag
         , TagSort(..)
         )
-import Msg exposing (Msg(..))
-import Router exposing (tagToRoute)
-import Set
-import String exposing (join)
 import Utils exposing (appName, formatNumber, null, repoUrl, untaggedKey)
 import Views.AuthorInfo exposing (authorInfo)
 import Views.BookInfo exposing (bookInfo)

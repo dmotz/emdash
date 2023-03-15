@@ -5,10 +5,10 @@ import Html.Attributes exposing (class, href)
 import Html.Events exposing (stopPropagationOn)
 import Json.Decode exposing (succeed)
 import List exposing (intersperse, map)
-import Model exposing (Book, Excerpt)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
 import String exposing (fromInt)
+import Types exposing (Book, Excerpt)
 import Utils exposing (formatScore, getExcerptDomId)
 
 

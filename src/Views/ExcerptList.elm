@@ -6,8 +6,8 @@ import Html.Attributes exposing (class)
 import Html.Keyed as Keyed
 import List exposing (indexedMap)
 import Maybe exposing (withDefault)
-import Model exposing (BookMap, Excerpt, ExcerptMap, ExcerptTab(..), Id, NeighborMap)
 import Msg exposing (Msg)
+import Types exposing (BookMap, Excerpt, ExcerptMap, ExcerptTab(..), Id, NeighborMap)
 import Views.Excerpt exposing (excerptView)
 
 

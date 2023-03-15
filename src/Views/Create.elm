@@ -32,9 +32,9 @@ import Html.Attributes as H
         )
 import Html.Events exposing (onBlur, onClick, onInput)
 import List exposing (map)
-import Model exposing (Author, PendingExcerpt, Title)
 import Msg exposing (Msg(..))
 import String exposing (isEmpty)
+import Types exposing (Author, PendingExcerpt, Title)
 
 
 createView : PendingExcerpt -> List Title -> List Author -> Html Msg

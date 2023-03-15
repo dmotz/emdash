@@ -31,19 +31,7 @@ import List
         , take
         )
 import Maybe exposing (andThen, withDefault)
-import Model
-    exposing
-        ( Book
-        , BookSort(..)
-        , ExcerptSort(..)
-        , Model
-        , Page(..)
-        , PendingExcerpt
-        , SearchMode(..)
-        , StoredModel
-        , TagSort(..)
-        , initialStoredModel
-        )
+import Model exposing (ModalMsg(..), Model, initialStoredModel)
 import Msg exposing (Msg(..))
 import Platform.Cmd exposing (batch, none)
 import Ports exposing (..)
@@ -54,6 +42,17 @@ import Set exposing (diff, toList, union)
 import String exposing (fromInt, join, toLower, trim)
 import Task exposing (attempt, perform)
 import Time exposing (posixToMillis)
+import Types
+    exposing
+        ( Book
+        , BookSort(..)
+        , ExcerptSort(..)
+        , Page(..)
+        , PendingExcerpt
+        , SearchMode(..)
+        , StoredModel
+        , TagSort(..)
+        )
 import Update.Extra as Update exposing (addCmd)
 import Url exposing (Url)
 import Url.Parser exposing (parse)

@@ -5,7 +5,8 @@ import Browser.Dom exposing (Element, Error)
 import Debounce
 import File exposing (File)
 import Http
-import Model
+import Time exposing (Posix)
+import Types
     exposing
         ( Author
         , Book
@@ -23,7 +24,6 @@ import Model
         , Tag
         , TagSort
         )
-import Time exposing (Posix)
 import Url exposing (Url)
 
 

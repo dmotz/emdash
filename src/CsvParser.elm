@@ -15,7 +15,7 @@ import Csv.Decode
 import Dict exposing (insert, update)
 import List exposing (foldr)
 import Maybe exposing (withDefault)
-import Model exposing (BookMap, ExcerptMap)
+import Types exposing (BookMap, ExcerptMap)
 import Utils exposing (makeExcerpt)
 
 

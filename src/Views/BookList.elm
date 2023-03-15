@@ -4,10 +4,10 @@ import Html exposing (Html, a, div, img, li, span, text)
 import Html.Attributes exposing (class, href, src)
 import Html.Keyed as Keyed
 import List exposing (map)
-import Model exposing (Book, BookSort(..))
 import Msg exposing (Msg)
 import Router exposing (titleSlugToRoute)
 import String exposing (fromInt, join)
+import Types exposing (Book, BookSort(..))
 import Utils exposing (null, ratingEl, sortBooks)
 
 

@@ -29,9 +29,9 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput, onSubmit)
 import List exposing (filter, length, map, member)
-import Model exposing (Tag)
 import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
+import Types exposing (Tag)
 import Utils exposing (null)
 
 

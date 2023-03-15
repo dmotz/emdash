@@ -40,8 +40,8 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput, onSubmit)
 import List exposing (drop, length, map, range, reverse, take)
-import Model exposing (Book)
 import Msg exposing (Msg(..))
+import Types exposing (Book)
 import Utils exposing (appName, repoUrl)
 import Views.BookList exposing (bookView)
 

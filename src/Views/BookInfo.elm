@@ -31,9 +31,9 @@ import Html.Attributes as H
 import Html.Events exposing (onClick, onInput)
 import List exposing (intersperse, map, repeat)
 import Maybe exposing (withDefault)
-import Model exposing (Book, BookMap, ExcerptSort(..), Id, NeighborMap, Tag)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
+import Types exposing (Book, BookMap, ExcerptSort(..), Id, NeighborMap, Tag)
 import Utils exposing (excerptCountLabel, formatScore, getExcerptDomId, null, ratingEl)
 import Views.TagSection exposing (tagSection)
 

@@ -1,6 +1,6 @@
 port module Ports exposing (..)
 
-import Model exposing (Author, Id, ScorePairs, StoredModel)
+import Types exposing (Author, Id, ScorePairs, StoredModel)
 
 
 port setStorage : StoredModel -> Cmd msg
