@@ -727,9 +727,8 @@ update message model =
                     , tagCounts = getTagCounts books
                     , completedEmbeddings =
                         Set.remove excerpt.id model.completedEmbeddings
+                    , neighborMap = Dict.empty
                     , bookNeighborMap = Dict.empty
-
-                    -- , neighborMap = Dict.empty
                   }
                 , batch
                     [ deleteEmbedding ( excerpt.id, excerpt.bookId )
@@ -751,6 +750,43 @@ update message model =
                         _ ->
                             none
                     ]
+                )
+
+        DeleteBook book ->
+            let
+                exIds =
+                    model.excerpts
+                        |> Dict.filter (\_ { bookId } -> bookId == book.id)
+                        |> values
+                        |> map .id
+                        |> Set.fromList
+
+                tagCounts =
+                    foldl
+                        (\tag acc ->
+                            Dict.update
+                                tag
+                                (Maybe.map ((+) -1))
+                                acc
+                        )
+                        model.tagCounts
+                        book.tags
+            in
+            store
+                ( { model
+                    | modalMessage = Nothing
+                    , books = remove book.id model.books
+                    , bookNeighborMap = Dict.empty
+                    , neighborMap = Dict.empty
+                    , authorNeighborMap = Dict.empty
+                    , hiddenExcerpts = union model.hiddenExcerpts exIds
+                    , completedEmbeddings = diff model.completedEmbeddings exIds
+                    , titleRouteMap = remove book.slug model.titleRouteMap
+                    , tagCounts = tagCounts
+                    , tags = Dict.filter (\_ n -> n > 0) tagCounts |> keys
+                    , bookmarks = remove book.id model.bookmarks
+                  }
+                , Nav.pushUrl model.key "/"
                 )
 
         ShowConfirmation text action ->
