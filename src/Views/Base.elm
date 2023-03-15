@@ -311,27 +311,47 @@ view model =
                 , div [ class "fleuron" ] [ text "❦" ]
                 ]
             :: (case model.modalMessage of
-                    Just ( msg, isErr ) ->
+                    Just msgType ->
                         [ div
                             [ class "modal" ]
                             [ div
                                 [ class "modalBox" ]
-                                (if isErr then
-                                    [ p
-                                        []
-                                        [ text "An error occurred parsing the file:" ]
-                                    , div [] [ code [] [ text msg ] ]
-                                    , button
-                                        [ class "button", onClick ClearModal ]
-                                        [ text "Dismiss" ]
-                                    ]
+                                (case msgType of
+                                    ErrMsg msg ->
+                                        [ p
+                                            []
+                                            [ text "An error occurred parsing the file:" ]
+                                        , div
+                                            [ class "error" ]
+                                            [ code [] [ text msg ] ]
+                                        , button
+                                            [ class "button", onClick ClearModal ]
+                                            [ text "Dismiss" ]
+                                        ]
 
-                                 else
-                                    [ p [] [ text msg ]
-                                    , button
-                                        [ class "button", onClick ClearModal ]
-                                        [ text "OK" ]
-                                    ]
+                                    InfoMsg msg ->
+                                        [ p [] [ text msg ]
+                                        , button
+                                            [ class "button", onClick ClearModal ]
+                                            [ text "OK" ]
+                                        ]
+
+                                    ConfirmationMsg msg onConfirm ->
+                                        [ p [] [ text msg ]
+                                        , div
+                                            [ class "confirm" ]
+                                            [ button
+                                                [ class "button okButton"
+                                                , onClick onConfirm
+                                                ]
+                                                [ text "Yes, delete" ]
+                                            , button
+                                                [ class "button"
+                                                , onClick ClearModal
+                                                ]
+                                                [ text "No, cancel" ]
+                                            ]
+                                        ]
                                 )
                             ]
                         ]
