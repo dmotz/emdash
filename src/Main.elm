@@ -729,6 +729,7 @@ update message model =
                         Set.remove excerpt.id model.completedEmbeddings
                     , neighborMap = Dict.empty
                     , bookNeighborMap = Dict.empty
+                    , modalMessage = Nothing
                   }
                 , batch
                     [ deleteEmbedding ( excerpt.id, excerpt.bookId )
