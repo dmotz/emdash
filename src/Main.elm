@@ -1048,7 +1048,11 @@ update message model =
         UrlChanged url ->
             let
                 model_ =
-                    { model | url = url, pendingTag = Nothing }
+                    { model
+                        | url = url
+                        , pendingTag = Nothing
+                        , searchQuery = ""
+                    }
 
                 scrollTop =
                     perform (always NoOp) (setViewport 0 0)
@@ -1070,7 +1074,6 @@ update message model =
 
                             else
                                 MainPage (values model.books) Nothing
-                        , searchQuery = ""
                       }
                     , batch
                         [ scrollTop
@@ -1116,7 +1119,6 @@ update message model =
                             ( { model_
                                 | page = TitlePage book excerpts
                                 , excerptSort = ExcerptPageSort
-                                , searchQuery = ""
                               }
                             , batch
                                 ((case mFragment of
@@ -1181,10 +1183,7 @@ update message model =
                     in
                     case ( mExcerpt, mBook ) of
                         ( Just excerpt, Just book ) ->
-                            ( { model_
-                                | page = ExcerptPage excerpt book
-                                , searchQuery = ""
-                              }
+                            ( { model_ | page = ExcerptPage excerpt book }
                             , batch
                                 [ scrollTop
                                 , if
@@ -1220,7 +1219,6 @@ update message model =
                                                 (\_ b -> member author b.authors)
                                             |> values
                                         )
-                                , searchQuery = ""
                               }
                             , batch
                                 [ if model.authorEmbeddingsReady then
@@ -1266,7 +1264,6 @@ update message model =
                                         |> values
                                     )
                                     (Just tag)
-                            , searchQuery = ""
                           }
                         , scrollTop
                         )
@@ -1310,7 +1307,7 @@ update message model =
                                 rootRedirect
 
                             else
-                                ( { model_ | searchQuery = "" }, none )
+                                ( model_, none )
 
                 Just SettingsRoute ->
                     ( { model_ | page = SettingsPage }, scrollTop )
