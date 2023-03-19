@@ -131,10 +131,9 @@ const processNewExcerpts = async ({books, excerpts}, cb) => {
   cb(Object.keys(excerptEmbMap))
 }
 
-const computeBookEmbeddings = targets => {
+const updateCaches = () => {
   excerptTensor?.dispose()
   bookTensor?.dispose()
-  computeAverages(targets, bookEmbMap)
   excerptKeyList = Object.keys(excerptEmbMap)
   bookKeyList = Object.keys(bookEmbMap)
   excerptTensor = tf.tensor(Object.values(excerptEmbMap))
@@ -173,7 +172,8 @@ const methods = {
   },
 
   computeBookEmbeddings: ({targets}, cb) => {
-    computeBookEmbeddings(targets)
+    computeAverages(targets, bookEmbMap)
+    updateCaches()
     cb(null)
   },
 
@@ -210,7 +210,23 @@ const methods = {
       del(targetId, embStore)
     }
 
-    computeBookEmbeddings([[bookId, bookExcerptIds]])
+    computeAverages([[bookId, bookExcerptIds]], bookEmbMap)
+    updateCaches()
+  },
+
+  deleteBook: ({bookId, bookExcerptIds}) => {
+    delete bookEmbMap[bookId]
+
+    bookExcerptIds.forEach(id => {
+      delete excerptEmbMap[id]
+      delete titleMap[id]
+    })
+
+    if (embStore) {
+      delMany(bookExcerptIds, embStore)
+    }
+
+    updateCaches()
   },
 
   setDemoEmbeddings: async ({ids}, cb) => {
