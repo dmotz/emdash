@@ -70,10 +70,13 @@ const semanticSort = (bookId, exIds) =>
 const computeAverages = (targets, map) =>
   targets.forEach(([collId, ids]) => {
     if (ids.length) {
-      map[collId] = ids
-        .flatMap(id => excerptEmbMap[id] || [])
-        .reduce((a, c) => a.map((n, i) => n + c[i]))
-        .map(n => n / targets[0][1][0].length)
+      const embs = ids.flatMap(id => excerptEmbMap[id] || [])
+
+      if (embs.length) {
+        map[collId] = embs
+          .reduce((a, c) => a.map((n, i) => n + c[i]))
+          .map(n => n / targets[0][1][0].length)
+      }
     }
   })
 
