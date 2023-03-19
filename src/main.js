@@ -5,7 +5,7 @@ import './styles/main.sass'
 
 const dbNs = 'marginalia'
 const stateKey = 'state'
-const writeMs = 999
+const writeMs = 333
 const worker = new SharedWorker(new URL('./worker.js', import.meta.url), {
   name: 'marginalia',
   type: 'module'
