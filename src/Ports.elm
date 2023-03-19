@@ -33,7 +33,7 @@ port requestAuthorEmbeddings : List ( Id, List Id ) -> Cmd msg
 port receiveAuthorEmbeddings : (() -> msg) -> Sub msg
 
 
-port deleteEmbedding : ( Id, Id ) -> Cmd msg
+port deleteEmbedding : ( Id, ( Id, List Id ) ) -> Cmd msg
 
 
 port requestExcerptNeighbors : ( Id, Bool ) -> Cmd msg
