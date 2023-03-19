@@ -137,10 +137,18 @@ let zipWorker
     worker.port.postMessage({method: 'computeAuthorEmbeddings', targets})
   )
 
-  app.ports.deleteEmbedding.subscribe(([target, bookId]) => {
-    worker.port.postMessage({method: 'deleteEmbedding', target})
-    worker.port.postMessage({method: 'requestBookNeighbors', target: bookId})
-  })
+  app.ports.deleteEmbedding.subscribe(
+    ([targetId, [bookId, bookExcerptIds]]) => {
+      worker.port.postMessage({
+        method: 'deleteEmbedding',
+        targetId,
+        bookId,
+        bookExcerptIds
+      })
+
+      worker.port.postMessage({method: 'requestBookNeighbors', target: bookId})
+    }
+  )
 
   app.ports.requestExcerptNeighbors.subscribe(([target]) =>
     worker.port.postMessage({method: 'requestExcerptNeighbors', target})
