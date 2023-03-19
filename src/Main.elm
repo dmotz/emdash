@@ -663,7 +663,7 @@ update message model =
 
         DeleteExcerpt excerpt ->
             let
-                excerpts =
+                newExcerpts =
                     remove excerpt.id model.excerpts
 
                 ( books, bookmarks ) =
@@ -709,7 +709,7 @@ update message model =
             store
                 ( { model
                     | hiddenExcerpts = Set.insert excerpt.id model.hiddenExcerpts
-                    , excerpts = excerpts
+                    , excerpts = newExcerpts
                     , books = books
                     , bookmarks = bookmarks
                     , page =
