@@ -764,12 +764,13 @@ update message model =
 
         DeleteBook book ->
             let
+                newExcerpts =
+                    Dict.filter
+                        (\_ { bookId } -> bookId == book.id)
+                        model.excerpts
+
                 exIds =
-                    model.excerpts
-                        |> Dict.filter (\_ { bookId } -> bookId == book.id)
-                        |> values
-                        |> map .id
-                        |> Set.fromList
+                    newExcerpts |> values |> map .id |> Set.fromList
 
                 tagCounts =
                     foldl
@@ -785,6 +786,7 @@ update message model =
             store
                 ( { model
                     | modalMessage = Nothing
+                    , excerpts = newExcerpts
                     , books = remove book.id model.books
                     , bookNeighborMap = Dict.empty
                     , neighborMap = Dict.empty
