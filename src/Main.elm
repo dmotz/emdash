@@ -732,7 +732,16 @@ update message model =
                     , modalMessage = Nothing
                   }
                 , batch
-                    [ deleteEmbedding ( excerpt.id, excerpt.bookId )
+                    [ deleteEmbedding
+                        ( excerpt.id
+                        , ( excerpt.bookId
+                          , newExcerpts
+                                |> Dict.filter
+                                    (\_ { bookId } -> bookId == excerpt.bookId)
+                                |> values
+                                |> map .id
+                          )
+                        )
                     , case model.page of
                         ExcerptPage { id } _ ->
                             if id == excerpt.id then
