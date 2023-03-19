@@ -764,13 +764,12 @@ update message model =
 
         DeleteBook book ->
             let
-                newExcerpts =
-                    Dict.filter
-                        (\_ { bookId } -> bookId == book.id)
-                        model.excerpts
-
                 exIds =
-                    newExcerpts |> values |> map .id |> Set.fromList
+                    model.excerpts
+                        |> Dict.filter (\_ { bookId } -> bookId == book.id)
+                        |> values
+                        |> map .id
+                        |> Set.fromList
 
                 tagCounts =
                     foldl
@@ -786,7 +785,10 @@ update message model =
             store
                 ( { model
                     | modalMessage = Nothing
-                    , excerpts = newExcerpts
+                    , excerpts =
+                        Dict.filter
+                            (\_ { bookId } -> bookId /= book.id)
+                            model.excerpts
                     , books = remove book.id model.books
                     , bookNeighborMap = Dict.empty
                     , neighborMap = Dict.empty
@@ -798,7 +800,10 @@ update message model =
                     , tags = Dict.filter (\_ n -> n > 0) tagCounts |> keys
                     , bookmarks = remove book.id model.bookmarks
                   }
-                , Nav.pushUrl model.key "/"
+                , batch
+                    [ Nav.pushUrl model.key "/"
+                    , deleteBook ( book.id, toList exIds )
+                    ]
                 )
 
         ShowConfirmation text action ->
