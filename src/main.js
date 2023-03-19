@@ -150,6 +150,10 @@ let zipWorker
     }
   )
 
+  app.ports.deleteBook.subscribe(([bookId, bookExcerptIds]) =>
+    worker.port.postMessage({method: 'deleteBook', bookId, bookExcerptIds})
+  )
+
   app.ports.requestExcerptNeighbors.subscribe(([target]) =>
     worker.port.postMessage({method: 'requestExcerptNeighbors', target})
   )
