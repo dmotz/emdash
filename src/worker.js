@@ -131,6 +131,16 @@ const processNewExcerpts = async ({books, excerpts}, cb) => {
   cb(Object.keys(excerptEmbMap))
 }
 
+const computeBookEmbeddings = targets => {
+  excerptTensor?.dispose()
+  bookTensor?.dispose()
+  computeAverages(targets, bookEmbMap)
+  excerptKeyList = Object.keys(excerptEmbMap)
+  bookKeyList = Object.keys(bookEmbMap)
+  excerptTensor = tf.tensor(Object.values(excerptEmbMap))
+  bookTensor = tf.tensor(Object.values(bookEmbMap))
+}
+
 const methods = {
   processNewExcerpts,
 
@@ -163,13 +173,7 @@ const methods = {
   },
 
   computeBookEmbeddings: ({targets}, cb) => {
-    excerptTensor?.dispose()
-    bookTensor?.dispose()
-    computeAverages(targets, bookEmbMap)
-    excerptKeyList = Object.keys(excerptEmbMap)
-    bookKeyList = Object.keys(bookEmbMap)
-    excerptTensor = tf.tensor(Object.values(excerptEmbMap))
-    bookTensor = tf.tensor(Object.values(bookEmbMap))
+    computeBookEmbeddings(targets)
     cb(null)
   },
 
@@ -199,12 +203,14 @@ const methods = {
   semanticSearch: ({query, threshold}, cb) =>
     semanticSearch(query, threshold).then(matches => cb([query, matches])),
 
-  deleteEmbedding: ({target}) => {
-    delete excerptEmbMap[target]
+  deleteEmbedding: ({targetId, bookId, bookExcerptIds}) => {
+    delete excerptEmbMap[targetId]
 
     if (embStore) {
-      del(target, embStore)
+      del(targetId, embStore)
     }
+
+    computeBookEmbeddings([[bookId, bookExcerptIds]])
   },
 
   setDemoEmbeddings: async ({ids}, cb) => {
