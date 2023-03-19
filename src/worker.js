@@ -203,7 +203,7 @@ const methods = {
   semanticSearch: ({query, threshold}, cb) =>
     semanticSearch(query, threshold).then(matches => cb([query, matches])),
 
-  deleteEmbedding: ({targetId, bookId, bookExcerptIds}) => {
+  deleteExcerpt: ({targetId, bookId, bookExcerptIds}) => {
     delete excerptEmbMap[targetId]
 
     if (embStore) {

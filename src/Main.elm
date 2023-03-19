@@ -732,7 +732,7 @@ update message model =
                     , modalMessage = Nothing
                   }
                 , batch
-                    [ deleteEmbedding
+                    [ deleteExcerpt
                         ( excerpt.id
                         , ( excerpt.bookId
                           , newExcerpts
