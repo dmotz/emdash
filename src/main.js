@@ -63,20 +63,20 @@ let zipWorker
     console.warn('cannot open DB for writing')
   }
 
+  const flags = [
+    restored || null,
+    [
+      version,
+      import.meta.env.VITE_MAILING_LIST_URL || '',
+      import.meta.env.VITE_MAILING_LIST_FIELD || ''
+    ]
+  ]
+
   try {
-    app = Elm.Main.init({
-      flags: [
-        version,
-        restored || null,
-        [
-          import.meta.env.VITE_MAILING_LIST_URL || '',
-          import.meta.env.VITE_MAILING_LIST_FIELD || ''
-        ]
-      ]
-    })
+    app = Elm.Main.init({flags})
   } catch (e) {
     console.warn('malformed restored state:', restored)
-    app = Elm.Main.init({flags: [version, null]})
+    app = Elm.Main.init({flags: [null, ...flags.slice(1)]})
   }
 
   channel.onmessage = ({data}) => app.ports.syncState.send(data)
