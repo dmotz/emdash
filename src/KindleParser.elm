@@ -68,6 +68,26 @@ findNotes block acc =
             acc
 
 
+parseInt : Regex -> String -> Maybe Int
+parseInt rx s =
+    Regex.find rx s
+        |> head
+        |> Maybe.map .submatches
+        |> andThen head
+        |> andThen identity
+        |> andThen toInt
+
+
+getPageNum : String -> Maybe Int
+getPageNum s =
+    case parseInt locationRx s of
+        Just loc ->
+            Just <| loc // 15
+
+        _ ->
+            parseInt pageRx s
+
+
 isNote : String -> Bool
 isNote =
     startsWith "- Your Note on Page "
@@ -86,6 +106,11 @@ titleAuthorRx =
 pageRx : Regex
 pageRx =
     rx_ " on page (\\d+)"
+
+
+locationRx : Regex
+locationRx =
+    rx_ " on location (\\d+)"
 
 
 dateRx : Regex
@@ -116,14 +141,6 @@ makeDicts =
                                 split "-" titleAuthor
                             )
                                 |> map trim
-
-                        page =
-                            Regex.find pageRx meta
-                                |> head
-                                |> Maybe.map .submatches
-                                |> andThen head
-                                |> andThen identity
-                                |> andThen toInt
 
                         dateRaw =
                             case
@@ -212,7 +229,7 @@ makeDicts =
                                         titleRaw
                                         authorRaw
                                         text
-                                        page
+                                        (getPageNum meta)
                                         dateRaw
                                         notes
                                         Nothing
