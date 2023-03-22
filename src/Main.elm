@@ -111,8 +111,8 @@ mimeJson =
     "application/json"
 
 
-createModel : String -> Maybe StoredModel -> Bool -> Url -> Nav.Key -> ( String, String ) -> Model
-createModel version mStoredModel demoMode url key ( mailingListUrl, mailingListField ) =
+createModel : Maybe StoredModel -> ( String, String, String ) -> Bool -> Url -> Nav.Key -> Model
+createModel mStoredModel ( version, mailingListUrl, mailingListField ) demoMode url key =
     let
         restored =
             withDefault initialStoredModel mStoredModel
@@ -165,7 +165,7 @@ createModel version mStoredModel demoMode url key ( mailingListUrl, mailingListF
     }
 
 
-main : Program ( String, Maybe String, ( String, String ) ) Model Msg
+main : Program ( Maybe String, ( String, String, String ) ) Model Msg
 main =
     application
         { init = init
@@ -235,12 +235,11 @@ main =
         }
 
 
-init : ( String, Maybe String, ( String, String ) ) -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init ( version, mStateString, mailingListParams ) url key =
+init : ( Maybe String, ( String, String, String ) ) -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init ( mStateString, params ) url key =
     let
         model =
             createModel
-                version
                 (case decodeStoredModel (withDefault "" mStateString) of
                     Ok storedModel ->
                         Just storedModel
@@ -248,10 +247,10 @@ init ( version, mStateString, mailingListParams ) url key =
                     _ ->
                         Nothing
                 )
+                params
                 False
                 url
                 key
-                mailingListParams
     in
     update (UrlChanged url) model
         |> addCmd (model |> modelToStoredModel |> handleNewExcerpts)
@@ -280,12 +279,14 @@ update message model =
             let
                 model_ =
                     createModel
-                        model.version
                         maybeModel
+                        ( model.version
+                        , model.mailingListUrl
+                        , model.mailingListField
+                        )
                         demoMode
                         model.url
                         model.key
-                        ( model.mailingListUrl, model.mailingListField )
             in
             update (UrlChanged model.url) model_
                 |> addCmd
