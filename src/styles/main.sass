@@ -471,6 +471,7 @@ footer
   align-items: center
   border: 1px solid $mid1
   font-size: 2rem
+  animation: hover 2s infinite alternate ease-in-out
 
   aside
     font-size: 1.6rem
@@ -490,6 +491,7 @@ footer
     text-align: center
     padding: 2rem
     font-size: 1.6rem
+    animation: none
 
     aside
       display: none
@@ -545,3 +547,10 @@ footer
 
       &::after
         background: $accent
+
+@keyframes hover
+  from
+    transform: none
+
+  to
+    transform: translateY(-5px)
