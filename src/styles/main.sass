@@ -521,7 +521,7 @@ footer
     display: flex
     flex-direction: column
 
-    div
+    .error
       margin: 3rem 0
       font-size: 1.4rem
       overflow: auto
@@ -529,6 +529,19 @@ footer
       code
         user-select: text
 
+    .confirm
+      display: flex
+      justify-content: center
+
+      button + button
+        margin-left: 2rem
+
     button
       margin-top: 3rem
       align-self: center
+
+    .okButton
+      border-color: $accent
+
+      &::after
+        background: $accent
