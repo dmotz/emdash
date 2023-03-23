@@ -134,7 +134,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                                  else
                                     "Mark"
                                 )
-                                    ++ " as last read in this book"
+                                    ++ " as last reviewed"
                             ]
                         ]
                 , if perma then
@@ -240,7 +240,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                             section
                                 [ class "notes" ]
                                 [ textarea
-                                    [ onInput (UpdateNotes excerpt.id)
+                                    [ onInput <| UpdateNotes excerpt.id
                                     , value excerpt.notes
                                     , placeholder "Add notes here"
                                     ]
@@ -252,7 +252,10 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                                 []
                                 [ button
                                     [ class "button"
-                                    , onClick (DeleteExcerpt excerpt)
+                                    , onClick <|
+                                        ShowConfirmation
+                                            "Delete this excerpt?"
+                                            (DeleteExcerpt excerpt)
                                     ]
                                     [ text "× Delete"
                                     , div
