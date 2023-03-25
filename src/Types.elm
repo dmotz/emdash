@@ -99,7 +99,7 @@ type alias StoredModel =
 type Page
     = MainPage (List Book) (Maybe Tag)
     | SearchPage String SearchMode (List Book) (List Excerpt) ScorePairs
-    | TitlePage Book (List Excerpt)
+    | TitlePage Book (List Excerpt) Bool
     | AuthorPage Author (List Book)
     | ExcerptPage Excerpt Book
     | NotFoundPage String
