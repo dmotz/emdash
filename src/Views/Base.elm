@@ -162,7 +162,7 @@ view model =
                                     query
                                 ]
 
-                        TitlePage book excerpts ->
+                        TitlePage book excerpts editMode ->
                             let
                                 excerpts_ =
                                     if model.excerptSort == ExcerptFavSort then
@@ -182,6 +182,7 @@ view model =
                                     (get book.id model.bookmarks)
                                     model.excerptSort
                                     progressView
+                                    editMode
                                 , if isEmpty excerpts_ then
                                     div
                                         [ class "noFav" ]
