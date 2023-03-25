@@ -92,7 +92,6 @@ let zipWorker
   app.ports.handleNewExcerpts.subscribe(state =>
     worker.port.postMessage({
       method: 'processNewExcerpts',
-      books: state.books,
       excerpts: state.excerpts
     })
   )

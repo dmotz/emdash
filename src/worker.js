@@ -115,7 +115,7 @@ const findAuthorNeighbors = async authorId =>
     )
   ).filter(([auth]) => auth !== authorId)
 
-const processNewExcerpts = async ({books, excerpts}, cb) => {
+const processNewExcerpts = async ({excerpts}, cb) => {
   if (embStore && !Object.keys(excerptEmbMap).length) {
     excerptEmbMap = Object.fromEntries(await entries(embStore))
   }
