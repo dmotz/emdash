@@ -26,6 +26,7 @@ import Html.Attributes as H
         ( class
         , classList
         , href
+        , placeholder
         , step
         , target
         , type_
@@ -155,6 +156,7 @@ bookInfo book books tags pendingTag bookNeighborMap mBookmark excerptSort progre
                             [ input
                                 [ value book.title
                                 , onInput SetPendingBookTitle
+                                , placeholder "Title"
                                 ]
                                 []
                             , div []
