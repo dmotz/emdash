@@ -14,8 +14,11 @@
     margin-bottom: 0
     font-size: 2.4rem
 
-  .col:last-child > :first-child
+  .col:last-child > *
     margin-bottom: 3rem
+
+    &:last-child
+      margin-bottom: 0
 
 .ratingNum
   font-size: 2.4rem
@@ -65,7 +68,7 @@
       display: flex
       flex-direction: column
       justify-content: space-between
-      padding-right: 0
+      padding-right: 2rem
       padding-left: 2rem
 
       @include mobile
@@ -78,6 +81,25 @@
   .tags
     padding: 0
     text-align: left
+
+  details
+    h5
+      display: inline-block
+      margin-bottom: 0
+      text-decoration: underline
+      text-decoration-color: $mid1
+      text-decoration-thickness: 3px
+
+    div
+      margin-top: 1rem
+
+    button + button
+      margin-left: 1rem
+
+  .editTitle
+    input
+      width: 100%
+      margin: 1rem 0
 
 .related
   li
