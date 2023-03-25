@@ -7,7 +7,9 @@ import Html
         , a
         , br
         , button
+        , details
         , div
+        , form
         , h1
         , h2
         , h5
@@ -15,6 +17,7 @@ import Html
         , li
         , section
         , span
+        , summary
         , text
         , ul
         )
@@ -28,13 +31,20 @@ import Html.Attributes as H
         , type_
         , value
         )
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import List exposing (intersperse, map, repeat)
 import Maybe exposing (withDefault)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
 import Types exposing (Book, BookMap, ExcerptSort(..), Id, NeighborMap, Tag)
-import Utils exposing (excerptCountLabel, formatScore, getExcerptDomId, null, ratingEl)
+import Utils
+    exposing
+        ( excerptCountLabel
+        , formatScore
+        , getExcerptDomId
+        , null
+        , ratingEl
+        )
 import Views.TagSection exposing (tagSection)
 
 
@@ -47,8 +57,9 @@ bookInfo :
     -> Maybe Id
     -> ExcerptSort
     -> Maybe (Html Msg)
+    -> Bool
     -> Html Msg
-bookInfo book books tags pendingTag bookNeighborMap mBookmark excerptSort progressView =
+bookInfo book books tags pendingTag bookNeighborMap mBookmark excerptSort progressView editMode =
     div
         [ class "bookInfo" ]
         [ h1 [] [ text book.title ]
@@ -135,6 +146,42 @@ bookInfo book books tags pendingTag bookNeighborMap mBookmark excerptSort progre
                             ]
                             []
                         ]
+                    ]
+                , details []
+                    [ summary [] [ h5 [] [ text "Edit" ] ]
+                    , if editMode then
+                        form
+                            [ class "editTitle", onSubmit SetBookTitle ]
+                            [ input
+                                [ value book.title
+                                , onInput SetPendingBookTitle
+                                ]
+                                []
+                            , div []
+                                [ button [ class "button" ] [ text "Save" ]
+                                , button
+                                    [ class "button"
+                                    , onClick ExitBookEditMode
+                                    ]
+                                    [ text "Cancel" ]
+                                ]
+                            ]
+
+                      else
+                        div
+                            []
+                            [ button
+                                [ class "button", onClick EnterBookEditMode ]
+                                [ text "Edit title text" ]
+                            , button
+                                [ class "button"
+                                , onClick <|
+                                    ShowConfirmation
+                                        "Delete this title and all of its excerpts?"
+                                        (DeleteBook book)
+                                ]
+                                [ text "Delete" ]
+                            ]
                     ]
                 ]
             ]
