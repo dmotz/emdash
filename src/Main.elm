@@ -865,29 +865,37 @@ update message model =
             case model.page of
                 TitlePage book excerpts _ ->
                     let
-                        ( titleRouteMap, booksWithSlugs ) =
-                            insert book.id book model.books
-                                |> values
-                                |> getTitleRouteMap
-
-                        newBooks =
-                            toDict booksWithSlugs
+                        newBook =
+                            { book | title = trim book.title }
                     in
-                    store
-                        ( { model
-                            | page = TitlePage book excerpts False
-                            , books = newBooks
-                            , titleRouteMap = titleRouteMap
-                          }
-                        , Nav.replaceUrl
-                            model.key
-                            (titleSlugToRoute
-                                (get book.id newBooks
-                                    |> Maybe.map .slug
-                                    |> withDefault ""
+                    if trim newBook.title == "" then
+                        update ExitBookEditMode model
+
+                    else
+                        let
+                            ( titleRouteMap, booksWithSlugs ) =
+                                insert book.id newBook model.books
+                                    |> values
+                                    |> getTitleRouteMap
+
+                            newBooks =
+                                toDict booksWithSlugs
+                        in
+                        store
+                            ( { model
+                                | page = TitlePage book excerpts False
+                                , books = newBooks
+                                , titleRouteMap = titleRouteMap
+                              }
+                            , Nav.replaceUrl
+                                model.key
+                                (titleSlugToRoute
+                                    (get book.id newBooks
+                                        |> Maybe.map .slug
+                                        |> withDefault ""
+                                    )
                                 )
                             )
-                        )
 
                 _ ->
                     noOp
