@@ -14,7 +14,7 @@ const embStore = createStore(`${dbNs}:${embKey}`, embKey)
 let excerptEmbMap = {}
 let bookEmbMap = {}
 let authorEmbMap = {}
-let titleMap = {}
+let excerptIdToBookId = {}
 let excerptTensor
 let bookTensor
 let authorTensor
@@ -81,7 +81,7 @@ const computeAverages = (targets, map) =>
   })
 
 const findExcerptNeighbors = async targetId => {
-  const targetTitle = titleMap[targetId]
+  const targetTitle = excerptIdToBookId[targetId]
 
   return (
     await getTopK(
@@ -95,7 +95,7 @@ const findExcerptNeighbors = async targetId => {
     (a, c) =>
       a.length === neighborsK
         ? a
-        : titleMap[c[0]] === targetTitle
+        : excerptIdToBookId[c[0]] === targetTitle
         ? a
         : [...a, c],
     []
@@ -116,19 +116,13 @@ const findAuthorNeighbors = async authorId =>
   ).filter(([auth]) => auth !== authorId)
 
 const processNewExcerpts = async ({books, excerpts}, cb) => {
-  const bookIdToTitle = Object.fromEntries(
-    books.map(({id, title}) => [id, title])
-  )
-
   if (embStore && !Object.keys(excerptEmbMap).length) {
     excerptEmbMap = Object.fromEntries(await entries(embStore))
   }
 
-  titleMap = {
-    ...titleMap,
-    ...Object.fromEntries(
-      excerpts.map(({id, bookId}) => [id, bookIdToTitle[bookId]])
-    )
+  excerptIdToBookId = {
+    ...excerptIdToBookId,
+    ...Object.fromEntries(excerpts.map(({id, bookId}) => [id, bookId]))
   }
 
   cb(Object.keys(excerptEmbMap))
@@ -222,7 +216,7 @@ const methods = {
 
     bookExcerptIds.forEach(id => {
       delete excerptEmbMap[id]
-      delete titleMap[id]
+      delete excerptIdToBookId[id]
     })
 
     if (embStore) {
@@ -256,7 +250,7 @@ const methods = {
     excerptEmbMap = {}
     bookEmbMap = {}
     authorEmbMap = {}
-    titleMap = {}
+    excerptIdToBookId = {}
     excerptTensor?.dispose()
     bookTensor?.dispose()
     authorTensor?.dispose()
