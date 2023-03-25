@@ -37,7 +37,14 @@ import Platform.Cmd exposing (batch, none)
 import Ports exposing (..)
 import Random exposing (generate)
 import Random.List exposing (shuffle)
-import Router exposing (Route(..), excerptToRoute, routeParser, searchToRoute)
+import Router
+    exposing
+        ( Route(..)
+        , excerptToRoute
+        , routeParser
+        , searchToRoute
+        , titleSlugToRoute
+        )
 import Set exposing (diff, toList, union)
 import String exposing (fromInt, join, toLower, trim)
 import Task exposing (attempt, perform)
@@ -188,7 +195,7 @@ main =
                                 SearchPage query _ _ _ _ ->
                                     "🔍 " ++ query
 
-                                TitlePage book _ ->
+                                TitlePage book _ _ ->
                                     book.title
 
                                 AuthorPage author _ ->
@@ -540,7 +547,7 @@ update message model =
                             ExcerptPage excerpt book ->
                                 ExcerptPage { excerpt | notes = text } book
 
-                            TitlePage book excerpts ->
+                            TitlePage book excerpts _ ->
                                 TitlePage
                                     book
                                     (map
@@ -553,6 +560,7 @@ update message model =
                                         )
                                         excerpts
                                     )
+                                    False
 
                             _ ->
                                 model.page
@@ -565,7 +573,7 @@ update message model =
 
         AddTag ->
             case model.page of
-                TitlePage book excerpts ->
+                TitlePage book excerpts _ ->
                     case model.pendingTag of
                         Just tag ->
                             let
@@ -597,6 +605,7 @@ update message model =
                                             TitlePage
                                                 { book | tags = newTagSet }
                                                 excerpts
+                                                False
                                       }
                                     , none
                                     )
@@ -609,7 +618,7 @@ update message model =
 
         RemoveTag tag ->
             case model.page of
-                TitlePage book excerpts ->
+                TitlePage book excerpts _ ->
                     let
                         newTagSet =
                             removeItem book.tags tag
@@ -633,6 +642,7 @@ update message model =
                                 TitlePage
                                     { book | tags = newTagSet }
                                     excerpts
+                                    False
                           }
                         , none
                         )
@@ -650,8 +660,8 @@ update message model =
                     | books = insert book.id newBook model.books
                     , page =
                         case model.page of
-                            TitlePage _ excerpts ->
-                                TitlePage newBook excerpts
+                            TitlePage _ excerpts _ ->
+                                TitlePage newBook excerpts False
 
                             _ ->
                                 model.page
@@ -715,13 +725,14 @@ update message model =
                     , bookmarks = bookmarks
                     , page =
                         case model.page of
-                            TitlePage oldBook oldExcerpts ->
+                            TitlePage oldBook oldExcerpts _ ->
                                 TitlePage
                                     (withDefault oldBook (get oldBook.id books))
                                     (filter
                                         (\e -> e.id /= excerpt.id)
                                         oldExcerpts
                                     )
+                                    False
 
                             _ ->
                                 model.page
@@ -751,7 +762,7 @@ update message model =
                             else
                                 none
 
-                        TitlePage book ents ->
+                        TitlePage book ents _ ->
                             if book.id == excerpt.bookId && length ents == 1 then
                                 Nav.pushUrl model.key "/"
 
@@ -806,6 +817,80 @@ update message model =
                     , deleteBook ( book.id, toList exIds )
                     ]
                 )
+
+        EnterBookEditMode ->
+            case model.page of
+                TitlePage book excerpts _ ->
+                    ( { model | page = TitlePage book excerpts True }, none )
+
+                _ ->
+                    noOp
+
+        ExitBookEditMode ->
+            case model.page of
+                TitlePage book excerpts _ ->
+                    ( { model
+                        | page =
+                            TitlePage
+                                { book
+                                    | title =
+                                        withDefault
+                                            book.title
+                                            (get book.id model.books
+                                                |> Maybe.map .title
+                                            )
+                                }
+                                excerpts
+                                False
+                      }
+                    , none
+                    )
+
+                _ ->
+                    noOp
+
+        SetPendingBookTitle title ->
+            case model.page of
+                TitlePage book excerpts editMode ->
+                    ( { model
+                        | page = TitlePage { book | title = title } excerpts editMode
+                      }
+                    , none
+                    )
+
+                _ ->
+                    noOp
+
+        SetBookTitle ->
+            case model.page of
+                TitlePage book excerpts _ ->
+                    let
+                        ( titleRouteMap, booksWithSlugs ) =
+                            insert book.id book model.books
+                                |> values
+                                |> getTitleRouteMap
+
+                        newBooks =
+                            toDict booksWithSlugs
+                    in
+                    store
+                        ( { model
+                            | page = TitlePage book excerpts False
+                            , books = newBooks
+                            , titleRouteMap = titleRouteMap
+                          }
+                        , Nav.replaceUrl
+                            model.key
+                            (titleSlugToRoute
+                                (get book.id newBooks
+                                    |> Maybe.map .slug
+                                    |> withDefault ""
+                                )
+                            )
+                        )
+
+                _ ->
+                    noOp
 
         ShowConfirmation text action ->
             ( { model | modalMessage = Just <| ConfirmationMsg text action }
@@ -890,7 +975,7 @@ update message model =
         ReceiveBookEmbeddings ->
             ( { model | embeddingsReady = True }
             , case model.page of
-                TitlePage book _ ->
+                TitlePage book _ _ ->
                     batch
                         [ requestBookNeighbors book.id
                         , requestSemanticRank
@@ -1032,7 +1117,7 @@ update message model =
                     }
             in
             case model.page of
-                TitlePage book _ ->
+                TitlePage book _ _ ->
                     if book.id == bookId && model.excerptSort == ExcerptSemanticSort then
                         update (SortExcerpts model.excerptSort) model_
 
@@ -1134,7 +1219,7 @@ update message model =
                                             )
                             in
                             ( { model_
-                                | page = TitlePage book excerpts
+                                | page = TitlePage book excerpts False
                                 , excerptSort = ExcerptPageSort
                               }
                             , batch
@@ -1358,7 +1443,7 @@ update message model =
                 | excerptSort = sort
                 , page =
                     case model.page of
-                        TitlePage book excerpts ->
+                        TitlePage book excerpts _ ->
                             TitlePage
                                 book
                                 (case sort of
@@ -1377,6 +1462,7 @@ update message model =
                                     _ ->
                                         sortBy .page excerpts
                                 )
+                                False
 
                         _ ->
                             model.page
@@ -1446,7 +1532,7 @@ update message model =
                             ExcerptPage excerpt book ->
                                 ExcerptPage (toggle excerpt) (updateCount book)
 
-                            TitlePage book excerpts ->
+                            TitlePage book excerpts _ ->
                                 TitlePage
                                     (updateCount book)
                                     (map
@@ -1459,6 +1545,7 @@ update message model =
                                         )
                                         excerpts
                                     )
+                                    False
 
                             _ ->
                                 model.page
