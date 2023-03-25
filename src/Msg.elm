@@ -43,6 +43,10 @@ type Msg
     | PickKindleFile
     | DeleteExcerpt Excerpt
     | DeleteBook Book
+    | EnterBookEditMode
+    | ExitBookEditMode
+    | SetPendingBookTitle String
+    | SetBookTitle
     | UpdateNotes Id String
     | SetBookmark Id Id
     | ToggleFavorite Id
