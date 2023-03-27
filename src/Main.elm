@@ -1799,8 +1799,7 @@ update message model =
                                             (Maybe.map
                                                 (\b ->
                                                     { b
-                                                        | count = b.count + 1
-                                                        , sortIndex =
+                                                        | sortIndex =
                                                             max
                                                                 b.sortIndex
                                                                 excerpt.date
