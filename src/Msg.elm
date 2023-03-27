@@ -49,7 +49,7 @@ type Msg
     | SetBookTitle
     | UpdateNotes Id String
     | SetBookmark Id Id
-    | ToggleFavorite Id
+    | ToggleFavorite Excerpt
     | UpdatePendingTag Tag
     | AddTag
     | RemoveTag Tag
