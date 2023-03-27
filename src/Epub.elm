@@ -18,7 +18,7 @@ import Time
         , toYear
         , utc
         )
-import Types exposing (Author, Book, BookSort(..), Excerpt, Title)
+import Types exposing (Author, BookSort(..), Excerpt, Title)
 import Utils exposing (appName, rx, sortBooks)
 
 
