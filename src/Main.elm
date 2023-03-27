@@ -82,6 +82,7 @@ import Utils
         , slugify
         , toDict
         , untaggedKey
+        , upsert
         )
 import Views.Base exposing (view)
 import Views.Landing exposing (landingPageBooks)
@@ -696,34 +697,19 @@ update message model =
                     remove excerpt.id model.excerpts
 
                 ( books, bookmarks ) =
-                    case get excerpt.bookId model.books of
-                        Just book ->
-                            if book.count == 1 then
-                                ( remove book.id model.books
-                                , remove book.id model.bookmarks
+                    case get excerpt.bookId model.excerptCountMap of
+                        Just n ->
+                            if n == 1 then
+                                ( remove excerpt.bookId model.books
+                                , remove excerpt.bookId model.bookmarks
                                 )
 
                             else
-                                ( Dict.update
-                                    book.id
-                                    (Maybe.map
-                                        (\b ->
-                                            { b
-                                                | count = b.count - 1
-                                                , favCount =
-                                                    if excerpt.isFavorite then
-                                                        b.favCount - 1
-
-                                                    else
-                                                        b.favCount
-                                            }
-                                        )
-                                    )
-                                    model.books
-                                , case get book.id model.bookmarks of
+                                ( model.books
+                                , case get excerpt.bookId model.bookmarks of
                                     Just id ->
                                         if id == excerpt.id then
-                                            remove book.id model.bookmarks
+                                            remove excerpt.bookId model.bookmarks
 
                                         else
                                             model.bookmarks
