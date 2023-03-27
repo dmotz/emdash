@@ -8,6 +8,7 @@ module Utils exposing
     , formatScore
     , getAuthorRouteMap
     , getAuthors
+    , getCounts
     , getExcerptDomId
     , getTagCounts
     , getTitleRouteMap
@@ -81,6 +82,11 @@ repoUrl =
 untaggedKey : String
 untaggedKey =
     "untagged"
+
+
+inc : Int -> Int
+inc =
+    (+) 1
 
 
 rx : String -> Regex
@@ -168,7 +174,7 @@ getTagCounts bookMap =
     books
         |> concatMap .tags
         |> foldl
-            (\tag acc -> update tag (withDefault 0 >> (+) 1 >> Just) acc)
+            (\tag acc -> update tag (withDefault 0 >> inc >> Just) acc)
             empty
         |> insert
             untaggedKey
@@ -467,3 +473,18 @@ getAuthors model =
             )
             Dict.empty
         |> Dict.toList
+
+
+getCounts : List Excerpt -> ( Dict Id Int, Dict Id Int )
+getCounts =
+    foldr
+        (\{ bookId, isFavorite } ( exCount, favCount ) ->
+            ( update bookId (Maybe.map inc) exCount
+            , if isFavorite then
+                update bookId (Maybe.map inc) favCount
+
+              else
+                favCount
+            )
+        )
+        ( Dict.empty, Dict.empty )
