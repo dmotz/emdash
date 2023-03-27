@@ -21,7 +21,8 @@ snippetView books mScore query excerpt =
                 inner =
                     innerSnippet excerpt book mScore query
             in
-            li [ class "snippet" ]
+            li
+                [ class "snippet" ]
                 [ a
                     [ href <| excerptToRoute books excerpt ]
                     (inner
@@ -35,7 +36,8 @@ snippetView books mScore query excerpt =
 
 innerSnippet : Excerpt -> Book -> Maybe Float -> Maybe String -> List (Html Msg)
 innerSnippet excerpt book mScore query =
-    [ blockquote []
+    [ blockquote
+        []
         (case query of
             Just q ->
                 addHighlighting excerpt.text q

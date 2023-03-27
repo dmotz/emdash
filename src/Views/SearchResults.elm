@@ -1,6 +1,6 @@
 module Views.SearchResults exposing (searchResults)
 
-import Dict exposing (get)
+import Dict exposing (Dict, get)
 import Html exposing (Html, button, div, li, p, span, text, ul)
 import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
@@ -14,6 +14,7 @@ import Types
         , BookSort(..)
         , Excerpt
         , ExcerptMap
+        , Id
         , ScorePairs
         , SearchMode(..)
         )
@@ -34,9 +35,11 @@ searchResults :
     -> List Book
     -> List Excerpt
     -> ScorePairs
+    -> Dict Id Int
+    -> Dict Id Int
     -> String
     -> Html Msg
-searchResults mode bookMap excerptMap books matches semanticMatches query =
+searchResults mode bookMap excerptMap books matches semanticMatches excerptCounts favCounts query =
     let
         textMatches =
             map (juxt identity (always Nothing)) matches
@@ -65,7 +68,7 @@ searchResults mode bookMap excerptMap books matches semanticMatches query =
             null
 
           else
-            bookList books TitleSort False
+            bookList books excerptCounts favCounts TitleSort False
         , div
             [ class "snippets" ]
             [ div
