@@ -46,12 +46,10 @@ type alias Book =
     { id : Id
     , title : Title
     , authors : List Author
-    , count : Int
     , rating : Float
     , sortIndex : Int
     , tags : List Tag
     , slug : String
-    , favCount : Int
     }
 
 
