@@ -52,9 +52,7 @@ bookDecoder =
         |> required "id" string
         |> required "title" string
         |> required "authors" (list string)
-        |> required "count" int
         |> optional "rating" float 0
         |> optional "sortIndex" int 0
         |> optional "tags" (list string) []
         |> required "slug" string
-        |> optional "favCount" int 0
