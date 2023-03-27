@@ -8,6 +8,7 @@ module Utils exposing
     , formatScore
     , getAuthorRouteMap
     , getAuthors
+    , getCount
     , getCounts
     , getExcerptDomId
     , getTagCounts
@@ -244,13 +245,13 @@ sortBooks sort reverseSort exCounts favCounts =
                 )
 
         NumSort ->
-            sortBy (\{ id } -> get id exCounts |> withDefault 0)
+            sortBy <| .id >> getCount exCounts
 
         RatingSort ->
             sortBy .rating
 
         FavSort ->
-            sortBy (\{ id } -> get id favCounts |> withDefault 0)
+            sortBy <| .id >> getCount favCounts
     )
         >> (if reverseSort then
                 reverse
@@ -496,3 +497,8 @@ getCounts =
             )
         )
         ( Dict.empty, Dict.empty )
+
+
+getCount : Dict Id Int -> Id -> Int
+getCount dict id =
+    get id dict |> withDefault 0
