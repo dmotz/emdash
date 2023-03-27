@@ -63,8 +63,8 @@ view model =
     div
         [ id "root" ]
         ((case model.page of
-            LandingPage books didSubmitEmail ->
-                [ landingView books didSubmitEmail ]
+            LandingPage books countMap didSubmitEmail ->
+                [ landingView books countMap didSubmitEmail ]
 
             _ ->
                 [ a
@@ -183,6 +183,7 @@ view model =
                                     model.tags
                                     model.pendingTag
                                     model.bookNeighborMap
+                                    (getCount model.excerptCountMap book.id)
                                     (get book.id model.bookmarks)
                                     model.excerptSort
                                     progressView
@@ -218,12 +219,18 @@ view model =
 
                         AuthorPage author books ->
                             div []
-                                [ authorInfo author books model.authorNeighborMap
+                                [ authorInfo
+                                    author
+                                    books
+                                    model.authorNeighborMap
+                                    model.excerptCountMap
                                 , bookSorter
                                     model.bookSort
                                     model.reverseSort
                                 , bookList
                                     books
+                                    model.excerptCountMap
+                                    model.favCountMap
                                     model.bookSort
                                     model.reverseSort
                                 ]
