@@ -64,6 +64,7 @@ import Types
         , Book
         , BookMap
         , BookSort(..)
+        , CountMap
         , Excerpt
         , Id
         , StoredModel
@@ -228,7 +229,7 @@ normalizeTitle =
     toLower >> replace (rx "^(the )") (always "")
 
 
-sortBooks : BookSort -> Bool -> Dict Id Int -> Dict Id Int -> List Book -> List Book
+sortBooks : BookSort -> Bool -> CountMap -> CountMap -> List Book -> List Book
 sortBooks sort reverseSort exCounts favCounts =
     (case sort of
         RecencySort ->
@@ -482,7 +483,7 @@ getAuthors model =
         |> Dict.toList
 
 
-getCounts : List Excerpt -> ( Dict Id Int, Dict Id Int )
+getCounts : List Excerpt -> ( CountMap, CountMap )
 getCounts =
     foldr
         (\{ bookId, isFavorite } ( exCount, favCount ) ->
@@ -497,6 +498,6 @@ getCounts =
         ( Dict.empty, Dict.empty )
 
 
-getCount : Dict Id Int -> Id -> Int
+getCount : CountMap -> Id -> Int
 getCount dict id =
     get id dict |> withDefault 0

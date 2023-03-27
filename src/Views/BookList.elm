@@ -1,19 +1,17 @@
 module Views.BookList exposing (bookList, bookView)
 
-import Dict exposing (Dict, get)
 import Html exposing (Html, a, div, img, li, span, text)
 import Html.Attributes exposing (class, href, src)
 import Html.Keyed as Keyed
 import List exposing (map)
-import Maybe exposing (withDefault)
 import Msg exposing (Msg)
 import Router exposing (titleSlugToRoute)
 import String exposing (fromInt, join)
-import Types exposing (Book, BookSort(..), Id)
+import Types exposing (Book, BookSort(..), CountMap)
 import Utils exposing (getCount, null, ratingEl, sortBooks)
 
 
-bookList : List Book -> Dict Id Int -> Dict Id Int -> BookSort -> Bool -> Html Msg
+bookList : List Book -> CountMap -> CountMap -> BookSort -> Bool -> Html Msg
 bookList books exCounts favCounts sort reverseSort =
     let
         showRating =

@@ -10,6 +10,7 @@ import Types
         ( Author
         , BookMap
         , BookSort
+        , CountMap
         , ExcerptMap
         , ExcerptSort
         , ExcerptTab
@@ -39,8 +40,8 @@ type alias Model =
     , authorEmbeddingsReady : Bool
     , titleRouteMap : Dict String Id
     , authorRouteMap : Dict String Author
-    , excerptCountMap : Dict Id Int
-    , favCountMap : Dict Id Int
+    , excerptCountMap : CountMap
+    , favCountMap : CountMap
     , tags : List Tag
     , tagCounts : Dict Tag Int
     , tagSort : TagSort

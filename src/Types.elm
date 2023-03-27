@@ -3,6 +3,7 @@ module Types exposing
     , Book
     , BookMap
     , BookSort(..)
+    , CountMap
     , Excerpt
     , ExcerptMap
     , ExcerptSort(..)
@@ -86,6 +87,10 @@ type alias NeighborMap =
     Dict Id ScorePairs
 
 
+type alias CountMap =
+    Dict Id Int
+
+
 type alias StoredModel =
     { excerpts : List Excerpt
     , books : List Book
@@ -102,7 +107,7 @@ type Page
     | ExcerptPage Excerpt Book
     | NotFoundPage String
     | SettingsPage
-    | LandingPage (List Book) (Dict Id Int) Bool
+    | LandingPage (List Book) CountMap Bool
     | ImportPage
     | CreatePage PendingExcerpt (List Title) (List Author)
 

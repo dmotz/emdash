@@ -1,6 +1,6 @@
 module Views.SearchResults exposing (searchResults)
 
-import Dict exposing (Dict, get)
+import Dict exposing (get)
 import Html exposing (Html, button, div, li, p, span, text, ul)
 import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
@@ -12,9 +12,9 @@ import Types
         ( Book
         , BookMap
         , BookSort(..)
+        , CountMap
         , Excerpt
         , ExcerptMap
-        , Id
         , ScorePairs
         , SearchMode(..)
         )
@@ -35,8 +35,8 @@ searchResults :
     -> List Book
     -> List Excerpt
     -> ScorePairs
-    -> Dict Id Int
-    -> Dict Id Int
+    -> CountMap
+    -> CountMap
     -> String
     -> Html Msg
 searchResults mode bookMap excerptMap books matches semanticMatches excerptCounts favCounts query =

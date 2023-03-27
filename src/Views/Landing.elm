@@ -1,6 +1,5 @@
 module Views.Landing exposing (landingPageBooks, landingView)
 
-import Dict exposing (Dict, get)
 import Html
     exposing
         ( Html
@@ -41,14 +40,13 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput, onSubmit)
 import List exposing (drop, length, map, range, reverse, take)
-import Maybe exposing (withDefault)
 import Msg exposing (Msg(..))
-import Types exposing (Book, Id)
+import Types exposing (Book, CountMap)
 import Utils exposing (appName, getCount, repoUrl)
 import Views.BookList exposing (bookView)
 
 
-landingView : List Book -> Dict Id Int -> Bool -> Html Msg
+landingView : List Book -> CountMap -> Bool -> Html Msg
 landingView bookList countMap didSubmitEmail =
     let
         bookCols =
