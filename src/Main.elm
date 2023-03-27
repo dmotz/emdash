@@ -72,6 +72,7 @@ import Utils
         , findMatches
         , getAuthorRouteMap
         , getAuthors
+        , getCounts
         , getTagCounts
         , getTitleRouteMap
         , insertOnce
@@ -132,6 +133,9 @@ createModel mStoredModel ( version, mailingListUrl, mailingListField ) demoMode 
 
         tags =
             restored.books |> concatMap .tags |> dedupe
+
+        ( exCount, favCount ) =
+            getCounts restored.excerpts
     in
     { page = MainPage (values books) Nothing
     , demoMode = demoMode
@@ -152,6 +156,8 @@ createModel mStoredModel ( version, mailingListUrl, mailingListField ) demoMode 
     , showTagHeader = length tags > 0
     , titleRouteMap = titleRouteMap
     , authorRouteMap = getAuthorRouteMap restored.books
+    , excerptCountMap = exCount
+    , favCountMap = favCount
     , pendingTag = Nothing
     , isDragging = False
     , reverseSort = True
@@ -351,11 +357,17 @@ update message model =
                     ( { model | modalMessage = Just <| ErrMsg err }, none )
 
         SyncState sModel ->
+            let
+                ( exCount, favCount ) =
+                    getCounts sModel.excerpts
+            in
             ( { model
                 | excerpts = toDict sModel.excerpts
                 , books = toDict sModel.books
                 , hiddenExcerpts = Set.fromList sModel.hiddenExcerpts
                 , bookmarks = Dict.fromList sModel.bookmarks
+                , excerptCountMap = exCount
+                , favCountMap = favCount
               }
             , none
             )
@@ -448,8 +460,7 @@ update message model =
                                     (Maybe.map
                                         (\book ->
                                             { book
-                                                | count = book.count + 1
-                                                , sortIndex =
+                                                | sortIndex =
                                                     max
                                                         book.sortIndex
                                                         excerpt.date
@@ -468,6 +479,17 @@ update message model =
 
                 ( titleRouteMap, booksWithSlugs ) =
                     getTitleRouteMap bookVals
+
+                excerpts =
+                    if model.demoMode then
+                        newExcerpts
+
+                    else
+                        Dict.union model.excerpts newExcerpts
+                            |> Dict.filter hiddenPred
+
+                ( exCount, favCount ) =
+                    excerpts |> values |> getCounts
             in
             store
                 ( { model
@@ -481,14 +503,10 @@ update message model =
                             InfoMsg <|
                                 countLabel "new excerpt" n
                                     ++ " imported."
-                    , excerpts =
-                        if model.demoMode then
-                            newExcerpts
-
-                        else
-                            Dict.union model.excerpts newExcerpts
-                                |> Dict.filter hiddenPred
+                    , excerpts = excerpts
                     , books = toDict booksWithSlugs
+                    , excerptCountMap = exCount
+                    , favCountMap = favCount
                     , titleRouteMap = titleRouteMap
                     , authorRouteMap =
                         getAuthorRouteMap bookVals
@@ -716,6 +734,9 @@ update message model =
 
                         _ ->
                             ( model.books, model.bookmarks )
+
+                ( exCount, favCount ) =
+                    newExcerpts |> values |> getCounts
             in
             store
                 ( { model
@@ -723,6 +744,8 @@ update message model =
                     , excerpts = newExcerpts
                     , books = books
                     , bookmarks = bookmarks
+                    , excerptCountMap = exCount
+                    , favCountMap = favCount
                     , page =
                         case model.page of
                             TitlePage oldBook oldExcerpts _ ->
@@ -793,15 +816,22 @@ update message model =
                         )
                         model.tagCounts
                         book.tags
+
+                excerpts =
+                    Dict.filter
+                        (\_ { bookId } -> bookId /= book.id)
+                        model.excerpts
+
+                ( exCount, favCount ) =
+                    excerpts |> values |> getCounts
             in
             store
                 ( { model
                     | modalMessage = Nothing
-                    , excerpts =
-                        Dict.filter
-                            (\_ { bookId } -> bookId /= book.id)
-                            model.excerpts
+                    , excerpts = excerpts
                     , books = remove book.id model.books
+                    , excerptCountMap = exCount
+                    , favCountMap = favCount
                     , bookNeighborMap = Dict.empty
                     , neighborMap = Dict.empty
                     , authorNeighborMap = Dict.empty
@@ -1496,60 +1526,43 @@ update message model =
                 , none
                 )
 
-        ToggleFavorite id ->
+        ToggleFavorite excerpt ->
             let
-                toggle =
-                    \excerpt -> { excerpt | isFavorite = not excerpt.isFavorite }
-
-                newExcerpts =
-                    Dict.update
-                        id
-                        (Maybe.map toggle)
-                        model.excerpts
-
-                countDelta =
-                    if
-                        newExcerpts
-                            |> get id
-                            |> Maybe.map .isFavorite
-                            |> withDefault False
-                    then
-                        1
-
-                    else
-                        -1
-
-                updateCount =
-                    \book -> { book | favCount = book.favCount + countDelta }
+                newExcerpt =
+                    { excerpt | isFavorite = not excerpt.isFavorite }
             in
             store
                 ( { model
-                    | excerpts = newExcerpts
-                    , books =
-                        case get id newExcerpts of
-                            Just excerpt ->
-                                Dict.update
-                                    excerpt.bookId
-                                    (Maybe.map updateCount)
-                                    model.books
+                    | excerpts = insert newExcerpt.id newExcerpt model.excerpts
+                    , favCountMap =
+                        Dict.update
+                            newExcerpt.id
+                            (Maybe.map
+                                ((+)
+                                    (if newExcerpt.isFavorite then
+                                        1
 
-                            _ ->
-                                model.books
+                                     else
+                                        -1
+                                    )
+                                )
+                            )
+                            model.favCountMap
                     , page =
                         case model.page of
-                            ExcerptPage excerpt book ->
-                                ExcerptPage (toggle excerpt) (updateCount book)
+                            ExcerptPage _ book ->
+                                ExcerptPage newExcerpt book
 
                             TitlePage book excerpts _ ->
                                 TitlePage
-                                    (updateCount book)
+                                    book
                                     (map
-                                        (\excerpt ->
-                                            if excerpt.id == id then
-                                                toggle excerpt
+                                        (\ex ->
+                                            if ex.id == newExcerpt.id then
+                                                newExcerpt
 
                                             else
-                                                excerpt
+                                                ex
                                         )
                                         excerpts
                                     )
@@ -1780,6 +1793,14 @@ update message model =
                                 , embeddingsReady = False
                                 , excerpts =
                                     insert excerpt.id excerpt model.excerpts
+                                , excerptCountMap =
+                                    (if Dict.member book.id model.books then
+                                        Dict.update book.id (Maybe.map ((+) 1))
+
+                                     else
+                                        Dict.insert book.id 1
+                                    )
+                                        model.excerptCountMap
                             }
                     in
                     store
