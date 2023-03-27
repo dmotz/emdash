@@ -229,8 +229,8 @@ normalizeTitle =
     toLower >> replace (rx "^(the )") (always "")
 
 
-sortBooks : BookSort -> Bool -> List Book -> List Book
-sortBooks sort reverseSort =
+sortBooks : BookSort -> Bool -> Dict Id Int -> Dict Id Int -> List Book -> List Book
+sortBooks sort reverseSort exCounts favCounts =
     (case sort of
         RecencySort ->
             sortBy .sortIndex
@@ -244,13 +244,13 @@ sortBooks sort reverseSort =
                 )
 
         NumSort ->
-            sortBy .count
+            sortBy (\{ id } -> get id exCounts |> withDefault 0)
 
         RatingSort ->
             sortBy .rating
 
         FavSort ->
-            sortBy .favCount
+            sortBy (\{ id } -> get id favCounts |> withDefault 0)
     )
         >> (if reverseSort then
                 reverse
