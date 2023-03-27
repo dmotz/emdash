@@ -187,9 +187,7 @@ getTagCounts bookMap =
         |> foldl
             (\tag acc -> update tag (withDefault 0 >> inc >> Just) acc)
             empty
-        |> insert
-            untaggedKey
-            (filter (\{ tags } -> isEmpty tags) books |> length)
+        |> insert untaggedKey (books |> filter (.tags >> isEmpty) |> length)
 
 
 getExcerptDomId : Id -> String

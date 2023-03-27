@@ -42,7 +42,7 @@ import Types
         , Tag
         , TagSort(..)
         )
-import Utils exposing (appName, formatNumber, null, repoUrl, untaggedKey)
+import Utils exposing (appName, formatNumber, getCount, null, repoUrl, untaggedKey)
 import Views.AuthorInfo exposing (authorInfo)
 import Views.BookInfo exposing (bookInfo)
 import Views.BookList exposing (bookList)

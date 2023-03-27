@@ -8,7 +8,7 @@ import Maybe exposing (withDefault)
 import Msg exposing (Msg)
 import Router exposing (authorToRoute)
 import Types exposing (Book, Id, NeighborMap)
-import Utils exposing (excerptCountLabel, titleCountLabel)
+import Utils exposing (excerptCountLabel, getCount, titleCountLabel)
 
 
 authorInfo : String -> List Book -> NeighborMap -> Dict Id Int -> Html Msg
@@ -22,11 +22,7 @@ authorInfo author books neighborMap countMap =
                 (length books)
                 ++ ", "
                 ++ (books
-                        |> foldl
-                            (\{ id } acc ->
-                                acc + (get id countMap |> withDefault 0)
-                            )
-                            0
+                        |> foldl (\{ id } acc -> acc + getCount countMap id) 0
                         |> excerptCountLabel
                    )
                 |> text

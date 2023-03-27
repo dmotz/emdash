@@ -10,7 +10,7 @@ import Msg exposing (Msg)
 import Router exposing (titleSlugToRoute)
 import String exposing (fromInt, join)
 import Types exposing (Book, BookSort(..), Id)
-import Utils exposing (null, ratingEl, sortBooks)
+import Utils exposing (getCount, null, ratingEl, sortBooks)
 
 
 bookList : List Book -> Dict Id Int -> Dict Id Int -> BookSort -> Bool -> Html Msg
@@ -29,8 +29,8 @@ bookList books exCounts favCounts sort reverseSort =
                 ( book.id
                 , bookView
                     book
-                    (get book.id exCounts |> withDefault 0)
-                    (get book.id favCounts |> withDefault 0)
+                    (getCount exCounts book.id)
+                    (getCount favCounts book.id)
                     showRating
                     showFavCount
                     False

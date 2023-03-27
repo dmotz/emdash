@@ -44,7 +44,7 @@ import List exposing (drop, length, map, range, reverse, take)
 import Maybe exposing (withDefault)
 import Msg exposing (Msg(..))
 import Types exposing (Book, Id)
-import Utils exposing (appName, repoUrl)
+import Utils exposing (appName, getCount, repoUrl)
 import Views.BookList exposing (bookView)
 
 
@@ -91,7 +91,7 @@ landingView bookList countMap didSubmitEmail =
                                             (\book ->
                                                 bookView
                                                     book
-                                                    (get book.id countMap |> withDefault 0)
+                                                    (getCount countMap book.id)
                                                     0
                                                     False
                                                     False
