@@ -39,6 +39,8 @@ type alias Model =
     , authorEmbeddingsReady : Bool
     , titleRouteMap : Dict String Id
     , authorRouteMap : Dict String Author
+    , excerptCountMap : Dict Id Int
+    , favCountMap : Dict Id Int
     , tags : List Tag
     , tagCounts : Dict Tag Int
     , tagSort : TagSort
