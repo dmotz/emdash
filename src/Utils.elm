@@ -487,9 +487,9 @@ getCounts : List Excerpt -> ( Dict Id Int, Dict Id Int )
 getCounts =
     foldr
         (\{ bookId, isFavorite } ( exCount, favCount ) ->
-            ( update bookId (Maybe.map inc) exCount
+            ( upsert exCount bookId inc 1
             , if isFavorite then
-                update bookId (Maybe.map inc) favCount
+                upsert favCount bookId inc 1
 
               else
                 favCount
