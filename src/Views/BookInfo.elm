@@ -55,12 +55,13 @@ bookInfo :
     -> List Tag
     -> Maybe Tag
     -> NeighborMap
+    -> Int
     -> Maybe Id
     -> ExcerptSort
     -> Maybe (Html Msg)
     -> Bool
     -> Html Msg
-bookInfo book books tags pendingTag bookNeighborMap mBookmark excerptSort progressView editMode =
+bookInfo book books tags pendingTag bookNeighborMap count mBookmark excerptSort progressView editMode =
     div
         [ class "bookInfo" ]
         [ h1 [] [ text book.title ]
@@ -71,7 +72,7 @@ bookInfo book books tags pendingTag bookNeighborMap mBookmark excerptSort progre
                 book.authors
                 |> intersperse (text " / ")
              )
-                ++ [ text <| " — " ++ excerptCountLabel book.count ]
+                ++ [ text <| " — " ++ excerptCountLabel count ]
             )
         , section
             [ class "bookMeta" ]
