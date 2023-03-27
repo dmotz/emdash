@@ -1,7 +1,9 @@
 port module Epub exposing (export)
 
+import Dict exposing (values)
 import List exposing (concat, filter, indexedMap, map, sortBy)
 import MD5 exposing (hex)
+import Model exposing (Model)
 import Regex exposing (Regex)
 import String exposing (fromInt, join, padLeft, replace, toLower)
 import Time
@@ -331,11 +333,16 @@ generateChapter i title authors excerpts =
     )
 
 
-export : Posix -> List Book -> List Excerpt -> Cmd msg
-export time books excerpts =
+export : Model -> Posix -> Cmd msg
+export model time =
     let
         sortedBooks =
-            sortBooks RecencySort True books
+            sortBooks
+                RecencySort
+                True
+                model.excerptCountMap
+                model.favCountMap
+                (values model.books)
 
         titles =
             map (.title >> replace "&" "and") sortedBooks
@@ -370,7 +377,11 @@ export time books excerpts =
                 i
                 (replace " & " " and " title)
                 authors
-                (excerpts |> filter (.bookId >> (==) id) |> sortBy .page)
+                (model.excerpts
+                    |> values
+                    |> filter (.bookId >> (==) id)
+                    |> sortBy .page
+                )
         )
         sortedBooks
     ]

@@ -951,7 +951,7 @@ update message model =
             )
 
         ExportEpub time ->
-            ( model, Epub.export time (values model.books) (values model.excerpts) )
+            ( model, Epub.export model time )
 
         RequestEmbeddings ->
             let
