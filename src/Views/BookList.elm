@@ -36,7 +36,7 @@ bookList books exCounts favCounts sort reverseSort =
                     False
                 )
             )
-            (sortBooks sort reverseSort books)
+            (sortBooks sort reverseSort exCounts favCounts books)
         )
 
 
@@ -68,7 +68,7 @@ bookView book exCount favCount showRating showFavCount isLandingPage =
             , if showFavCount then
                 div
                     [ class "favCount" ]
-                    (if book.favCount > 0 then
+                    (if favCount > 0 then
                         [ img
                             [ class "icon"
                             , src "/images/icons/favorite.svg"
