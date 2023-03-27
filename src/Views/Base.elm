@@ -63,8 +63,8 @@ view model =
     div
         [ id "root" ]
         ((case model.page of
-            LandingPage bookList didSubmitEmail ->
-                [ landingView bookList didSubmitEmail ]
+            LandingPage books didSubmitEmail ->
+                [ landingView books didSubmitEmail ]
 
             _ ->
                 [ a
@@ -145,6 +145,8 @@ view model =
                                     model.reverseSort
                                 , bookList
                                     books
+                                    model.excerptCountMap
+                                    model.favCountMap
                                     model.bookSort
                                     model.reverseSort
                                 ]
@@ -159,6 +161,8 @@ view model =
                                     books
                                     excerpts
                                     semanticMatches
+                                    model.excerptCountMap
+                                    model.favCountMap
                                     query
                                 ]
 

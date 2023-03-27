@@ -1,18 +1,20 @@
 module Views.BookList exposing (bookList, bookView)
 
+import Dict exposing (Dict, get)
 import Html exposing (Html, a, div, img, li, span, text)
 import Html.Attributes exposing (class, href, src)
 import Html.Keyed as Keyed
 import List exposing (map)
+import Maybe exposing (withDefault)
 import Msg exposing (Msg)
 import Router exposing (titleSlugToRoute)
 import String exposing (fromInt, join)
-import Types exposing (Book, BookSort(..))
+import Types exposing (Book, BookSort(..), Id)
 import Utils exposing (null, ratingEl, sortBooks)
 
 
-bookList : List Book -> BookSort -> Bool -> Html Msg
-bookList books sort reverseSort =
+bookList : List Book -> Dict Id Int -> Dict Id Int -> BookSort -> Bool -> Html Msg
+bookList books exCounts favCounts sort reverseSort =
     let
         showRating =
             sort == RatingSort
@@ -23,13 +25,23 @@ bookList books sort reverseSort =
     Keyed.ul
         [ class "bookList" ]
         (map
-            (\book -> ( book.id, bookView book showRating showFavCount False ))
+            (\book ->
+                ( book.id
+                , bookView
+                    book
+                    (get book.id exCounts |> withDefault 0)
+                    (get book.id favCounts |> withDefault 0)
+                    showRating
+                    showFavCount
+                    False
+                )
+            )
             (sortBooks sort reverseSort books)
         )
 
 
-bookView : Book -> Bool -> Bool -> Bool -> Html Msg
-bookView book showRating showFavCount isLandingPage =
+bookView : Book -> Int -> Int -> Bool -> Bool -> Bool -> Html Msg
+bookView book exCount favCount showRating showFavCount isLandingPage =
     (if isLandingPage then
         div
 
@@ -47,7 +59,7 @@ bookView book showRating showFavCount isLandingPage =
             ]
             [ div [ class "title" ] [ text book.title ]
             , div [ class "author" ] [ text <| join " / " book.authors ]
-            , div [ class "count" ] [ text <| fromInt book.count ]
+            , div [ class "count" ] [ text <| fromInt exCount ]
             , if showRating then
                 ratingEl book
 
@@ -62,7 +74,7 @@ bookView book showRating showFavCount isLandingPage =
                             , src "/images/icons/favorite.svg"
                             ]
                             []
-                        , text <| fromInt book.favCount
+                        , text <| fromInt favCount
                         ]
 
                      else
