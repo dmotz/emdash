@@ -447,12 +447,10 @@ makeExcerpt titleRaw authorRaw excerptText mPage mDate notes mUrl =
     , { id = bookId
       , title = title
       , authors = authors
-      , count = 0
       , rating = 0
       , sortIndex = date
       , tags = []
       , slug = ""
-      , favCount = 0
       }
     )
 
