@@ -102,7 +102,7 @@ type Page
     | ExcerptPage Excerpt Book
     | NotFoundPage String
     | SettingsPage
-    | LandingPage (List Book) Bool
+    | LandingPage (List Book) (Dict Id Int) Bool
     | ImportPage
     | CreatePage PendingExcerpt (List Title) (List Author)
 
