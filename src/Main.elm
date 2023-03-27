@@ -191,7 +191,7 @@ main =
                         MainPage _ Nothing ->
                             appName
 
-                        LandingPage _ _ ->
+                        LandingPage _ _ _ ->
                             appName
 
                         _ ->
@@ -1196,7 +1196,7 @@ update message model =
                     ( { model_
                         | page =
                             if showLanding then
-                                LandingPage [] False
+                                LandingPage [] Dict.empty False
 
                             else
                                 MainPage (values model.books) Nothing
@@ -1715,16 +1715,21 @@ update message model =
 
         GotLandingData ( titles, nums ) ->
             case model.page of
-                LandingPage _ didSubmit ->
+                LandingPage _ _ didSubmit ->
+                    let
+                        books =
+                            map
+                                (\( title, author ) ->
+                                    Book "" title [ author ] 0 0 [] ""
+                                )
+                                titles
+                    in
                     ( { model
                         | page =
                             LandingPage
-                                (map2
-                                    (\( title, author ) n ->
-                                        Book "" title [ author ] n 0 0 [] "" 0
-                                    )
-                                    titles
-                                    nums
+                                books
+                                (map2 (\{ id } n -> ( id, n )) books nums
+                                    |> Dict.fromList
                                 )
                                 didSubmit
                       }
@@ -1780,13 +1785,7 @@ update message model =
                                 , excerpts =
                                     insert excerpt.id excerpt model.excerpts
                                 , excerptCountMap =
-                                    (if Dict.member book.id model.books then
-                                        Dict.update book.id (Maybe.map ((+) 1))
-
-                                     else
-                                        Dict.insert book.id 1
-                                    )
-                                        model.excerptCountMap
+                                    upsert model.excerptCountMap book.id ((+) 1) 1
                             }
                     in
                     store
@@ -1884,8 +1883,8 @@ update message model =
 
             else
                 case model.page of
-                    LandingPage bookList _ ->
-                        ( { model | page = LandingPage bookList True }
+                    LandingPage bookList countMap _ ->
+                        ( { model | page = LandingPage bookList countMap True }
                         , Http.post
                             { url = model.mailingListUrl
                             , body =
