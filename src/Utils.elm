@@ -27,12 +27,13 @@ module Utils exposing
     , titleCountLabel
     , toDict
     , untaggedKey
+    , upsert
     )
 
 import Base64 exposing (fromBytes)
 import Bytes.Encode exposing (encode, sequence, unsignedInt8)
 import Char exposing (isDigit)
-import Dict exposing (Dict, empty, get, insert, update, values)
+import Dict exposing (Dict, empty, get, insert, member, update, values)
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (class, classList)
 import List
@@ -137,6 +138,15 @@ juxt f g x =
 toDict : List { a | id : comparable } -> Dict comparable { a | id : comparable }
 toDict =
     map (juxt .id identity) >> Dict.fromList
+
+
+upsert : Dict comparable a -> comparable -> (a -> a) -> a -> Dict comparable a
+upsert dict id f default =
+    if member id dict then
+        update id (Maybe.map f) dict
+
+    else
+        insert id default dict
 
 
 phraseMatch : Regex -> (a -> String) -> a -> Bool
