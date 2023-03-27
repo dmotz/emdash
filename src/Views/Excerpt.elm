@@ -68,7 +68,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                   else
                     div [] [ text <| fromInt (i + 1) ]
                 , button
-                    [ onClick (ToggleFavorite excerpt.id)
+                    [ onClick (ToggleFavorite excerpt)
                     , classList
                         [ ( "favorite", True )
                         , ( "active", excerpt.isFavorite )
