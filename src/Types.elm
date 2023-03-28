@@ -96,6 +96,7 @@ type alias StoredModel =
     , books : List Book
     , hiddenExcerpts : List Id
     , bookmarks : List ( Id, Id )
+    , semanticThreshold : Float
     }
 
 

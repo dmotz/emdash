@@ -2,6 +2,7 @@ module Utils exposing
     ( appName
     , countLabel
     , dedupe
+    , defaultSemanticThreshold
     , excerptCountLabel
     , findMatches
     , formatNumber
@@ -87,6 +88,11 @@ untaggedKey =
     "untagged"
 
 
+defaultSemanticThreshold : Float
+defaultSemanticThreshold =
+    0.3
+
+
 inc : Int -> Int
 inc =
     (+) 1
@@ -129,6 +135,7 @@ modelToStoredModel model =
     , books = values model.books
     , hiddenExcerpts = Set.toList model.hiddenExcerpts
     , bookmarks = Dict.toList model.bookmarks
+    , semanticThreshold = model.semanticThreshold
     }
 
 
