@@ -14,7 +14,8 @@
     "build": "vite build",
     "postinstall": "elm-tooling install",
     "prebuild": "elm-tooling install",
-    "lint": "elm-review --template jfmengels/elm-review-unused/example && elm-review --template jfmengels/elm-review-simplify/example"
+    "lint": "elm-review --template jfmengels/elm-review-unused/example && elm-review --template jfmengels/elm-review-simplify/example",
+    "demo-embed": "node ./scripts/gen-demo-embeddings.mjs"
   },
   "dependencies": {
     "@tensorflow-models/universal-sentence-encoder": "^1.3.3",
