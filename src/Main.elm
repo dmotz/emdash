@@ -898,7 +898,13 @@ update message model =
                 TitlePage book excerpts _ ->
                     let
                         newBook =
-                            { book | title = trim book.title }
+                            { book
+                                | title = trim book.title
+                                , authors =
+                                    book.authors
+                                        |> map trim
+                                        |> filter (not << String.isEmpty)
+                            }
                     in
                     if trim newBook.title == "" then
                         update ExitBookEditMode model
