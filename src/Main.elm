@@ -142,7 +142,7 @@ createModel mStoredModel ( version, mailingListUrl, mailingListField ) demoMode 
     , demoMode = demoMode
     , excerpts = toDict restored.excerpts
     , books = books
-    , semanticThreshold = 0.1
+    , semanticThreshold = 0.3
     , neighborMap = Dict.empty
     , bookNeighborMap = Dict.empty
     , authorNeighborMap = Dict.empty
