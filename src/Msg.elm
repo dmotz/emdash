@@ -46,7 +46,8 @@ type Msg
     | EnterBookEditMode
     | ExitBookEditMode
     | SetPendingBookTitle String
-    | SetBookTitle
+    | SetPendingBookAuthor String
+    | SetBookEdits
     | UpdateNotes Id String
     | SetBookmark Id Id
     | ToggleFavorite Excerpt
