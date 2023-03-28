@@ -1,26 +1,50 @@
 module Views.Settings exposing (settingsView)
 
-import Html exposing (Html, a, button, div, em, h1, h2, li, ol, p, section, span, text)
-import Html.Attributes exposing (class, href, target)
-import Html.Events exposing (onClick)
+import Html exposing (Html, a, div, em, h1, h2, input, label, li, p, pre, section, sup, text, ul)
+import Html.Attributes exposing (class, href, step, type_, value)
+import Html.Events exposing (onInput)
 import List exposing (map)
 import Msg exposing (Msg(..))
-import Utils exposing (formatNumber)
+import String exposing (fromFloat, fromInt)
+import Utils exposing (appName, formatNumber, repoUrl)
 
 
-settingsView : Int -> Int -> Int -> Int -> Html Msg
-settingsView entryCount bookCount authorCount tagCount =
+settingsView : String -> Int -> Int -> Int -> Int -> Float -> Html Msg
+settingsView version excerptCount bookCount authorCount tagCount semanticThreshold =
     div
         [ class "settings" ]
         [ h1 [] [ text "Settings ", em [] [ text "&c." ] ]
         , section []
             [ div
                 []
+                [ h2 [] [ text "Semantic search threshold" ]
+                , div
+                    []
+                    [ label
+                        []
+                        [ input
+                            [ type_ "range"
+                            , Html.Attributes.min "0.10"
+                            , Html.Attributes.max "0.95"
+                            , step "0.01"
+                            , value <| fromFloat semanticThreshold
+                            , onInput SetSemanticThreshold
+                            ]
+                            []
+                        , text <| fromInt (floor (semanticThreshold * 100))
+                        , sup [] [ text "%" ]
+                        ]
+                    ]
+                , p [] [ text "Lower values yield more semantic matches." ]
+                ]
+            , div
+                []
                 [ h2 [] [ text "Statistics" ]
-                , ol []
+                , ul []
                     (map
                         (\( name, n ) ->
-                            li []
+                            li
+                                []
                                 [ text <|
                                     formatNumber n
                                         ++ " "
@@ -33,7 +57,7 @@ settingsView entryCount bookCount authorCount tagCount =
                                            )
                                 ]
                         )
-                        [ ( "excerpt", entryCount )
+                        [ ( "excerpt", excerptCount )
                         , ( "title", bookCount )
                         , ( "author", authorCount )
                         , ( "tag", tagCount )
@@ -49,60 +73,16 @@ settingsView entryCount bookCount authorCount tagCount =
                     ]
                 , p [ class "colophon" ]
                     [ text "Itʼs written in "
-                    , a [ href "https://elm-lang.org/" ] [ text "Elm" ]
+                    , a [ href "https://elm-lang.org" ] [ text "Elm" ]
                     , text " and typeset in "
                     , a
                         [ href "https://en.wikipedia.org/wiki/EB_Garamond" ]
                         [ text "EB Garamond" ]
                     , text ". Read the "
                     , a
-                        [ href "https://github.com/dmotz/marginalia" ]
+                        [ href repoUrl ]
                         [ text "source code here" ]
                     , text "."
-                    ]
-                ]
-            , div
-                []
-                [ h2 [] [ text "Imports ", em [] [ text "&" ], text " exports" ]
-                , button
-                    [ class "button"
-                    , onClick ExportJson
-                    ]
-                    [ text "Export "
-                    , span
-                        [ class "smallCaps" ]
-                        [ text "json" ]
-                    ]
-                , p
-                    []
-                    [ text "Exports your full collection including tags and notes for safekeeping." ]
-                , button
-                    [ class "button"
-                    , onClick ExportEpub
-                    ]
-                    [ text "Export "
-                    , span
-                        [ class "smallCaps" ]
-                        [ text "epub" ]
-                    ]
-                , p []
-                    [ text "Exports your excerpts into an "
-                    , span [ class "smallCaps" ] [ text "epub" ]
-                    , text " file for review on an e-reader."
-                    ]
-                , button
-                    [ class "button"
-                    , onClick ExportEpub
-                    ]
-                    [ text "Import "
-                    , span
-                        [ class "smallCaps" ]
-                        [ text "json" ]
-                    ]
-                , p []
-                    [ text "Restore your collection via a previously exported "
-                    , span [ class "smallCaps" ] [ text "json" ]
-                    , text " file."
                     ]
                 ]
             ]
