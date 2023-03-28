@@ -877,7 +877,23 @@ update message model =
                 _ ->
                     noOp
 
-        SetBookTitle ->
+        SetPendingBookAuthor author ->
+            case model.page of
+                TitlePage book excerpts editMode ->
+                    ( { model
+                        | page =
+                            TitlePage
+                                { book | authors = String.split "/" author }
+                                excerpts
+                                editMode
+                      }
+                    , none
+                    )
+
+                _ ->
+                    noOp
+
+        SetBookEdits ->
             case model.page of
                 TitlePage book excerpts _ ->
                     let
