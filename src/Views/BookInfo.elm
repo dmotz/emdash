@@ -27,6 +27,7 @@ import Html.Attributes as H
         , classList
         , href
         , placeholder
+        , spellcheck
         , step
         , target
         , type_
@@ -37,6 +38,7 @@ import List exposing (intersperse, map, repeat)
 import Maybe exposing (withDefault)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
+import String exposing (join)
 import Types exposing (Book, BookMap, ExcerptSort(..), Id, NeighborMap, Tag)
 import Utils
     exposing
@@ -153,11 +155,19 @@ bookInfo book books tags pendingTag bookNeighborMap count mBookmark excerptSort 
                     [ summary [] [ h5 [] [ text "Edit" ] ]
                     , if editMode then
                         form
-                            [ class "editTitle", onSubmit SetBookTitle ]
+                            [ class "editTitle", onSubmit SetBookEdits ]
                             [ input
                                 [ value book.title
                                 , onInput SetPendingBookTitle
                                 , placeholder "Title"
+                                , spellcheck False
+                                ]
+                                []
+                            , input
+                                [ value <| join "/" book.authors
+                                , onInput SetPendingBookAuthor
+                                , placeholder "Author"
+                                , spellcheck False
                                 ]
                                 []
                             , div []
@@ -175,7 +185,7 @@ bookInfo book books tags pendingTag bookNeighborMap count mBookmark excerptSort 
                             []
                             [ button
                                 [ class "button", onClick EnterBookEditMode ]
-                                [ text "Edit title text" ]
+                                [ text "Edit title / author" ]
                             , button
                                 [ class "button"
                                 , onClick <|
