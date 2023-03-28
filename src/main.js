@@ -191,6 +191,10 @@ let zipWorker
 window.addEventListener(
   'input',
   ({target}) => {
+    if (target.type !== 'text') {
+      return
+    }
+
     const {value, selectionStart} = target
 
     requestAnimationFrame(() => {
