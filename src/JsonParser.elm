@@ -18,6 +18,7 @@ import Json.Decode
 import Json.Decode.Pipeline exposing (optional, required)
 import Tuple exposing (pair)
 import Types exposing (Book, Excerpt, StoredModel)
+import Utils exposing (defaultSemanticThreshold)
 
 
 decodeStoredModel : String -> Result Error StoredModel
@@ -30,6 +31,7 @@ decodeStoredModel =
             "bookmarks"
             (list (map2 pair (index 0 string) (index 1 string)))
             []
+        |> optional "semanticThreshold" float defaultSemanticThreshold
         |> decodeString
 
 
