@@ -31,7 +31,7 @@ import List
         , take
         )
 import Maybe exposing (andThen, withDefault)
-import Model exposing (ModalMsg(..), Model, initialStoredModel)
+import Model exposing (ModalMsg(..), Model)
 import Msg exposing (Msg(..))
 import Platform.Cmd exposing (batch, none)
 import Ports exposing (..)
@@ -68,6 +68,7 @@ import Utils
         ( appName
         , countLabel
         , dedupe
+        , defaultSemanticThreshold
         , excerptCountLabel
         , findMatches
         , getAuthorRouteMap
@@ -124,7 +125,14 @@ createModel : Maybe StoredModel -> ( String, String, String ) -> Bool -> Url -> 
 createModel mStoredModel ( version, mailingListUrl, mailingListField ) demoMode url key =
     let
         restored =
-            withDefault initialStoredModel mStoredModel
+            withDefault
+                { excerpts = []
+                , books = []
+                , hiddenExcerpts = []
+                , bookmarks = []
+                , semanticThreshold = defaultSemanticThreshold
+                }
+                mStoredModel
 
         ( titleRouteMap, booksWithSlugs ) =
             getTitleRouteMap restored.books
@@ -142,7 +150,7 @@ createModel mStoredModel ( version, mailingListUrl, mailingListField ) demoMode 
     , demoMode = demoMode
     , excerpts = toDict restored.excerpts
     , books = books
-    , semanticThreshold = 0.3
+    , semanticThreshold = restored.semanticThreshold
     , neighborMap = Dict.empty
     , bookNeighborMap = Dict.empty
     , authorNeighborMap = Dict.empty

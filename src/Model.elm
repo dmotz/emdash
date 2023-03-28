@@ -1,4 +1,4 @@
-module Model exposing (ModalMsg(..), Model, initialStoredModel)
+module Model exposing (ModalMsg(..), Model)
 
 import Browser.Navigation as Nav
 import Debounce exposing (Debounce)
@@ -17,7 +17,6 @@ import Types
         , Id
         , NeighborMap
         , Page
-        , StoredModel
         , Tag
         , TagSort
         )
@@ -63,15 +62,6 @@ type alias Model =
     , mailingListUrl : String
     , mailingListField : String
     , mailingListEmail : String
-    }
-
-
-initialStoredModel : StoredModel
-initialStoredModel =
-    { excerpts = []
-    , books = []
-    , hiddenExcerpts = []
-    , bookmarks = []
     }
 
 
