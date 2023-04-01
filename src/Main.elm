@@ -1684,6 +1684,7 @@ update message model =
                             (model.excerpts
                                 |> values
                                 |> findMatches query (\e -> e.text ++ " " ++ e.notes)
+                                |> sortBy .bookId
                             )
                             (if String.length query >= minSemanticQueryLen then
                                 withDefault [] prevSemantic
