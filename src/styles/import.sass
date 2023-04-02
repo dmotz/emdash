@@ -52,23 +52,26 @@
   li
     margin-bottom: 1.6rem
 
-  .dropZone
-    border: 1px dashed $mid2
-    display: flex
-    align-items: center
-    justify-content: center
-    text-align: center
-    margin-bottom: 4rem
-    height: 15rem
-    transition: border-color .2s
+.dropZone
+  border: 1px dashed $mid2
+  display: flex
+  align-items: center
+  justify-content: center
+  text-align: center
+  margin-bottom: 4rem
+  height: 15rem
+  transition: border-color .2s
 
-    h3
-      font-size: 2.2rem
-      font-style: italic
-      margin-bottom: 1rem
+  *
+    user-select: none
 
-    &.active
-      border-color: $fg
+  h3
+    font-size: 2.2rem
+    font-style: italic
+    margin-bottom: 1rem
 
-    @include touch
-      display: none
+  &.active
+    border-color: $fg
+
+  @include touch
+    display: none
