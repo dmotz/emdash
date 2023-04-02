@@ -6,7 +6,6 @@ const dbNs = 'marginalia'
 const embKey = 'embeddings'
 const model = load()
 const embSize = 512
-const neighborsK = 5
 const semanticSearchLimit = 203
 const embsInProgress = {}
 const embStore = createStore(`${dbNs}:${embKey}`, embKey)
@@ -80,7 +79,7 @@ const computeAverages = (targets, map) =>
     }
   })
 
-const findExcerptNeighbors = async targetId => {
+const findExcerptNeighbors = async (targetId, k) => {
   const targetTitle = excerptIdToBookId[targetId]
 
   return (
@@ -93,7 +92,7 @@ const findExcerptNeighbors = async targetId => {
     )
   ).reduce(
     (a, c) =>
-      a.length === neighborsK
+      a.length === k
         ? a
         : excerptIdToBookId[c[0]] === targetTitle
         ? a
@@ -102,17 +101,12 @@ const findExcerptNeighbors = async targetId => {
   )
 }
 
-const findBookNeighbors = bookId =>
-  getTopK(bookTensor, bookKeyList, bookEmbMap[bookId], neighborsK, true)
+const findBookNeighbors = (bookId, k) =>
+  getTopK(bookTensor, bookKeyList, bookEmbMap[bookId], k, true)
 
-const findAuthorNeighbors = async authorId =>
+const findAuthorNeighbors = async (authorId, k) =>
   (
-    await getTopK(
-      authorTensor,
-      authorKeyList,
-      authorEmbMap[authorId],
-      neighborsK + 1
-    )
+    await getTopK(authorTensor, authorKeyList, authorEmbMap[authorId], k + 1)
   ).filter(([auth]) => auth !== authorId)
 
 const processNewExcerpts = async ({excerpts}, cb) => {
@@ -182,14 +176,17 @@ const methods = {
     cb(null)
   },
 
-  requestExcerptNeighbors: async ({target}, cb) =>
-    cb([target, await findExcerptNeighbors(target)]),
+  requestExcerptNeighbors: async ({target, k}, cb) =>
+    cb([target, await findExcerptNeighbors(target, k)]),
 
-  requestBookNeighbors: async ({target}, cb) =>
-    cb([target, bookEmbMap[target] ? await findBookNeighbors(target) : []]),
+  requestBookNeighbors: async ({target, k}, cb) =>
+    cb([target, bookEmbMap[target] ? await findBookNeighbors(target, k) : []]),
 
-  requestAuthorNeighbors: async ({target}, cb) =>
-    cb([target, authorEmbMap[target] ? await findAuthorNeighbors(target) : []]),
+  requestAuthorNeighbors: async ({target, k}, cb) =>
+    cb([
+      target,
+      authorEmbMap[target] ? await findAuthorNeighbors(target, k) : []
+    ]),
 
   requestSemanticRank: async ({bookId, excerptIds}, cb) =>
     cb([

@@ -151,16 +151,16 @@ let zipWorker
     worker.port.postMessage({method: 'deleteBook', bookId, bookExcerptIds})
   )
 
-  app.ports.requestExcerptNeighbors.subscribe(([target]) =>
-    worker.port.postMessage({method: 'requestExcerptNeighbors', target})
+  app.ports.requestExcerptNeighbors.subscribe(([target, k]) =>
+    worker.port.postMessage({method: 'requestExcerptNeighbors', target, k})
   )
 
-  app.ports.requestAuthorNeighbors.subscribe(target =>
-    worker.port.postMessage({method: 'requestAuthorNeighbors', target})
+  app.ports.requestAuthorNeighbors.subscribe(([target, k]) =>
+    worker.port.postMessage({method: 'requestAuthorNeighbors', target, k})
   )
 
-  app.ports.requestBookNeighbors.subscribe(target =>
-    worker.port.postMessage({method: 'requestBookNeighbors', target})
+  app.ports.requestBookNeighbors.subscribe(([target, k]) =>
+    worker.port.postMessage({method: 'requestBookNeighbors', target, k})
   )
 
   app.ports.requestSemanticSearch.subscribe(([query, threshold]) =>
