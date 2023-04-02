@@ -37,7 +37,9 @@ importView emptyOrDemo isDragging =
         , section
             []
             [ if emptyOrDemo then
-                aside [] [ text "Ready to import your collection? Drop a file or read the instructions below." ]
+                aside
+                    []
+                    [ text "Ready to import your collection? Drop a file or read the instructions below." ]
 
               else
                 null
@@ -79,6 +81,7 @@ importView emptyOrDemo isDragging =
                                     []
                                     [ text "Plug your Kindle in via "
                                     , span [ class "smallCaps" ] [ text "usb" ]
+                                    , text "."
                                     ]
                                 , li
                                     []
@@ -86,11 +89,11 @@ importView emptyOrDemo isDragging =
                                     , code
                                         []
                                         [ text "Kindle/Documents/My Clippings.txt" ]
-                                    , text " in a file browser"
+                                    , text " in a file browser."
                                     ]
                                 , li
                                     []
-                                    [ text "Drag it onto this page or click the button above" ]
+                                    [ text "Drag it onto this page or click the button above." ]
                                 , li
                                     []
                                     [ text "Repeat this process whenever you highlight new excerpts and theyʼll be added to your collection." ]
