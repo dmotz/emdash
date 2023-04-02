@@ -99,6 +99,21 @@ embeddingBatchSize =
     10
 
 
+excerptNeighborK : Int
+excerptNeighborK =
+    5
+
+
+bookNeighborK : Int
+bookNeighborK =
+    6
+
+
+authorNeighborK : Int
+authorNeighborK =
+    5
+
+
 debounceConfig : Debounce.Config Msg
 debounceConfig =
     { strategy = Debounce.soon 999
@@ -1031,7 +1046,7 @@ update message model =
             , case model.page of
                 TitlePage book _ _ ->
                     batch
-                        [ requestBookNeighbors book.id
+                        [ requestBookNeighbors ( book.id, bookNeighborK )
                         , requestSemanticRank
                             ( book.id
                             , model.excerpts
@@ -1045,7 +1060,7 @@ update message model =
                         ]
 
                 ExcerptPage excerpt _ ->
-                    requestExcerptNeighbors ( excerpt.id, True )
+                    requestExcerptNeighbors ( excerpt.id, excerptNeighborK, True )
 
                 SearchPage query _ _ _ _ ->
                     requestSemanticSearch ( query, model.semanticThreshold )
@@ -1061,7 +1076,7 @@ update message model =
             ( { model | authorEmbeddingsReady = True }
             , case model.page of
                 AuthorPage author _ ->
-                    requestAuthorNeighbors author
+                    requestAuthorNeighbors ( author, authorNeighborK )
 
                 _ ->
                     none
@@ -1297,7 +1312,7 @@ update message model =
                                  )
                                     :: (if model.embeddingsReady then
                                             [ if not (Dict.member book.id model.bookNeighborMap) then
-                                                requestBookNeighbors book.id
+                                                requestBookNeighbors ( book.id, bookNeighborK )
 
                                               else
                                                 none
@@ -1346,7 +1361,7 @@ update message model =
                                     model.embeddingsReady
                                         && not (Dict.member excerpt.id model.neighborMap)
                                   then
-                                    requestExcerptNeighbors ( excerpt.id, True )
+                                    requestExcerptNeighbors ( excerpt.id, excerptNeighborK, True )
 
                                   else
                                     none
@@ -1379,7 +1394,7 @@ update message model =
                             , batch
                                 [ if model.authorEmbeddingsReady then
                                     if not <| Dict.member author model.authorNeighborMap then
-                                        requestAuthorNeighbors author
+                                        requestAuthorNeighbors ( author, authorNeighborK )
 
                                     else
                                         none
@@ -1610,7 +1625,7 @@ update message model =
                         && not (Dict.member id model.neighborMap)
                         && model.embeddingsReady
                   then
-                    requestExcerptNeighbors ( id, True )
+                    requestExcerptNeighbors ( id, excerptNeighborK, True )
 
                   else
                     none

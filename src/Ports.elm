@@ -39,19 +39,19 @@ port deleteExcerpt : ( Id, ( Id, List Id ) ) -> Cmd msg
 port deleteBook : ( Id, List Id ) -> Cmd msg
 
 
-port requestExcerptNeighbors : ( Id, Bool ) -> Cmd msg
+port requestExcerptNeighbors : ( Id, Int, Bool ) -> Cmd msg
 
 
 port receiveExcerptNeighbors : (( Id, ScorePairs ) -> msg) -> Sub msg
 
 
-port requestBookNeighbors : Id -> Cmd msg
+port requestBookNeighbors : ( Id, Int ) -> Cmd msg
 
 
 port receiveBookNeighbors : (( Id, ScorePairs ) -> msg) -> Sub msg
 
 
-port requestAuthorNeighbors : Author -> Cmd msg
+port requestAuthorNeighbors : ( Author, Int ) -> Cmd msg
 
 
 port receiveAuthorNeighbors : (( Author, ScorePairs ) -> msg) -> Sub msg
