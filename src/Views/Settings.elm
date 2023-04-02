@@ -36,6 +36,13 @@ settingsView version excerptCount bookCount authorCount tagCount semanticThresho
                         ]
                     ]
                 , p [] [ text "Lower values yield more semantic matches." ]
+                , h2 [] [ text "Import/export excerpts" ]
+                , p
+                    []
+                    [ text "Visit the "
+                    , a [ href "/import" ] [ text "import page" ]
+                    , text "."
+                    ]
                 ]
             , div
                 []

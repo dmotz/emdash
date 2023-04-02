@@ -3,7 +3,7 @@
     margin-bottom: 4rem
 
   h2
-    margin-bottom: 2.5rem
+    margin-bottom: 1.6rem
 
   section
     display: flex
@@ -22,12 +22,16 @@
 
       &:last-child
         padding-left: 6rem
+        border-left: 1px solid $mid2
+
+        @include mobile
+          border: none
 
       @include mobile
         padding: 0 !important
 
       div
-        margin-bottom: 2rem
+        margin-bottom: 1rem
 
   button
     margin-bottom: 1.5rem
@@ -35,8 +39,8 @@
   p
     margin-bottom: 4rem
 
-  ol
-    list-style: lower-roman
+  ul
+    list-style: disc
     font-size: 1.8rem
     line-height: 1
     margin-bottom: 4rem
