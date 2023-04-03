@@ -1,10 +1,9 @@
 $scrollSpeed: 20s
-$centerGutter: 14rem
 $bookGap: 1rem
 $maxColWidth: 900px
 
 :root
-  --center-gutter: 14rem
+  --center-gutter: 13rem
 
   @include mobile
     --center-gutter: #{$bookGap}
@@ -20,18 +19,20 @@ $maxColWidth: 900px
   *
     user-select: text
 
+  img
+    user-select: none
+
   main
     position: relative
 
-  .monogram
-    width: 20rem
+  .logo
+    width: 22rem
     margin: 0 auto
-    transform: translateX(-3%)
-    margin-top: -12rem
-    margin-bottom: -5rem
+    margin-top: -15rem
+    margin-bottom: -2rem
     position: relative
     z-index: 1
-    display: block
+    transform: translateX(-7%)
 
   section, hr
     width: 100%
@@ -111,12 +112,12 @@ $maxColWidth: 900px
       position: relative
       display: flex
       justify-content: center
-      margin-top: 8rem
+      margin-top: 12rem
       margin-bottom: 2rem
 
     h1
       font-weight: normal
-      font-size: clamp(2.6rem, 4vw, 4rem)
+      font-size: clamp(2.6rem, 4vw, 3.6rem)
       margin: 0 auto
       margin-bottom: 3rem
       padding: 0 6rem
@@ -209,6 +210,9 @@ $maxColWidth: 900px
     margin-bottom: 10rem
     padding: 0
 
+    > div
+      position: relative
+
     h2
       margin-bottom: 6rem
 
@@ -223,7 +227,8 @@ $maxColWidth: 900px
       display: grid
       grid: 1fr / 1fr 1fr
       grid-gap: 14rem
-      row-gap: 8rem
+      margin-top: 12rem
+      row-gap: 18rem
 
       @include mobile
         grid-template-columns: 1fr
@@ -231,6 +236,8 @@ $maxColWidth: 900px
 
     li
       text-align: center
+
+    figure
       position: relative
 
     figcaption
@@ -241,8 +248,23 @@ $maxColWidth: 900px
         margin-bottom: 1rem
 
     img
+      position: absolute
       width: 30%
-      display: none
+      left: 50%
+      top: 17rem
+      transform: translateX(-50%)
+
+      &:nth-child(2)
+        margin-top: 42rem
+        width: 20%
+        transform: translateX(-50%) rotate(-10deg)
+
+      &:nth-child(3)
+        margin-top: 72rem
+        width: 15%
+
+      @include mobile
+        display: none
 
     p
       font-size: 2.3rem
