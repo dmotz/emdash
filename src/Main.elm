@@ -22,6 +22,7 @@ import List
         , filterMap
         , foldl
         , head
+        , indexedMap
         , isEmpty
         , length
         , map
@@ -1783,9 +1784,9 @@ update message model =
                 LandingPage _ _ didSubmit ->
                     let
                         books =
-                            map
-                                (\( title, author ) ->
-                                    Book "" title [ author ] 0 0 [] ""
+                            indexedMap
+                                (\i ( title, author ) ->
+                                    Book (String.fromInt i) title [ author ] 0 0 [] ""
                                 )
                                 titles
                     in
