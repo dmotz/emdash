@@ -1,12 +1,13 @@
 $scrollSpeed: 20s
 $bookGap: 1rem
+$bookScale: 0.7
 $maxColWidth: 900px
 
 :root
   --center-gutter: 13rem
 
   @include mobile
-    --center-gutter: #{$bookGap}
+    --center-gutter: #{$bookGap * $bookScale}
 
 .landing
   margin: 0 auto
@@ -33,6 +34,10 @@ $maxColWidth: 900px
     position: relative
     z-index: 1
     transform: translateX(-7%)
+
+    @include mobile
+      width: 16rem
+      margin-top: -13rem
 
   section, hr
     width: 100%
@@ -72,11 +77,11 @@ $maxColWidth: 900px
       display: flex
       justify-content: flex-end
       transform-origin: 0 0
-      transform: scale(.7) translateX(-100%)
+      transform: scale($bookScale) translateX(-100%)
 
       &:last-child
         left: calc(50% + var(--center-gutter))
-        transform: scale(.7)
+        transform: scale($bookScale)
 
     .bookCol
       margin-right: 2rem
