@@ -36,7 +36,7 @@ type Route
     | SearchRoute (Maybe String)
     | SettingsRoute
     | ImportRoute
-    | CreateRoute
+    | CreateRoute (Maybe String) (Maybe String) (Maybe String) (Maybe String) (Maybe Int)
 
 
 routeParser : Parser (Route -> a) a
@@ -50,7 +50,14 @@ routeParser =
         , map SearchRoute (s "search" <?> Query.string "q")
         , map SettingsRoute (s "settings")
         , map ImportRoute (s "import")
-        , map CreateRoute (s "create")
+        , map CreateRoute
+            (s "create"
+                <?> Query.string "title"
+                <?> Query.string "author"
+                <?> Query.string "text"
+                <?> Query.string "sourceUrl"
+                <?> Query.int "page"
+            )
         ]
 
 
