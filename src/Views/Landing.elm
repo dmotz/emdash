@@ -8,8 +8,6 @@ import Html
         , button
         , div
         , em
-        , figcaption
-        , figure
         , form
         , h1
         , h2
@@ -22,6 +20,7 @@ import Html
         , p
         , section
         , span
+        , sup
         , text
         , ul
         )
@@ -60,12 +59,7 @@ landingView bookList countMap didSubmitEmail =
 
         bookLists =
             range 0 (bookCols - 1)
-                |> map
-                    (\n ->
-                        bookList
-                            |> drop (n * colSize)
-                            |> take colSize
-                    )
+                |> map (\n -> bookList |> drop (n * colSize) |> take colSize)
 
         list1 =
             take (bookCols // 2) bookLists
@@ -122,7 +116,7 @@ landingView bookList countMap didSubmitEmail =
                     , em [] [ text "actually remember & learn from" ]
                     , text " what you read."
                     ]
-                , aside [] [ text "And itʼs free & open-source." ]
+                , aside [] [ text "Oh and itʼs free & open-source." ]
                 , div
                     []
                     [ button
@@ -138,95 +132,76 @@ landingView bookList countMap didSubmitEmail =
             , section
                 [ class "features" ]
                 [ h2 [] [ text "Featuring" ]
-                , ul []
-                    [ li
-                        []
-                        [ figure
+                , div
+                    []
+                    [ img [ src "/images/landing/botanical19.png" ] []
+                    , img [ src "/images/landing/botanical16.png" ] []
+                    , ul []
+                        [ li
                             []
-                            [ figcaption [] [ text "i" ] ]
-                        , h3 [] [ text "AI analysis" ]
-                        , p
-                            []
-                            [ text
-                                """
-                            Draw new connections and discover related passages
-                            from other books via on-device machine learning.
-                            """
-                            ]
-                        ]
-                    , li
-                        []
-                        [ figure
-                            []
-                            [ figcaption [] [ text "ii" ] ]
-                        , h3 [] [ text "Instant semantic search" ]
-                        , p
-                            []
-                            [ text
-                                """
-                            Find what youʼre looking for with both full-text
-                            search and deeper semantic matching for fuzzy concepts.
-                            """
-                            ]
-                        ]
-                    , li
-                        []
-                        [ figure
-                            []
-                            [ figcaption [] [ text "iii" ] ]
-                        , h3 [] [ text "Tag, rate, note, reflect" ]
-                        , p
-                            []
-                            [ text
-                                """
-                            Organize everything with tags, add ratings, and
-                            filter and sort with both. Export back to
-                            """
-                            , span [ class "smallCaps" ] [ text "epub" ]
-                            , text " for review on an e-reader."
-                            ]
-                        ]
-                    , li
-                        []
-                        [ figure
-                            []
-                            [ figcaption [] [ text "iv" ] ]
-                        , h3 [] [ text "Roll the dice" ]
-                        , p [] [ text "Unearth ideas youʼve forgotten about via random discovery." ]
-                        ]
-                    , li
-                        []
-                        [ figure
-                            []
-                            [ figcaption [] [ text "v" ] ]
-                        , h3 [] [ text "No lock-in" ]
-                        , p []
-                            [ text "Bring in your highlights from your Kindle or as "
-                            , span [ class "smallCaps" ] [ text "json" ]
-                            , text " or "
-                            , span [ class "smallCaps" ] [ text "csv" ]
-                            , text ". Export instantly to the same open formats."
-                            ]
-                        ]
-                    , li
-                        []
-                        [ figure
-                            []
-                            [ figcaption [] [ text "vi" ] ]
-                        , h3
-                            []
-                            [ text "Open source "
-                            , span [] [ text "&" ]
-                            , text " offline first"
-                            ]
-                        , p []
-                            [ text "Fully private AI analysis and fully "
-                            , a
-                                [ href repoUrl
-                                , target "_blank"
+                            [ h3 [] [ text "AI analysis" ]
+                            , p
+                                []
+                                [ text <|
+                                    "Draw new connections and discover related passages "
+                                        ++ "from other books via on-device machine learning."
                                 ]
-                                [ text "open source" ]
-                            , text ". Your data stay on your device."
+                            ]
+                        , li
+                            []
+                            [ h3 [] [ text "Instant semantic search" ]
+                            , p
+                                []
+                                [ text <|
+                                    "Find what youʼre looking for with both full-text "
+                                        ++ "search and deeper semantic matching for fuzzy concepts."
+                                ]
+                            ]
+                        , li
+                            []
+                            [ h3 [] [ text "Tag, rate, note, reflect" ]
+                            , p
+                                []
+                                [ text <|
+                                    "Organize with tags, add ratings, and "
+                                        ++ "annotate your thoughts. Export back to "
+                                , span [ class "smallCaps" ] [ text "epub" ]
+                                , text " for review on your e-reader."
+                                ]
+                            ]
+                        , li
+                            []
+                            [ h3 [] [ text "Roll the dice" ]
+                            , p [] [ text "Unearth ideas youʼve forgotten about via serendipitous discovery." ]
+                            ]
+                        , li
+                            []
+                            [ h3 [] [ text "No lock-in" ]
+                            , p []
+                                [ text "Bring in your highlights from your Kindle or as "
+                                , span [ class "smallCaps" ] [ text "json" ]
+                                , text " or "
+                                , span [ class "smallCaps" ] [ text "csv" ]
+                                , text ". Export instantly to the same open formats."
+                                ]
+                            ]
+                        , li
+                            []
+                            [ h3
+                                []
+                                [ text "Open-source "
+                                , span [] [ text "&" ]
+                                , text " offline first"
+                                ]
+                            , p []
+                                [ text "Fully private AI analysis and fully "
+                                , a
+                                    [ href repoUrl
+                                    , target "_blank"
+                                    ]
+                                    [ text "open-source" ]
+                                , text ". Your data stay on your device."
+                                ]
                             ]
                         ]
                     ]
@@ -242,19 +217,26 @@ landingView bookList countMap didSubmitEmail =
                     , ul
                         []
                         [ li [] [ text "More advanced AI analysis" ]
-                        , li [] [ text "Socratic interaction (interrogate your books!)" ]
-                        , li [] [ text "Cross device syncing and backup" ]
+                        , li
+                            []
+                            [ text "Socratic interaction "
+                            , em [] [ text "(interrogate your books!)" ]
+                            ]
+                        , li [] [ text "Cross-device syncing and backup" ]
                         , li [] [ text "Publishing / sharing excerpts" ]
                         , li [] [ text "Sturdier gardening tools" ]
                         ]
                     ]
                 ]
             , if didSubmitEmail then
-                div [] [ h3 [] [ text "Thank you!" ] ]
+                div [] [ h3 [] [ text "Thanks, weʼll be in touch with updates." ] ]
 
               else
-                form [ onSubmit SubscribeToMailingList ]
-                    [ h3 [] [ text <| "Sign up for the occasional " ++ appName ++ " update:" ]
+                form
+                    [ onSubmit SubscribeToMailingList ]
+                    [ h3
+                        []
+                        [ text <| "Sign up for the occasional " ++ appName ++ " update:" ]
                     , div []
                         [ input
                             [ type_ "email"
@@ -265,6 +247,18 @@ landingView bookList countMap didSubmitEmail =
                         , button [ class "button" ] [ text "Submit" ]
                         ]
                     ]
+            , section
+                [ class "coda" ]
+                [ aside [] [ text "Thank you for reading." ]
+                , p
+                    []
+                    [ em [] [ text "ex libris " ]
+                    , a
+                        [ href "https://oxism.com", target "_blank" ]
+                        [ text "oxism.com" ]
+                    , text " • A.D. MMXXIII"
+                    ]
+                ]
             ]
         ]
 
