@@ -15,7 +15,8 @@ import JsonParser exposing (decodeStoredModel)
 import KindleParser
 import List
     exposing
-        ( concatMap
+        ( all
+        , concatMap
         , drop
         , filter
         , filterMap
@@ -473,7 +474,8 @@ update message model =
                         newExcerpts
 
                     else
-                        Dict.diff newExcerpts model.excerpts |> Dict.filter hiddenPred
+                        Dict.diff newExcerpts model.excerpts
+                            |> Dict.filter hiddenPred
 
                 bookVals =
                     unseenExcerpts
@@ -1486,16 +1488,33 @@ update message model =
                 Just ImportRoute ->
                     ( { model_ | page = ImportPage }, scrollTop )
 
-                Just CreateRoute ->
-                    ( { model_
-                        | page =
-                            CreatePage
-                                (PendingExcerpt "" "" "" Nothing "")
-                                (values model.books |> map .title |> sort)
-                                (values model.authorRouteMap)
-                      }
-                    , scrollTop
-                    )
+                Just (CreateRoute mTitle mAuthor mText mSource mPage) ->
+                    let
+                        pendingEx =
+                            PendingExcerpt
+                                (withDefault "" mTitle)
+                                (withDefault "" mAuthor)
+                                (withDefault "" mText)
+                                mPage
+                                (withDefault "" mSource)
+                    in
+                    if
+                        all
+                            (not << String.isEmpty)
+                            [ pendingEx.title, pendingEx.author, pendingEx.text ]
+                    then
+                        update (GetTime (CreateExcerpt pendingEx)) model
+
+                    else
+                        ( { model_
+                            | page =
+                                CreatePage
+                                    pendingEx
+                                    (values model.books |> map .title |> sort)
+                                    (values model.authorRouteMap)
+                          }
+                        , scrollTop
+                        )
 
                 _ ->
                     ( { model_ | page = NotFoundPage "Route not found." }
