@@ -20,7 +20,6 @@ import Html
         , p
         , section
         , span
-        , sup
         , text
         , ul
         )
@@ -108,7 +107,9 @@ landingView bookList countMap didSubmitEmail =
                 [ map reverse list2 ++ list1, list2 ++ map reverse list1 ]
             )
         , main_ []
-            [ img [ src "/images/logo.svg", class "monogram", draggable "false", alt appName ] []
+            [ img
+                [ src "/images/logo.svg", class "logo", draggable "false", alt appName ]
+                []
             , section
                 [ class "cta" ]
                 [ h1 []
@@ -171,11 +172,6 @@ landingView bookList countMap didSubmitEmail =
                             ]
                         , li
                             []
-                            [ h3 [] [ text "Roll the dice" ]
-                            , p [] [ text "Unearth ideas youʼve forgotten about via serendipitous discovery." ]
-                            ]
-                        , li
-                            []
                             [ h3 [] [ text "No lock-in" ]
                             , p []
                                 [ text "Bring in your highlights from your Kindle or as "
@@ -184,6 +180,11 @@ landingView bookList countMap didSubmitEmail =
                                 , span [ class "smallCaps" ] [ text "csv" ]
                                 , text ". Export instantly to the same open formats."
                                 ]
+                            ]
+                        , li
+                            []
+                            [ h3 [] [ text "Roll the dice" ]
+                            , p [] [ text "Unearth ideas youʼve forgotten about via serendipitous discovery." ]
                             ]
                         , li
                             []
