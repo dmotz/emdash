@@ -5,6 +5,7 @@ import Html
     exposing
         ( Attribute
         , Html
+        , a
         , aside
         , br
         , button
@@ -22,11 +23,11 @@ import Html
         , summary
         , text
         )
-import Html.Attributes exposing (class, classList)
+import Html.Attributes exposing (class, classList, disabled, href)
 import Html.Events exposing (onClick, preventDefaultOn)
 import Json.Decode as Decode exposing (Decoder)
 import Msg exposing (Msg(..))
-import Utils exposing (appName, null)
+import Utils exposing (appName, null, repoUrl)
 
 
 importView : Bool -> Bool -> Html Msg
@@ -141,6 +142,16 @@ importView emptyOrDemo isDragging =
                                 ++ " "
                         , span [ class "smallCaps" ] [ text "json" ]
                         , text " file. This will replace all existing state."
+                        ]
+                    , button
+                        [ class "button", disabled True ]
+                        [ text "Import ???" ]
+                    , p
+                        []
+                        [ text "Need another way to import your excerpts? "
+                        , br [] []
+                        , a [ href <| repoUrl ++ "/issues/new" ] [ text "Open an issue here" ]
+                        , text "."
                         ]
                     ]
                 , div
