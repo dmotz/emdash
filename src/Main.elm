@@ -788,6 +788,7 @@ update message model =
                                 |> values
                                 |> map .id
                           )
+                        , bookNeighborK
                         )
                     , case model.page of
                         ExcerptPage { id } _ ->
