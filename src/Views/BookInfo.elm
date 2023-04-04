@@ -122,7 +122,7 @@ bookInfo book books tags pendingTag bookNeighborMap count mBookmark excerptSort 
                                     li
                                         [ class "wait" ]
                                         [ text "…" ]
-                                        :: repeat 4 (li [] [ br [] [] ])
+                                        :: repeat 5 (li [] [ br [] [] ])
                             )
                 ]
             , div
