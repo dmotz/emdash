@@ -82,7 +82,7 @@ getPageNum : String -> Maybe Int
 getPageNum s =
     case parseInt locationRx s of
         Just loc ->
-            Just <| loc // 15
+            (loc // 15) |> max 1 |> Just
 
         _ ->
             parseInt pageRx s
