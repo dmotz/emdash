@@ -23,9 +23,10 @@ import Html
         , summary
         , text
         )
-import Html.Attributes exposing (class, classList, disabled, href)
+import Html.Attributes exposing (class, classList, disabled, href, target)
 import Html.Events exposing (onClick, preventDefaultOn)
 import Json.Decode as Decode exposing (Decoder)
+import List exposing (intersperse, map)
 import Msg exposing (Msg(..))
 import Utils exposing (appName, null, repoUrl)
 
@@ -120,9 +121,20 @@ importView emptyOrDemo isDragging =
                             , p []
                                 [ text "Provide rows of excerpts in the following schema: "
                                 , br [] []
+                                , br [] []
                                 , code
                                     []
-                                    [ text "title, author, text, pageNum (optional), date (unix time, optional), notes (optional)" ]
+                                    (map
+                                        text
+                                        [ "title,"
+                                        , "author,"
+                                        , "pageNum (optional),"
+                                        , "date (unix time, optional),"
+                                        , "notes (optional),"
+                                        , "source URL (optional)"
+                                        ]
+                                        |> intersperse (br [] [])
+                                    )
                                 ]
                             ]
                         ]
