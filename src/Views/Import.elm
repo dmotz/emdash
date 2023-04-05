@@ -162,8 +162,32 @@ importView emptyOrDemo isDragging =
                         []
                         [ text "Need another way to import your excerpts? "
                         , br [] []
-                        , a [ href <| repoUrl ++ "/issues/new" ] [ text "Open an issue here" ]
+                        , a
+                            [ href <| repoUrl ++ "/issues", target "_blank" ]
+                            [ text "Open an issue here" ]
                         , text "."
+                        ]
+                    , p []
+                        [ text "You can also automatically add new excerpts via "
+                        , span [ class "smallCaps" ] [ text "url" ]
+                        , text " parameters."
+                        , br [] []
+                        , br [] []
+                        , details
+                            []
+                            [ summary [] [ text "How?" ]
+                            , code
+                                []
+                                (map
+                                    text
+                                    [ "https://emdash.ai/create"
+                                    , "?title=The Work Title"
+                                    , "&author=The Author"
+                                    , "&text=The text of the excerpt"
+                                    ]
+                                    |> intersperse (br [] [])
+                                )
+                            ]
                         ]
                     ]
                 , div
