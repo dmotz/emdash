@@ -837,12 +837,15 @@ update message model =
 
                 ( exCount, favCount ) =
                     excerpts |> values |> getCounts
+
+                newBooks =
+                    remove book.id model.books
             in
             store
                 ( { model
                     | modalMessage = Nothing
                     , excerpts = excerpts
-                    , books = remove book.id model.books
+                    , books = newBooks
                     , excerptCountMap = exCount
                     , favCountMap = favCount
                     , bookNeighborMap = Dict.empty
@@ -852,7 +855,7 @@ update message model =
                     , completedEmbeddings = diff model.completedEmbeddings exIds
                     , titleRouteMap = remove book.slug model.titleRouteMap
                     , tagCounts = tagCounts
-                    , tags = Dict.filter (\_ n -> n > 0) tagCounts |> keys
+                    , tags = newBooks |> values |> concatMap .tags |> dedupe
                     , bookmarks = remove book.id model.bookmarks
                   }
                 , batch
