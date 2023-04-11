@@ -310,7 +310,7 @@ view model =
                       else
                         a [ href "/settings" ] [ text "Settings" ]
                     , a
-                        [ href <| repoUrl ++ "/issues/new"
+                        [ href <| repoUrl ++ "/issues"
                         , target "_blank"
                         ]
                         [ text "Report a bug" ]
