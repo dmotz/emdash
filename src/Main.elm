@@ -138,6 +138,11 @@ mimeJson =
     "application/json"
 
 
+demoJsonPath : String
+demoJsonPath =
+    "/demo/demo.json"
+
+
 createModel : Maybe StoredModel -> ( String, String, String ) -> Bool -> Url -> Nav.Key -> Model
 createModel mStoredModel ( version, mailingListUrl, mailingListField ) demoMode url key =
     let
@@ -1256,15 +1261,21 @@ update message model =
                     , batch
                         [ scrollTop
                         , if showLanding then
-                            generate
-                                GotLandingData
-                                (Random.pair
-                                    (shuffle landingPageBooks)
-                                    (Random.list
-                                        (length landingPageBooks)
-                                        (Random.int 3 79)
+                            batch
+                                [ generate
+                                    GotLandingData
+                                    (Random.pair
+                                        (shuffle landingPageBooks)
+                                        (Random.list
+                                            (length landingPageBooks)
+                                            (Random.int 3 79)
+                                        )
                                     )
-                                )
+                                , Http.get
+                                    { url = demoJsonPath
+                                    , expect = Http.expectWhatever (always NoOp)
+                                    }
+                                ]
 
                           else
                             none
@@ -1770,9 +1781,7 @@ update message model =
         StartDemo ->
             ( { model | demoMode = True }
             , Http.get
-                { url = "/demo/demo.json"
-                , expect = Http.expectString GotDemoData
-                }
+                { url = demoJsonPath, expect = Http.expectString GotDemoData }
             )
 
         GotDemoData result ->
