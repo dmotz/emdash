@@ -16,7 +16,8 @@ citation : Excerpt -> Book -> Maybe Float -> Html Msg
 citation excerpt book mScore =
     cite
         []
-        ([ div []
+        ([ div
+            []
             [ a
                 [ class "title", href <| titleSlugToRoute book.slug, stopLinkProp ]
                 [ text book.title ]

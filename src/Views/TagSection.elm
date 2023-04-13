@@ -33,6 +33,7 @@ import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
 import Types exposing (Tag)
 import Utils exposing (null)
+import Views.Button exposing (actionButton)
 
 
 tagSection : List Tag -> List Tag -> Maybe Tag -> Html Msg
@@ -94,8 +95,8 @@ tagSection tags globalTags pendingTag =
                 , spellcheck False
                 ]
                 []
-            , button
-                [ class "button", disabled <| pendTag == "" ]
+            , actionButton
+                [ disabled <| pendTag == "" ]
                 [ text "+" ]
             ]
         ]

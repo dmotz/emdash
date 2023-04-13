@@ -37,6 +37,7 @@ import Router exposing (excerptToRoute)
 import String exposing (fromInt)
 import Types exposing (BookMap, Excerpt, ExcerptMap, ExcerptTab(..), ScorePairs)
 import Utils exposing (getExcerptDomId, null)
+import Views.Button exposing (actionButton)
 import Views.Citation exposing (citation)
 import Views.Snippet exposing (snippetView)
 
@@ -250,9 +251,8 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                         Etc ->
                             section
                                 []
-                                [ button
-                                    [ class "button"
-                                    , onClick <|
+                                [ actionButton
+                                    [ onClick <|
                                         ShowConfirmation
                                             "Delete this excerpt?"
                                             (DeleteExcerpt excerpt)

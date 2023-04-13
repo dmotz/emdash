@@ -46,6 +46,7 @@ import Utils exposing (appName, formatNumber, getCount, null, repoUrl, untaggedK
 import Views.AuthorInfo exposing (authorInfo)
 import Views.BookInfo exposing (bookInfo)
 import Views.BookList exposing (bookList)
+import Views.Button exposing (actionButton)
 import Views.Create exposing (createView)
 import Views.EmbeddingProgress exposing (embeddingProgress)
 import Views.Excerpt exposing (excerptView)
@@ -336,15 +337,15 @@ view model =
                                         , div
                                             [ class "error" ]
                                             [ code [] [ text msg ] ]
-                                        , button
-                                            [ class "button", onClick ClearModal ]
+                                        , actionButton
+                                            [ onClick ClearModal ]
                                             [ text "Dismiss" ]
                                         ]
 
                                     InfoMsg msg ->
                                         [ p [] [ text msg ]
-                                        , button
-                                            [ class "button", onClick ClearModal ]
+                                        , actionButton
+                                            [ onClick ClearModal ]
                                             [ text "OK" ]
                                         ]
 
@@ -352,15 +353,13 @@ view model =
                                         [ p [] [ text msg ]
                                         , div
                                             [ class "confirm" ]
-                                            [ button
-                                                [ class "button okButton"
+                                            [ actionButton
+                                                [ class "okButton"
                                                 , onClick onConfirm
                                                 ]
                                                 [ text "Yes, delete" ]
-                                            , button
-                                                [ class "button"
-                                                , onClick ClearModal
-                                                ]
+                                            , actionButton
+                                                [ onClick ClearModal ]
                                                 [ text "No, cancel" ]
                                             ]
                                         ]

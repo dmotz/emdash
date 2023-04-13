@@ -29,6 +29,7 @@ import Json.Decode as Decode exposing (Decoder)
 import List exposing (intersperse, map)
 import Msg exposing (Msg(..))
 import Utils exposing (appName, null, repoUrl)
+import Views.Button exposing (actionButton)
 
 
 importView : Bool -> Bool -> Html Msg
@@ -67,12 +68,9 @@ importView emptyOrDemo isDragging =
             , div []
                 [ div
                     [ class "buttonStack" ]
-                    [ button
-                        [ class "button"
-                        , onClick PickKindleFile
-                        ]
-                        [ text "Import from Kindle "
-                        ]
+                    [ actionButton
+                        [ onClick PickKindleFile ]
+                        [ text "Import from Kindle" ]
                     , p []
                         [ text "Import new excerpts from a Kindle clippings file."
                         , details
@@ -102,10 +100,8 @@ importView emptyOrDemo isDragging =
                                 ]
                             ]
                         ]
-                    , button
-                        [ class "button"
-                        , onClick ImportCsv
-                        ]
+                    , actionButton
+                        [ onClick ImportCsv ]
                         [ text "Import "
                         , span
                             [ class "smallCaps" ]
@@ -138,10 +134,8 @@ importView emptyOrDemo isDragging =
                                 ]
                             ]
                         ]
-                    , button
-                        [ class "button"
-                        , onClick ImportJson
-                        ]
+                    , actionButton
+                        [ onClick ImportJson ]
                         [ text "Import "
                         , span
                             [ class "smallCaps" ]
@@ -155,8 +149,8 @@ importView emptyOrDemo isDragging =
                         , span [ class "smallCaps" ] [ text "json" ]
                         , text " file. This will replace all existing state."
                         ]
-                    , button
-                        [ class "button", disabled True ]
+                    , actionButton
+                        [ disabled True ]
                         [ text "Import ???" ]
                     , p
                         []
@@ -192,10 +186,8 @@ importView emptyOrDemo isDragging =
                     ]
                 , div
                     [ class "buttonStack" ]
-                    [ button
-                        [ class "button"
-                        , onClick ExportJson
-                        ]
+                    [ actionButton
+                        [ onClick ExportJson ]
                         [ text "Export "
                         , span
                             [ class "smallCaps" ]
@@ -204,10 +196,8 @@ importView emptyOrDemo isDragging =
                     , p
                         []
                         [ text "Exports your full collection including tags, notes, and ratings for safekeeping." ]
-                    , button
-                        [ class "button"
-                        , onClick (GetTime ExportEpub)
-                        ]
+                    , actionButton
+                        [ onClick (GetTime ExportEpub) ]
                         [ text "Export "
                         , span
                             [ class "smallCaps" ]

@@ -42,6 +42,7 @@ import Msg exposing (Msg(..))
 import Types exposing (Book, CountMap)
 import Utils exposing (appName, getCount, repoUrl)
 import Views.BookList exposing (bookView)
+import Views.Button exposing (actionButton)
 
 
 landingView : List Book -> CountMap -> Bool -> Html Msg
@@ -120,8 +121,8 @@ landingView bookList countMap didSubmitEmail =
                 , aside [] [ text "Oh and itʼs free & open-source." ]
                 , div
                     []
-                    [ button
-                        [ class "button", onClick StartDemo ]
+                    [ actionButton
+                        [ onClick StartDemo ]
                         [ text "Try an ", em [] [ text "instant" ], text " demo" ]
                     , img [ src "/images/landing/botanical1.png", class "botanical1" ] []
                     , aside [] [ text "Please, click." ]
@@ -232,21 +233,21 @@ landingView bookList countMap didSubmitEmail =
             , if didSubmitEmail then
                 div [] [ h3 [] [ text "Thanks, weʼll be in touch with updates." ] ]
 
-              else
-                form
-                    [ onSubmit SubscribeToMailingList ]
-                    [ h3
-                        []
-                        [ text <| "Sign up for the occasional " ++ appName ++ " update:" ]
-                    , div []
-                        [ input
-                            [ type_ "email"
-                            , placeholder "Your email address"
-                            , onInput UpdateMailingListEmail
+                         else
+                            [ aside
+                                []
+                                [ text "Care to sign up for the waitlist?" ]
+                            , div []
+                                [ input
+                                    [ type_ "email"
+                                    , placeholder "Your email address"
+                                    , onInput UpdateMailingListEmail
+                                    ]
+                                    []
+                                , actionButton [] [ text "Submit" ]
+                                ]
                             ]
-                            []
-                        , button [ class "button" ] [ text "Submit" ]
-                        ]
+                        )
                     ]
             , section
                 [ class "coda" ]

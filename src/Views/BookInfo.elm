@@ -48,6 +48,7 @@ import Utils
         , null
         , ratingEl
         )
+import Views.Button exposing (actionButton)
 import Views.TagSection exposing (tagSection)
 
 
@@ -171,11 +172,9 @@ bookInfo book books tags pendingTag bookNeighborMap count mBookmark excerptSort 
                                 ]
                                 []
                             , div []
-                                [ button [ class "button" ] [ text "Save" ]
-                                , button
-                                    [ class "button"
-                                    , onClick ExitBookEditMode
-                                    ]
+                                [ actionButton [] [ text "Save" ]
+                                , actionButton
+                                    [ onClick ExitBookEditMode ]
                                     [ text "Cancel" ]
                                 ]
                             ]
@@ -183,12 +182,11 @@ bookInfo book books tags pendingTag bookNeighborMap count mBookmark excerptSort 
                       else
                         div
                             []
-                            [ button
-                                [ class "button", onClick EnterBookEditMode ]
+                            [ actionButton
+                                [ onClick EnterBookEditMode ]
                                 [ text "Edit title / author" ]
-                            , button
-                                [ class "button"
-                                , onClick <|
+                            , actionButton
+                                [ onClick <|
                                     ShowConfirmation
                                         "Delete this title and all of its excerpts?"
                                         (DeleteBook book)

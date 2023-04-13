@@ -35,6 +35,7 @@ import List exposing (map)
 import Msg exposing (Msg(..))
 import String exposing (isEmpty)
 import Types exposing (Author, PendingExcerpt, Title)
+import Views.Button exposing (actionButton)
 
 
 createView : PendingExcerpt -> List Title -> List Author -> Html Msg
@@ -153,9 +154,8 @@ createView pendingExcerpt titles authors =
                     ]
                 ]
             ]
-        , button
-            [ class "button"
-            , onClick <| GetTime (CreateExcerpt pendingExcerpt)
+        , actionButton
+            [ onClick <| GetTime (CreateExcerpt pendingExcerpt)
             , disabled <|
                 isEmpty pendingExcerpt.text
                     || isEmpty pendingExcerpt.title
