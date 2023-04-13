@@ -117,6 +117,8 @@ $maxColWidth: 900px
       position: relative
       display: flex
       justify-content: center
+      flex-direction: column
+      align-items: center
       margin-top: 12rem
       margin-bottom: 2rem
 
@@ -153,38 +155,34 @@ $maxColWidth: 900px
       @include mobile
         object-position: 0 7rem
 
-    button
-      font-size: 3rem
+    .actionButton
       margin-bottom: 2rem
-      padding: 2rem 4rem
-      border: 3px double $fg
       user-select: none
+
+      .buttonContent
+        font-size: 3rem
+        padding: 2rem 4rem
+        border: 3px double $fg
 
       em
         font-style: normal
         border-bottom: 3px solid $fg
         transition: border-bottom-color .3s
 
-      &::after
-        width: calc(100% + 4px)
-        height: calc(100% + 4px)
-        top: 2px
-        left: 2px
+      .buttonShadow
+        top: 4px
+        left: 4px
 
       &:hover
-        transform: translateX(-2px) translateY(-2px)
+        .buttonContent
+          transform: translateX(-2px) translateY(-2px)
 
         em
           border-bottom-color: $accent
 
-        &::after
-          transform: translateZ(-1px) translateX(2px) translateY(2px)
-
       &:active
-        transform: translateX(3px) translateY(3px)
-
-        &::after
-          transform: translateZ(-1px) translateX(-3px) translateY(-3px)
+        .buttonContent
+          transform: translateX(4px) translateY(4px)
 
       @include mobile
         font-size: 2.6rem
@@ -201,11 +199,6 @@ $maxColWidth: 900px
       display: block
       text-align: center
       margin-top: 4rem
-
-    div
-      display: flex
-      flex-direction: column
-      align-items: center
 
   hr
     margin: 0 auto
