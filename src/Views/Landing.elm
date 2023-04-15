@@ -5,7 +5,6 @@ import Html
         ( Html
         , a
         , aside
-        , button
         , div
         , em
         , form
