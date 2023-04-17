@@ -32,6 +32,7 @@ decodeStoredModel =
             (list (map2 pair (index 0 string) (index 1 string)))
             []
         |> optional "semanticThreshold" float defaultSemanticThreshold
+        |> optional "version" string ""
         |> decodeString
 
 
