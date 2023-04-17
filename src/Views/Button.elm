@@ -7,7 +7,7 @@ import Html.Attributes exposing (class)
 actionButton : List (Html.Attribute msg) -> List (Html.Html msg) -> Html.Html msg
 actionButton attrs children =
     button
-        [ class "actionButton" ]
-        [ div (class "buttonContent" :: attrs) children
+        (class "actionButton" :: attrs)
+        [ div [ class "buttonContent" ] children
         , div [ class "buttonShadow" ] []
         ]
