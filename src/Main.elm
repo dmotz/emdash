@@ -153,6 +153,7 @@ createModel mStoredModel ( version, mailingListUrl, mailingListField ) demoMode 
                 , hiddenExcerpts = []
                 , bookmarks = []
                 , semanticThreshold = defaultSemanticThreshold
+                , version = ""
                 }
                 mStoredModel
 

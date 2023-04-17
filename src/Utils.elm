@@ -136,6 +136,7 @@ modelToStoredModel model =
     , hiddenExcerpts = Set.toList model.hiddenExcerpts
     , bookmarks = Dict.toList model.bookmarks
     , semanticThreshold = model.semanticThreshold
+    , version = model.version
     }
 
 
