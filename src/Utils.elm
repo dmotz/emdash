@@ -16,6 +16,7 @@ module Utils exposing
     , getTitleRouteMap
     , insertOnce
     , juxt
+    , lensToString
     , makeExcerpt
     , modelToStoredModel
     , null
@@ -68,6 +69,7 @@ import Types
         , CountMap
         , Excerpt
         , Id
+        , Lens(..)
         , StoredModel
         , Tag
         )
@@ -451,6 +453,7 @@ makeExcerpt titleRaw authorRaw excerptText mPage mDate notes mUrl =
       , notes = notes
       , isFavorite = False
       , sourceUrl = mUrl
+      , lenses = []
       }
     , { id = bookId
       , title = title
@@ -509,3 +512,13 @@ getCounts =
 getCount : CountMap -> Id -> Int
 getCount dict id =
     get id dict |> withDefault 0
+
+
+lensToString : Lens -> String
+lensToString lens =
+    case lens of
+        Succint ->
+            "succint"
+
+        Metaphor ->
+            "metaphor"
