@@ -9,6 +9,7 @@ module Types exposing
     , ExcerptSort(..)
     , ExcerptTab(..)
     , Id
+    , Lens(..)
     , NeighborMap
     , Page(..)
     , PendingExcerpt
@@ -63,6 +64,7 @@ type alias Excerpt =
     , notes : String
     , isFavorite : Bool
     , sourceUrl : Maybe String
+    , lenses : List ( String, List String )
     }
 
 
@@ -135,6 +137,7 @@ type TagSort
 
 type ExcerptTab
     = Related
+    | Lenses Lens Int
     | Notes
     | Etc
 
@@ -142,3 +145,8 @@ type ExcerptTab
 type SearchMode
     = TextMatches
     | SemanticMatches
+
+
+type Lens
+    = Succint
+    | Metaphor
