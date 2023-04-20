@@ -11,4 +11,5 @@ dist
 package-lock.json
 clippings.txt
 art
-.env.local
+archives
+.env
