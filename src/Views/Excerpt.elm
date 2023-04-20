@@ -7,13 +7,18 @@ import Html
         , a
         , blockquote
         , button
+        , details
         , div
+        , em
         , figcaption
         , figure
         , hr
         , img
         , li
+        , p
         , section
+        , span
+        , summary
         , text
         , textarea
         , ul
@@ -31,12 +36,21 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Html.Lazy exposing (lazy4)
-import List exposing (isEmpty, map)
+import List exposing (head, isEmpty, map)
+import Maybe exposing (andThen)
 import Msg exposing (Msg(..))
 import Router exposing (excerptToRoute)
 import String exposing (fromInt)
-import Types exposing (BookMap, Excerpt, ExcerptMap, ExcerptTab(..), ScorePairs)
-import Utils exposing (getExcerptDomId, null)
+import Types
+    exposing
+        ( BookMap
+        , Excerpt
+        , ExcerptMap
+        , ExcerptTab(..)
+        , Lens(..)
+        , ScorePairs
+        )
+import Utils exposing (getExcerptDomId, lensToString, null)
 import Views.Button exposing (actionButton)
 import Views.Citation exposing (citation)
 import Views.Snippet exposing (snippetView)
@@ -171,7 +185,7 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                         button
                             [ onClick <|
                                 SetExcerptTab
-                                    excerpt.id
+                                    excerpt
                                     tab
                                     (not perma
                                         && (not showDetails || tab == activeTab)
@@ -187,6 +201,9 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                                     Related ->
                                         "Related"
 
+                                    Lenses _ _ ->
+                                        "Lenses"
+
                                     Notes ->
                                         "Notes"
                                             ++ (if String.isEmpty excerpt.notes then
@@ -200,7 +217,16 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                                         "&c."
                             ]
                     )
-                    [ Related, Notes, Etc ]
+                    [ Related
+                    , case activeTab of
+                        Lenses lensType index ->
+                            Lenses lensType index
+
+                        _ ->
+                            Lenses Succint 0
+                    , Notes
+                    , Etc
+                    ]
                 )
             , if showDetails then
                 div
@@ -235,6 +261,73 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                                                     )
                                                     neighbors
                                                 )
+                                ]
+
+                        Lenses activeLens lensIndex ->
+                            section
+                                [ class "lenses" ]
+                                [ div
+                                    [ class "modeHeading" ]
+                                    [ ul
+                                        []
+                                        (map
+                                            (\lens ->
+                                                li
+                                                    [ classList
+                                                        [ ( "active"
+                                                          , lens == activeLens
+                                                          )
+                                                        ]
+                                                    ]
+                                                    [ button
+                                                        [ onClick <|
+                                                            SetExcerptTab
+                                                                excerpt
+                                                                (Lenses lens lensIndex)
+                                                                False
+                                                        ]
+                                                        [ span []
+                                                            [ text <|
+                                                                case lens of
+                                                                    Succint ->
+                                                                        "⅀ Succint"
+
+                                                                    Metaphor ->
+                                                                        "≈ Metaphor"
+                                                            ]
+                                                        ]
+                                                    ]
+                                            )
+                                            [ Succint, Metaphor ]
+                                        )
+                                    ]
+                                , div []
+                                    (case
+                                        excerpt.lenses
+                                            |> Dict.fromList
+                                            |> get (lensToString activeLens)
+                                            |> andThen head
+                                     of
+                                        Just lensText ->
+                                            [ p [] [ text lensText ]
+                                            , details
+                                                []
+                                                [ summary [] [ text "Lenses?" ]
+                                                , p
+                                                    []
+                                                    [ text "Lenses are an upcoming feature of "
+                                                    , em [] [ text "Monk-Mode" ]
+                                                    , text " which use generative AI to rephrase and summarize ideas."
+                                                    ]
+                                                ]
+                                            ]
+
+                                        _ ->
+                                            [ p
+                                                [ class "loading" ]
+                                                [ text "Loading…" ]
+                                            ]
+                                    )
                                 ]
 
                         Notes ->
