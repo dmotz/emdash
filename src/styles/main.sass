@@ -141,15 +141,7 @@ ul
   list-style: none
 
 a
-  cursor: pointer
-  color: $fg
-  text-decoration: underline
-  text-decoration-color: $mid1
-  text-decoration-thickness: 3px
-  transition: text-decoration-color .3s
-
-  &:hover
-    text-decoration-color: $accent
+  @include linkStyle
 
 hr
   border: none
@@ -481,6 +473,11 @@ footer
   aside
     font-size: 1.7rem
     margin-bottom: 1.5rem
+
+  button
+    font-size: inherit
+    font-style: inherit
+    @include linkStyle
 
   span
     margin-right: 0.7rem
