@@ -81,7 +81,7 @@ type Msg
     | UrlChanged Url
     | SortBooks BookSort
     | SortExcerpts ExcerptSort
-    | SetExcerptTab Id ExcerptTab Bool
+    | SetExcerptTab Excerpt ExcerptTab Bool
     | ScrollToTop
     | OnSearchStart String
     | OnSearchEnd String

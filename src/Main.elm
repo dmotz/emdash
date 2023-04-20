@@ -56,6 +56,7 @@ import Types
         ( Book
         , BookSort(..)
         , ExcerptSort(..)
+        , ExcerptTab(..)
         , Page(..)
         , PendingExcerpt
         , SearchMode(..)
@@ -79,6 +80,7 @@ import Utils
         , getTagCounts
         , getTitleRouteMap
         , insertOnce
+        , lensToString
         , makeExcerpt
         , modelToStoredModel
         , removeItem
@@ -1641,34 +1643,64 @@ update message model =
                 , none
                 )
 
-        SetExcerptTab id tab toggle ->
+        SetExcerptTab excerpt tab toggle ->
             let
-                m =
-                    { model
-                        | idToActiveTab = insert id tab model.idToActiveTab
-                    }
+                { id } =
+                    excerpt
             in
-            if toggle then
-                let
-                    newState =
-                        get id model.idToShowDetails |> withDefault False |> not
-                in
-                ( { m
-                    | idToShowDetails = insert id newState model.idToShowDetails
-                  }
-                , if
-                    newState
-                        && not (Dict.member id model.neighborMap)
-                        && model.embeddingsReady
-                  then
-                    requestExcerptNeighbors ( id, excerptNeighborK, True )
+            ( { model
+                | idToActiveTab = insert id tab model.idToActiveTab
+                , idToShowDetails =
+                    if toggle then
+                        Dict.update id
+                            (withDefault False >> not >> Just)
+                            model.idToShowDetails
 
-                  else
-                    none
-                )
+                    else
+                        model.idToShowDetails
+              }
+            , batch
+                [ case tab of
+                    Related ->
+                        if
+                            not (Dict.member id model.neighborMap)
+                                && model.embeddingsReady
+                        then
+                            requestExcerptNeighbors
+                                ( id, excerptNeighborK, True )
 
-            else
-                ( m, none )
+                        else
+                            none
+
+                    Lenses lens _ ->
+                        let
+                            lensKey =
+                                lensToString lens
+                        in
+                        if
+                            not <|
+                                foldl
+                                    (\( k, v ) acc ->
+                                        acc || (k == lensKey && v /= [])
+                                    )
+                                    False
+                                    excerpt.lenses
+                        then
+                            Http.get
+                                { url =
+                                    "/demo/lenses/" ++ id ++ "-" ++ lensKey ++ ".txt"
+                                , expect =
+                                    Http.expectString
+                                        (ReceiveLensText id lens)
+                                }
+
+                        else
+                            none
+
+                    _ ->
+                        none
+                ]
+            )
 
         ScrollToTop ->
             ( model, scrollToTop () )
