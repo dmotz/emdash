@@ -17,6 +17,7 @@ import Types
         , ExcerptSort
         , ExcerptTab
         , Id
+        , Lens
         , PendingExcerpt
         , ScorePairs
         , SearchMode
@@ -96,3 +97,4 @@ type Msg
     | CreateExcerpt PendingExcerpt Posix
     | SubscribeToMailingList
     | UpdateMailingListEmail String
+    | ReceiveLensText Id Lens (Result Http.Error String)

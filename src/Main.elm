@@ -1790,7 +1790,7 @@ update message model =
                 Ok text ->
                     update (ParseJsonText False text) model
 
-                Err _ ->
+                _ ->
                     noOp
 
         GotLandingData ( titles, nums ) ->
@@ -1977,3 +1977,53 @@ update message model =
 
                     _ ->
                         noOp
+
+        ReceiveLensText id lensType result ->
+            case result of
+                Ok lensText ->
+                    let
+                        lensKey =
+                            lensToString lensType
+
+                        f =
+                            \excerpt ->
+                                { excerpt
+                                    | lenses =
+                                        ( lensKey, [ lensText ] ) :: excerpt.lenses
+                                }
+                    in
+                    store
+                        ( { model
+                            | excerpts =
+                                Dict.update
+                                    id
+                                    (Maybe.map f)
+                                    model.excerpts
+                            , page =
+                                case model.page of
+                                    ExcerptPage excerpt book ->
+                                        ExcerptPage (f excerpt) book
+
+                                    TitlePage book excerpts _ ->
+                                        TitlePage
+                                            book
+                                            (map
+                                                (\e ->
+                                                    if e.id == id then
+                                                        f e
+
+                                                    else
+                                                        e
+                                                )
+                                                excerpts
+                                            )
+                                            False
+
+                                    _ ->
+                                        model.page
+                          }
+                        , none
+                        )
+
+                _ ->
+                    noOp
