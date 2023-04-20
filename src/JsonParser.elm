@@ -47,6 +47,9 @@ excerptDecoder =
         |> optional "notes" string ""
         |> optional "isFavorite" bool False
         |> optional "sourceUrl" (nullable string) Nothing
+        |> optional "lenses"
+            (list (map2 pair (index 0 string) (index 1 (list string))))
+            []
 
 
 bookDecoder : Decoder Book
