@@ -104,7 +104,7 @@ button
     padding: 0.5rem 1rem
     border: 1px solid $fg
     color: $fg
-    transition: all .1s ease-out
+    transition: all .2s ease-out
     will-change: transform
     user-select: none
     white-space: nowrap
@@ -128,13 +128,16 @@ button
   &:active
     .buttonContent
       transform: translateX(2px) translateY(2px)
+      transition-duration: .1s
 
   &:disabled
-    border-color: $mid3
-    color: $mid3
     pointer-events: none
 
-    &::after
+    .buttonContent
+      border-color: $mid3
+      color: $mid3
+
+    .buttonShadow
       background: $mid3
 
 ul
