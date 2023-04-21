@@ -140,12 +140,11 @@ landingView bookList countMap didSubmitEmail =
                     , ul []
                         [ li
                             []
-                            [ h3 [] [ text "AI analysis" ]
+                            [ h3 [] [ text "Conceptual cousins" ]
                             , p
                                 []
                                 [ text <|
-                                    "Draw new connections and discover related passages "
-                                        ++ "from other books via on-device machine learning."
+                                    "On-device AI analysis finds passages with similar ideas from other authors, often with a very different angle."
                                 ]
                             ]
                         , li
@@ -155,7 +154,7 @@ landingView bookList countMap didSubmitEmail =
                                 []
                                 [ text <|
                                     "Find what youʼre looking for with both full-text "
-                                        ++ "search and deeper semantic matching for fuzzy concepts."
+                                        ++ "search and deeper semantic matching for fuzzy ideas."
                                 ]
                             ]
                         , li
@@ -172,19 +171,23 @@ landingView bookList countMap didSubmitEmail =
                             ]
                         , li
                             []
-                            [ h3 [] [ text "No lock-in" ]
+                            [ h3 [] [ text "Roll the dice, change your lens" ]
                             , p []
-                                [ text "Bring in your highlights from your Kindle or as "
-                                , span [ class "smallCaps" ] [ text "json" ]
-                                , text " or "
-                                , span [ class "smallCaps" ] [ text "csv" ]
-                                , text ". Export instantly to the same open formats."
+                                [ text <|
+                                    "Unearth ideas youʼve forgotten about via "
+                                        ++ "serendipitous discovery. Rephrase dense concepts and re-explain with metaphors."
                                 ]
                             ]
                         , li
                             []
-                            [ h3 [] [ text "Roll the dice" ]
-                            , p [] [ text "Unearth ideas youʼve forgotten about via serendipitous discovery." ]
+                            [ h3 [] [ text "No lock-in" ]
+                            , p []
+                                [ text "Bring in your highlights from your Kindle or as "
+                                , span [ class "smallCaps" ] [ text "json" ]
+                                , text ", "
+                                , span [ class "smallCaps" ] [ text "csv" ]
+                                , text " or manual input. Export instantly to the same open formats."
+                                ]
                             ]
                         , li
                             []
@@ -217,20 +220,29 @@ landingView bookList countMap didSubmitEmail =
                     , h2 [] [ text "Monk-Mode" ]
                     , ul
                         []
-                        [ li [] [ text "More advanced AI analysis" ]
+                        [ li []
+                            [ text "Lenses — "
+                            , em [] [ text "summarize & rephrase complex ideas" ]
+                            ]
                         , li
                             []
-                            [ text "Socratic interaction "
-                            , em [] [ text "(interrogate your books!)" ]
+                            [ text "Socratic switch — "
+                            , em [] [ text "interview your books" ]
                             ]
                         , li [] [ text "Cross-device syncing and backup" ]
                         , li [] [ text "Publishing / sharing excerpts" ]
                         , li [] [ text "Sturdier gardening tools" ]
                         ]
-                    ]
-                ]
-            , if didSubmitEmail then
-                div [] [ h3 [] [ text "Thanks, weʼll be in touch with updates." ] ]
+                    , form
+                        [ onSubmit SubscribeToMailingList ]
+                        (if didSubmitEmail then
+                            [ aside
+                                []
+                                [ text <|
+                                    "Thanks for joining the waitlist, "
+                                        ++ "weʼll be in touch with updates."
+                                ]
+                            ]
 
                          else
                             [ aside
@@ -248,6 +260,7 @@ landingView bookList countMap didSubmitEmail =
                             ]
                         )
                     ]
+                ]
             , section
                 [ class "coda" ]
                 [ aside [] [ text "Thank you for reading." ]
