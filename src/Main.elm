@@ -145,8 +145,8 @@ demoJsonPath =
     "/demo/demo.json"
 
 
-createModel : Maybe StoredModel -> ( String, String, String ) -> Bool -> Url -> Nav.Key -> Model
-createModel mStoredModel ( version, mailingListUrl, mailingListField ) demoMode url key =
+createModel : Maybe StoredModel -> List String -> ( String, String, String ) -> Bool -> Url -> Nav.Key -> Model
+createModel mStoredModel supportIssues ( version, mailingListUrl, mailingListField ) demoMode url key =
     let
         restored =
             withDefault
@@ -209,10 +209,11 @@ createModel mStoredModel ( version, mailingListUrl, mailingListField ) demoMode 
     , mailingListEmail = ""
     , mailingListUrl = mailingListUrl
     , mailingListField = mailingListField
+    , supportIssues = supportIssues
     }
 
 
-main : Program ( Maybe String, ( String, String, String ) ) Model Msg
+main : Program ( Maybe String, List String, ( String, String, String ) ) Model Msg
 main =
     application
         { init = init
@@ -282,8 +283,8 @@ main =
         }
 
 
-init : ( Maybe String, ( String, String, String ) ) -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init ( mStateString, params ) url key =
+init : ( Maybe String, List String, ( String, String, String ) ) -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init ( mStateString, supportIssues, params ) url key =
     let
         model =
             createModel
@@ -294,6 +295,7 @@ init ( mStateString, params ) url key =
                     _ ->
                         Nothing
                 )
+                supportIssues
                 params
                 False
                 url
@@ -327,6 +329,7 @@ update message model =
                 model_ =
                     createModel
                         maybeModel
+                        model.supportIssues
                         ( model.version
                         , model.mailingListUrl
                         , model.mailingListField
