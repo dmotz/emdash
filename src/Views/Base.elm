@@ -69,8 +69,8 @@ view model =
     div
         [ id "root" ]
         ((case model.page of
-            LandingPage books countMap didSubmitEmail ->
-                [ landingView books countMap didSubmitEmail ]
+            LandingPage books countMap ->
+                [ landingView books countMap model.didJoinMailingList ]
 
             _ ->
                 [ a
@@ -304,6 +304,9 @@ view model =
 
                         CreatePage pExcerpt books authors ->
                             createView pExcerpt books authors
+
+                        MonkPage ->
+                            monkSignup model.didJoinMailingList
 
                         _ ->
                             null
