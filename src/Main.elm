@@ -1677,45 +1677,43 @@ update message model =
                     else
                         model.idToShowDetails
               }
-            , batch
-                [ case tab of
-                    Related ->
-                        if
-                            not (Dict.member id model.neighborMap)
-                                && model.embeddingsReady
-                        then
-                            requestExcerptNeighbors
-                                ( id, excerptNeighborK, True )
+            , case tab of
+                Related ->
+                    if
+                        not (Dict.member id model.neighborMap)
+                            && model.embeddingsReady
+                    then
+                        requestExcerptNeighbors
+                            ( id, excerptNeighborK, True )
 
-                        else
-                            none
-
-                    Lenses lens _ ->
-                        let
-                            lensKey =
-                                lensToString lens
-                        in
-                        if
-                            not <|
-                                foldl
-                                    (\( k, v ) acc ->
-                                        acc || (k == lensKey && v /= [])
-                                    )
-                                    False
-                                    excerpt.lenses
-                        then
-                            if model.demoMode then
-                                fetchLensText id lens
-
-                            else
-                                none
-
-                        else
-                            none
-
-                    _ ->
+                    else
                         none
-                ]
+
+                Lenses lens _ ->
+                    let
+                        lensKey =
+                            lensToString lens
+                    in
+                    if
+                        not <|
+                            foldl
+                                (\( k, v ) acc ->
+                                    acc || (k == lensKey && v /= [])
+                                )
+                                False
+                                excerpt.lenses
+                    then
+                        if model.demoMode then
+                            fetchLensText id lens
+
+                        else
+                            none
+
+                    else
+                        none
+
+                _ ->
+                    none
             )
 
         ScrollToTop ->
