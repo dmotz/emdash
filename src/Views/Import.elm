@@ -161,10 +161,11 @@ importView emptyOrDemo isDragging =
                         , text "."
                         ]
                     , p []
-                        [ text "You can also automatically add new excerpts via "
+                        [ text "You can also manually "
+                        , a [ href "/create" ] [ text "create new excerpts" ]
+                        , text " or automatically add them via "
                         , span [ class "smallCaps" ] [ text "url" ]
                         , text " parameters."
-                        , br [] []
                         , br [] []
                         , details
                             []
