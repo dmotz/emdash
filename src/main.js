@@ -5,9 +5,11 @@ import './styles/main.sass'
 
 const dbNs = 'marginalia'
 const stateKey = 'state'
+const swKey = 'SharedWorker'
+const bcKey = 'BroadcastChannel'
 const writeMs = 333
-const supportsSharedWorker = 'SharedWorker' in window
-const supportsBroadcastChannel = 'BroadcastChannel' in window
+const supportsSharedWorker = swKey in window
+const supportsBroadcastChannel = bcKey in window
 
 const worker =
   supportsSharedWorker &&
@@ -75,10 +77,9 @@ let zipWorker
 
   const flags = [
     restored || null,
-    [
-      !supportsSharedWorker && 'SharedWorker',
-      !supportsBroadcastChannel && 'BroadcastChannel'
-    ].filter(Boolean),
+    [!supportsSharedWorker && swKey, !supportsBroadcastChannel && bcKey].filter(
+      Boolean
+    ),
     [
       version,
       import.meta.env.VITE_MAILING_LIST_URL || '',
