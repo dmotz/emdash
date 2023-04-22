@@ -112,7 +112,7 @@ type Page
     | ExcerptPage Excerpt Book
     | NotFoundPage String
     | SettingsPage
-    | LandingPage (List Book) CountMap Bool
+    | LandingPage (List Book) CountMap
     | ImportPage
     | MonkPage
     | CreatePage PendingExcerpt (List Title) (List Author)

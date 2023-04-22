@@ -158,6 +158,7 @@ createModel mStoredModel supportIssues ( version, mailingListUrl, mailingListFie
                 , bookmarks = []
                 , semanticThreshold = defaultSemanticThreshold
                 , version = ""
+                , didJoinMailingList = False
                 }
                 mStoredModel
 
@@ -211,6 +212,7 @@ createModel mStoredModel supportIssues ( version, mailingListUrl, mailingListFie
     , mailingListEmail = ""
     , mailingListUrl = mailingListUrl
     , mailingListField = mailingListField
+    , didJoinMailingList = restored.didJoinMailingList
     , supportIssues = supportIssues
     }
 
@@ -227,8 +229,8 @@ main =
                         MainPage _ Nothing ->
                             appName
 
-                        LandingPage _ _ _ ->
-                            appName
+                        LandingPage _ _ ->
+                            appName ++ " — organize your book highlights with AI"
 
                         _ ->
                             (case m.page of
@@ -1264,7 +1266,7 @@ update message model =
                     ( { model_
                         | page =
                             if showLanding then
-                                LandingPage [] Dict.empty False
+                                LandingPage [] Dict.empty
 
                             else
                                 MainPage (values model.books) Nothing
@@ -1854,7 +1856,7 @@ update message model =
 
         GotLandingData ( titles, nums ) ->
             case model.page of
-                LandingPage _ _ didSubmit ->
+                LandingPage _ _ ->
                     let
                         books =
                             indexedMap
@@ -1870,7 +1872,6 @@ update message model =
                                 (map2 (\{ id } n -> ( id, n )) books nums
                                     |> Dict.fromList
                                 )
-                                didSubmit
                       }
                     , none
                     )
@@ -2021,21 +2022,17 @@ update message model =
                 noOp
 
             else
-                case model.page of
-                    LandingPage bookList countMap _ ->
-                        ( { model | page = LandingPage bookList countMap True }
-                        , Http.post
-                            { url = model.mailingListUrl
-                            , body =
-                                Http.stringBody
-                                    "application/x-www-form-urlencoded"
-                                    (model.mailingListField ++ "=" ++ model.mailingListEmail)
-                            , expect = Http.expectWhatever (always NoOp)
-                            }
-                        )
-
-                    _ ->
-                        noOp
+                store
+                    ( { model | didJoinMailingList = True }
+                    , Http.post
+                        { url = model.mailingListUrl
+                        , body =
+                            Http.stringBody
+                                "application/x-www-form-urlencoded"
+                                (model.mailingListField ++ "=" ++ model.mailingListEmail)
+                        , expect = Http.expectWhatever (always NoOp)
+                        }
+                    )
 
         ReceiveLensText id lensType result ->
             case result of
