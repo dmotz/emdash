@@ -1,13 +1,13 @@
-$inset: 1.6rem
+$inset: 1.45rem
 
 .logo, .toolbar
   z-index: 99
 
 .logo
   position: fixed
-  top: $inset
-  left: 1.9rem
-  width: 6rem
+  top: 1.73rem
+  left: 1.73rem
+  width: 3.65rem
 
   img
     width: 100%
@@ -20,7 +20,6 @@ $inset: 1.6rem
   flex-direction: column
   align-items: center
   margin-left: auto
-  padding-top: 1rem
 
   @include mobile
     top: 0.8rem
@@ -31,9 +30,9 @@ $inset: 1.6rem
     align-items: center
     margin-bottom: 0.8rem
 
-    &:hover img
-      opacity: 1
+    &:hover
+      img, .hint
+        opacity: 1
 
-    &:hover .hint
-      opacity: 1
-      color: $bg
+      .hint
+        color: $bg
