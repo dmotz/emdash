@@ -187,7 +187,7 @@ createModel mStoredModel supportIssues ( version, mailingListUrl, mailingListFie
     , completedEmbeddings = Set.empty
     , embeddingsReady = False
     , authorEmbeddingsReady = False
-    , tags = restored.books |> concatMap .tags |> dedupe
+    , tags = tags
     , tagCounts = getTagCounts books
     , tagSort = TagAlphaSort
     , showTagHeader = length tags > 0
