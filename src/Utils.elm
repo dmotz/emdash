@@ -4,6 +4,7 @@ module Utils exposing
     , dedupe
     , defaultSemanticThreshold
     , excerptCountLabel
+    , fetchLensText
     , findMatches
     , formatNumber
     , formatScore
@@ -39,6 +40,7 @@ import Char exposing (isDigit)
 import Dict exposing (Dict, empty, get, insert, member, update, values)
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (class, classList)
+import Http
 import List
     exposing
         ( all
@@ -57,6 +59,7 @@ import List
 import MD5 exposing (bytes)
 import Maybe exposing (withDefault)
 import Model exposing (Model)
+import Msg exposing (Msg(..))
 import Regex exposing (Match, Regex, replace)
 import Set
 import String exposing (fromInt, join, split, toLower, trim)
@@ -522,3 +525,14 @@ lensToString lens =
 
         Metaphor ->
             "metaphor"
+
+
+fetchLensText : Id -> Lens -> Cmd Msg
+fetchLensText id lens =
+    Http.get
+        { url =
+            "/demo/lenses/" ++ id ++ "-" ++ lensToString lens ++ ".txt"
+        , expect =
+            Http.expectString
+                (ReceiveLensText id lens)
+        }
