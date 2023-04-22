@@ -12,4 +12,5 @@ package-lock.json
 clippings.txt
 art
 archives
+assets/demo/
 .env
