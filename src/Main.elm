@@ -57,6 +57,7 @@ import Types
         , BookSort(..)
         , ExcerptSort(..)
         , ExcerptTab(..)
+        , Lens(..)
         , Page(..)
         , PendingExcerpt
         , SearchMode(..)
@@ -73,6 +74,7 @@ import Utils
         , dedupe
         , defaultSemanticThreshold
         , excerptCountLabel
+        , fetchLensText
         , findMatches
         , getAuthorRouteMap
         , getAuthors
@@ -1392,6 +1394,11 @@ update message model =
 
                                   else
                                     none
+                                , if model.demoMode then
+                                    fetchLensText excerpt.id Succint
+
+                                  else
+                                    none
                                 ]
                             )
 
@@ -1695,13 +1702,11 @@ update message model =
                                     False
                                     excerpt.lenses
                         then
-                            Http.get
-                                { url =
-                                    "/demo/lenses/" ++ id ++ "-" ++ lensKey ++ ".txt"
-                                , expect =
-                                    Http.expectString
-                                        (ReceiveLensText id lens)
-                                }
+                            if model.demoMode then
+                                fetchLensText id lens
+
+                            else
+                                none
 
                         else
                             none
