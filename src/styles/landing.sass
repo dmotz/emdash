@@ -322,54 +322,6 @@ $maxColWidth: 900px
         width: 80%
         margin-bottom: 2rem
 
-  footer
-    margin-top: 8rem
-
-  .monk
-    display: flex
-    justify-content: center
-    position: relative
-    margin-top: 13rem
-    margin-bottom: 8rem
-
-    @include mobile
-      padding: 0
-      margin-top: 10rem
-      margin-bottom: 3rem
-
-    > div
-      border: 1px double $mid2
-      outline: 1px solid $mid2
-      outline-offset: 4px
-      box-shadow: 0 0 0 4px $bg
-      max-width: 500px
-      padding: 6rem 5rem
-      text-align: center
-      position: relative
-      z-index: 9
-      background: $bg
-
-      @include mobile
-        padding: 3rem 2rem
-
-    ul
-      font-size: 2rem
-
-      li
-        line-height: 1.6
-
-        + li
-          margin-top: 1.4rem
-
-        &::before
-          content: '• '
-
-      @include mobile
-        font-size: 1.8rem
-
-    aside
-      margin-bottom: 1rem
-
   .mushrooms
     position: absolute
     max-width: 20rem
@@ -382,11 +334,8 @@ $maxColWidth: 900px
       left: 74%
       max-width: 16rem
 
-  .coda
-    text-align: center
-
-    aside
-      margin-bottom: 4rem
+main > .monk
+  margin-top: 20rem !important
 
 @keyframes scrollUp
   from
