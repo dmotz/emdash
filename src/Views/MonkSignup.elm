@@ -22,7 +22,7 @@ import Views.Button exposing (actionButton)
 
 
 monkSignup : Bool -> Html Msg
-monkSignup didSubmitEmail =
+monkSignup didJoinMailingList =
     section
         [ class "monk" ]
         [ img [ src "/images/landing/mushroom.png", class "mushrooms" ] []
@@ -46,7 +46,7 @@ monkSignup didSubmitEmail =
                 ]
             , form
                 [ onSubmit SubscribeToMailingList ]
-                (if didSubmitEmail then
+                (if didJoinMailingList then
                     [ aside
                         []
                         [ text <|
