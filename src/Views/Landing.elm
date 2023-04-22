@@ -42,6 +42,7 @@ import Types exposing (Book, CountMap)
 import Utils exposing (appName, getCount, repoUrl)
 import Views.BookList exposing (bookView)
 import Views.Button exposing (actionButton)
+import Views.MonkSignup exposing (monkSignup)
 
 
 landingView : List Book -> CountMap -> Bool -> Html Msg
@@ -212,55 +213,7 @@ landingView bookList countMap didSubmitEmail =
                 ]
             , hr [] []
             , hr [] []
-            , section
-                [ class "monk" ]
-                [ img [ src "/images/landing/botanical3.png", class "mushrooms" ] []
-                , div []
-                    [ aside [] [ text "Coming eventually" ]
-                    , h2 [] [ text "Monk-Mode" ]
-                    , ul
-                        []
-                        [ li []
-                            [ text "Lenses — "
-                            , em [] [ text "summarize & rephrase complex ideas" ]
-                            ]
-                        , li
-                            []
-                            [ text "Socratic switch — "
-                            , em [] [ text "interview your books" ]
-                            ]
-                        , li [] [ text "Cross-device syncing and backup" ]
-                        , li [] [ text "Publishing / sharing excerpts" ]
-                        , li [] [ text "Sturdier gardening tools" ]
-                        ]
-                    , form
-                        [ onSubmit SubscribeToMailingList ]
-                        (if didSubmitEmail then
-                            [ aside
-                                []
-                                [ text <|
-                                    "Thanks for joining the waitlist, "
-                                        ++ "weʼll be in touch with updates."
-                                ]
-                            ]
-
-                         else
-                            [ aside
-                                []
-                                [ text "Care to sign up for the waitlist?" ]
-                            , div []
-                                [ input
-                                    [ type_ "email"
-                                    , placeholder "Your email address"
-                                    , onInput UpdateMailingListEmail
-                                    ]
-                                    []
-                                , actionButton [] [ text "Submit" ]
-                                ]
-                            ]
-                        )
-                    ]
-                ]
+            , monkSignup didSubmitEmail
             , section
                 [ class "coda" ]
                 [ aside [] [ text "Thank you for reading." ]
