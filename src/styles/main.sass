@@ -223,7 +223,7 @@ input[type='range']
 
 summary
   cursor: pointer
-  text-decoration: underline 3px transparent
+  user-select: none
 
   &:hover
     text-decoration-color: $mid1
@@ -231,9 +231,8 @@ summary
   &:focus
     outline: none
 
-details[open]
-  summary
-    text-decoration-color: $mid1
+  &::marker
+    font-size: 0.75em
 
 progress
   accent-color: $fg
