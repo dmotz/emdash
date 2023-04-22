@@ -76,6 +76,10 @@ let zipWorker
   const flags = [
     restored || null,
     [
+      !supportsSharedWorker && 'SharedWorker',
+      !supportsBroadcastChannel && 'BroadcastChannel'
+    ].filter(Boolean),
+    [
       version,
       import.meta.env.VITE_MAILING_LIST_URL || '',
       import.meta.env.VITE_MAILING_LIST_FIELD || ''
