@@ -33,6 +33,7 @@ decodeStoredModel =
             []
         |> optional "semanticThreshold" float defaultSemanticThreshold
         |> optional "version" string ""
+        |> optional "didJoinMailingList" bool False
         |> decodeString
 
 
