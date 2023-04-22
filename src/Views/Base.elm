@@ -57,6 +57,7 @@ import Views.Excerpt exposing (excerptView)
 import Views.ExcerptList exposing (excerptList)
 import Views.Import exposing (importView)
 import Views.Landing exposing (landingView)
+import Views.MonkSignup exposing (monkSignup)
 import Views.SearchInput exposing (searchInput)
 import Views.SearchResults exposing (searchResults)
 import Views.Settings exposing (settingsView)
@@ -92,14 +93,19 @@ view model =
                         [ class "demoNotice" ]
                         [ aside
                             []
-                            [ text "Feel free to peruse this sample library. Make yourself at home." ]
+                            [ text "Feel free to peruse this sample library. Make yourself at home."
+                            , br [] []
+                            , button
+                                [ onClick ShowRandom ]
+                                [ text "Try viewing a random excerpt." ]
+                            ]
                         , div
                             []
                             [ span [] [ text "❧" ]
                             , a
                                 [ href "/import" ]
                                 [ text <|
-                                    "Ready to try "
+                                    "Ready to use "
                                         ++ appName
                                         ++ " with your own collection?"
                                 ]
