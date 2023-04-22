@@ -1815,10 +1815,23 @@ update message model =
             )
 
         StartDemo ->
-            ( { model | demoMode = True }
-            , Http.get
-                { url = demoJsonPath, expect = Http.expectString GotDemoData }
-            )
+            if model.supportIssues == [] then
+                ( { model | demoMode = True }
+                , Http.get
+                    { url = demoJsonPath, expect = Http.expectString GotDemoData }
+                )
+
+            else
+                ( { model
+                    | modalMessage =
+                        Just <|
+                            InitErrMsg
+                                ("Missing support for "
+                                    ++ String.join ", " model.supportIssues
+                                )
+                  }
+                , none
+                )
 
         GotDemoData result ->
             case result of

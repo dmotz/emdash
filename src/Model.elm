@@ -69,4 +69,5 @@ type alias Model =
 type ModalMsg
     = InfoMsg String
     | ErrMsg String
+    | InitErrMsg String
     | ConfirmationMsg String Msg
