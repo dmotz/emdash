@@ -36,6 +36,7 @@ type Route
     | SearchRoute (Maybe String)
     | SettingsRoute
     | ImportRoute
+    | MonkRoute
     | CreateRoute (Maybe String) (Maybe String) (Maybe String) (Maybe String) (Maybe Int)
 
 
@@ -50,6 +51,7 @@ routeParser =
         , map SearchRoute (s "search" <?> Query.string "q")
         , map SettingsRoute (s "settings")
         , map ImportRoute (s "import")
+        , map MonkRoute (s "monk-mode")
         , map CreateRoute
             (s "create"
                 <?> Query.string "title"
