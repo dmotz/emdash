@@ -32,6 +32,9 @@ const messageToPort = {
   setDemoEmbeddings: 'receiveExcerptEmbeddings'
 }
 
+const msgWorker = (method, payload) =>
+  worker && worker.port.postMessage({method, ...payload})
+
 const downloadFile = (name, data) => {
   const a = document.createElement('a')
   const url = URL.createObjectURL(data)
@@ -47,7 +50,7 @@ let writeTimer
 let zipWorker
 
 !(async () => {
-  console.log(`Marginalia v${version} ⁓ habent sua fata libelli`)
+  console.log(`${dbNs} v${version} ⁓ habent sua fata libelli`)
 
   let restored = null
   let stateStore
@@ -89,18 +92,11 @@ let zipWorker
   channel.onmessage = ({data}) => app.ports.syncState.send(data)
 
   app.ports.initWithClear.subscribe(state =>
-    worker.port.postMessage({
-      method: 'initWithClear',
-      books: state.books,
-      excerpts: state.excerpts
-    })
+    msgWorker('initWithClear', {books: state.books, excerpts: state.excerpts})
   )
 
   app.ports.handleNewExcerpts.subscribe(state =>
-    worker.port.postMessage({
-      method: 'processNewExcerpts',
-      excerpts: state.excerpts
-    })
+    msgWorker('processNewExcerpts', {excerpts: state.excerpts})
   )
 
   app.ports.exportJson.subscribe(state =>
@@ -132,56 +128,46 @@ let zipWorker
   })
 
   app.ports.requestExcerptEmbeddings.subscribe(targets =>
-    worker.port.postMessage({method: 'computeExcerptEmbeddings', targets})
+    msgWorker('computeExcerptEmbeddings', {targets})
   )
 
   app.ports.requestBookEmbeddings.subscribe(targets =>
-    worker.port.postMessage({method: 'computeBookEmbeddings', targets})
+    msgWorker('computeBookEmbeddings', {targets})
   )
 
   app.ports.requestAuthorEmbeddings.subscribe(targets =>
-    worker.port.postMessage({method: 'computeAuthorEmbeddings', targets})
+    msgWorker('computeAuthorEmbeddings', {targets})
   )
 
   app.ports.deleteExcerpt.subscribe(
     ([targetId, [bookId, bookExcerptIds], k]) => {
-      worker.port.postMessage({
-        method: 'deleteExcerpt',
-        targetId,
-        bookId,
-        bookExcerptIds
-      })
-
-      worker.port.postMessage({
-        method: 'requestBookNeighbors',
-        target: bookId,
-        k
-      })
+      msgWorker('deleteExcerpt', {targetId, bookId, bookExcerptIds})
+      msgWorker('requestBookNeighbors', {target: bookId, k})
     }
   )
 
   app.ports.deleteBook.subscribe(([bookId, bookExcerptIds]) =>
-    worker.port.postMessage({method: 'deleteBook', bookId, bookExcerptIds})
+    msgWorker('deleteBook', {bookId, bookExcerptIds})
   )
 
   app.ports.requestExcerptNeighbors.subscribe(([target, k]) =>
-    worker.port.postMessage({method: 'requestExcerptNeighbors', target, k})
+    msgWorker('requestExcerptNeighbors', {target, k})
   )
 
   app.ports.requestAuthorNeighbors.subscribe(([target, k]) =>
-    worker.port.postMessage({method: 'requestAuthorNeighbors', target, k})
+    msgWorker('requestAuthorNeighbors', {target, k})
   )
 
   app.ports.requestBookNeighbors.subscribe(([target, k]) =>
-    worker.port.postMessage({method: 'requestBookNeighbors', target, k})
+    msgWorker('requestBookNeighbors', {target, k})
   )
 
   app.ports.requestSemanticSearch.subscribe(([query, threshold]) =>
-    worker.port.postMessage({method: 'semanticSearch', query, threshold})
+    msgWorker('semanticSearch', {query, threshold})
   )
 
   app.ports.requestSemanticRank.subscribe(([bookId, excerptIds]) =>
-    worker.port.postMessage({method: 'requestSemanticRank', bookId, excerptIds})
+    msgWorker('requestSemanticRank', {bookId, excerptIds})
   )
 
   app.ports.scrollToTop.subscribe(() =>
@@ -193,7 +179,7 @@ let zipWorker
   )
 
   app.ports.fetchDemoEmbeddings.subscribe(ids =>
-    worker.port.postMessage({method: 'setDemoEmbeddings', ids})
+    msgWorker('setDemoEmbeddings', {ids})
   )
 
   worker.port.start()
