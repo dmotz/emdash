@@ -62,6 +62,7 @@ type alias Model =
     , mailingListUrl : String
     , mailingListField : String
     , mailingListEmail : String
+    , didJoinMailingList : Bool
     , supportIssues : List String
     }
 
