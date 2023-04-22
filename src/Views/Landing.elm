@@ -7,13 +7,11 @@ import Html
         , aside
         , div
         , em
-        , form
         , h1
         , h2
         , h3
         , hr
         , img
-        , input
         , li
         , main_
         , p
@@ -29,13 +27,11 @@ import Html.Attributes
         , class
         , draggable
         , href
-        , placeholder
         , src
         , style
         , target
-        , type_
         )
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Events exposing (onClick)
 import List exposing (drop, length, map, range, reverse, take)
 import Msg exposing (Msg(..))
 import Types exposing (Book, CountMap)
