@@ -142,6 +142,7 @@ modelToStoredModel model =
     , bookmarks = Dict.toList model.bookmarks
     , semanticThreshold = model.semanticThreshold
     , version = model.version
+    , didJoinMailingList = model.didJoinMailingList
     }
 
 

@@ -100,6 +100,7 @@ type alias StoredModel =
     , bookmarks : List ( Id, Id )
     , semanticThreshold : Float
     , version : String
+    , didJoinMailingList : Bool
     }
 
 
