@@ -89,7 +89,9 @@ let zipWorker
     app = Elm.Main.init({flags: [null, ...flags.slice(1)]})
   }
 
-  channel.onmessage = ({data}) => app.ports.syncState.send(data)
+  if (channel) {
+    channel.onmessage = ({data}) => app.ports.syncState.send(data)
+  }
 
   app.ports.initWithClear.subscribe(state =>
     msgWorker('initWithClear', {books: state.books, excerpts: state.excerpts})
@@ -182,9 +184,11 @@ let zipWorker
     msgWorker('setDemoEmbeddings', {ids})
   )
 
-  worker.port.start()
-  worker.port.onmessage = ({data: {method, data}}) =>
-    app.ports[messageToPort[method]].send(data)
+  if (worker) {
+    worker.port.start()
+    worker.port.onmessage = ({data: {method, data}}) =>
+      app.ports[messageToPort[method]].send(data)
+  }
 })()
 
 window.addEventListener(
