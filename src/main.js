@@ -6,11 +6,18 @@ import './styles/main.sass'
 const dbNs = 'marginalia'
 const stateKey = 'state'
 const writeMs = 333
-const worker = new SharedWorker(new URL('./worker.js', import.meta.url), {
-  name: 'marginalia',
-  type: 'module'
-})
-const channel = new BroadcastChannel(dbNs)
+const supportsSharedWorker = 'SharedWorker' in window
+const supportsBroadcastChannel = 'BroadcastChannel' in window
+
+const worker =
+  supportsSharedWorker &&
+  new SharedWorker(new URL('./worker.js', import.meta.url), {
+    name: 'marginalia',
+    type: 'module'
+  })
+
+const channel = supportsBroadcastChannel && new BroadcastChannel(dbNs)
+
 const messageToPort = {
   processNewExcerpts: 'receiveExcerptEmbeddings',
   initWithClear: 'receiveExcerptEmbeddings',
