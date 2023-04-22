@@ -124,10 +124,10 @@ landingView bookList countMap didSubmitEmail =
                     [ actionButton
                         [ onClick StartDemo ]
                         [ text "Try an ", em [] [ text "instant" ], text " demo" ]
-                    , img [ src "/images/landing/botanical1.png", class "botanical1" ] []
+                    , img [ src "/images/landing/flower-yellow.png", class "botanical1" ] []
                     , aside [] [ text "Please, click." ]
                     ]
-                , img [ src "/images/landing/botanical2.png", class "botanical2" ] []
+                , img [ src "/images/landing/orange.png", class "botanical2" ] []
                 ]
             , hr [] []
             , hr [] []
@@ -136,8 +136,8 @@ landingView bookList countMap didSubmitEmail =
                 [ h2 [] [ text "Featuring" ]
                 , div
                     []
-                    [ img [ src "/images/landing/botanical19.png" ] []
-                    , img [ src "/images/landing/botanical16.png" ] []
+                    [ img [ src "/images/landing/flower-white.png" ] []
+                    , img [ src "/images/landing/flower-red.png" ] []
                     , ul []
                         [ li
                             []
