@@ -62,13 +62,14 @@ excerptView :
     -> ScorePairs
     -> Bool
     -> ExcerptTab
+    -> Bool
     -> Int
     -> Bool
     -> Bool
     -> Maybe (Html Msg)
     -> Excerpt
     -> Html Msg
-excerptView excerpts books neighbors showDetails activeTab i perma isMarked mProgress excerpt =
+excerptView excerpts books neighbors showDetails activeTab showLensTab i perma isMarked mProgress excerpt =
     li
         [ classList [ ( "excerpt", True ), ( "permalink", perma ) ]
         , id <| getExcerptDomId excerpt.id
@@ -217,16 +218,23 @@ excerptView excerpts books neighbors showDetails activeTab i perma isMarked mPro
                                         "&c."
                             ]
                     )
-                    [ Related
-                    , case activeTab of
-                        Lenses lensType index ->
-                            Lenses lensType index
+                    ((if showLensTab then
+                        [ case activeTab of
+                            Lenses lensType index ->
+                                Lenses lensType index
 
-                        _ ->
-                            Lenses Succint 0
-                    , Notes
-                    , Etc
-                    ]
+                            _ ->
+                                Lenses Succint 0
+                        ]
+
+                      else
+                        []
+                     )
+                        ++ [ Related
+                           , Notes
+                           , Etc
+                           ]
+                    )
                 )
             , if showDetails then
                 div

@@ -42,6 +42,7 @@ import Types
         , BookSort(..)
         , ExcerptSort(..)
         , ExcerptTab(..)
+        , Lens(..)
         , Page(..)
         , Tag
         , TagSort(..)
@@ -222,6 +223,7 @@ view model =
                                     model.neighborMap
                                     model.idToShowDetails
                                     model.idToActiveTab
+                                    model.demoMode
                                     (get book.id model.bookmarks
                                         |> withDefault ""
                                     )
@@ -263,12 +265,18 @@ view model =
                                         )
                                         True
                                         (withDefault
-                                            Related
+                                            (if model.demoMode then
+                                                Lenses Succint 0
+
+                                             else
+                                                Related
+                                            )
                                             (get
                                                 excerpt.id
                                                 model.idToActiveTab
                                             )
                                         )
+                                        model.demoMode
                                         -1
                                         True
                                         False

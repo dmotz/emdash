@@ -18,10 +18,11 @@ excerptList :
     -> NeighborMap
     -> Dict Id Bool
     -> Dict Id ExcerptTab
+    -> Bool
     -> Id
     -> Maybe (Html Msg)
     -> Html Msg
-excerptList excerpts excerptMap books neighbors idToShowDetails idToActiveTab bookmark mProgress =
+excerptList excerpts excerptMap books neighbors idToShowDetails idToActiveTab showLensTab bookmark mProgress =
     Keyed.ul
         [ class "excerpts" ]
         (indexedMap
@@ -33,6 +34,7 @@ excerptList excerpts excerptMap books neighbors idToShowDetails idToActiveTab bo
                     (withDefault [] (get excerpt.id neighbors))
                     (withDefault False (get excerpt.id idToShowDetails))
                     (withDefault Related (get excerpt.id idToActiveTab))
+                    showLensTab
                     i
                     False
                     (bookmark == excerpt.id)
