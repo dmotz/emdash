@@ -113,6 +113,7 @@ type Page
     | SettingsPage
     | LandingPage (List Book) CountMap Bool
     | ImportPage
+    | MonkPage
     | CreatePage PendingExcerpt (List Title) (List Author)
 
 

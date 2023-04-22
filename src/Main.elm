@@ -251,6 +251,9 @@ main =
                                 ImportPage ->
                                     "Import"
 
+                                MonkPage ->
+                                    "Monk-Mode"
+
                                 CreatePage _ _ _ ->
                                     "New excerpt"
 
@@ -1509,6 +1512,9 @@ update message model =
 
                 Just ImportRoute ->
                     ( { model_ | page = ImportPage }, scrollTop )
+
+                Just MonkRoute ->
+                    ( { model_ | page = MonkPage }, scrollTop )
 
                 Just (CreateRoute mTitle mAuthor mText mSource mPage) ->
                     let
