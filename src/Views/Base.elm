@@ -1,17 +1,21 @@
 module Views.Base exposing (view)
 
+-- import Regex
+
 import Dict exposing (Dict, get, size)
 import Html
     exposing
         ( Html
         , a
         , aside
+        , br
         , button
         , code
         , div
         , footer
         , h2
         , h3
+        , h4
         , hr
         , img
         , li
@@ -340,6 +344,25 @@ view model =
                                         , actionButton
                                             [ onClick ClearModal ]
                                             [ text "Dismiss" ]
+                                        ]
+
+                                    InitErrMsg msg ->
+                                        [ h4 [] [ text "This is awkward…" ]
+                                        , p
+                                            []
+                                            [ text <|
+                                                appName
+                                                    ++ " uses some very new web features that your browser doesnʼt support."
+                                                    ++ " Please update your browser/OS to the latest version and try again."
+                                            ]
+                                        , br [] []
+                                        , p [] [ text "Details:" ]
+                                        , div
+                                            [ class "error" ]
+                                            [ code [] [ text msg ] ]
+                                        , actionButton
+                                            [ onClick ClearModal ]
+                                            [ text "Understood" ]
                                         ]
 
                                     InfoMsg msg ->
