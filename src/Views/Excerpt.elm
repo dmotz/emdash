@@ -324,8 +324,8 @@ excerptView excerpts books neighbors showDetails activeTab showLensTab i perma i
                                                 , p
                                                     []
                                                     [ text "Lenses are an upcoming feature of "
-                                                    , em [] [ text "Monk-Mode" ]
-                                                    , text " which use generative AI to rephrase and summarize ideas."
+                                                    , a [ href "/monk-mode" ] [ em [] [ text "Monk-Mode" ] ]
+                                                    , text " which uses generative AI to rephrase and summarize ideas."
                                                     ]
                                                 ]
                                             ]
