@@ -315,6 +315,7 @@ const start = port => {
   )
     .then(tf.ready)
     .then(load)
+    .then(() => console.log(`using ${tf.getBackend()} backend`))
 }
 
 self.onconnect = e => start(e.ports[0])
