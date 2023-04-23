@@ -309,7 +309,12 @@ init ( mStateString, supportIssues, params ) url key =
                 key
     in
     update (UrlChanged url) model
-        |> addCmd (model |> modelToStoredModel |> handleNewExcerpts)
+        |> (if Dict.isEmpty model.excerpts then
+                identity
+
+            else
+                addCmd (model |> modelToStoredModel |> handleNewExcerpts)
+           )
 
 
 store : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
