@@ -94,6 +94,7 @@ tagSection tags globalTags pendingTag =
                 , placeholder "Add tag"
                 , autocomplete False
                 , attribute "autocapitalize" "off"
+                , attribute "enterkeyhint" "done"
                 , spellcheck False
                 ]
                 []
