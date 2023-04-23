@@ -9,6 +9,16 @@ const embSize = 512
 const semanticSearchLimit = 203
 const embsInProgress = {}
 const embStore = createStore(`${dbNs}:${embKey}`, embKey)
+const hasDb = new Promise(res => {
+  const testNs = `${dbNs}:test`
+  const dbReq = indexedDB.open(testNs)
+  dbReq.onerror = () => res(false)
+
+  dbReq.onsuccess = () => {
+    res(true)
+    indexedDB.deleteDatabase(testNs)
+  }
+})
 
 let excerptEmbMap = {}
 let bookEmbMap = {}
@@ -110,7 +120,8 @@ const findAuthorNeighbors = async (authorId, k) =>
   ).filter(([auth]) => auth !== authorId)
 
 const processNewExcerpts = async ({excerpts}, cb) => {
-  if (embStore && !Object.keys(excerptEmbMap).length) {
+  if ((await hasDb) && !Object.keys(excerptEmbMap).length) {
+    console.log('hitting embstore', embStore)
     excerptEmbMap = Object.fromEntries(await entries(embStore))
   }
 
@@ -149,14 +160,14 @@ const methods = {
 
     needed.forEach(([id]) => (embsInProgress[id] = true))
 
-    computeEmbeddings(needed).then(embeddings => {
+    computeEmbeddings(needed).then(async embeddings => {
       cb(embeddings.map(([id]) => id).concat(has))
       embeddings.forEach(([id, v]) => {
         excerptEmbMap[id] = v
         delete embsInProgress[id]
       })
 
-      if (embStore) {
+      if (await hasDb) {
         setMany(embeddings, embStore)
       }
     })
@@ -197,10 +208,10 @@ const methods = {
   semanticSearch: ({query, threshold}, cb) =>
     semanticSearch(query, threshold).then(matches => cb([query, matches])),
 
-  deleteExcerpt: ({targetId, bookId, bookExcerptIds}) => {
+  deleteExcerpt: async ({targetId, bookId, bookExcerptIds}) => {
     delete excerptEmbMap[targetId]
 
-    if (embStore) {
+    if (await hasDb) {
       del(targetId, embStore)
     }
 
@@ -208,7 +219,7 @@ const methods = {
     updateCaches()
   },
 
-  deleteBook: ({bookId, bookExcerptIds}) => {
+  deleteBook: async ({bookId, bookExcerptIds}) => {
     delete bookEmbMap[bookId]
 
     bookExcerptIds.forEach(id => {
@@ -216,7 +227,7 @@ const methods = {
       delete excerptIdToBookId[id]
     })
 
-    if (embStore) {
+    if (await hasDb) {
       delMany(bookExcerptIds, embStore)
     }
 
@@ -243,7 +254,7 @@ const methods = {
     cb(ids)
   },
 
-  initWithClear: (state, cb) => {
+  initWithClear: async (state, cb) => {
     excerptEmbMap = {}
     bookEmbMap = {}
     authorEmbMap = {}
@@ -253,7 +264,7 @@ const methods = {
     authorTensor?.dispose()
     processNewExcerpts(state, cb)
 
-    if (embStore) {
+    if (await hasDb) {
       keys(embStore).then(ids => {
         const toKeep = state.excerpts.map(({id}) => id)
 
