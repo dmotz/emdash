@@ -24,3 +24,5 @@ self.onmessage = ({data}) => {
       ])
     )
 }
+
+self.postMessage(null)
