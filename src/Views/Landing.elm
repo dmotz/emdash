@@ -35,7 +35,7 @@ import Html.Events exposing (onClick)
 import List exposing (drop, length, map, range, reverse, take)
 import Msg exposing (Msg(..))
 import Types exposing (Book, CountMap)
-import Utils exposing (appName, getCount, repoUrl)
+import Utils exposing (appName, getCount)
 import Views.BookList exposing (bookView)
 import Views.Button exposing (actionButton)
 import Views.MonkSignup exposing (monkSignup)
@@ -109,8 +109,9 @@ landingView bookList countMap didSubmitEmail =
                 []
             , section
                 [ class "cta" ]
-                [ h1 []
-                    [ text <| appName ++ " uses AI to organize highlights from ebooks so you can "
+                [ h1
+                    []
+                    [ text <| appName ++ " uses AI to organize text snippets so you can "
                     , em [] [ text "actually remember & learn from" ]
                     , text " what you read."
                     ]
@@ -184,7 +185,7 @@ landingView bookList countMap didSubmitEmail =
                                 , span [ class "smallCaps" ] [ text "json" ]
                                 , text ", "
                                 , span [ class "smallCaps" ] [ text "csv" ]
-                                , text " or manual input. Export instantly to the same open formats."
+                                , text ", or manual input. Export instantly to the same open formats."
                                 ]
                             ]
                         , li
