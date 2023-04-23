@@ -318,6 +318,7 @@ const start = port => {
     .then(() => console.log(`using ${tf.getBackend()} backend`))
 }
 
+tf.enableProdMode()
 self.onconnect = e => start(e.ports[0])
 self.onerror = e => console.log(e)
 
