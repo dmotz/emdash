@@ -1491,34 +1491,34 @@ update message model =
                         )
 
                 Just (SearchRoute query) ->
-                    case query of
-                        Just text ->
-                            let
-                                ( debounce, cmd ) =
-                                    Debounce.push
-                                        debounceConfig
-                                        text
-                                        model.searchDebounce
-                            in
-                            ( { model_
-                                | searchDebounce = debounce
-                                , searchQuery = text
-                                , page =
-                                    case model.page of
-                                        SearchPage _ _ _ _ _ ->
-                                            model.page
+                    if showLanding then
+                        rootRedirect
 
-                                        _ ->
-                                            SearchPage text TextMatches [] [] []
-                              }
-                            , cmd
-                            )
+                    else
+                        case query of
+                            Just text ->
+                                let
+                                    ( debounce, cmd ) =
+                                        Debounce.push
+                                            debounceConfig
+                                            text
+                                            model.searchDebounce
+                                in
+                                ( { model_
+                                    | searchDebounce = debounce
+                                    , searchQuery = text
+                                    , page =
+                                        case model.page of
+                                            SearchPage _ _ _ _ _ ->
+                                                model.page
 
-                        _ ->
-                            if showLanding then
-                                rootRedirect
+                                            _ ->
+                                                SearchPage text TextMatches [] [] []
+                                  }
+                                , cmd
+                                )
 
-                            else
+                            _ ->
                                 ( model_, none )
 
                 Just SettingsRoute ->
