@@ -254,6 +254,7 @@ const methods = {
     try {
       buff = await (await fetch('/demo/embs')).arrayBuffer()
     } catch (e) {
+      console.log(e)
       return
     }
 
