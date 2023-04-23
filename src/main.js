@@ -1,22 +1,19 @@
 import {get, set, createStore} from 'idb-keyval'
+import SharedWorker from '@okikio/sharedworker'
 import {Elm} from './Main.elm'
 import {version} from '../package.json'
 import './styles/main.sass'
 
 const dbNs = 'marginalia'
 const stateKey = 'state'
-const swKey = 'SharedWorker'
-const bcKey = 'BroadcastChannel'
 const writeMs = 333
-const supportsSharedWorker = swKey in window
+const bcKey = 'BroadcastChannel'
 const supportsBroadcastChannel = bcKey in window
 
-const worker =
-  supportsSharedWorker &&
-  new SharedWorker(new URL('./worker.js', import.meta.url), {
-    name: 'marginalia',
-    type: 'module'
-  })
+const worker = new SharedWorker(new URL('./worker.js', import.meta.url), {
+  name: 'marginalia',
+  type: 'module'
+})
 
 const channel = supportsBroadcastChannel && new BroadcastChannel(dbNs)
 
@@ -77,9 +74,7 @@ let zipWorker
 
   const flags = [
     restored || null,
-    [!supportsSharedWorker && swKey, !supportsBroadcastChannel && bcKey].filter(
-      Boolean
-    ),
+    [!supportsBroadcastChannel && bcKey].filter(Boolean),
     [
       version,
       import.meta.env.VITE_MAILING_LIST_URL || '',
@@ -189,10 +184,9 @@ let zipWorker
     msgWorker('setDemoEmbeddings', {ids})
   )
 
-  if (worker) {
-    worker.port.start()
-    worker.port.onmessage = ({data: {method, data}}) =>
-      app.ports[messageToPort[method]].send(data)
+  worker.port.start()
+  worker.port.onmessage = ({data: {method, data}}) => {
+    app.ports[messageToPort[method]].send(data)
   }
 })()
 
