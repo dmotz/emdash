@@ -121,7 +121,6 @@ const findAuthorNeighbors = async (authorId, k) =>
 
 const processNewExcerpts = async ({excerpts}, cb) => {
   if ((await hasDb) && !Object.keys(excerptEmbMap).length) {
-    console.log('hitting embstore', embStore)
     excerptEmbMap = Object.fromEntries(await entries(embStore))
   }
 
