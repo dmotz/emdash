@@ -4,6 +4,7 @@ import Html exposing (Html, button, div, input, text)
 import Html.Attributes
     exposing
         ( attribute
+        , autocomplete
         , class
         , placeholder
         , spellcheck
@@ -24,6 +25,8 @@ searchInput searchQuery =
             , placeholder "Search your library"
             , value searchQuery
             , attribute "enterkeyhint" "search"
+            , attribute "autocapitalize" "off"
+            , autocomplete False
             ]
             []
         , button
