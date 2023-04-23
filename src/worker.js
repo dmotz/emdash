@@ -1,10 +1,10 @@
 import * as tf from '@tensorflow/tfjs'
+import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm'
 import {load} from '@tensorflow-models/universal-sentence-encoder'
 import {createStore, del, delMany, entries, keys, setMany} from 'idb-keyval'
 
 const dbNs = 'marginalia'
 const embKey = 'embeddings'
-const model = load()
 const embSize = 512
 const semanticSearchLimit = 203
 const embsInProgress = {}
@@ -44,6 +44,7 @@ let authorTensor
 let excerptKeyList
 let bookKeyList
 let authorKeyList
+let model
 
 const computeEmbeddings = async pairs => {
   const tensor = await (await model).embed(pairs.map(([, text]) => text))
@@ -290,12 +291,33 @@ const methods = {
   }
 }
 
-const start = port =>
-  (port.onmessage = ({data: {method, ...payload}}) =>
-    methods[method](payload, data => port.postMessage({method, data})))
+const setWasm = () => {
+  setWasmPaths(
+    'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.4.0/dist/'
+  )
+
+  return tf.setBackend('wasm')
+}
+
+const start = port => {
+  port.onmessage = ({data: {method, ...payload}}) =>
+    methods[method](payload, data => port.postMessage({method, data}))
+
+  console.log = msg => port.postMessage(msg)
+
+  model = (
+    'OffscreenCanvas' in self
+      ? tf
+          .setBackend('webgl')
+          .then(() => (tf.ENV.flags.HAS_WEBGL ? Promise.resolve() : setWasm()))
+      : setWasm()
+  )
+    .then(tf.ready)
+    .then(load)
+}
 
 self.onconnect = e => start(e.ports[0])
-self.onerror = e => console.error(e)
+self.onerror = e => console.log(e)
 
 if (!('SharedWorkerGlobalScope' in self)) {
   start(self)
