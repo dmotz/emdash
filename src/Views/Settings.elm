@@ -43,6 +43,14 @@ settingsView version excerptCount bookCount authorCount tagCount semanticThresho
                     , a [ href "/import" ] [ text "import page" ]
                     , text "."
                     ]
+                , h2 [] [ text "Monk-Mode" ]
+                , p []
+                    [ a [ href "/monk-mode" ] [ em [] [ text "Monk-Mode" ] ]
+                    , text <|
+                        " is a forthcoming set of features to further enhance your "
+                            ++ appName
+                            ++ " experience. Consider joining the waitlist."
+                    ]
                 ]
             , div
                 []
@@ -74,7 +82,7 @@ settingsView version excerptCount bookCount authorCount tagCount semanticThresho
                 , p [] [ pre [] [ text version ] ]
                 , h2 [] [ text "Colophon" ]
                 , p [ class "colophon" ]
-                    [ text <| appName ++ " is an open-source tool created by "
+                    [ text <| appName ++ " is an open-source wisdom-indexer created by "
                     , a [ href "https://oxism.com" ] [ text "Dan Motzenbecker" ]
                     , text "."
                     ]
