@@ -314,8 +314,8 @@ const start = port => {
       : setWasm()
   )
     .then(tf.ready)
-    .then(load)
     .then(() => console.log(`using ${tf.getBackend()} backend`))
+    .then(load)
 }
 
 tf.enableProdMode()
