@@ -10,14 +10,28 @@ const semanticSearchLimit = 203
 const embsInProgress = {}
 const embStore = createStore(`${dbNs}:${embKey}`, embKey)
 const hasDb = new Promise(res => {
-  const testNs = `${dbNs}:test`
-  const dbReq = indexedDB.open(testNs)
-  dbReq.onerror = () => res(false)
+  const attempt = () => {
+    const testNs = `${dbNs}:test`
+    const dbReq = indexedDB.open(testNs)
 
-  dbReq.onsuccess = () => {
-    res(true)
-    indexedDB.deleteDatabase(testNs)
+    dbReq.onerror = () => {
+      clearTimeout(timeout)
+      res(false)
+    }
+
+    dbReq.onsuccess = () => {
+      clearTimeout(timeout)
+      res(true)
+      indexedDB.deleteDatabase(testNs)
+    }
   }
+
+  let timeout = setTimeout(() => {
+    attempt()
+    timeout = setTimeout(() => res(false), 3000)
+  }, 3000)
+
+  attempt()
 })
 
 let excerptEmbMap = {}
