@@ -522,46 +522,46 @@ footer
   inset: 0
   z-index: 9999
 
-  .modalBox
-    @include dropShadow
-    font-size: 1.8rem
-    border: 1px solid $mid2
-    padding: 4rem
-    max-width: 80vw
-    background: $bg
-    max-height: 80vh
+.modalBox
+  @include dropShadow
+  font-size: 1.8rem
+  border: 1px solid $mid2
+  padding: 4rem
+  max-width: 80vw
+  background: $bg
+  max-height: 80vh
+  display: flex
+  flex-direction: column
+
+  h4
+    font-size: 3rem
+    margin-bottom: 1.5rem
+
+  .error
+    margin: 3rem 0
+    font-size: 1.4rem
+    overflow: auto
+
+    code
+      user-select: text
+
+  .confirm
     display: flex
-    flex-direction: column
+    justify-content: center
 
-    h4
-      font-size: 3rem
-      margin-bottom: 1.5rem
+    button + button
+      margin-left: 2rem
 
-    .error
-      margin: 3rem 0
-      font-size: 1.4rem
-      overflow: auto
+  button
+    margin-top: 3rem
+    align-self: center
 
-      code
-        user-select: text
+  .okButton
+    .buttonContent
+      border-color: $accent
 
-    .confirm
-      display: flex
-      justify-content: center
-
-      button + button
-        margin-left: 2rem
-
-    button
-      margin-top: 3rem
-      align-self: center
-
-    .okButton
-      .buttonContent
-        border-color: $accent
-
-      .buttonShadow
-        background: $accent
+    .buttonShadow
+      background: $accent
 
 @keyframes hover
   from
