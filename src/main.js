@@ -184,9 +184,13 @@ let zipWorker
     msgWorker('setDemoEmbeddings', {ids})
   )
 
-  worker.port.start()
-  worker.port.onmessage = ({data: {method, data}}) => {
-    app.ports[messageToPort[method]].send(data)
+  worker.port.onmessage = ({data}) => {
+    if (!data.method) {
+      console.log('worker:', data)
+      return
+    }
+
+    app.ports[messageToPort[data.method]].send(data.data)
   }
 })()
 
