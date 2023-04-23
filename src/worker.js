@@ -277,12 +277,9 @@ const methods = {
   }
 }
 
-const start = port => {
-  port.onmessage = ({data: {method, ...payload}}) =>
-    methods[method](payload, data => port.postMessage({method, data}))
-
-  model.then(() => tf.setBackend('webgl'))
-}
+const start = port =>
+  (port.onmessage = ({data: {method, ...payload}}) =>
+    methods[method](payload, data => port.postMessage({method, data})))
 
 self.onconnect = e => start(e.ports[0])
 self.onerror = e => console.error(e)
