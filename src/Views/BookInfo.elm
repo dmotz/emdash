@@ -128,28 +128,31 @@ bookInfo book books tags pendingTag bookNeighborMap count mBookmark excerptSort 
                 ]
             , div
                 [ class "col" ]
-                [ tagSection
-                    book.tags
-                    tags
-                    pendingTag
-                , div
-                    []
-                    [ h5 [] [ text "Rating" ]
+                [ div
+                    [ class "tagsRating" ]
+                    [ tagSection
+                        book.tags
+                        tags
+                        pendingTag
                     , div
-                        [ class "rating" ]
-                        [ ratingEl book
-                        , input
-                            [ type_ "range"
-                            , H.min "0"
-                            , H.max "5"
-                            , step "0.5"
-                            , value <| String.fromFloat book.rating
-                            , onInput <|
-                                String.toFloat
-                                    >> withDefault 0
-                                    >> SetRating book
+                        []
+                        [ h5 [] [ text "Rating" ]
+                        , div
+                            [ class "rating" ]
+                            [ ratingEl book
+                            , input
+                                [ type_ "range"
+                                , H.min "0"
+                                , H.max "5"
+                                , step "0.5"
+                                , value <| String.fromFloat book.rating
+                                , onInput <|
+                                    String.toFloat
+                                        >> withDefault 0
+                                        >> SetRating book
+                                ]
+                                []
                             ]
-                            []
                         ]
                     ]
                 , details []
