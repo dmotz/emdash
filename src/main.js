@@ -185,7 +185,7 @@ let zipWorker
   )
 
   worker.port.onmessage = ({data}) => {
-    if (!data.method) {
+    if (!data?.method) {
       console.log('worker:', data)
       return
     }
