@@ -47,7 +47,7 @@ main
   padding: 0 6rem
 
   @include mobile
-    padding: 0 3rem
+    padding: 0 4.5rem
 
   > div
     margin: 0 auto
@@ -63,7 +63,7 @@ main
       margin-top: 0
 
     @include mobile
-      margin-top: 2rem
+      margin-top: 0
 
 h1, h2, h3, h4, h5, h6
   font-weight: normal
@@ -158,6 +158,7 @@ input, textarea
   font-family: $font
   outline: none
   border: 1px solid $mid2
+  border-radius: 0
   color: $fg
 
   &::placeholder
@@ -176,7 +177,6 @@ input
 
 textarea
   border: 1px solid $mid2
-  border-radius: 0
   padding: 1rem
   font-family: $monoFont
   font-size: 1.4rem
@@ -201,8 +201,8 @@ input[type='range']
     height: 1.4rem
     border-radius: 100%
     background: $fg
-    border: none
-    outline: 1px solid $bg
+    border: 1px solid $bg
+    box-shadow: none
     transform: translateY(-50%)
     cursor: ew-resize
 
@@ -372,6 +372,7 @@ progress
     font-size: 1.6rem
     display: flex
     justify-content: center
+    line-height: 1
 
     span
       padding: 0.6rem 0
@@ -415,7 +416,7 @@ progress
       flex: 1
 
     button
-      font-size: 1.3rem
+      font-size: 1.4rem
       width: 100%
       padding: 0 0.6rem
 

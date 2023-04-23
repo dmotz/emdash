@@ -30,6 +30,9 @@
     opacity: 0
     @include fade
 
+    @include mobile
+      opacity: 1
+
   .bookmark, .favorite
     position: relative
     margin: 0.2rem 0
@@ -51,6 +54,10 @@
         opacity: 1
 
   &.permalink
+
+    @include mobile
+      padding-top: 0
+
     figure > cite
       font-size: 2.4rem
       margin: 4rem 0
