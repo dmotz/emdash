@@ -141,7 +141,8 @@ landingView bookList countMap didSubmitEmail =
                             , p
                                 []
                                 [ text <|
-                                    "On-device AI analysis finds passages with similar ideas from other authors, often with a very different angle."
+                                    "On-device AI analysis finds passages with similar ideas "
+                                        ++ "from other authors, often from a different angle."
                                 ]
                             ]
                         , li
@@ -151,7 +152,7 @@ landingView bookList countMap didSubmitEmail =
                                 []
                                 [ text <|
                                     "Find what youʼre looking for with both full-text "
-                                        ++ "search and deeper semantic matching for fuzzy ideas."
+                                        ++ "search and deeper semantic matching of fuzzy ideas."
                                 ]
                             ]
                         , li
@@ -172,7 +173,7 @@ landingView bookList countMap didSubmitEmail =
                             , p []
                                 [ text <|
                                     "Unearth ideas youʼve forgotten about via "
-                                        ++ "serendipitous discovery. Rephrase dense concepts and re-explain with metaphors."
+                                        ++ "random discovery. Rephrase dense concepts and re-explain with metaphors."
                                 ]
                             ]
                         , li
@@ -194,14 +195,11 @@ landingView bookList countMap didSubmitEmail =
                                 , span [] [ text "&" ]
                                 , text " offline first"
                                 ]
-                            , p []
-                                [ text "Fully private AI analysis and fully "
-                                , a
-                                    [ href repoUrl
-                                    , target "_blank"
-                                    ]
-                                    [ text "open-source" ]
-                                , text ". Your data stay on your device."
+                            , p
+                                []
+                                [ text <|
+                                    "On-device analysis means your collection stays on "
+                                        ++ "your device until you opt into advanced features."
                                 ]
                             ]
                         ]
