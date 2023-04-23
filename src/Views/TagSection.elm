@@ -17,7 +17,8 @@ import Html
         )
 import Html.Attributes
     exposing
-        ( autocomplete
+        ( attribute
+        , autocomplete
         , class
         , disabled
         , href
@@ -92,6 +93,7 @@ tagSection tags globalTags pendingTag =
                 , list datalistId
                 , placeholder "Add tag"
                 , autocomplete False
+                , attribute "autocapitalize" "off"
                 , spellcheck False
                 ]
                 []
