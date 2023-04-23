@@ -47,6 +47,7 @@ const downloadFile = (name, data) => {
 let app
 let writeTimer
 let zipWorker
+let zipWorkerReady
 
 !(async () => {
   console.log(`${dbNs} v${version} ⁓ habent sua fata libelli`)
@@ -118,14 +119,24 @@ let zipWorker
     }
   })
 
-  app.ports.createEpub.subscribe(pairs => {
+  app.ports.createEpub.subscribe(async pairs => {
     if (!zipWorker) {
-      zipWorker = new Worker(new URL('./zip-worker.js', import.meta.url), {
-        type: 'module'
+      zipWorkerReady = new Promise(res => {
+        zipWorker = new Worker(new URL('./zip-worker.js', import.meta.url), {
+          type: 'module'
+        })
+
+        zipWorker.onmessage = ({data}) => {
+          if (!data) {
+            res()
+            return
+          }
+          downloadFile(...data)
+        }
       })
-      zipWorker.onmessage = ({data}) => downloadFile(...data)
     }
 
+    await zipWorkerReady
     zipWorker.postMessage(pairs)
   })
 
