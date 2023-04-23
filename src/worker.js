@@ -277,11 +277,16 @@ const methods = {
   }
 }
 
-self.onconnect = e => {
-  const [port] = e.ports
-
-  model.then(() => tf.setBackend('webgl'))
-
+const start = port => {
   port.onmessage = ({data: {method, ...payload}}) =>
     methods[method](payload, data => port.postMessage({method, data}))
+
+  model.then(() => tf.setBackend('webgl'))
+}
+
+self.onconnect = e => start(e.ports[0])
+self.onerror = e => console.error(e)
+
+if (!('SharedWorkerGlobalScope' in self)) {
+  start(self)
 }
