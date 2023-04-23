@@ -28,7 +28,10 @@
       visibility: visible
 
   @media (max-width: 1000px)
-    max-width: calc(100vw - 180px)
+    max-width: calc(100vw - 18rem)
+
+  @include mobile
+    max-width: calc(100% - 6rem)
 
 .searchResults
   display: flex
