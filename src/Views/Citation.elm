@@ -17,14 +17,14 @@ citation excerpt book mScore =
     cite
         []
         ([ div
-            []
+            [ class "title" ]
             [ a
-                [ class "title", href <| titleSlugToRoute book.slug, stopLinkProp ]
+                [ href <| titleSlugToRoute book.slug, stopLinkProp ]
                 [ text book.title ]
             , span [ class "divider" ] [ text "•" ]
             ]
          , div
-            []
+            [ class "author" ]
             ((map
                 (\author ->
                     a
@@ -49,6 +49,7 @@ citation excerpt book mScore =
                                 ++ "#"
                                 ++ getExcerptDomId excerpt.id
                         , stopLinkProp
+                        , class "page"
                         ]
                         [ text <| "p. " ++ fromInt excerpt.page ]
                     ]
