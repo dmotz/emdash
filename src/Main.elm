@@ -361,6 +361,7 @@ update message model =
                             model_ |> modelToStoredModel |> setStorage
                         ]
                     )
+                |> addCmd (Nav.pushUrl model.key "/")
 
         ParseJsonText forceDemoExit text ->
             let
