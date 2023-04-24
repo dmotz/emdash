@@ -75,7 +75,10 @@ port requestSemanticSearch : ( String, Float ) -> Cmd msg
 port receiveSemanticSearch : (( String, ScorePairs ) -> msg) -> Sub msg
 
 
-port fetchDemoEmbeddings : List Id -> Cmd msg
+port fetchDemoEmbeddings : () -> Cmd msg
+
+
+port setDemoEmbeddings : List Id -> Cmd msg
 
 
 port syncState : (StoredModel -> msg) -> Sub msg
