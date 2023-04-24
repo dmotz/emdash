@@ -361,6 +361,9 @@ progress
         span
           border-color: $fg
 
+        .icon
+          opacity: 1
+
   button
     width: 11.88rem
     color: $mid4
@@ -373,12 +376,22 @@ progress
       padding: 0.6rem 0
       font-size: inherit
       border-bottom: 1px solid transparent
+      display: flex
+      align-items: center
 
     &:hover
       color: $fg
 
       span
         border-color: $mid2
+
+      .icon
+        opacity: 1
+
+    .icon
+      width: 1.2rem
+      margin-right: 0.3em
+      opacity: .7
 
   .sorter
     position: absolute
