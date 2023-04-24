@@ -100,7 +100,7 @@ const computeAverages = (targets, map) =>
       if (embs.length) {
         map[collId] = embs
           .reduce((a, c) => a.map((n, i) => n + c[i]))
-          .map(n => n / targets[0][1][0].length)
+          .map(n => n / embs.length)
       }
     }
   })
