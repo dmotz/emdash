@@ -1,3 +1,5 @@
-# ❧ [Emdash](https://emdash.ai)
+## <img src="https://emdash.ai/images/favicon.svg" width="300"/>
 
-## A book excerpt organizer
+---
+
+# ❧ [Emdash](https://emdash.ai)
