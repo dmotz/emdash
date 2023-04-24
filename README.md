@@ -1,3 +1,3 @@
-## <img src="https://emdash.ai/images/favicon.svg" width="300"/>
+<img src="https://emdash.ai/images/favicon.svg" width="200"/>
 
-# ❧ [Emdash](https://emdash.ai)
+# [Emdash](https://emdash.ai)
