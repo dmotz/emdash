@@ -1,11 +1,25 @@
 port module Epub exposing (export)
 
-import List exposing (concat, filter, indexedMap, map, reverse)
+import Dict exposing (values)
+import List exposing (concat, filter, indexedMap, map, sortBy)
 import MD5 exposing (hex)
-import Model exposing (Author, Entry, Title)
+import Model exposing (Model)
 import Regex exposing (Regex)
-import String exposing (fromInt, replace, toLower)
-import Utils exposing (rx)
+import String exposing (fromInt, join, padLeft, replace, toLower)
+import Time
+    exposing
+        ( Month(..)
+        , Posix
+        , toDay
+        , toHour
+        , toMinute
+        , toMonth
+        , toSecond
+        , toYear
+        , utc
+        )
+import Types exposing (Author, BookSort(..), Excerpt, Title)
+import Utils exposing (appName, rx, sortBooks)
 
 
 type alias Epub =
@@ -17,12 +31,7 @@ port createEpub : Epub -> Cmd msg
 
 globalTitle : String
 globalTitle =
-    "Marginalia Excerpts"
-
-
-globalAuthor : String
-globalAuthor =
-    "Marginalia"
+    appName ++ " Excerpts"
 
 
 container : ( String, String )
@@ -45,7 +54,7 @@ container =
 
 titleRx : Regex
 titleRx =
-    rx "[^a-zA-Z\\d]"
+    rx "[^a-zA-Z\\d\\-]"
 
 
 trimRx : Regex
@@ -57,14 +66,14 @@ normalizeTitle : Int -> Title -> String
 normalizeTitle n title =
     fromInt (n + 1)
         ++ "_"
-        ++ (replace " " "-" (toLower title)
-                |> Regex.replace titleRx (always "")
+        ++ (Regex.replace titleRx (always "") (toLower title)
+                |> replace " " "-"
            )
         ++ ".xhtml"
 
 
-tocEntry : Int -> Title -> String
-tocEntry i title =
+tocExcerpt : Int -> Title -> String
+tocExcerpt i title =
     "<li><a href=\"" ++ normalizeTitle i title ++ "\">" ++ title ++ "</a></li>"
 
 
@@ -91,7 +100,7 @@ generateToc titles =
           <ol>
             <li><a href="toc.xhtml">- Table of Contents -</a></li>
       """
-        ++ (String.concat <| indexedMap tocEntry titles)
+        ++ (String.concat <| indexedMap tocExcerpt titles)
         ++ """
           </ol>
         </nav>
@@ -101,17 +110,19 @@ generateToc titles =
     )
 
 
-generateTocNcx : List Title -> ( String, String )
-generateTocNcx titles =
+generateTocNcx : String -> List Title -> ( String, String )
+generateTocNcx epubId titles =
     ( "OEBPS/toc.ncx"
     , """
       <?xml version="1.0" encoding="UTF-8"?>
       <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
         <head>
           <meta name="dtb:uid" content=\""""
-        ++ (hex <| String.concat titles)
+        ++ epubId
         ++ """" />
-          <meta name="dtb:generator" content="Marginalia"/>
+          <meta name="dtb:generator" content=\""""
+        ++ appName
+        ++ """"/>
           <meta name="dtb:depth" content="1"/>
           <meta name="dtb:totalPageCount" content="0"/>
           <meta name="dtb:maxPageNumber" content="0"/>
@@ -123,13 +134,13 @@ generateTocNcx titles =
         </docTitle>
         <docAuthor>
           <text>"""
-        ++ globalAuthor
+        ++ appName
         ++ """</text>
         </docAuthor>
         <navMap>
           <navPoint id="toc" playOrder="0" class="chapter">
             <navLabel>
-              <text>Table Of Contents</text>
+              <text>Table of Contents</text>
             </navLabel>
             <content src="toc.xhtml"/>
           </navPoint>
@@ -175,8 +186,8 @@ generateTocNcx titles =
     )
 
 
-generateContent : List Title -> ( String, String )
-generateContent titles =
+generateContent : String -> String -> List Title -> ( String, String )
+generateContent epubId timeString titles =
     ( "OEBPS/content.opf"
     , """
       <?xml version="1.0" encoding="UTF-8"?>
@@ -188,19 +199,20 @@ generateContent titles =
         xmlns:dcterms="http://purl.org/dc/terms/"
         xml:lang="en"
         xmlns:media="http://www.idpf.org/epub/vocab/overlays/#">
-
         <metadata
           xmlns:dc="http://purl.org/dc/elements/1.1/"
           xmlns:opf="http://www.idpf.org/2007/opf">
-
           <dc:identifier id="BookId">"""
-        ++ (hex <| String.concat titles)
+        ++ epubId
         ++ """</dc:identifier>
           <meta
             refines="#BookId"
             property="identifier-type"
             scheme="onix:codelist5">22</meta>
           <meta property="dcterms:identifier" id="meta-identifier">BookId</meta>
+          <meta property="dcterms:modified">"""
+        ++ timeString
+        ++ """</meta>
           <dc:title>"""
         ++ globalTitle
         ++ """</dc:title>
@@ -208,16 +220,17 @@ generateContent titles =
         ++ globalTitle
         ++ """</meta>
           <dc:creator id="creator">"""
-        ++ globalAuthor
+        ++ appName
         ++ """</dc:creator>
           <meta refines="#creator" property="file-as">"""
-        ++ globalAuthor
+        ++ appName
         ++ """</meta>
           <dc:language>en</dc:language>
           <meta property="dcterms:language" id="meta-language">en</meta>
-          <meta name="generator" content="Marginalia"/>
+          <meta name="generator" content=\""""
+        ++ appName
+        ++ """"/>
         </metadata>
-
         <manifest>
           <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />
           <item
@@ -245,7 +258,6 @@ generateContent titles =
            )
         ++ """
         </manifest>
-
         <spine toc="ncx">
           <itemref idref="toc"/>
         """
@@ -274,22 +286,8 @@ generateContent titles =
     )
 
 
-getAuthor : Title -> List Entry -> String
-getAuthor title entries =
-    case entries of
-        entry :: ents ->
-            if entry.title == title then
-                entry.author
-
-            else
-                getAuthor title ents
-
-        [] ->
-            ""
-
-
-generateChapter : Int -> Title -> Author -> List Entry -> ( String, String )
-generateChapter i title author entries =
+generateChapter : Int -> Title -> List Author -> List Excerpt -> ( String, String )
+generateChapter i title authors excerpts =
     ( "OEBPS/" ++ normalizeTitle i title
     , """
     <?xml version="1.0" encoding="UTF-8"?>
@@ -307,26 +305,26 @@ generateChapter i title author entries =
       <body>
         <h1>"""
         ++ title
-        ++ """</h1>
-        <h2>"""
-        ++ author
-        ++ """</h2>
-        """
+        ++ "</h1>"
+        ++ join " " (map (\author -> "<h2>" ++ author ++ "</h2>") authors)
         ++ (String.concat <|
                 map
-                    (\entry ->
+                    (\{ text, page } ->
                         "<p>"
-                            ++ replace "&" "&amp;" entry.text
+                            ++ (text
+                                    |> replace "&" "&amp;"
+                                    |> replace "<" "&lt;"
+                                    |> replace ">" "&gt;"
+                               )
                             ++ "</p>"
-                            ++ (case entry.page of
-                                    Just n ->
-                                        "<cite>- p. " ++ fromInt n ++ "</cite>"
+                            ++ (if page /= -1 then
+                                    "<cite>— p. " ++ fromInt page ++ "</cite>"
 
-                                    _ ->
-                                        ""
+                                else
+                                    ""
                                )
                     )
-                    (reverse entries)
+                    excerpts
            )
         ++ """
       </body>
@@ -335,23 +333,57 @@ generateChapter i title author entries =
     )
 
 
-export : List Title -> List Entry -> Cmd msg
-export titles entries =
-    [ [ ( "mimetype", "application/epub+zip" )
-      , container
+export : Model -> Posix -> Cmd msg
+export model time =
+    let
+        sortedBooks =
+            sortBooks
+                RecencySort
+                True
+                model.excerptCountMap
+                model.favCountMap
+                (values model.books)
+
+        titles =
+            map (.title >> replace "&" "and") sortedBooks
+
+        timeString =
+            join
+                "-"
+                [ toYear utc time |> fromInt
+                , toMonth utc time |> monthToInt |> padN
+                , toDay utc time |> padN
+                ]
+                ++ "T"
+                ++ join
+                    ":"
+                    (map
+                        (\f -> f utc time |> padN)
+                        [ toHour, toMinute, toSecond ]
+                    )
+                ++ "Z"
+
+        epubId =
+            hex timeString
+    in
+    [ [ container
       , generateToc titles
-      , generateTocNcx titles
-      , generateContent titles
+      , generateTocNcx epubId titles
+      , generateContent epubId timeString titles
       ]
     , indexedMap
-        (\i ( title, author ) ->
+        (\i { id, title, authors } ->
             generateChapter
                 i
-                title
-                author
-                (filter (.title >> (==) title) entries)
+                (replace " & " " and " title)
+                authors
+                (model.excerpts
+                    |> values
+                    |> filter (.bookId >> (==) id)
+                    |> sortBy .page
+                )
         )
-        (map (\title -> ( title, getAuthor title entries )) titles)
+        sortedBooks
     ]
         |> concat
         |> map
@@ -359,3 +391,48 @@ export titles entries =
                 ( path, Regex.replace trimRx (always " ") text )
             )
         |> createEpub
+
+
+padN : Int -> String
+padN =
+    fromInt >> padLeft 2 '0'
+
+
+monthToInt : Month -> Int
+monthToInt month =
+    case month of
+        Jan ->
+            1
+
+        Feb ->
+            2
+
+        Mar ->
+            3
+
+        Apr ->
+            4
+
+        May ->
+            5
+
+        Jun ->
+            6
+
+        Jul ->
+            7
+
+        Aug ->
+            8
+
+        Sep ->
+            9
+
+        Oct ->
+            10
+
+        Nov ->
+            11
+
+        Dec ->
+            12

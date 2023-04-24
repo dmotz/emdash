@@ -1,0 +1,412 @@
+$scrollSpeed: 20s
+$bookGap: 1rem
+$bookScale: 0.7
+$maxColWidth: 90rem
+
+@mixin header
+  font-size: 4rem
+  margin-bottom: 1.8rem
+  text-align: center
+
+  @include mobile
+    font-size: 3rem
+
+:root
+  --center-gutter: 13rem
+
+  @include mobile
+    --center-gutter: #{$bookGap * $bookScale}
+
+.landing
+  margin: 0 auto
+  padding: 8rem 0
+  padding-top: 0
+
+  @include mobile
+    padding-bottom: 0
+
+  *
+    user-select: text
+
+  h2
+    @include header
+
+  img
+    user-select: none
+
+  main
+    position: relative
+
+  .logo
+    width: 22rem
+    margin: 0 auto
+    margin-top: -15rem
+    margin-bottom: -2rem
+    position: relative
+    z-index: 1
+    transform: translateX(-7%)
+
+    @include mobile
+      width: 16rem
+      margin-top: -13rem
+
+  section, hr
+    width: 100%
+    max-width: $maxColWidth
+    padding: 0 4rem
+    margin: 0 auto
+
+  section
+    margin-top: 8rem
+
+  .anim
+    pointer-events: none
+    opacity: .5
+    display: flex
+    width: 100vw
+    height: 25rem
+    position: relative
+    overflow: hidden
+    margin-bottom: 5rem
+    border-bottom: 1px solid $mid2
+    user-select: none
+
+    .bookShelf
+      position: absolute
+      top: 0
+      left: calc(50% - var(--center-gutter))
+      display: flex
+      justify-content: flex-end
+      transform-origin: 0 0
+      transform: scale($bookScale) translateX(-100%)
+
+      &:last-child
+        left: calc(50% + var(--center-gutter))
+        transform: scale($bookScale)
+
+    .bookCol
+      margin-right: 2rem
+      height: fit-content
+
+      > div
+        animation: scrollUp $scrollSpeed linear infinite
+
+        @media (prefers-reduced-motion)
+          animation: none
+
+      &:nth-child(even)
+        > div
+          animation: scrollDown $scrollSpeed linear infinite
+
+          @media (prefers-reduced-motion)
+            animation: none
+            transform: translateY(-100px)
+
+      &:last-child
+        margin-right: 0
+
+    .book
+      list-style: none
+      margin-bottom: $bookGap
+
+  .cta
+    padding: 0
+    padding-bottom: 8rem
+    position: relative
+
+    > div
+      position: relative
+      display: flex
+      justify-content: center
+      flex-direction: column
+      align-items: center
+      margin-top: 12rem
+      margin-bottom: 2rem
+
+      @include mobile
+        margin-top: 6rem
+
+    h1
+      font-weight: normal
+      font-size: clamp(2.6rem, 4vw, 3.8rem)
+      margin: 0 auto
+      margin-bottom: 3rem
+      padding: 0 6rem
+      line-height: 1.8
+      text-align: center
+
+      @include mobile
+        padding: 0
+
+    img
+      pointer-events: none
+      position: absolute
+      width: clamp(12rem, 20vw, 155px)
+      user-select: none
+
+    .botanical1
+      transform: translateX(-17rem) translateY(-3rem)
+      z-index: -1
+
+      @include mobile
+        transform: translateX(-14rem) translateY(-2rem)
+
+    .botanical2
+      bottom: 0
+      right: 3rem
+      object-position: 0 10rem
+
+      @include mobile
+        object-position: 0 7rem
+        right: 0
+
+    .actionButton
+      margin-bottom: 2rem
+      user-select: none
+
+      .buttonContent
+        font-size: 3rem
+        padding: 2rem 4rem
+        border: 3px double $fg
+
+      em
+        font-style: normal
+        border-bottom: 3px solid $fg
+        transition: border-bottom-color .3s
+
+      .buttonShadow
+        top: 4px
+        left: 4px
+
+      &:hover
+        .buttonContent
+          transform: translateX(-2px) translateY(-2px)
+
+        em
+          border-bottom-color: $accent
+
+      &:active
+        .buttonContent
+          transform: translateX(4px) translateY(4px)
+
+      @include mobile
+        font-size: 2.6rem
+
+    aside
+      text-align: center
+
+    p
+      font-size: 1.6rem
+
+    &::after
+      content: '❦'
+      font-size: 4rem
+      display: block
+      text-align: center
+      margin-top: 4rem
+
+  hr
+    margin: 0 auto
+    margin-bottom: 0.5rem
+
+  .features
+    margin-bottom: 16rem
+    padding: 0
+
+    > div
+      position: relative
+
+    h2
+      margin-bottom: 6rem
+
+      @include mobile
+        font-size: 3rem
+        margin-bottom: 4rem
+
+    h2, h4
+      text-align: center
+
+    ul
+      display: grid
+      grid: 1fr / 1fr 1fr
+      grid-gap: 14rem
+      margin-top: 12rem
+      row-gap: 18rem
+
+      @include mobile
+        grid-template-columns: 1fr
+        row-gap: 5rem
+        margin-top: 6rem
+
+    li
+      text-align: center
+
+    img
+      position: absolute
+      width: 19%
+      left: 50%
+      top: 16.3rem
+      transform: translateX(-50%)
+
+      &:nth-child(2)
+        margin-top: 42rem
+        width: 15%
+        transform: translateX(-50%) rotate(-10deg)
+
+      @include mobile
+        right: 0
+        left: unset
+        transform: translateX(80%)
+        top: 32rem
+        width: 12rem
+
+        &:nth-child(2)
+          left: 0
+          margin-top: 43rem
+          width: 9rem
+          transform: translateX(-77%)
+
+    p
+      font-size: 2.3rem
+      line-height: 1.7
+
+      @include mobile
+        padding: 0 0.5rem
+        font-size: 2rem
+
+  h3
+    font-size: 3rem
+    line-height: 1.4
+    margin-bottom: 3rem
+    text-align: center
+
+    @include mobile
+      margin-bottom: 1.5rem
+      font-size: 2.6rem
+
+    span
+      font-style: italic
+
+  footer
+    margin-top: 8rem
+
+  .coda
+    text-align: center
+
+    aside
+      margin-bottom: 4rem
+
+.monk
+  display: flex
+  justify-content: center
+  position: relative
+  margin-top: 13rem !important
+  margin-bottom: 8rem !important
+
+  @include mobile
+    padding: 0 !important
+    margin-top: 10rem !important
+    margin-bottom: 3rem !important
+
+  h2
+    @include header
+
+  > div
+    border: 1px double $mid2
+    outline: 1px solid $mid2
+    outline-offset: 4px
+    box-shadow: 0 0 0 4px $bg
+    max-width: 500px
+    padding: 6rem 5rem
+    text-align: center
+    position: relative
+    z-index: 9
+    background: $bg
+
+    @include mobile
+      padding: 3rem 2rem
+
+  ul
+    font-size: 2rem
+
+    li
+      line-height: 1.6
+
+      + li
+        margin-top: 1.4rem
+
+      &::before
+        content: '• '
+
+    @include mobile
+      font-size: 1.8rem
+
+  aside
+    margin-bottom: 1rem
+
+  form
+    display: flex
+    flex-direction: column
+    align-items: center
+    margin-top: 6rem
+
+    > div
+      width: 100%
+      max-width: 45rem
+      display: flex
+      flex-direction: column
+      justify-content: center
+      align-items: center
+
+      @include mobile
+        flex-direction: column
+        align-items: center
+
+    aside
+      max-width: 20rem
+
+  input
+    margin-top: 2rem
+    margin-right: 1rem
+    font-size: 1.8rem
+    width: 100%
+    text-align: center
+    margin-bottom: 2rem
+
+    &:invalid, &:placeholder-shown
+      + button
+        pointer-events: none
+
+    @include mobile
+      text-align: center
+      width: 80%
+      margin-bottom: 2rem
+
+  .mushrooms
+    position: absolute
+    max-width: 20rem
+    left: 50%
+    transform: translateX(-28rem) translateY(-89%)
+    pointer-events: none
+    user-select: none
+
+    @include mobile
+      left: 74%
+      max-width: 16rem
+
+main > .monk
+  margin-top: 20rem !important
+
+@keyframes scrollUp
+  from
+    transform: translateY(0)
+
+  to
+    transform: translateY(calc(-100% - $bookGap))
+
+@keyframes scrollDown
+  from
+    transform: translateY(-100%)
+
+  to
+    transform: translateY($bookGap)

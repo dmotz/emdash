@@ -1,0 +1,566 @@
+@import 'vars'
+@import 'landing'
+@import '404'
+@import 'nav'
+@import 'search'
+@import 'tags'
+@import 'books'
+@import 'book-info'
+@import 'excerpts'
+@import 'tabs'
+@import 'settings'
+@import 'import'
+@import 'create'
+@import 'lenses'
+
+*
+  box-sizing: border-box
+  margin: 0
+  padding: 0
+  user-select: none
+
+::selection
+  background: $fg
+  color: $bg
+  text-shadow: none
+
+html
+  font-size: 9px
+
+body
+  color: $fg
+  background: $bg
+  font-family: $font
+  font-size: $baseFontSize
+
+#root
+  width: 100vw
+  min-height: 100vh
+  display: flex
+  flex-direction: column
+  overflow: hidden
+
+main
+  display: flex
+  flex-direction: column
+  flex: 1
+  padding: 0 6rem
+
+  @include mobile
+    padding: 0 4.5rem
+
+  > div
+    margin: 0 auto
+    margin-top: 8rem
+    width: 100%
+    max-width: $maxWidth
+
+    &.fullWidth
+      max-width: 100%
+      margin-top: 0
+
+    &.searchPage
+      margin-top: 0
+
+    @include mobile
+      margin-top: 0
+
+h1, h2, h3, h4, h5, h6
+  font-weight: normal
+
+h1
+  font-size: 5rem
+  line-height: 1.2
+  margin-bottom: 1rem
+
+  @include mobile
+    font-size: 4rem
+
+h5
+  font-size: 2rem
+  font-weight: 500
+  margin-bottom: 1rem
+
+p, aside
+  line-height: 1.6
+
+pre, code
+  font-family: $monoFont
+
+aside
+  font-style: italic
+
+button
+  font-family: $font
+  color: $fg
+  appearance: none
+  background: none
+  outline: none
+  border: none
+  cursor: pointer
+  font-size: $baseFontSize
+
+.actionButton
+  position: relative
+  display: inline-block
+
+  .buttonContent
+    font-family: $font
+    background: $bg
+    padding: 0.5rem 1rem
+    border: 1px solid $fg
+    color: $fg
+    transition: all .2s ease-out
+    will-change: transform
+    user-select: none
+    white-space: nowrap
+    position: relative
+    z-index: 2
+
+  .buttonShadow
+    position: absolute
+    display: block
+    background: $fg
+    width: calc(100% - 0.1px)
+    height: 100%
+    top: 2px
+    left: 2px
+    z-index: 1
+
+  &:hover
+    .buttonContent
+      transform: translateX(-1px) translateY(-1px)
+
+  &:active
+    .buttonContent
+      transform: translateX(2px) translateY(2px)
+      transition-duration: .1s
+
+  &:disabled
+    pointer-events: none
+
+    .buttonContent
+      border-color: $mid3
+      color: $mid3
+
+    .buttonShadow
+      background: $mid3
+
+ul
+  list-style: none
+
+a
+  @include linkStyle
+
+hr
+  border: none
+  border-bottom: 1px solid $mid3
+
+input, textarea
+  background: none
+  font-family: $font
+  outline: none
+  border: 1px solid $mid2
+  border-radius: 0
+  color: $fg
+
+  &::placeholder
+    color: $mid3
+
+  &:focus
+    border-color: $fg
+
+input
+  border: none
+  border-bottom: 1px solid $mid2
+  padding: 0
+  padding-top: 0.2rem
+  padding-bottom: 0.4rem
+  font-size: $baseFontSize
+  accent-color: $fg
+
+textarea
+  border: 1px solid $mid2
+  padding: 1rem
+  font-family: $monoFont
+  font-size: 1.4rem
+  resize: none
+  display: block
+  width: 100%
+  height: 12rem
+
+input[type='range']
+  accent-color: $fg
+  appearance: none
+  border: none
+  margin-right: 1rem
+
+  &:focus
+    outline: none
+    border: 0
+
+  @mixin rangeThumb
+    appearance: none
+    width: 1.4rem
+    height: 1.4rem
+    border-radius: 100%
+    background: $fg
+    border: 1px solid $bg
+    box-shadow: none
+    transform: translateY(-50%)
+    cursor: ew-resize
+
+  &::-webkit-slider-thumb
+    @include rangeThumb
+
+  &::-moz-range-thumb
+    @include rangeThumb
+    transform: none
+
+  @mixin rangeTrack
+    width: 100%
+    height: 1px
+    background: $mid2
+
+  &::-webkit-slider-runnable-track
+    @include rangeTrack
+
+  &::-moz-range-track
+    @include rangeTrack
+
+summary
+  cursor: pointer
+  user-select: none
+
+  &:hover
+    text-decoration-color: $mid1
+
+  &:focus
+    outline: none
+
+  &::marker
+    font-size: 0.75em
+
+progress
+  accent-color: $fg
+  height: 1rem
+
+.title
+  font-style: italic
+
+.hidden
+  visibility: hidden
+
+.icon
+  width: 28px
+
+.hint
+  @include fade
+  position: absolute
+  display: flex
+  font-weight: normal
+  align-items: center
+  pointer-events: none
+  width: max-content
+  font-style: italic
+  background: $fg
+  color: $bg
+  font-size: 1.5rem
+  right: -2rem
+  transform: translateX(100%)
+  padding: 0.2rem 0.6rem
+  opacity: 0
+  line-height: 1.4
+  padding-left: 0
+
+  @include mobile
+    display: none
+
+  &:before
+    content: ''
+    position: absolute
+    top: 0
+    left: 0
+    z-index: -1
+    transform-origin: 0 0
+    height: 70.71067812%
+    aspect-ratio: 1
+    transform: rotate(45deg)
+    background: inherit
+
+  &.left
+    right: unset
+    padding-left: 0.6rem
+    padding-right: 0
+    left: -2rem
+    transform: translateX(-100%)
+
+    &:before
+      left: unset
+      right: 0
+      transform: translateX(100%) rotate(45deg)
+
+    &.swapRight
+      @include midWidth
+        transform: translateX(100%)
+        left: unset
+        right: -2rem
+        padding: 0.2rem 0.6rem
+        padding-left: 0
+
+        &:before
+          left: 0
+          right: unset
+          transform: rotate(45deg)
+
+*:has(> .hint)
+  display: flex
+  align-items: center
+
+  &:hover .hint
+    opacity: 1
+
+.smallCaps
+  font-variant: small-caps
+  font-weight: 500
+
+.modeHeading
+  margin: 0 auto
+  margin-bottom: 1rem
+  color: $mid4
+  display: flex
+  justify-content: center
+  position: relative
+  width: fit-content
+
+  &.center
+    margin-bottom: 4rem
+
+    @include mobile
+      margin-bottom: 6rem
+
+  ul
+    display: flex
+    margin-bottom: 0.6rem
+
+  li
+    border-left: 1px solid $mid2
+    text-align: center
+    display: flex
+    align-items: center
+    justify-content: center
+    position: relative
+
+    &:last-child
+      border-right: 1px solid $mid2
+
+    &.active
+      button
+        color: $fg
+
+        span
+          border-color: $fg
+
+  button
+    width: 11.88rem
+    color: $mid4
+    font-size: 1.6rem
+    display: flex
+    justify-content: center
+    line-height: 1
+
+    span
+      padding: 0.6rem 0
+      font-size: inherit
+      border-bottom: 1px solid transparent
+
+    &:hover
+      color: $fg
+
+      span
+        border-color: $mid2
+
+  .sorter
+    position: absolute
+    bottom: -3.4rem
+    font-size: 1.4rem
+    white-space: nowrap
+
+    span
+      position: relative
+      border-bottom: none !important
+
+    .arrow
+      font-size: 1rem
+      padding: 0
+      line-height: 2.1
+      transform: translateX(-150%)
+      position: absolute
+      left: 0
+
+      &.reverse
+        transform: translateX(-150%) rotate(180deg)
+
+  @include mobile
+    width: 100%
+
+    ul
+      width: 100%
+
+    li
+      flex: 1
+
+    button
+      font-size: 1.5rem
+      width: 100%
+      padding: 0 0.6rem
+
+footer
+  display: flex
+  flex-direction: column
+  padding: 4rem 0
+  margin-bottom: 4rem
+  margin-top: auto
+  align-items: center
+  justify-content: center
+
+  @include mobile
+    padding: 4rem
+
+  .links
+    margin: 4rem 0
+    text-align: center
+
+    a
+      margin: 0 1rem
+      display: inline-block
+      margin-bottom: 1rem
+
+  .fleuron
+    font-size: 4rem
+
+.embeddingProgress
+  flex: 1
+  justify-content: center
+  display: flex
+  flex-direction: column
+
+  p
+    font-style: italic
+
+  progress
+    margin: 0.8rem 0
+
+  div
+    display: flex
+    align-items: center
+
+    p
+      margin-left: 1rem
+
+.demoNotice
+  position: fixed
+  bottom: 2rem
+  left: 2rem
+  @include dropShadow
+  background: $bg
+  padding: 3rem
+  z-index: 99
+  justify-content: center
+  align-items: center
+  border: 1px solid $accent
+  font-size: 2rem
+  animation: hover 2s infinite alternate ease-in-out
+
+  aside
+    font-size: 1.7rem
+    margin-bottom: 2.5rem
+
+  button
+    font-size: inherit
+    font-style: inherit
+    margin-top: 1rem
+    @include linkStyle
+
+  span
+    margin-right: 0.7rem
+    font-size: 2rem
+
+  @include mobile
+    bottom: 0
+    left: 0
+    right: 0
+    border-bottom: none
+    border-left: none
+    border-right: none
+    text-align: center
+    padding: 2rem
+    font-size: 1.6rem
+    animation: none
+
+    aside
+      display: none
+
+.buttonStack
+  button
+    margin-bottom: 1.5rem
+
+  p
+    margin-bottom: 4rem
+
+.modal
+  position: fixed
+  display: flex
+  justify-content: center
+  align-items: center
+  background: rgba(255, 255, 255, 0.9)
+  inset: 0
+  z-index: 9999
+
+.modalBox
+  @include dropShadow
+  font-size: 1.8rem
+  border: 1px solid $mid2
+  padding: 4rem
+  max-width: 80vw
+  background: $bg
+  max-height: 80vh
+  display: flex
+  flex-direction: column
+
+  h4
+    font-size: 3rem
+    margin-bottom: 1.5rem
+
+  .error
+    margin: 3rem 0
+    font-size: 1.4rem
+    overflow: auto
+
+    code
+      user-select: text
+
+  .confirm
+    display: flex
+    justify-content: center
+
+    button + button
+      margin-left: 2rem
+
+  button
+    margin-top: 3rem
+    align-self: center
+
+  .okButton
+    .buttonContent
+      border-color: $accent
+
+    .buttonShadow
+      background: $accent
+
+@keyframes hover
+  from
+    transform: none
+
+  to
+    transform: translateY(-5px)

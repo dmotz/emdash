@@ -1,0 +1,38 @@
+$inset: 1.45rem
+
+.logo, .toolbar
+  z-index: 99
+
+.logo
+  position: fixed
+  top: 16px
+  left: 16px
+  width: 32px
+
+  img
+    width: 100%
+
+.toolbar
+  position: fixed
+  top: $inset
+  right: $inset
+  display: flex
+  flex-direction: column
+  align-items: center
+  margin-left: auto
+
+  @include mobile
+    top: 0.8rem
+    right: 0.5rem
+
+  a, button
+    display: flex
+    align-items: center
+    margin-bottom: 0.8rem
+
+    &:hover
+      img, .hint
+        opacity: 1
+
+      .hint
+        color: $bg

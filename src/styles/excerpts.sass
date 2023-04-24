@@ -1,0 +1,226 @@
+.excerpts
+  width: 100%
+  margin: 0 auto
+  margin-bottom: 8rem
+  display: flex
+  flex-direction: column
+  align-items: center
+
+.excerpt
+  width: 100%
+  padding-top: 4rem
+  margin-bottom: 2rem
+  position: relative
+
+  .tabs
+    margin-top: 1.2rem
+    opacity: 0
+    @include fade
+
+    &.active
+      opacity: 1
+
+    button:last-child
+      text-transform: unset
+
+    @include touch
+      opacity: 1
+
+  hr
+    opacity: 0
+    @include fade
+
+    @include touch
+      opacity: 1
+
+  .bookmark, .favorite
+    position: relative
+    margin: 0.2rem 0
+    opacity: 0
+    @include fade
+
+    &.active
+      opacity: 1
+
+  .icon
+    margin-right: -8px
+
+  &:hover
+    .tabs, hr
+      opacity: 1
+
+    .meta
+      .page, a, .bookmark, .favorite
+        opacity: 1
+
+  &.permalink
+
+    @include mobile
+      padding-top: 0
+
+    figure > cite
+      font-size: 2.4rem
+      margin: 4rem 0
+      margin-bottom: 6rem
+
+      @include mobile
+        font-size: 1.8rem
+
+    @include mobile
+      .favorite
+        margin-left: -0.4rem
+
+blockquote
+  font-size: 2.4rem
+  line-height: 1.8
+  user-select: text
+  hyphens: auto
+
+  @include mobile
+    font-size: 2rem
+
+.meta
+  position: absolute
+  transform: translateX(-100%)
+  display: flex
+  flex-direction: column
+  align-items: flex-end
+  padding-right: 2rem
+  font-size: 1.4rem
+  margin-top: 0.4rem
+  text-align: right
+  line-height: 2
+
+  @include mobile
+    margin-bottom: 1rem
+    position: static
+    flex-direction: row
+    transform: none
+    align-items: center
+
+    > *
+      margin-right: 1.8rem !important
+      transform: none !important
+      opacity: 1 !important
+
+  .page, a
+    opacity: 0
+    position: relative
+    @include fade
+
+.detailsToggle
+  position: absolute
+  transform: translateX(-100%)
+  color: $mid2
+  padding: 2rem 2rem 0 0
+  opacity: 0
+
+  &.active
+    > span
+      color: $fg
+      transform: rotate(90deg)
+
+  > span
+    transition: all 0.2s
+    display: inline-block
+    font-size: 1.2rem
+
+  &:hover
+    .hint
+      opacity: 1
+
+.details
+  section:not(.relatedExcerpts)
+    padding: 3rem 0
+
+  .embeddingProgress
+    margin: 4rem 0
+
+  + hr
+    opacity: 1
+
+.relatedExcerpts
+  min-height: 0.4rem
+
+.neighbors
+  margin: 4rem 0
+
+.snippet
+  $size: 1.8rem
+  position: relative
+  margin-bottom: 4rem
+
+  > a
+    text-decoration: none
+
+  &:hover
+    .clone
+      display: block
+      z-index: 1
+      outline: 1px solid $mid1
+      @include dropShadow
+
+  blockquote
+    font-size: $size
+    overflow: hidden
+    display: -webkit-box
+    -webkit-box-orient: vertical
+    -webkit-line-clamp: 3
+
+  mark
+    background: none
+    box-shadow: inset 0 -8.5px 0 yellow
+
+  cite
+    font-size: $size
+    margin-top: 1.5rem
+
+  .clone
+    $pad: 3rem
+    position: absolute
+    width: calc(100% + #{$pad} * 2)
+    top: -$pad
+    left: -$pad
+    background: $bg
+    display: none
+    padding: $pad
+
+    blockquote
+      overflow: visible
+      display: block
+
+.score
+  font-size: 1.2rem
+  font-weight: 500
+  position: relative
+
+cite
+  display: flex
+  flex-wrap: wrap
+  font-style: normal
+  line-height: 1.5
+
+  > *
+    flex-shrink: 0
+
+  .divider
+    margin: 0 .4em
+    color: $mid2
+    font-size: .8em
+
+  .score
+    margin-left: auto
+    display: flex
+    align-items: center
+
+    span
+      font-size: 1.2rem
+
+  @include mobile
+    flex-wrap: nowrap
+
+    .title
+      flex: 1
+
+    .divider, .author, .page
+      display: none

@@ -8,6 +8,10 @@ elm-stuff/
 repl-temp-*
 .DS_Store
 dist
+dev-dist
 package-lock.json
 clippings.txt
 art
+archives
+assets/demo
+.env

@@ -1,60 +1,106 @@
 module Utils exposing
-    ( ClickWithKeys
-    , KeyEvent
-    , charLimit
-    , embeddingBatchSize
-    , find
+    ( appName
+    , countLabel
+    , dedupe
+    , defaultSemanticThreshold
+    , excerptCountLabel
+    , fetchLensText
+    , findMatches
     , formatNumber
-    , getEntryHeight
-    , getIndex
-    , getNextIndex
-    , getPrevIndex
+    , formatScore
+    , getAuthorRouteMap
+    , getAuthors
+    , getCount
+    , getCounts
+    , getExcerptDomId
+    , getTagCounts
+    , getTitleRouteMap
     , insertOnce
-    , mapIdsToEntries
+    , juxt
+    , lensToString
+    , makeExcerpt
     , modelToStoredModel
-    , needsTitles
-    , queryCharMin
+    , null
+    , ratingEl
     , removeItem
+    , repoUrl
     , rx
-    , takeExcerpt
-    , updateItem
-    , updateItems
+    , rx_
+    , slugify
+    , sortBooks
+    , titleCountLabel
+    , toDict
+    , untaggedKey
+    , upsert
     )
 
-import Dict exposing (Dict)
-import List exposing (length, map)
-import Maybe exposing (withDefault)
-import Model
+import Base64 exposing (fromBytes)
+import Bytes.Encode exposing (encode, sequence, unsignedInt8)
+import Char exposing (isDigit)
+import Dict exposing (Dict, empty, get, insert, member, update, values)
+import Html exposing (Html, div, span, text)
+import Html.Attributes exposing (class, classList)
+import Http
+import List
     exposing
-        ( Entry
-        , Filter(..)
-        , Id
-        , Model
-        , StoredModel
-        , filterToString
+        ( all
+        , concatMap
+        , filter
+        , foldl
+        , foldr
+        , isEmpty
+        , length
+        , map
+        , partition
+        , reverse
+        , sortBy
+        , sortWith
         )
-import Regex exposing (Regex)
+import MD5 exposing (bytes)
+import Maybe exposing (withDefault)
+import Model exposing (Model)
+import Msg exposing (Msg(..))
+import Regex exposing (Match, Regex, replace)
 import Set
-import String exposing (fromChar, toList)
+import String exposing (fromInt, join, split, toLower, trim)
+import Types
+    exposing
+        ( Author
+        , Book
+        , BookMap
+        , BookSort(..)
+        , CountMap
+        , Excerpt
+        , Id
+        , Lens(..)
+        , StoredModel
+        , Tag
+        )
 
 
-type alias KeyEvent =
-    { key : String
-    , control : Bool
-    , meta : Bool
-    }
+appName : String
+appName =
+    "Emdash"
 
 
-type alias ClickWithKeys =
-    { control : Bool
-    , meta : Bool
-    , shift : Bool
-    }
+repoUrl : String
+repoUrl =
+    "https://github.com/dmotz/emdash"
 
 
-queryCharMin : Int
-queryCharMin =
-    4
+untaggedKey : String
+untaggedKey =
+    "untagged"
+
+
+defaultSemanticThreshold : Float
+defaultSemanticThreshold =
+    0.3
+
+
+inc : Int -> Int
+inc =
+    (+) 1
 
 
 rx : String -> Regex
@@ -62,9 +108,15 @@ rx =
     Regex.fromString >> withDefault Regex.never
 
 
+rx_ : String -> Regex
+rx_ =
+    Regex.fromStringWith { caseInsensitive = True, multiline = False }
+        >> withDefault Regex.never
+
+
 formatNumber : Int -> String
 formatNumber =
-    String.fromInt >> Regex.replace (rx "\\B(?=(\\d{3})+(?!\\d))") (always ",")
+    fromInt >> replace (rx "\\B(?=(\\d{3})+(?!\\d))") (always ",")
 
 
 insertOnce : List comparable -> comparable -> List comparable
@@ -77,144 +129,411 @@ removeItem list x =
     Set.toList <| Set.remove x (Set.fromList list)
 
 
-updateItem : List a -> a -> a -> List a
-updateItem list old new =
-    map
-        (\x ->
-            if x == old then
-                new
-
-            else
-                x
-        )
-        list
-
-
-updateItems :
-    List { a | id : comparable }
-    -> Dict comparable { a | id : comparable }
-    -> List { a | id : comparable }
-updateItems list mapping =
-    map
-        (\x ->
-            withDefault x (Dict.get x.id mapping)
-        )
-        list
-
-
-getIndex : List a -> a -> Int
-getIndex list item =
-    let
-        f l target n =
-            case l of
-                [] ->
-                    -1
-
-                x :: xs ->
-                    if x == target then
-                        n
-
-                    else
-                        f xs target (n + 1)
-    in
-    f list item 0
-
-
-getNextIndex : List a -> a -> Int
-getNextIndex list item =
-    let
-        idx =
-            getIndex list item + 1
-    in
-    if idx == length list then
-        0
-
-    else
-        idx
-
-
-getPrevIndex : List a -> a -> Int
-getPrevIndex list item =
-    let
-        idx =
-            getIndex list item
-    in
-    if idx == 0 then
-        length list - 1
-
-    else
-        idx - 1
+dedupe : List comparable -> List comparable
+dedupe =
+    Set.fromList >> Set.toList
 
 
 modelToStoredModel : Model -> StoredModel
 modelToStoredModel model =
-    { entries = model.entries
-    , selectedEntries = map .id model.selectedEntries
-    , hiddenEntries = Set.toList model.hiddenEntries
-    , filterType = filterToString model.filterType
-    , filterValue = model.filterValue
-    , focusMode = model.focusMode
-    , reverseList = model.reverseList
-    , schemaVersion = model.schemaVersion
+    { excerpts = values model.excerpts
+    , books = values model.books
+    , hiddenExcerpts = Set.toList model.hiddenExcerpts
+    , bookmarks = Dict.toList model.bookmarks
+    , semanticThreshold = model.semanticThreshold
+    , version = model.version
+    , didJoinMailingList = model.didJoinMailingList
     }
 
 
-needsTitles : Model -> Bool
-needsTitles model =
-    model.filterType /= TitleFilter || model.filterValue == Nothing
+juxt : (a -> b) -> (a -> c) -> a -> ( b, c )
+juxt f g x =
+    ( f x, g x )
 
 
-getEntryHeight : Bool -> Int
-getEntryHeight hasTitle =
-    if hasTitle then
-        90
+toDict : List { a | id : comparable } -> Dict comparable { a | id : comparable }
+toDict =
+    map (juxt .id identity) >> Dict.fromList
+
+
+upsert : Dict comparable a -> comparable -> (a -> a) -> a -> Dict comparable a
+upsert dict id f default =
+    if member id dict then
+        update id (Maybe.map f) dict
 
     else
-        60
+        insert id default dict
 
 
-charLimit : Int
-charLimit =
-    42
+phraseMatch : Regex -> (a -> String) -> a -> Bool
+phraseMatch regex accessor x =
+    x |> accessor |> toLower |> Regex.contains regex
 
 
-embeddingBatchSize : Int
-embeddingBatchSize =
-    10
-
-
-takeExcerpt : String -> String
-takeExcerpt text =
+findMatches : String -> (a -> String) -> List a -> List a
+findMatches query accessor xs =
     let
-        f acc chars n =
-            case chars of
-                x :: xs ->
-                    if n < charLimit || n >= charLimit && x /= ' ' then
-                        f (acc ++ fromChar x) xs (n + 1)
+        ( phraseMatches, rest ) =
+            partition (phraseMatch (rx_ <| "\\b" ++ query) accessor) xs
 
-                    else
-                        acc
-
-                [] ->
-                    acc
+        wordsRx =
+            "^"
+                ++ (split " " query
+                        |> map (\word -> "(?=.*\\b" ++ word ++ ")")
+                        |> String.concat
+                   )
+                ++ ".*$"
+                |> rx_
     in
-    f "" (toList text) 0 ++ " …"
+    phraseMatches
+        ++ filter
+            (\x -> Regex.contains wordsRx (toLower (accessor x)))
+            rest
 
 
-find : List a -> (a -> Bool) -> Maybe a
-find l f =
-    case l of
-        x :: xs ->
-            if f x then
-                Just x
+getTagCounts : BookMap -> Dict Tag Int
+getTagCounts bookMap =
+    let
+        books =
+            values bookMap
+    in
+    books
+        |> concatMap .tags
+        |> foldl
+            (\tag acc -> update tag (withDefault 0 >> inc >> Just) acc)
+            empty
+        |> insert untaggedKey (books |> filter (.tags >> isEmpty) |> length)
+
+
+getExcerptDomId : Id -> String
+getExcerptDomId =
+    (++) "excerpt-"
+
+
+countLabel : String -> Int -> String
+countLabel label n =
+    formatNumber n
+        ++ " "
+        ++ label
+        ++ (if n == 1 then
+                ""
 
             else
-                find xs f
-
-        [] ->
-            Nothing
+                "s"
+           )
 
 
-mapIdsToEntries : List Entry -> Dict Id Entry
-mapIdsToEntries entries =
-    map (\e -> ( e.id, e )) entries |> Dict.fromList
+formatScore : Float -> Html msg
+formatScore =
+    (*) 100 >> round >> fromInt >> (\s -> s ++ "%") >> text
+
+
+excerptCountLabel : Int -> String
+excerptCountLabel =
+    countLabel "excerpt"
+
+
+titleCountLabel : Int -> String
+titleCountLabel =
+    countLabel "title"
+
+
+normalizeTitle : String -> String
+normalizeTitle =
+    toLower >> replace (rx "^(the )") (always "")
+
+
+sortBooks : BookSort -> Bool -> CountMap -> CountMap -> List Book -> List Book
+sortBooks sort reverseSort exCounts favCounts =
+    (case sort of
+        RecencySort ->
+            sortBy .sortIndex
+
+        TitleSort ->
+            sortWith
+                (\a b ->
+                    compare
+                        (a |> .title |> normalizeTitle)
+                        (b |> .title |> normalizeTitle)
+                )
+
+        NumSort ->
+            sortBy <| .id >> getCount exCounts
+
+        RatingSort ->
+            sortBy .rating
+
+        FavSort ->
+            sortBy <| .id >> getCount favCounts
+    )
+        >> (if reverseSort then
+                reverse
+
+            else
+                identity
+           )
+
+
+ratingEl : Book -> Html msg
+ratingEl book =
+    let
+        baseInt =
+            truncate book.rating
+    in
+    div
+        [ classList [ ( "ratingNum", True ), ( "unrated", book.rating == 0 ) ] ]
+        (if book.rating == 0 then
+            [ text "—" ]
+
+         else if ceiling book.rating > baseInt then
+            [ if baseInt == 0 then
+                null
+
+              else
+                book.rating |> truncate |> fromInt |> text
+            , span [ class "half" ] [ text "1/2" ]
+            ]
+
+         else
+            [ text (String.fromFloat book.rating) ]
+        )
+
+
+null : Html msg
+null =
+    text ""
+
+
+getTitleRouteMap : List Book -> ( Dict String Id, List Book )
+getTitleRouteMap =
+    sortBy .sortIndex
+        >> reverse
+        >> foldr
+            (\book ( slugToId, newBooks ) ->
+                let
+                    slug =
+                        case get (slugify book.title) slugToId of
+                            Just _ ->
+                                slugify
+                                    (book.title
+                                        ++ " by "
+                                        ++ join " & " book.authors
+                                    )
+
+                            _ ->
+                                slugify book.title
+                in
+                ( insert slug book.id slugToId
+                , { book | slug = slug } :: newBooks
+                )
+            )
+            ( Dict.empty, [] )
+
+
+getAuthorRouteMap : List Book -> Dict String Author
+getAuthorRouteMap =
+    concatMap (.authors >> map (juxt slugify identity)) >> Dict.fromList
+
+
+slugify : String -> String
+slugify =
+    replace (rx "\\s") (always "-")
+        >> replace (rx "[^\\w-]") (always "")
+
+
+apostropheRx : Regex
+apostropheRx =
+    rx "(\\w)(')(\\w)"
+
+
+apostropheReplacer : Match -> String
+apostropheReplacer match =
+    String.concat <|
+        map
+            (\sub ->
+                let
+                    s =
+                        withDefault "" sub
+                in
+                if s == "'" then
+                    "’"
+
+                else
+                    s
+            )
+            match.submatches
+
+
+replaceApostrophes : String -> String
+replaceApostrophes =
+    replace apostropheRx apostropheReplacer
+
+
+authorSplitRx : Regex
+authorSplitRx =
+    rx "[;&]|\\sand\\s"
+
+
+footnoteRx : Regex
+footnoteRx =
+    rx "([^\\s\\d]{2,})(\\d+)"
+
+
+footnoteReplacer : Match -> String
+footnoteReplacer match =
+    String.concat <|
+        map
+            (\sub ->
+                let
+                    s =
+                        withDefault "" sub
+                in
+                if all isDigit (String.toList s) then
+                    ""
+
+                else
+                    s
+            )
+            match.submatches
+
+
+hashId : String -> Id
+hashId =
+    bytes
+        >> map unsignedInt8
+        >> sequence
+        >> encode
+        >> fromBytes
+        >> withDefault ""
+        >> String.replace "==" ""
+        >> String.replace "+" "-"
+        >> String.replace "/" "_"
+
+
+getBookId : String -> List String -> Id
+getBookId title authors =
+    hashId (title ++ join " / " authors)
+
+
+getExcerptId : String -> String -> Int -> Id
+getExcerptId text bookId page =
+    hashId (text ++ bookId ++ String.fromInt page)
+
+
+makeExcerpt :
+    String
+    -> String
+    -> String
+    -> Maybe Int
+    -> Maybe Int
+    -> String
+    -> Maybe String
+    -> ( Excerpt, Book )
+makeExcerpt titleRaw authorRaw excerptText mPage mDate notes mUrl =
+    let
+        title =
+            replaceApostrophes titleRaw
+
+        authors =
+            authorRaw
+                |> replaceApostrophes
+                |> Regex.split authorSplitRx
+                |> map trim
+
+        page =
+            withDefault -1 mPage
+
+        bookId =
+            getBookId title authors
+
+        date =
+            withDefault 0 mDate
+    in
+    ( { id = getExcerptId excerptText bookId page
+      , text = replace footnoteRx footnoteReplacer excerptText
+      , bookId = bookId
+      , date = date
+      , page = page
+      , notes = notes
+      , isFavorite = False
+      , sourceUrl = mUrl
+      , lenses = []
+      }
+    , { id = bookId
+      , title = title
+      , authors = authors
+      , rating = 0
+      , sortIndex = date
+      , tags = []
+      , slug = ""
+      }
+    )
+
+
+getAuthors : Model -> List ( Id, List Id )
+getAuthors model =
+    model.excerpts
+        |> values
+        |> foldl
+            (\excerpt acc ->
+                foldl
+                    (\author acc2 ->
+                        insert
+                            author
+                            (excerpt.id
+                                :: withDefault []
+                                    (get author acc2)
+                            )
+                            acc2
+                    )
+                    acc
+                    (withDefault
+                        []
+                        (get excerpt.bookId model.books
+                            |> Maybe.map .authors
+                        )
+                    )
+            )
+            Dict.empty
+        |> Dict.toList
+
+
+getCounts : List Excerpt -> ( CountMap, CountMap )
+getCounts =
+    foldr
+        (\{ bookId, isFavorite } ( exCount, favCount ) ->
+            ( upsert exCount bookId inc 1
+            , if isFavorite then
+                upsert favCount bookId inc 1
+
+              else
+                favCount
+            )
+        )
+        ( Dict.empty, Dict.empty )
+
+
+getCount : CountMap -> Id -> Int
+getCount dict id =
+    get id dict |> withDefault 0
+
+
+lensToString : Lens -> String
+lensToString lens =
+    case lens of
+        Succint ->
+            "succint"
+
+        Metaphor ->
+            "metaphor"
+
+
+fetchLensText : Id -> Lens -> Cmd Msg
+fetchLensText id lens =
+    Http.get
+        { url =
+            "/demo/lenses/" ++ id ++ "-" ++ lensToString lens ++ ".txt"
+        , expect =
+            Http.expectString
+                (ReceiveLensText id lens)
+        }

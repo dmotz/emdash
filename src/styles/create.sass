@@ -1,0 +1,47 @@
+.createPage
+  font-size: 1.8rem
+
+  h1
+    margin-bottom: 1rem
+
+  form
+    margin-top: 4rem
+
+    > div
+      display: flex
+
+      @include mobile
+        flex-direction: column
+
+      label
+        flex: 1
+
+        + label
+          margin-left: 2rem
+          flex: 3
+
+          @include mobile
+            margin-left: 0
+
+  form, label
+    display: flex
+    flex-direction: column
+
+  label
+    margin-bottom: 2rem
+
+    em
+      color: $mid3
+      font-style: italic
+      margin-left: 0.6rem
+
+  input, textarea
+    margin-bottom: .5rem
+    font-size: 2rem
+
+  textarea
+    font-size: 1.4rem
+    height: 24rem
+
+  button
+    margin-top: 3rem

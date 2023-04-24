@@ -1,0 +1,7 @@
+{
+  "name": "Emdash",
+  "icons": [
+    {"src": "/images/favicon-192.png", "type": "image/png", "sizes": "192x192"},
+    {"src": "/images/favicon-512.png", "type": "image/png", "sizes": "512x512"}
+  ]
+}

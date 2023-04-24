@@ -1,0 +1,24 @@
+.notFound
+  flex: 1
+  text-align: center
+  display: flex
+  flex-direction: column
+  justify-content: center
+
+  h2, h3
+    font-size: 2.2rem
+    margin-bottom: 2rem
+
+  h2
+    font-style: italic
+
+  h3
+    margin-bottom: 5rem
+
+  a
+    color: $mid4
+
+    &::before
+      content: '↢'
+      position: absolute
+      transform: translateX(-150%)

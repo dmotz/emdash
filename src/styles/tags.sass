@@ -1,0 +1,122 @@
+.tag
+  margin-right: 1rem
+  margin-bottom: 1rem
+  display: inline-flex
+  align-items: center
+  position: relative
+
+  &:hover
+    a
+      color: $fg
+
+    .tagDelete
+      display: block
+
+  &:after
+    content: '•'
+    margin-left: 1rem
+    color: $mid2
+
+    @include mobile
+      font-size: 1.2rem
+      margin-left: 0.6rem
+
+  &:last-child::after
+    visibility: hidden
+
+  a
+    font-size: 2rem
+    font-style: italic
+
+  .count
+    margin-left: 0.4rem
+    margin-top: -0.8rem
+
+    @include mobile
+      font-size: 1rem
+
+  &.active
+    a
+      color: $fg
+      text-decoration-color: $accent
+
+  &.special
+    a
+      font-style: normal
+
+.tagDelete
+  font-size: 2rem
+  align-self: flex-end
+  line-height: 0.5
+  display: none
+  position: absolute
+  top: -0.4em
+  right: 0.1em
+  color: $mid2
+  transition: color .2s
+
+  &:hover
+    color: $fg
+
+    + a
+      color: $mid2
+      text-decoration: line-through 2px $fg
+
+.tagHeader
+  display: flex
+  flex-direction: column
+  align-items: center
+  margin-bottom: 4rem
+
+  .tabs
+    width: 60rem
+    max-width: 100%
+    text-align: center
+
+  hr
+    width: 60rem
+    max-width: 100%
+    border: none
+    border-bottom: 1px solid $mid3
+
+  .modeHeading
+    margin-top: 1.5rem
+    margin-bottom: 2rem
+
+  .tags
+    margin-bottom: 2rem
+
+  .tag:last-child::after
+    content: ''
+
+.tagSort
+  display: flex
+  justify-content: center
+  margin: 1rem
+
+  button
+    margin: 0 1rem
+
+    &:hover
+      color: $fg
+
+    &.active
+      color: $fg
+      border-bottom: 2px solid $fg
+
+.tagInput
+  margin-top: 0rem
+  display: inline-flex
+
+  button
+    margin-left: 1rem
+
+    @include touch
+      display: none
+
+  input
+    border-color: $mid2
+    font-size: 2rem
+
+    &:placeholder-shown + button
+      visibility: hidden

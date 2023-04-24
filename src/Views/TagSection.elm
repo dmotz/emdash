@@ -3,60 +3,60 @@ module Views.TagSection exposing (tagSection)
 import Html
     exposing
         ( Html
+        , a
         , button
         , datalist
         , div
+        , form
         , h5
         , input
         , li
         , option
-        , section
         , text
         , ul
         )
 import Html.Attributes
     exposing
-        ( autocomplete
+        ( attribute
+        , autocomplete
         , class
         , disabled
+        , href
         , id
         , list
         , placeholder
         , spellcheck
         , value
         )
-import Html.Events exposing (onBlur, onClick, onFocus, onInput)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import List exposing (filter, length, map, member)
-import Model exposing (Filter(..), InputFocus(..), Tag)
 import Msg exposing (Msg(..))
+import Router exposing (tagToRoute)
+import Types exposing (Tag)
+import Utils exposing (null)
+import Views.Button exposing (actionButton)
 
 
 tagSection : List Tag -> List Tag -> Maybe Tag -> Html Msg
 tagSection tags globalTags pendingTag =
-    let
-        pendTag =
-            Maybe.withDefault "" pendingTag
-    in
-    section []
-        [ h5 [] [ text "tags:" ]
+    div []
+        [ h5 [] [ text "Tags" ]
         , if length tags > 0 then
             div
-                [ id "tags" ]
+                [ class "tags" ]
                 [ ul
                     []
                     (map
                         (\tag ->
                             li
                                 [ class "tag" ]
-                                [ div
+                                [ button
                                     [ onClick <| RemoveTag tag
-                                    , class "tag-delete"
+                                    , class "tagDelete"
                                     ]
                                     [ text "×" ]
-                                , div
-                                    [ onClick <| FilterBy TagFilter tag
-                                    , class "tag-title"
-                                    ]
+                                , a
+                                    [ href <| tagToRoute tag ]
                                     [ text tag ]
                                 ]
                         )
@@ -65,12 +65,16 @@ tagSection tags globalTags pendingTag =
                 ]
 
           else
-            text ""
+            null
         , let
             datalistId =
-                "tags-datalist"
+                "tagDatalist"
+
+            pendTag =
+                Maybe.withDefault "" pendingTag
           in
-          div [ class "tag-input" ]
+          form
+            [ class "tagInput", onSubmit AddTag ]
             [ datalist [ id datalistId ]
                 (map
                     (\tag -> option [ value tag ] [])
@@ -85,17 +89,17 @@ tagSection tags globalTags pendingTag =
                 )
             , input
                 [ onInput UpdatePendingTag
-                , onFocus <| SetInputFocus (Just TagFocus)
-                , onBlur <| SetInputFocus Nothing
                 , value pendTag
                 , list datalistId
-                , placeholder "add tag"
+                , placeholder "Add tag"
                 , autocomplete False
+                , attribute "autocapitalize" "off"
+                , attribute "enterkeyhint" "done"
                 , spellcheck False
                 ]
                 []
-            , button
-                [ onClick AddTag, disabled <| pendTag == "" ]
-                [ text "Add" ]
+            , actionButton
+                [ disabled <| pendTag == "" ]
+                [ text "+" ]
             ]
         ]

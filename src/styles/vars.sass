@@ -1,0 +1,42 @@
+$font: 'EB Garamond', ui-serif, serif
+$monoFont: Consolas, Monaco, Courier, monospace
+
+$bg: #fff
+$mid1: #ddd
+$mid2: #ccc
+$mid3: #aaa
+$mid4: #777
+$fg: #333
+$accent: #0000ff
+
+$baseFontSize: 1.6rem
+$maxWidth: 80rem
+
+@mixin linkStyle
+  cursor: pointer
+  color: $fg
+  text-decoration: underline
+  text-decoration-color: $mid1
+  text-decoration-thickness: 3px
+  transition: text-decoration-color .3s
+
+  &:hover
+    text-decoration-color: $accent
+
+@mixin fade
+  transition: opacity 0.2s
+
+@mixin dropShadow
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1)
+
+@mixin mobile
+  @media (max-width: 733px)
+    @content
+
+@mixin midWidth
+  @media (max-width: 1270px)
+    @content
+
+@mixin touch
+  @media (hover: none)
+    @content

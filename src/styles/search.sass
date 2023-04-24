@@ -1,0 +1,99 @@
+.search
+  max-width: $maxWidth
+  position: relative
+  display: flex
+  align-items: center
+  padding-top: 1.6rem
+  width: 100%
+  margin: 0 auto
+  margin-bottom: 4rem
+
+  input
+    font-size: 2rem
+    width: 100%
+    border-color: $mid2
+    text-align: center
+    padding-left: 1.6rem
+    padding-right: 1.6rem
+
+    &:focus
+      border-color: $accent
+
+  button
+    position: absolute
+    right: 0
+    visibility: hidden
+
+    &.active
+      visibility: visible
+
+  @media (max-width: 1000px)
+    max-width: calc(100vw - 18rem)
+
+  @include mobile
+    max-width: calc(100% - 6rem)
+
+.searchResults
+  display: flex
+  justify-content: center
+
+  @media (max-width: 1000px)
+    max-width: calc(100vw - 200px)
+    margin: 0 auto
+
+  @include mobile
+    flex-direction: column
+    max-width: 100%
+
+  > *
+    flex: 2
+    padding: 2rem 0
+
+  .modeHeading
+    margin-left: 0
+    margin-bottom: 4rem
+
+    li
+      &::after
+        content: ''
+
+      + li
+        margin-left: 1.6rem
+
+        @include mobile
+          margin: 0
+
+    button
+      width: 22rem
+      position: relative
+
+      @include mobile
+        width: 100%
+
+  .count
+    font-size: 1.4rem
+    display: inline-block
+    font-weight: 500
+    position: absolute
+    bottom: -2.2rem
+
+  .bookList
+    max-width: 60rem
+    margin: 0
+    margin-right: 2rem
+    align-items: flex-start
+    justify-content: center
+    display: flex
+    flex-wrap: wrap
+    align-content: flex-start
+
+    @include mobile
+      margin-bottom: 3rem
+
+  .snippets
+    flex: 3
+    max-width: $maxWidth
+
+.noResults
+  text-align: center
+  margin-top: 6rem

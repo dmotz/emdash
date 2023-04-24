@@ -1,47 +1,100 @@
 module Msg exposing (Msg(..))
 
-import Browser.Dom exposing (Error)
+import Browser exposing (UrlRequest)
+import Browser.Dom exposing (Element, Error)
+import Debounce
 import File exposing (File)
-import InfiniteList as IL
-import Model exposing (Entry, Filter, Id, InputFocus, Tag)
-import Utils exposing (ClickWithKeys, KeyEvent)
+import Http
+import Time exposing (Posix)
+import Types
+    exposing
+        ( Author
+        , Book
+        , BookMap
+        , BookSort
+        , Excerpt
+        , ExcerptMap
+        , ExcerptSort
+        , ExcerptTab
+        , Id
+        , Lens
+        , PendingExcerpt
+        , ScorePairs
+        , SearchMode
+        , StoredModel
+        , Tag
+        , TagSort
+        )
+import Url exposing (Url)
 
 
 type Msg
     = NoOp
-    | SelectEntries (List Entry)
-    | EntryClick Entry ClickWithKeys
+    | RestoreState (Maybe StoredModel) Bool
+    | MergeNewExcerpts ExcerptMap BookMap
+    | ParseJsonText Bool String
+    | ParseCsvText String
     | ShowRandom
-    | ShowByIndex Int
-    | ShowNext
-    | ShowPrev
-    | FilterBy Filter String
-    | ToggleFocusMode
-    | ToggleAboutMode
+    | GotRandomIndex Int
     | DragEnter
     | DragLeave
-    | GotFiles (String -> Msg) File (List File)
-    | FileLoad String
-    | PickFile
-    | KeyDown KeyEvent
-    | SetInputFocus (Maybe InputFocus)
-    | HideEntries (List Entry)
-    | PromptHide
-    | CancelHide
-    | UpdateNotes String
+    | GotFile (String -> Msg) File
+    | GotDroppedFile File
+    | LoadKindleFile String
+    | PickKindleFile
+    | DeleteExcerpt Excerpt
+    | DeleteBook Book
+    | EnterBookEditMode
+    | ExitBookEditMode
+    | SetPendingBookTitle String
+    | SetPendingBookAuthor String
+    | SetBookEdits
+    | UpdateNotes Id String
+    | SetBookmark Id Id
+    | ToggleFavorite Excerpt
     | UpdatePendingTag Tag
     | AddTag
     | RemoveTag Tag
+    | SetRating Book Float
+    | SetTagSort TagSort
     | Sort
-    | GotDomEl (Result Error (List Float))
-    | DidScroll (Result Error ())
+    | ToggleTagHeader
+    | ScrollToElement (Result Error Element)
     | ExportJson
     | ImportJson
-    | JsonFileLoad String
-    | ResetError
-    | Resize ( Int, Int )
-    | InfList IL.Model
-    | ExportEpub
+    | ImportCsv
+    | SyncState StoredModel
+    | ClearModal
+    | ShowConfirmation String Msg
+    | ExportEpub Posix
     | RequestEmbeddings
     | ReceiveEmbeddings (List Id)
-    | ReceiveNeighbors ( Id, List ( Id, Float ) )
+    | ReceiveBookEmbeddings
+    | ReceiveAuthorEmbeddings
+    | ReceiveNeighbors ( Id, ScorePairs )
+    | ReceiveBookNeighbors ( Id, ScorePairs )
+    | ReceiveAuthorNeighbors ( Author, ScorePairs )
+    | ReceiveSemanticSearch ( String, ScorePairs )
+    | ReceiveSemanticRank ( Id, ScorePairs )
+    | SetSemanticThreshold String
+    | LinkClicked UrlRequest
+    | UrlChanged Url
+    | SortBooks BookSort
+    | SortExcerpts ExcerptSort
+    | SetExcerptTab Excerpt ExcerptTab Bool
+    | ScrollToTop
+    | OnSearchStart String
+    | OnSearchEnd String
+    | SetSearchTab SearchMode
+    | ReceiveUnicodeNormalized String
+    | DebounceMsg Debounce.Msg
+    | StartDemo
+    | GotDemoData (Result Http.Error String)
+    | GotLandingData ( List ( String, String ), List Int )
+    | GetTime (Posix -> Msg)
+    | UpdatePendingExcerpt PendingExcerpt
+    | PendingTitleBlur
+    | CreateExcerpt PendingExcerpt Posix
+    | SubscribeToMailingList
+    | UpdateMailingListEmail String
+    | ReceiveLensText Id Lens (Result Http.Error String)
