@@ -45,6 +45,7 @@ let excerptKeyList
 let bookKeyList
 let authorKeyList
 let model
+let demoEmbedP
 
 const computeEmbeddings = async pairs => {
   const tensor = await (await model).embed(pairs.map(([, text]) => text))
@@ -248,11 +249,14 @@ const methods = {
     updateCaches()
   },
 
+  fetchDemoEmbeddings: () =>
+    (demoEmbedP = fetch('/demo/embs').then(r => r.arrayBuffer())),
+
   setDemoEmbeddings: async ({ids}, cb) => {
     let buff
 
     try {
-      buff = await (await fetch('/demo/embs')).arrayBuffer()
+      buff = await demoEmbedP
     } catch (e) {
       console.log(e)
       return
