@@ -294,15 +294,27 @@ excerptView excerpts books neighbors showDetails activeTab showLensTab i perma i
                                                                 (Lenses lens lensIndex)
                                                                 False
                                                         ]
-                                                        [ span []
-                                                            [ text <|
-                                                                case lens of
-                                                                    Succint ->
-                                                                        "⅀ Succint"
+                                                        [ span
+                                                            []
+                                                            (case lens of
+                                                                Succint ->
+                                                                    [ img
+                                                                        [ class "icon"
+                                                                        , src "/images/icons/succint.svg"
+                                                                        ]
+                                                                        []
+                                                                    , text "Succint"
+                                                                    ]
 
-                                                                    Metaphor ->
-                                                                        "≈ Metaphor"
-                                                            ]
+                                                                Metaphor ->
+                                                                    [ img
+                                                                        [ class "icon"
+                                                                        , src "/images/icons/metaphor.svg"
+                                                                        ]
+                                                                        []
+                                                                    , text "Metaphor"
+                                                                    ]
+                                                            )
                                                         ]
                                                     ]
                                             )
