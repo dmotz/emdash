@@ -355,7 +355,7 @@ update message model =
                     (batch
                         [ model_ |> modelToStoredModel |> initWithClear
                         , if demoMode then
-                            fetchDemoEmbeddings (keys model_.excerpts)
+                            setDemoEmbeddings (keys model_.excerpts)
 
                           else
                             model_ |> modelToStoredModel |> setStorage
@@ -1294,6 +1294,7 @@ update message model =
                                     { url = demoJsonPath
                                     , expect = Http.expectWhatever (always NoOp)
                                     }
+                                , fetchDemoEmbeddings ()
                                 ]
 
                           else
