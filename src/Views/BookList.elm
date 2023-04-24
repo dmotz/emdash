@@ -1,7 +1,7 @@
 module Views.BookList exposing (bookList, bookView)
 
 import Html exposing (Html, a, div, img, li, span, text)
-import Html.Attributes exposing (class, href, src)
+import Html.Attributes exposing (class, href, src, tabindex)
 import Html.Keyed as Keyed
 import List exposing (map)
 import Msg exposing (Msg)
@@ -48,13 +48,12 @@ bookView book exCount favCount showRating showFavCount isLandingPage =
     )
         [ class "book" ]
         [ a
-            [ href <|
-                if isLandingPage then
-                    "#"
+            (if isLandingPage then
+                [ href "#", tabindex -1 ]
 
-                else
-                    titleSlugToRoute book.slug
-            ]
+             else
+                [ href <| titleSlugToRoute book.slug ]
+            )
             [ div [ class "title" ] [ text book.title ]
             , div [ class "author" ] [ text <| join " / " book.authors ]
             , div [ class "count" ] [ text <| fromInt exCount ]
