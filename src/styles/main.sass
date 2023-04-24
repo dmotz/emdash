@@ -136,6 +136,10 @@ button
       transform: translateX(2px) translateY(2px)
       transition-duration: .1s
 
+  &:focus-visible
+    .buttonContent
+      border-color: $accent
+
   &:disabled
     pointer-events: none
 
