@@ -3,7 +3,7 @@ import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm'
 import {load} from '@tensorflow-models/universal-sentence-encoder'
 import {createStore, del, delMany, entries, keys, setMany} from 'idb-keyval'
 
-const dbNs = 'marginalia'
+const dbNs = 'emdash'
 const embKey = 'embeddings'
 const embSize = 512
 const semanticSearchLimit = 203

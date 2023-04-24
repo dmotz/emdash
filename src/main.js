@@ -4,14 +4,14 @@ import {Elm} from './Main.elm'
 import {version} from '../package.json'
 import './styles/main.sass'
 
-const dbNs = 'marginalia'
+const dbNs = 'emdash'
 const stateKey = 'state'
 const writeMs = 333
 const bcKey = 'BroadcastChannel'
 const supportsBroadcastChannel = bcKey in window
 
 const worker = new SharedWorker(new URL('./worker.js', import.meta.url), {
-  name: 'marginalia',
+  name: 'emdash',
   type: 'module'
 })
 

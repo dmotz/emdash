@@ -19,7 +19,7 @@ self.onmessage = ({data}) => {
     .generateAsync({type: 'blob'})
     .then(zipData =>
       self.postMessage([
-        `marginalia_excerpts_${new Date().toLocaleDateString()}.epub`,
+        `emdash_excerpts_${new Date().toLocaleDateString()}.epub`,
         zipData
       ])
     )

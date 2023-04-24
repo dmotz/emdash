@@ -80,7 +80,7 @@ import Types
 
 appName : String
 appName =
-    "Marginalia"
+    "Emdash"
 
 
 repoUrl : String
