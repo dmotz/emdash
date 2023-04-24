@@ -15,7 +15,7 @@ unlinkSync(outputPath)
 const file = createWriteStream(outputPath, {flags: 'a'})
 
 const model = await load()
-const {excerpts} = JSON.parse(demoJson)
+const {excerpts} = demoJson
 
 let i = 0
 
