@@ -85,7 +85,7 @@ appName =
 
 repoUrl : String
 repoUrl =
-    "https://github.com/dmotz/marginalia"
+    "https://github.com/dmotz/emdash"
 
 
 untaggedKey : String
