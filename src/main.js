@@ -191,7 +191,11 @@ let zipWorkerReady
     app.ports.receiveUnicodeNormalized.send(str.normalize('NFC'))
   )
 
-  app.ports.fetchDemoEmbeddings.subscribe(ids =>
+  app.ports.fetchDemoEmbeddings.subscribe(() =>
+    msgWorker('fetchDemoEmbeddings')
+  )
+
+  app.ports.setDemoEmbeddings.subscribe(ids =>
     msgWorker('setDemoEmbeddings', {ids})
   )
 
