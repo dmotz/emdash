@@ -1,3 +1,3 @@
-# ❧ (Emdash)[https://emdash.ai]
+# ❧ [Emdash](https://emdash.ai)
 
 ## A book excerpt organizer
