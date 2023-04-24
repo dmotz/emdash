@@ -555,7 +555,13 @@ update message model =
                                 countLabel "new excerpt" n
                                     ++ " imported."
                     , excerpts = excerpts
-                    , books = toDict booksWithSlugs
+                    , books =
+                        booksWithSlugs
+                            |> filter
+                                (\{ id } ->
+                                    get id exCount |> withDefault 0 |> (/=) 0
+                                )
+                            |> toDict
                     , excerptCountMap = exCount
                     , favCountMap = favCount
                     , titleRouteMap = titleRouteMap
