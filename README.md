@@ -1,4 +1,4 @@
-<img src="https://emdash.ai/images/embed.png"/>
+[![Emdash](https://emdash.ai/images/embed.png)](https://emdash.ai)
 
 # [Emdash](https://emdash.ai)
 
