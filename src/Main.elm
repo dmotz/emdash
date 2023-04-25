@@ -297,7 +297,11 @@ main =
         }
 
 
-init : ( Maybe String, List String, ( String, String, String ) ) -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init :
+    ( Maybe String, List String, ( String, String, String ) )
+    -> Url
+    -> Nav.Key
+    -> ( Model, Cmd Msg )
 init ( mStateString, supportIssues, params ) url key =
     let
         model =
