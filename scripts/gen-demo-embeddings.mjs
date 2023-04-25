@@ -7,8 +7,8 @@ import '@tensorflow/tfjs-node'
 import demoJson from '../assets/demo/demo.json' assert {type: 'json'}
 
 const batchSize = 20
-const dir = dirname(fileURLToPath(import.meta.url))
-const outputPath = dir + '/../assets/demo/embs'
+const outputPath =
+  dirname(fileURLToPath(import.meta.url)) + '/../assets/demo/embs'
 
 unlinkSync(outputPath)
 
