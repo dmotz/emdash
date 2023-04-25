@@ -147,7 +147,14 @@ demoJsonPath =
     "/demo/demo.json"
 
 
-createModel : Maybe StoredModel -> List String -> ( String, String, String ) -> Bool -> Url -> Nav.Key -> Model
+createModel :
+    Maybe StoredModel
+    -> List String
+    -> ( String, String, String )
+    -> Bool
+    -> Url
+    -> Nav.Key
+    -> Model
 createModel mStoredModel supportIssues ( version, mailingListUrl, mailingListField ) demoMode url key =
     let
         restored =
