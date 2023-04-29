@@ -466,6 +466,7 @@ makeExcerpt titleRaw authorRaw excerptText mPage mDate notes mUrl =
       , sortIndex = date
       , tags = []
       , slug = ""
+      , notes = ""
       }
     )
 
