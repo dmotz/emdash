@@ -64,6 +64,7 @@ type alias Model =
     , mailingListEmail : String
     , didJoinMailingList : Bool
     , supportIssues : List String
+    , showHoverUi : Bool
     }
 
 

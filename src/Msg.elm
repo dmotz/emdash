@@ -84,6 +84,7 @@ type Msg
     | SortExcerpts ExcerptSort
     | SetExcerptTab Excerpt ExcerptTab Bool
     | ScrollToTop
+    | HideHoverUiState Id
     | OnSearchStart String
     | OnSearchEnd String
     | SetSearchTab SearchMode

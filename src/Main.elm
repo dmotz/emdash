@@ -72,6 +72,7 @@ import Utils
         , countLabel
         , dedupe
         , defaultSemanticThreshold
+        , delay
         , excerptCountLabel
         , fetchLensText
         , findMatches
@@ -220,6 +221,7 @@ createModel mStoredModel supportIssues ( version, mailingListUrl, mailingListFie
     , mailingListField = mailingListField
     , didJoinMailingList = restored.didJoinMailingList
     , supportIssues = supportIssues
+    , showHoverUi = False
     }
 
 
@@ -1363,6 +1365,7 @@ update message model =
                             ( { model_
                                 | page = TitlePage book excerpts False
                                 , excerptSort = ExcerptPageSort
+                                , showHoverUi = True
                               }
                             , batch
                                 ((case mFragment of
@@ -1402,6 +1405,7 @@ update message model =
                                         else
                                             []
                                        )
+                                    ++ [ delay 2000 (HideHoverUiState book.id) ]
                                 )
                             )
 
@@ -1760,6 +1764,18 @@ update message model =
 
         ScrollToTop ->
             ( model, scrollToTop () )
+
+        HideHoverUiState id ->
+            case model.page of
+                TitlePage book _ _ ->
+                    if book.id == id then
+                        ( { model | showHoverUi = False }, none )
+
+                    else
+                        noOp
+
+                _ ->
+                    noOp
 
         OnSearchStart query ->
             if String.isEmpty query then

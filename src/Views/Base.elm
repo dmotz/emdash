@@ -188,7 +188,7 @@ view model =
                                         excerpts
                             in
                             div
-                                []
+                                [ classList [ ( "showHints", model.showHoverUi ) ] ]
                                 [ bookInfo
                                     book
                                     model.books
