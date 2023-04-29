@@ -9,6 +9,7 @@ import Html
         , button
         , details
         , div
+        , em
         , form
         , h1
         , h2
@@ -19,6 +20,7 @@ import Html
         , span
         , summary
         , text
+        , textarea
         , ul
         )
 import Html.Attributes as H
@@ -156,7 +158,16 @@ bookInfo book books tags pendingTag bookNeighborMap count mBookmark excerptSort 
                         ]
                     ]
                 , details []
-                    [ summary [] [ h5 [] [ text "Edit" ] ]
+                    [ summary []
+                        [ h5 []
+                            [ text "Edit"
+                            , if book.notes /= "" then
+                                span [] [ em [] [ text " &" ], text " view notes" ]
+
+                              else
+                                null
+                            ]
+                        ]
                     , if editMode then
                         form
                             [ class "editTitle", onSubmit SetBookEdits ]
@@ -195,6 +206,12 @@ bookInfo book books tags pendingTag bookNeighborMap count mBookmark excerptSort 
                                         (DeleteBook book)
                                 ]
                                 [ text "Delete" ]
+                            , textarea
+                                [ placeholder "Add notes about this title here. Perhaps your review?"
+                                , value book.notes
+                                , onInput <| UpdateBookNotes book.id
+                                ]
+                                []
                             ]
                     ]
                 ]
