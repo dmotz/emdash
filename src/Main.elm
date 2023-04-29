@@ -53,8 +53,7 @@ import Task exposing (attempt, perform)
 import Time exposing (posixToMillis)
 import Types
     exposing
-        ( Book
-        , BookSort(..)
+        ( BookSort(..)
         , ExcerptSort(..)
         , ExcerptTab(..)
         , Lens(..)
