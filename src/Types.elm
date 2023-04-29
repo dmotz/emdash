@@ -52,6 +52,7 @@ type alias Book =
     , sortIndex : Int
     , tags : List Tag
     , slug : String
+    , notes : String
     }
 
 

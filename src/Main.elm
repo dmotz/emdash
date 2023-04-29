@@ -1902,7 +1902,15 @@ update message model =
                         books =
                             indexedMap
                                 (\i ( title, author ) ->
-                                    Book (String.fromInt i) title [ author ] 0 0 [] ""
+                                    { id = String.fromInt i
+                                    , title = title
+                                    , authors = [ author ]
+                                    , rating = 0
+                                    , sortIndex = 0
+                                    , tags = []
+                                    , slug = ""
+                                    , notes = ""
+                                    }
                                 )
                                 titles
                     in
