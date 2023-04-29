@@ -3,6 +3,7 @@ module Utils exposing
     , countLabel
     , dedupe
     , defaultSemanticThreshold
+    , delay
     , excerptCountLabel
     , fetchLensText
     , findMatches
@@ -60,9 +61,11 @@ import MD5 exposing (bytes)
 import Maybe exposing (withDefault)
 import Model exposing (Model)
 import Msg exposing (Msg(..))
+import Process exposing (sleep)
 import Regex exposing (Match, Regex, replace)
 import Set
 import String exposing (fromInt, join, split, toLower, trim)
+import Task
 import Types
     exposing
         ( Author
@@ -538,3 +541,10 @@ fetchLensText id lens =
             Http.expectString
                 (ReceiveLensText id lens)
         }
+
+
+delay : Float -> a -> Cmd a
+delay ms msg =
+    sleep ms
+        |> Task.andThen (always <| Task.succeed msg)
+        |> Task.perform identity
