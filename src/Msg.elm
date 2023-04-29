@@ -50,6 +50,7 @@ type Msg
     | SetPendingBookAuthor String
     | SetBookEdits
     | UpdateNotes Id String
+    | UpdateBookNotes Id String
     | SetBookmark Id Id
     | ToggleFavorite Excerpt
     | UpdatePendingTag Tag

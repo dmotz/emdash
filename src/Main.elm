@@ -654,6 +654,25 @@ update message model =
                 , none
                 )
 
+        UpdateBookNotes id text ->
+            let
+                f =
+                    \book -> { book | notes = text }
+            in
+            store
+                ( { model
+                    | books = Dict.update id (Maybe.map f) model.books
+                    , page =
+                        case model.page of
+                            TitlePage book excerpts editMode ->
+                                TitlePage (f book) excerpts editMode
+
+                            _ ->
+                                model.page
+                  }
+                , none
+                )
+
         UpdatePendingTag text ->
             ( { model | pendingTag = Just text }, none )
 
