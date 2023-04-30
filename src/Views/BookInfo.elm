@@ -31,16 +31,18 @@ import Html.Attributes as H
         , placeholder
         , spellcheck
         , step
+        , style
         , target
         , type_
         , value
         )
 import Html.Events exposing (onClick, onInput, onSubmit)
-import List exposing (intersperse, map, repeat)
+import Html.Keyed as Keyed
+import List exposing (indexedMap, intersperse, map, repeat)
 import Maybe exposing (withDefault)
 import Msg exposing (Msg(..))
 import Router exposing (authorToRoute, titleSlugToRoute)
-import String exposing (join)
+import String exposing (fromInt, join)
 import Types exposing (Book, BookMap, ExcerptSort(..), Id, NeighborMap, Tag)
 import Utils
     exposing
@@ -89,17 +91,22 @@ bookInfo book books tags pendingTag bookNeighborMap count mBookmark excerptSort 
                         view
 
                     _ ->
-                        ul
+                        Keyed.ul
                             [ class "related" ]
                             (case get book.id bookNeighborMap of
                                 Just ids ->
-                                    map
-                                        (\( id, score ) ->
-                                            case
+                                    indexedMap
+                                        (\i ( id, score ) ->
+                                            ( book.id ++ id
+                                            , case
                                                 get id books
-                                            of
+                                              of
                                                 Just neighbor ->
-                                                    li []
+                                                    li
+                                                        [ style
+                                                            "animation-delay"
+                                                            (fromInt (i * 99) ++ "ms")
+                                                        ]
                                                         [ a
                                                             [ class "title"
                                                             , href <|
@@ -118,6 +125,7 @@ bookInfo book books tags pendingTag bookNeighborMap count mBookmark excerptSort 
 
                                                 _ ->
                                                     null
+                                            )
                                         )
                                         ids
 
@@ -126,6 +134,7 @@ bookInfo book books tags pendingTag bookNeighborMap count mBookmark excerptSort 
                                         [ class "wait" ]
                                         [ text "…" ]
                                         :: repeat 5 (li [] [ br [] [] ])
+                                        |> indexedMap (\i el -> ( fromInt i, el ))
                             )
                 ]
             , div

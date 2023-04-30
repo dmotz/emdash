@@ -23,7 +23,7 @@ snippetView books mScore query i excerpt =
             in
             li
                 [ class "snippet"
-                , style "animation-delay" (fromInt ((i + 0) * 99) ++ "ms")
+                , style "animation-delay" (fromInt (i * 99) ++ "ms")
                 ]
                 [ a
                     [ href <| excerptToRoute books excerpt ]
