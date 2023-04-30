@@ -5,7 +5,7 @@ import Html exposing (Html, button, div, li, p, span, text, ul)
 import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
 import Html.Keyed as Keyed
-import List exposing (filterMap, isEmpty, length, map, take)
+import List exposing (filterMap, indexedMap, isEmpty, length, map, take)
 import Msg exposing (Msg(..))
 import Types
     exposing
@@ -115,10 +115,10 @@ searchResults mode bookMap excerptMap books matches semanticMatches excerptCount
                 in
                 Keyed.ul
                     []
-                    (map
-                        (\( excerpt, mScore ) ->
+                    (indexedMap
+                        (\i ( excerpt, mScore ) ->
                             ( excerpt.id
-                            , snippetView bookMap mScore q excerpt
+                            , snippetView bookMap mScore q i excerpt
                             )
                         )
                         (take maxResults list)

@@ -2,19 +2,19 @@ module Views.Snippet exposing (snippetView)
 
 import Dict exposing (get)
 import Html exposing (Html, a, blockquote, div, li, mark, text)
-import Html.Attributes exposing (class, href)
+import Html.Attributes exposing (class, href, style)
 import List exposing (indexedMap)
 import Msg exposing (Msg)
 import Regex
 import Router exposing (excerptToRoute)
-import String exposing (join, split)
+import String exposing (fromInt, join, split)
 import Types exposing (Book, BookMap, Excerpt)
 import Utils exposing (appName, null, rx_)
 import Views.Citation exposing (citation)
 
 
-snippetView : BookMap -> Maybe Float -> Maybe String -> Excerpt -> Html Msg
-snippetView books mScore query excerpt =
+snippetView : BookMap -> Maybe Float -> Maybe String -> Int -> Excerpt -> Html Msg
+snippetView books mScore query i excerpt =
     case get excerpt.bookId books of
         Just book ->
             let
@@ -22,7 +22,9 @@ snippetView books mScore query excerpt =
                     innerSnippet excerpt book mScore query
             in
             li
-                [ class "snippet" ]
+                [ class "snippet"
+                , style "animation-delay" (fromInt ((i + 0) * 99) ++ "ms")
+                ]
                 [ a
                     [ href <| excerptToRoute books excerpt ]
                     (inner

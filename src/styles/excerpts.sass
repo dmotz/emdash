@@ -54,10 +54,6 @@
         opacity: 1
 
   &.permalink
-
-    @include mobile
-      padding-top: 0
-
     figure > cite
       font-size: 2.4rem
       margin: 4rem 0
@@ -67,6 +63,8 @@
         font-size: 1.8rem
 
     @include mobile
+      padding-top: 0
+
       .favorite
         margin-left: -0.4rem
 
@@ -145,6 +143,10 @@ blockquote
 .neighbors
   margin: 4rem 0
 
+  .snippet
+    opacity: 0
+    animation: fadeIn 333ms forwards
+
 .snippet
   $size: 1.8rem
   position: relative
@@ -154,6 +156,8 @@ blockquote
     text-decoration: none
 
   &:hover
+    z-index: 999
+
     .clone
       display: block
       z-index: 1

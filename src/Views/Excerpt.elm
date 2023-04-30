@@ -256,15 +256,16 @@ excerptView excerpts books neighbors showDetails activeTab showLensTab i perma i
 
                                         else
                                             ul [ class "neighbors" ]
-                                                (map
-                                                    (\( id, score ) ->
+                                                (indexedMap
+                                                    (\n ( id, score ) ->
                                                         case get id excerpts of
                                                             Just neighbor ->
-                                                                lazy4
+                                                                lazy5
                                                                     snippetView
                                                                     books
                                                                     (Just score)
                                                                     Nothing
+                                                                    n
                                                                     neighbor
 
                                                             _ ->
