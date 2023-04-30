@@ -32,15 +32,18 @@ import Html.Attributes
         , id
         , placeholder
         , src
+        , style
         , value
         )
 import Html.Events exposing (onClick, onInput)
-import Html.Lazy exposing (lazy4)
-import List exposing (head, isEmpty, map)
+import Html.Keyed exposing (node)
+import Html.Lazy exposing (lazy5)
+import List exposing (foldl, head, indexedMap, isEmpty, map)
 import Maybe exposing (andThen)
 import Msg exposing (Msg(..))
 import Router exposing (excerptToRoute)
-import String exposing (fromInt)
+import String exposing (endsWith, fromInt, split)
+import Tuple exposing (first)
 import Types
     exposing
         ( BookMap
@@ -322,14 +325,51 @@ excerptView excerpts books neighbors showDetails activeTab showLensTab i perma i
                                         )
                                     ]
                                 , div []
-                                    (case
+                                    (let
+                                        lensString =
+                                            lensToString activeLens
+                                     in
+                                     case
                                         excerpt.lenses
                                             |> Dict.fromList
-                                            |> get (lensToString activeLens)
+                                            |> get lensString
                                             |> andThen head
                                      of
                                         Just lensText ->
-                                            [ p [] [ text lensText ]
+                                            [ node
+                                                "p"
+                                                [ class "lensText" ]
+                                                (foldl
+                                                    (\c ( xs, ms ) ->
+                                                        ( xs
+                                                            ++ [ ( excerpt.id
+                                                                    ++ lensString
+                                                                    ++ fromInt ms
+                                                                 , span
+                                                                    [ style
+                                                                        "animation-delay"
+                                                                        (fromInt ms ++ "ms")
+                                                                    ]
+                                                                    [ text <| c ++ " " ]
+                                                                 )
+                                                               ]
+                                                        , ms
+                                                            + 133
+                                                            + (if endsWith "." c then
+                                                                533
+
+                                                               else if endsWith "," c then
+                                                                233
+
+                                                               else
+                                                                0
+                                                              )
+                                                        )
+                                                    )
+                                                    ( [], 333 )
+                                                    (split " " lensText)
+                                                    |> first
+                                                )
                                             , details
                                                 []
                                                 [ summary [] [ text "Lenses?" ]
