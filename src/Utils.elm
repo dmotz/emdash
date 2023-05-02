@@ -63,7 +63,7 @@ import Model exposing (Model)
 import Msg exposing (Msg(..))
 import Process exposing (sleep)
 import Regex exposing (Match, Regex, replace)
-import Set
+import Set exposing (Set)
 import String exposing (fromInt, join, split, toLower, trim)
 import Task
 import Types
@@ -122,14 +122,23 @@ formatNumber =
     fromInt >> replace (rx "\\B(?=(\\d{3})+(?!\\d))") (always ",")
 
 
+asSet :
+    (comparable -> Set comparable -> Set comparable)
+    -> List comparable
+    -> comparable
+    -> List comparable
+asSet f xs x =
+    xs |> Set.fromList |> f x |> Set.toList
+
+
 insertOnce : List comparable -> comparable -> List comparable
-insertOnce list x =
-    Set.toList <| Set.insert x (Set.fromList list)
+insertOnce =
+    asSet Set.insert
 
 
 removeItem : List comparable -> comparable -> List comparable
-removeItem list x =
-    Set.toList <| Set.remove x (Set.fromList list)
+removeItem =
+    asSet Set.remove
 
 
 dedupe : List comparable -> List comparable
