@@ -502,9 +502,7 @@ getAuthors model =
                     acc
                     (withDefault
                         []
-                        (get excerpt.bookId model.books
-                            |> Maybe.map .authors
-                        )
+                        (get excerpt.bookId model.books |> Maybe.map .authors)
                     )
             )
             Dict.empty

@@ -82,7 +82,7 @@ createView pendingExcerpt titles authors =
                     , spellcheck False
                     ]
                     []
-                , text "Book title"
+                , text "Book/article/essay title"
                 , datalist
                     [ id listId ]
                     (map (\t -> option [ value t ] []) titles)
