@@ -11,7 +11,7 @@
   "private": true,
   "scripts": {
     "start": "vite",
-    "build": "NODE_ENV=production; vite build",
+    "build": "NODE_ENV=production; vite build; npm run prerender",
     "postinstall": "elm-tooling install",
     "lint": "elm-review --template jfmengels/elm-review-unused/example && elm-review --template jfmengels/elm-review-simplify/example",
     "demo-embed": "node ./scripts/gen-demo-embeddings.mjs",
