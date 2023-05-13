@@ -14,7 +14,9 @@
     "build": "NODE_ENV=production; vite build",
     "postinstall": "elm-tooling install",
     "lint": "elm-review --template jfmengels/elm-review-unused/example && elm-review --template jfmengels/elm-review-simplify/example",
-    "demo-embed": "node ./scripts/gen-demo-embeddings.mjs"
+    "demo-embed": "node ./scripts/gen-demo-embeddings.mjs",
+    "preview": "vite preview",
+    "prerender": "node ./scripts/prerender.mjs"
   },
   "dependencies": {
     "@okikio/sharedworker": "^1.0.4",
