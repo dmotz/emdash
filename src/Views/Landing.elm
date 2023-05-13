@@ -67,41 +67,45 @@ landingView bookList countMap didSubmitEmail =
         [ class "landing" ]
         [ div
             [ class "anim", attribute "aria-hidden" "true" ]
-            (map
-                (\col ->
-                    div
-                        [ class "bookShelf" ]
-                        (map
-                            (\books ->
-                                let
-                                    bookViews =
-                                        map
-                                            (\book ->
-                                                bookView
-                                                    book
-                                                    (getCount countMap book.id)
-                                                    0
-                                                    False
-                                                    False
-                                                    True
-                                            )
-                                            books
+            (if bookList == [] then
+                []
 
-                                    duration =
-                                        style
-                                            "animation-duration"
-                                            (String.fromInt (length books * speed) ++ "s")
-                                in
-                                div
-                                    [ class "bookCol" ]
-                                    [ div [ duration ] bookViews
-                                    , div [ duration ] bookViews
-                                    ]
+             else
+                map
+                    (\col ->
+                        div
+                            [ class "bookShelf" ]
+                            (map
+                                (\books ->
+                                    let
+                                        bookViews =
+                                            map
+                                                (\book ->
+                                                    bookView
+                                                        book
+                                                        (getCount countMap book.id)
+                                                        0
+                                                        False
+                                                        False
+                                                        True
+                                                )
+                                                books
+
+                                        duration =
+                                            style
+                                                "animation-duration"
+                                                (String.fromInt (length books * speed) ++ "s")
+                                    in
+                                    div
+                                        [ class "bookCol" ]
+                                        [ div [ duration ] bookViews
+                                        , div [ duration ] bookViews
+                                        ]
+                                )
+                                col
                             )
-                            col
-                        )
-                )
-                [ map reverse list2 ++ list1, list2 ++ map reverse list1 ]
+                    )
+                    [ map reverse list2 ++ list1, list2 ++ map reverse list1 ]
             )
         , main_ []
             [ img
