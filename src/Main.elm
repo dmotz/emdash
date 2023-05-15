@@ -64,7 +64,7 @@ import Types
         , TagSort(..)
         )
 import Update.Extra as Update exposing (addCmd)
-import Url exposing (Url)
+import Url exposing (Url, percentEncode)
 import Url.Parser exposing (parse)
 import Utils
     exposing
@@ -2093,7 +2093,10 @@ update message model =
                         , body =
                             Http.stringBody
                                 "application/x-www-form-urlencoded"
-                                (model.mailingListField ++ "=" ++ model.mailingListEmail)
+                                (model.mailingListField
+                                    ++ "="
+                                    ++ percentEncode model.mailingListEmail
+                                )
                         , expect = Http.expectWhatever (always NoOp)
                         }
                     )
