@@ -5,7 +5,7 @@
     "email": "dan@oxism.com",
     "url": "https://oxism.com"
   },
-  "version": "0.5.2.borges",
+  "version": "0.5.3.borges",
   "license": "GPL-3.0",
   "description": "Wisdom indexer",
   "private": true,
