@@ -151,5 +151,5 @@ type SearchMode
 
 
 type Lens
-    = Succint
+    = Succinct
     | Metaphor

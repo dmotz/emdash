@@ -532,8 +532,8 @@ getCount dict id =
 lensToString : Lens -> String
 lensToString lens =
     case lens of
-        Succint ->
-            "succint"
+        Succinct ->
+            "succinct"
 
         Metaphor ->
             "metaphor"

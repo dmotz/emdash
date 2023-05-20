@@ -227,7 +227,7 @@ excerptView excerpts books neighbors showDetails activeTab showLensTab i perma i
                                 Lenses lensType index
 
                             _ ->
-                                Lenses Succint 0
+                                Lenses Succinct 0
                         ]
 
                       else
@@ -301,13 +301,13 @@ excerptView excerpts books neighbors showDetails activeTab showLensTab i perma i
                                                         [ span
                                                             []
                                                             (case lens of
-                                                                Succint ->
+                                                                Succinct ->
                                                                     [ img
                                                                         [ class "icon"
-                                                                        , src "/images/icons/succint.svg"
+                                                                        , src "/images/icons/succinct.svg"
                                                                         ]
                                                                         []
-                                                                    , text "Succint"
+                                                                    , text "Succinct"
                                                                     ]
 
                                                                 Metaphor ->
@@ -322,7 +322,7 @@ excerptView excerpts books neighbors showDetails activeTab showLensTab i perma i
                                                         ]
                                                     ]
                                             )
-                                            [ Succint, Metaphor ]
+                                            [ Succinct, Metaphor ]
                                         )
                                     ]
                                 , div []

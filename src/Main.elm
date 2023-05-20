@@ -1443,7 +1443,7 @@ update message model =
                                   else
                                     none
                                 , if model.demoMode then
-                                    fetchLensText excerpt.id Succint
+                                    fetchLensText excerpt.id Succinct
 
                                   else
                                     none

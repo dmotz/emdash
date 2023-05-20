@@ -266,7 +266,7 @@ view model =
                                         True
                                         (withDefault
                                             (if model.demoMode then
-                                                Lenses Succint 0
+                                                Lenses Succinct 0
 
                                              else
                                                 Related
