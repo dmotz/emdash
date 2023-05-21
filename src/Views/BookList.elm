@@ -1,7 +1,7 @@
 module Views.BookList exposing (bookList, bookView)
 
 import Html exposing (Html, a, div, img, li, span, text)
-import Html.Attributes exposing (class, href, src, tabindex)
+import Html.Attributes exposing (alt, class, href, src, tabindex)
 import Html.Keyed as Keyed
 import List exposing (map)
 import Msg exposing (Msg)
@@ -69,6 +69,7 @@ bookView book exCount favCount showRating showFavCount isLandingPage =
                         [ img
                             [ class "icon"
                             , src "/images/icons/favorite.svg"
+                            , alt "favorites"
                             ]
                             []
                         , text <| fromInt favCount

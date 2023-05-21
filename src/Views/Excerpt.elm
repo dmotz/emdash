@@ -25,7 +25,8 @@ import Html
         )
 import Html.Attributes
     exposing
-        ( class
+        ( alt
+        , class
         , classList
         , draggable
         , href
@@ -105,6 +106,14 @@ excerptView excerpts books neighbors showDetails activeTab showLensTab i perma i
                                         ""
                                    )
                                 ++ ".svg"
+                        , alt <|
+                            (if excerpt.isFavorite then
+                                "remove"
+
+                             else
+                                "add"
+                            )
+                                ++ " favorite"
                         ]
                         []
                     , div
@@ -142,6 +151,14 @@ excerptView excerpts books neighbors showDetails activeTab showLensTab i perma i
                                             ""
                                        )
                                     ++ ".svg"
+                            , alt <|
+                                (if isMarked then
+                                    "remove"
+
+                                 else
+                                    "add"
+                                )
+                                    ++ " bookmark"
                             ]
                             []
                         , div
@@ -305,6 +322,7 @@ excerptView excerpts books neighbors showDetails activeTab showLensTab i perma i
                                                                     [ img
                                                                         [ class "icon"
                                                                         , src "/images/icons/succinct.svg"
+                                                                        , alt ""
                                                                         ]
                                                                         []
                                                                     , text "Succinct"
@@ -314,6 +332,7 @@ excerptView excerpts books neighbors showDetails activeTab showLensTab i perma i
                                                                     [ img
                                                                         [ class "icon"
                                                                         , src "/images/icons/metaphor.svg"
+                                                                        , alt ""
                                                                         ]
                                                                         []
                                                                     , text "Metaphor"
