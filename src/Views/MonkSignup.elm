@@ -15,7 +15,7 @@ import Html
         , text
         , ul
         )
-import Html.Attributes exposing (class, placeholder, src, type_)
+import Html.Attributes exposing (alt, class, placeholder, src, type_)
 import Html.Events exposing (onInput, onSubmit)
 import Msg exposing (Msg(..))
 import Views.Button exposing (actionButton)
@@ -25,7 +25,9 @@ monkSignup : Bool -> Html Msg
 monkSignup didJoinMailingList =
     section
         [ class "monk" ]
-        [ img [ src "/images/landing/mushroom.png", class "mushrooms" ] []
+        [ img
+            [ src "/images/landing/mushroom.png", class "mushrooms", alt "" ]
+            []
         , div []
             [ aside [] [ text "Coming eventually" ]
             , h2 [] [ text "Monk-Mode" ]
