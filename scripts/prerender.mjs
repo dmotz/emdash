@@ -22,4 +22,5 @@ server.stdout.on('data', async d => {
   )
   await browser.close()
   server.kill()
+  process.exit(0)
 })
