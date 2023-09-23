@@ -374,12 +374,12 @@ excerptView excerpts books neighbors showDetails activeTab showLensTab i perma i
                                                                  )
                                                                ]
                                                         , ms
-                                                            + 133
+                                                            + 33
                                                             + (if endsWith "." c then
-                                                                533
+                                                                333
 
                                                                else if endsWith "," c then
-                                                                233
+                                                                133
 
                                                                else
                                                                 0
