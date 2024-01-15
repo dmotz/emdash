@@ -303,7 +303,7 @@ const methods = {
 
 const setWasm = () => {
   setWasmPaths(
-    'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.7.0/dist/'
+    'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.16.0/dist/'
   )
 
   return tf.setBackend('wasm')
