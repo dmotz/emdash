@@ -552,6 +552,4 @@ fetchLensText id lens =
 
 delay : Float -> a -> Cmd a
 delay ms msg =
-    sleep ms
-        |> Task.andThen (always <| Task.succeed msg)
-        |> Task.perform identity
+    Task.perform (always msg) (sleep ms)
