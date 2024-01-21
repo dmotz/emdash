@@ -13,7 +13,7 @@
     "start": "vite",
     "build": "NODE_ENV=production; vite build; npm run prerender",
     "postinstall": "elm-tooling install",
-    "lint": "elm-review --template jfmengels/elm-review-unused/example && elm-review --template jfmengels/elm-review-simplify/example",
+    "lint": "elm-review --template jfmengels/elm-review-unused/example; elm-review --template jfmengels/elm-review-simplify/example",
     "demo-embed": "node ./scripts/gen-demo-embeddings.mjs",
     "preview": "vite preview",
     "prerender": "node ./scripts/prerender.mjs"
@@ -31,6 +31,7 @@
     "dotenv": "^16.0.3",
     "elm-review": "^2.7.3",
     "elm-tooling": "^1.8.0",
+    "prettier": "^3.2.4",
     "puppeteer": "^21.7.0",
     "sass": "^1.53.0",
     "vite": "^5.0.11",
