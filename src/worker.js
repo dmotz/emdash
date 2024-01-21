@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs'
-import {setWasmPaths} from '@tensorflow/tfjs-backend-wasm'
+import {setWasmPaths, version_wasm as wasmVersion} from '@tensorflow/tfjs-backend-wasm'
 import {load} from '@tensorflow-models/universal-sentence-encoder'
 import {createStore, del, delMany, entries, keys, setMany} from 'idb-keyval'
 
@@ -303,7 +303,7 @@ const methods = {
 
 const setWasm = () => {
   setWasmPaths(
-    'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.16.0/dist/'
+    `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${wasmVersion}/dist/`
   )
 
   return tf.setBackend('wasm')
