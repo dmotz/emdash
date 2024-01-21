@@ -1,5 +1,8 @@
 import * as tf from '@tensorflow/tfjs'
-import {setWasmPaths, version_wasm as wasmVersion} from '@tensorflow/tfjs-backend-wasm'
+import {
+  setWasmPaths,
+  version_wasm as wasmVersion
+} from '@tensorflow/tfjs-backend-wasm'
 import {load} from '@tensorflow-models/universal-sentence-encoder'
 import {createStore, del, delMany, entries, keys, setMany} from 'idb-keyval'
 
@@ -121,8 +124,8 @@ const findExcerptNeighbors = async (targetId, k) => {
       a.length === k
         ? a
         : excerptIdToBookId[c[0]] === targetTitle
-        ? a
-        : [...a, c],
+          ? a
+          : [...a, c],
     []
   )
 }
@@ -270,7 +273,7 @@ const methods = {
     const vecSize = embSize * 4
 
     excerptEmbMap = Object.fromEntries(
-      new Array(buff.byteLength / vecSize)
+      Array(buff.byteLength / vecSize)
         .fill()
         .map((_, i) => [ids[i], new Float32Array(buff, i * vecSize, embSize)])
     )
