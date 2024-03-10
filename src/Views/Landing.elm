@@ -232,7 +232,7 @@ landingView bookList countMap didSubmitEmail =
                     , a
                         [ href "https://oxism.com", target "_blank" ]
                         [ text "oxism.com" ]
-                    , text " • A.D. MMXXIII"
+                    , text " • A.D. MMXXIV"
                     ]
                 ]
             ]
