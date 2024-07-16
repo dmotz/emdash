@@ -553,6 +553,14 @@ update message model =
 
                 ( exCount, favCount ) =
                     excerpts |> values |> getCounts
+
+                books =
+                    booksWithSlugs
+                        |> filter
+                            (\{ id } ->
+                                get id exCount |> withDefault 0 |> (/=) 0
+                            )
+                        |> toDict
             in
             store
                 ( { model
@@ -567,13 +575,7 @@ update message model =
                                 countLabel "new excerpt" n
                                     ++ " imported."
                     , excerpts = excerpts
-                    , books =
-                        booksWithSlugs
-                            |> filter
-                                (\{ id } ->
-                                    get id exCount |> withDefault 0 |> (/=) 0
-                                )
-                            |> toDict
+                    , books = books
                     , excerptCountMap = exCount
                     , favCountMap = favCount
                     , titleRouteMap = titleRouteMap
@@ -587,6 +589,24 @@ update message model =
 
                         else
                             model.completedEmbeddings
+                    , tags =
+                        if model.demoMode then
+                            []
+
+                        else
+                            model.tags
+                    , tagCounts =
+                        if model.demoMode then
+                            Dict.empty
+
+                        else
+                            getTagCounts books
+                    , showTagHeader =
+                        if model.demoMode then
+                            False
+
+                        else
+                            model.showTagHeader
                   }
                 , batch
                     [ model
