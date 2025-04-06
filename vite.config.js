@@ -6,5 +6,12 @@ export default defineConfig({
   publicDir: 'assets',
   server: {port: 1999},
   plugins: [elmPlugin({debug: false}), ViteMinifyPlugin({})],
-  esbuild: {legalComments: 'none'}
+  esbuild: {legalComments: 'none'},
+  css: {
+    preprocessorOptions: {
+      sass: {
+        api: 'modern'
+      }
+    }
+  }
 })
