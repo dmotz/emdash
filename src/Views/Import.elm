@@ -123,10 +123,11 @@ importView emptyOrDemo isDragging =
                                         text
                                         [ "title,"
                                         , "author,"
+                                        , "text,"
                                         , "pageNum (optional),"
                                         , "date (unix time, optional),"
                                         , "notes (optional),"
-                                        , "source URL (optional)"
+                                        , "sourceUrl (optional)"
                                         ]
                                         |> intersperse (br [] [])
                                     )
