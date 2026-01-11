@@ -487,19 +487,26 @@ update message model =
             ( model, requestUnicodeNormalized text )
 
         ReceiveUnicodeNormalized text ->
-            let
-                ( excerpts, books ) =
-                    KindleParser.parse text
-            in
-            if Dict.isEmpty excerpts then
-                ( { model
-                    | modalMessage = Just <| ErrMsg "Failed to parse text."
-                  }
-                , none
-                )
+            case KindleParser.parse text of
+                Ok ( excerpts, books ) ->
+                    if Dict.isEmpty excerpts then
+                        ( { model
+                            | modalMessage =
+                                Just <|
+                                    ErrMsg "No highlights found in file."
+                          }
+                        , none
+                        )
 
-            else
-                update (MergeNewExcerpts excerpts books) model
+                    else
+                        update (MergeNewExcerpts excerpts books) model
+
+                Err err ->
+                    ( { model
+                        | modalMessage = Just <| ErrMsg err
+                      }
+                    , none
+                    )
 
         MergeNewExcerpts newExcerpts newBooks ->
             let

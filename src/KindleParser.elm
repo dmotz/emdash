@@ -1,262 +1,551 @@
 module KindleParser exposing (parse)
 
 import DateTime exposing (fromRawParts, toPosix)
-import Dict exposing (insert, update)
-import List exposing (foldr, head, map)
-import Maybe exposing (andThen, withDefault)
-import Regex exposing (Regex)
-import String exposing (lines, repeat, right, split, startsWith, toInt, trim)
+import Dict
+import List exposing (drop, filter, filterMap, head, indexedMap, reverse, take)
+import Parser
+    exposing
+        ( (|.)
+        , (|=)
+        , Parser
+        , Step(..)
+        , andThen
+        , backtrackable
+        , chompIf
+        , chompUntil
+        , chompWhile
+        , deadEndsToString
+        , end
+        , getChompedString
+        , int
+        , loop
+        , map
+        , oneOf
+        , problem
+        , run
+        , spaces
+        , succeed
+        , symbol
+        )
+import String exposing (trim)
 import Time exposing (Month(..), posixToMillis)
 import Types exposing (BookMap, ExcerptMap)
-import Utils exposing (makeExcerpt, rx, rx_)
+import Utils exposing (makeExcerpt)
 
 
-parse : String -> ( ExcerptMap, BookMap )
-parse =
-    lines
-        >> foldr folder ( [], [] )
-        >> (\( xs, x ) -> x :: xs)
-        >> foldr findNotes []
-        >> makeDicts
+type alias Metadata =
+    { type_ : MetadataType
+    , page : Maybe Int
+    , location : Maybe Int
+    , date : Maybe Int
+    }
+
+
+type MetadataType
+    = Highlight
+    | Bookmark
+    | Note
+    | Unknown
 
 
 separator : String
 separator =
-    repeat 10 "="
+    "=========="
 
 
-folder :
-    String
-    -> ( List (List String), List String )
-    -> ( List (List String), List String )
-folder line ( blocks, currentBlock ) =
-    if line == "" then
-        ( blocks, currentBlock )
+parse : String -> Result String ( ExcerptMap, BookMap )
+parse input =
+    case run (loop ( [], Dict.empty, Dict.empty ) blockLoop) input of
+        Ok ( _, excerpts, books ) ->
+            Ok ( excerpts, books )
 
-    else if line == separator then
-        ( currentBlock :: blocks, [] )
-
-    else
-        ( blocks, currentBlock ++ [ line ] )
+        Err e ->
+            Err <| "Failed to parse Kindle highlights: " ++ deadEndsToString e
 
 
-findNotes :
-    List String
-    -> List ( List String, String )
-    -> List ( List String, String )
-findNotes block acc =
-    case block of
-        [ text, meta, _ ] ->
-            if text == limitNotice then
-                acc
-
-            else if isNote meta then
-                case acc of
-                    [ ( x, _ ) ] ->
-                        [ ( x, text ) ]
-
-                    ( x, _ ) :: xs ->
-                        ( x, text ) :: xs
-
-                    _ ->
-                        acc
-
-            else
-                ( block, "" ) :: acc
-
-        _ ->
-            acc
+type alias State =
+    ( List String, ExcerptMap, BookMap )
 
 
-parseInt : Regex -> String -> Maybe Int
-parseInt rx s =
-    Regex.find rx s
-        |> head
-        |> Maybe.map .submatches
-        |> andThen head
-        |> andThen identity
-        |> andThen toInt
+blockLoop : State -> Parser (Step State State)
+blockLoop ( lastIds, excerpts, books ) =
+    oneOf
+        [ succeed
+            (\entry ->
+                Loop (updateState entry ( lastIds, excerpts, books ))
+            )
+            |= entryParser
+        , succeed (Done ( lastIds, excerpts, books ))
+            |. end
+        ]
 
 
-getPageNum : String -> Maybe Int
-getPageNum s =
-    case parseInt locationRx s of
-        Just loc ->
-            (loc // 15) |> max 1 |> Just
-
-        _ ->
-            parseInt pageRx s
-
-
-isNote : String -> Bool
-isNote =
-    startsWith "- Your Note on Page "
-
-
-limitNotice : String
-limitNotice =
-    " <You have reached the clipping limit for this item>"
-
-
-titleAuthorRx : Regex
-titleAuthorRx =
-    rx "(.+) \\((.+)\\)"
-
-
-pageRx : Regex
-pageRx =
-    rx_ " on page (\\d+)"
-
-
-locationRx : Regex
-locationRx =
-    rx_ " on location (\\d+)"
-
-
-dateRx : Regex
-dateRx =
-    rx " \\| Added on \\w+, (\\w+) (\\d+), (\\d+) (\\d+):(\\d+):(\\d+) (\\w+)"
-
-
-makeDicts : List ( List String, String ) -> ( ExcerptMap, BookMap )
-makeDicts =
-    foldr
-        (\( raw, notes ) ( excerpts, books ) ->
+updateState : Maybe Entry -> State -> State
+updateState mEntry ( lastIds, excerpts, books ) =
+    case mEntry of
+        Just (HighlightEntry e) ->
             let
-                noOp =
-                    ( excerpts, books )
+                ( excerpt, book ) =
+                    makeExcerpt
+                        e.title
+                        e.author
+                        e.content
+                        e.page
+                        e.date
+                        ""
+                        Nothing
+
+                newExcerpts =
+                    Dict.insert excerpt.id excerpt excerpts
+
+                newBooks =
+                    Dict.update book.id
+                        (\mBook ->
+                            Just <|
+                                case mBook of
+                                    Just b ->
+                                        { b
+                                            | sortIndex =
+                                                max b.sortIndex excerpt.date
+                                        }
+
+                                    Nothing ->
+                                        book
+                        )
+                        books
             in
-            case raw of
-                [ text, meta, titleAuthor ] ->
+            ( excerpt.id :: lastIds, newExcerpts, newBooks )
+
+        Just (NoteEntry n) ->
+            case lastIds of
+                id :: _ ->
                     let
-                        pair =
-                            (if right 1 titleAuthor == ")" then
-                                Regex.find titleAuthorRx titleAuthor
-                                    |> head
-                                    |> Maybe.map (.submatches >> map (withDefault ""))
-                                    |> withDefault []
-
-                             else
-                                split "-" titleAuthor
-                            )
-                                |> map trim
-
-                        dateRaw =
-                            case
-                                Regex.find dateRx meta
-                                    |> head
-                                    |> andThen
-                                        (.submatches
-                                            >> foldr
-                                                (Maybe.map2 (::))
-                                                (Just [])
-                                        )
-                            of
-                                Just [ month, d, y, h, m, s, meridian ] ->
-                                    case map toInt [ y, d, h, m, s ] of
-                                        [ Just year, Just day, Just hour, Just minute, Just second ] ->
-                                            fromRawParts
-                                                { day = day
-                                                , month =
-                                                    case month of
-                                                        "January" ->
-                                                            Jan
-
-                                                        "February" ->
-                                                            Feb
-
-                                                        "March" ->
-                                                            Mar
-
-                                                        "April" ->
-                                                            Apr
-
-                                                        "May" ->
-                                                            May
-
-                                                        "June" ->
-                                                            Jun
-
-                                                        "July" ->
-                                                            Jul
-
-                                                        "August" ->
-                                                            Aug
-
-                                                        "September" ->
-                                                            Sep
-
-                                                        "October" ->
-                                                            Oct
-
-                                                        "November" ->
-                                                            Nov
-
-                                                        _ ->
-                                                            Dec
-                                                , year = year
-                                                }
-                                                { hours =
-                                                    hour
-                                                        + (if meridian == "AM" then
-                                                            0
-
-                                                           else if hour < 12 then
-                                                            12
-
-                                                           else
-                                                            0
-                                                          )
-                                                , minutes = minute
-                                                , seconds = second
-                                                , milliseconds = 0
-                                                }
-                                                |> Maybe.map
-                                                    (toPosix >> posixToMillis)
-
-                                        _ ->
-                                            Just 0
-
-                                _ ->
-                                    Just 0
+                        newExcerpts =
+                            Dict.update
+                                id
+                                (Maybe.map (\e -> { e | notes = n.content }))
+                                excerpts
                     in
-                    case pair of
-                        [ titleRaw, authorRaw ] ->
-                            let
-                                ( excerpt, book ) =
-                                    makeExcerpt
-                                        titleRaw
-                                        authorRaw
-                                        text
-                                        (getPageNum meta)
-                                        dateRaw
-                                        notes
-                                        Nothing
-                            in
-                            ( insert excerpt.id excerpt excerpts
-                            , update
-                                excerpt.bookId
-                                (\mBook ->
-                                    Just <|
-                                        case mBook of
-                                            Just b ->
-                                                { b
-                                                    | sortIndex =
-                                                        max
-                                                            book.sortIndex
-                                                            excerpt.date
-                                                }
+                    ( lastIds, newExcerpts, books )
 
-                                            _ ->
-                                                book
-                                )
-                                books
-                            )
+                [] ->
+                    ( lastIds, excerpts, books )
 
-                        _ ->
-                            noOp
+        Nothing ->
+            ( lastIds, excerpts, books )
+
+
+type Entry
+    = HighlightEntry
+        { title : String
+        , author : String
+        , content : String
+        , page : Maybe Int
+        , date : Maybe Int
+        }
+    | NoteEntry
+        { title : String
+        , author : String
+        , content : String
+        , page : Maybe Int
+        , date : Maybe Int
+        }
+
+
+entryParser : Parser (Maybe Entry)
+entryParser =
+    succeed
+        (\( title, author ) meta content ->
+            let
+                page =
+                    case meta.page of
+                        Just p ->
+                            Just p
+
+                        Nothing ->
+                            Maybe.map (max 1 << (//) 15) meta.location
+            in
+            case meta.type_ of
+                Highlight ->
+                    Just
+                        (HighlightEntry
+                            { title = title
+                            , author = author
+                            , content = content
+                            , page = page
+                            , date = meta.date
+                            }
+                        )
+
+                Note ->
+                    Just
+                        (NoteEntry
+                            { title = title
+                            , author = author
+                            , content = content
+                            , page = page
+                            , date = meta.date
+                            }
+                        )
 
                 _ ->
-                    noOp
+                    Nothing
         )
-        ( Dict.empty, Dict.empty )
+        |= titleAuthorParser
+        |. lineBreak
+        |= metadataParser
+        |. lineBreak
+        |. spaces
+        |= contentParser
+        |. symbol separator
+        |. spaces
+
+
+lineBreak : Parser ()
+lineBreak =
+    oneOf
+        [ symbol "\u{000D}\n"
+        , symbol "\n"
+        ]
+
+
+titleAuthorParser : Parser ( String, String )
+titleAuthorParser =
+    getChompedString (chompUntil "\n") |> map splitTitleAuthor
+
+
+splitTitleAuthor : String -> ( String, String )
+splitTitleAuthor s =
+    let
+        trimmed =
+            trim s
+    in
+    if String.endsWith ")" trimmed then
+        case String.indices "(" trimmed |> reverse |> head of
+            Just openParenIndex ->
+                ( trim (String.left openParenIndex trimmed)
+                , trim
+                    (String.slice
+                        (openParenIndex + 1)
+                        (String.length trimmed - 1)
+                        trimmed
+                    )
+                )
+
+            Nothing ->
+                splitByDash trimmed
+
+    else
+        splitByDash trimmed
+
+
+splitByDash : String -> ( String, String )
+splitByDash s =
+    case String.split " - " s of
+        [ t, a ] ->
+            ( trim t, trim a )
+
+        _ ->
+            ( trim s, "" )
+
+
+metadataParser : Parser Metadata
+metadataParser =
+    getChompedString (chompUntil "\n")
+        |> andThen
+            (\line ->
+                case run subMetadataParser (trim line) of
+                    Ok m ->
+                        succeed m
+
+                    Err _ ->
+                        succeed
+                            { type_ = Unknown
+                            , page = Nothing
+                            , location = Nothing
+                            , date = Nothing
+                            }
+            )
+
+
+subMetadataParser : Parser Metadata
+subMetadataParser =
+    succeed
+        (\type_ mPage mLocation date ->
+            { type_ = type_
+            , page = mPage
+            , location = mLocation
+            , date = date
+            }
+        )
+        |. symbol "- Your "
+        |= typeParser
+        |= oneOf
+            [ backtrackable
+                (succeed Just
+                    |. oneOf [ chompUntil "Page ", chompUntil "page " ]
+                    |. oneOf [ symbol "Page ", symbol "page " ]
+                    |= int
+                )
+            , succeed Nothing
+            ]
+        |= oneOf
+            [ backtrackable
+                (succeed Just
+                    |. oneOf [ chompUntil "Location ", chompUntil "location " ]
+                    |. oneOf [ symbol "Location ", symbol "location " ]
+                    |= int
+                    |. chompWhile (\c -> Char.isDigit c || c == '-')
+                )
+            , succeed Nothing
+            ]
+        |= oneOf
+            [ backtrackable
+                (succeed
+                    identity
+                    |. chompUntil "Added on "
+                    |. symbol "Added on "
+                    |= dateParser
+                )
+            , succeed Nothing
+            ]
+
+
+typeParser : Parser MetadataType
+typeParser =
+    oneOf
+        [ symbol "Highlight" |> map (always Highlight)
+        , symbol "Bookmark" |> map (always Bookmark)
+        , symbol "Note" |> map (always Note)
+        , succeed Unknown
+        ]
+
+
+monthToEnum : String -> Maybe Month
+monthToEnum s =
+    case String.toLower (trim s) of
+        "january" ->
+            Just Jan
+
+        "february" ->
+            Just Feb
+
+        "march" ->
+            Just Mar
+
+        "april" ->
+            Just Apr
+
+        "may" ->
+            Just May
+
+        "june" ->
+            Just Jun
+
+        "july" ->
+            Just Jul
+
+        "august" ->
+            Just Aug
+
+        "september" ->
+            Just Sep
+
+        "october" ->
+            Just Oct
+
+        "november" ->
+            Just Nov
+
+        "december" ->
+            Just Dec
+
+        _ ->
+            Nothing
+
+
+monthFromInt : Int -> Month
+monthFromInt n =
+    case n of
+        1 ->
+            Jan
+
+        2 ->
+            Feb
+
+        3 ->
+            Mar
+
+        4 ->
+            Apr
+
+        5 ->
+            May
+
+        6 ->
+            Jun
+
+        7 ->
+            Jul
+
+        8 ->
+            Aug
+
+        9 ->
+            Sep
+
+        10 ->
+            Oct
+
+        11 ->
+            Nov
+
+        12 ->
+            Dec
+
+        _ ->
+            Jan
+
+
+dateParser : Parser (Maybe Int)
+dateParser =
+    loop ( [], [] )
+        (\( nums, words ) ->
+            oneOf
+                [ backtrackable
+                    (getChompedString (chompWhile Char.isDigit)
+                        |> andThen
+                            (\s ->
+                                if s == "" then
+                                    problem "not a number"
+
+                                else
+                                    case String.toInt s of
+                                        Just n ->
+                                            succeed (Loop ( n :: nums, words ))
+
+                                        Nothing ->
+                                            problem "not a number"
+                            )
+                    )
+                , backtrackable
+                    (getChompedString (chompWhile Char.isAlpha)
+                        |> andThen
+                            (\s ->
+                                if s == "" then
+                                    problem "empty"
+
+                                else
+                                    succeed (Loop ( nums, s :: words ))
+                            )
+                    )
+                , chompIf (always True) |> map (\_ -> Loop ( nums, words ))
+                , succeed (Done ( reverse nums, reverse words ))
+                ]
+        )
+        |> map
+            (\( nums, words ) ->
+                let
+                    yearMatch =
+                        nums
+                            |> indexedMap (\i n -> ( i, n ))
+                            |> filter (\( _, n ) -> n > 1900)
+                            |> head
+
+                    ( year, dateNums, timeNums ) =
+                        case yearMatch of
+                            Just ( idx, y ) ->
+                                ( y
+                                , take idx nums
+                                , drop (idx + 1) nums
+                                )
+
+                            Nothing ->
+                                ( 2023, [], nums )
+
+                    monthFromWords =
+                        filterMap monthToEnum words |> head
+
+                    day =
+                        case ( monthFromWords, dateNums ) of
+                            ( Just _, dVal :: _ ) ->
+                                dVal
+
+                            ( Nothing, _ :: dVal :: _ ) ->
+                                dVal
+
+                            ( _, dVal :: _ ) ->
+                                dVal
+
+                            _ ->
+                                1
+
+                    month =
+                        case ( monthFromWords, dateNums ) of
+                            ( Just m, _ ) ->
+                                m
+
+                            ( Nothing, mVal :: _ ) ->
+                                monthFromInt mVal
+
+                            _ ->
+                                Jan
+
+                    ( h, mi, s ) =
+                        case timeNums of
+                            h1 :: m1 :: s1 :: _ ->
+                                ( h1, m1, s1 )
+
+                            h1 :: m1 :: _ ->
+                                ( h1, m1, 0 )
+
+                            h1 :: _ ->
+                                ( h1, 0, 0 )
+
+                            _ ->
+                                ( 0, 0, 0 )
+
+                    meridian =
+                        filter
+                            (\w ->
+                                let
+                                    lw =
+                                        String.toLower w
+                                in
+                                lw == "am" || lw == "pm"
+                            )
+                            words
+                            |> head
+
+                    hour =
+                        case meridian |> Maybe.map String.toLower of
+                            Just "pm" ->
+                                if h < 12 then
+                                    h + 12
+
+                                else
+                                    h
+
+                            Just "am" ->
+                                if h == 12 then
+                                    0
+
+                                else
+                                    h
+
+                            _ ->
+                                h
+                in
+                fromRawParts
+                    { day = day
+                    , month = month
+                    , year = year
+                    }
+                    { hours = hour, minutes = mi, seconds = s, milliseconds = 0 }
+                    |> Maybe.map (toPosix >> posixToMillis)
+            )
+
+
+contentParser : Parser String
+contentParser =
+    separator |> chompUntil |> getChompedString |> map trim
