@@ -29,7 +29,7 @@ import Html.Attributes
         , value
         )
 import Html.Events exposing (onClick, onInput, onSubmit)
-import List exposing (filter, length, map, member)
+import List exposing (filter, isEmpty, length, map, member)
 import Msg exposing (Msg(..))
 import Router exposing (tagToRoute)
 import Types exposing (Tag)
@@ -41,7 +41,7 @@ tagSection : List Tag -> List Tag -> Maybe Tag -> Html Msg
 tagSection tags globalTags pendingTag =
     div []
         [ h5 [] [ text "Tags" ]
-        , if length tags > 0 then
+        , if not (isEmpty tags) then
             div
                 [ class "tags" ]
                 [ ul

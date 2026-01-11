@@ -319,8 +319,7 @@ null =
 getTitleRouteMap : List Book -> ( Dict String Id, List Book )
 getTitleRouteMap =
     sortBy .sortIndex
-        >> reverse
-        >> foldr
+        >> foldl
             (\book ( slugToId, newBooks ) ->
                 let
                     slug =
@@ -486,9 +485,8 @@ makeExcerpt titleRaw authorRaw excerptText mPage mDate notes mUrl =
 getAuthors : Model -> List ( Id, List Id )
 getAuthors model =
     model.excerpts
-        |> values
-        |> foldl
-            (\excerpt acc ->
+        |> Dict.foldl
+            (\_ excerpt acc ->
                 foldl
                     (\author acc2 ->
                         insert

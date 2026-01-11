@@ -132,10 +132,9 @@ makeDicts =
                         pair =
                             (if right 1 titleAuthor == ")" then
                                 Regex.find titleAuthorRx titleAuthor
-                                    |> map .submatches
                                     |> head
+                                    |> Maybe.map (.submatches >> map (withDefault ""))
                                     |> withDefault []
-                                    |> map (withDefault "")
 
                              else
                                 split "-" titleAuthor

@@ -197,7 +197,7 @@ createModel mStoredModel supportIssues ( version, mailingListUrl, mailingListFie
     , tags = tags
     , tagCounts = getTagCounts books
     , tagSort = TagAlphaSort
-    , showTagHeader = length tags > 0
+    , showTagHeader = not (isEmpty tags)
     , titleRouteMap = titleRouteMap
     , authorRouteMap = getAuthorRouteMap restored.books
     , excerptCountMap = exCount
@@ -628,7 +628,7 @@ update message model =
             ( model
             , generate
                 GotRandomIndex
-                (Random.int 0 ((model.excerpts |> values |> length) - 1))
+                (Random.int 0 ((model.excerpts |> Dict.size) - 1))
             )
 
         GotRandomIndex n ->
@@ -1097,8 +1097,8 @@ update message model =
                         model.hiddenExcerpts
                         |> toList
                         |> filterMap (\id -> get id model.excerpts)
-                        |> map (\excerpt -> ( excerpt.id, excerpt.text ))
                         |> take embeddingBatchSize
+                        |> map (\excerpt -> ( excerpt.id, excerpt.text ))
             in
             if isEmpty nextBatch then
                 ( model
@@ -1764,7 +1764,7 @@ update message model =
                         not <|
                             foldl
                                 (\( k, v ) acc ->
-                                    acc || (k == lensKey && v /= [])
+                                    acc || (k == lensKey && not (isEmpty v))
                                 )
                                 False
                                 excerpt.lenses
@@ -1904,7 +1904,7 @@ update message model =
             )
 
         StartDemo ->
-            if model.supportIssues == [] then
+            if isEmpty model.supportIssues then
                 ( { model | demoMode = True }
                 , Http.get
                     { url = demoJsonPath, expect = Http.expectString GotDemoData }

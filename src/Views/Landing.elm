@@ -32,7 +32,7 @@ import Html.Attributes
         , target
         )
 import Html.Events exposing (onClick)
-import List exposing (drop, length, map, range, reverse, take)
+import List exposing (drop, isEmpty, length, map, range, reverse, take)
 import Msg exposing (Msg(..))
 import Types exposing (Book, CountMap)
 import Utils exposing (appName, getCount)
@@ -67,7 +67,7 @@ landingView bookList countMap didSubmitEmail =
         [ class "landing" ]
         [ div
             [ class "anim", attribute "aria-hidden" "true" ]
-            (if bookList == [] then
+            (if isEmpty bookList then
                 []
 
              else
