@@ -439,7 +439,7 @@ dateParser =
                                     succeed (Loop ( nums, s :: words ))
                             )
                     )
-                , chompIf (always True) |> map (\_ -> Loop ( nums, words ))
+                , chompIf (always True) |> map (always (Loop ( nums, words )))
                 , succeed (Done ( reverse nums, reverse words ))
                 ]
         )
@@ -448,7 +448,7 @@ dateParser =
                 let
                     yearMatch =
                         nums
-                            |> indexedMap (\i n -> ( i, n ))
+                            |> indexedMap Tuple.pair
                             |> filter (\( _, n ) -> n > 1900)
                             |> head
 
@@ -461,7 +461,7 @@ dateParser =
                                 )
 
                             Nothing ->
-                                ( 2023, [], nums )
+                                ( 2026, [], nums )
 
                     monthFromWords =
                         filterMap monthToEnum words |> head
