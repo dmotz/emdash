@@ -1,6 +1,6 @@
-[![Emdash](https://emdash.ai/images/embed.png?)](https://emdash.ai)
+[![Emdash](https://emdash.oxism.com/images/embed.png)](https://emdash.oxism.com)
 
-# [Emdash](https://emdash.ai)
+# [Emdash](https://emdash.oxism.com)
 
 > Emdash uses AI to organize text snippets so you can actually remember & learn
 > from what you read.
